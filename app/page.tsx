@@ -183,21 +183,21 @@ export default function HomePage() {
   return (
     <div className="min-h-screen regia-bg-main overflow-x-hidden">
       {/* HERO SECTION - Estilo Flyer Cuernavaca */}
-      <section className="relative w-full flex flex-col items-center justify-end overflow-hidden bg-black" style={{ minHeight: '100vh' }}>
+      <section className="relative w-full min-h-screen flex flex-col items-center justify-end overflow-hidden bg-black">
         {/* Imagen de fondo con silueta dramática */}
         {featuredEvent && (
-          <div className="absolute inset-0 z-0 flex items-center justify-center">
-            <Image
-              src={featuredEvent.image}
-              alt={featuredEvent.artist}
-              fill
-              className="object-contain"
-              style={{ 
-                maxWidth: '870px',
-                maxHeight: '948px',
-              }}
-              priority
-            />
+          <div className="absolute inset-0 z-0">
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="relative w-full max-w-[870px] h-full">
+                <Image
+                  src={featuredEvent.image}
+                  alt={featuredEvent.artist}
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+            </div>
             {/* Overlay oscuro con gradiente - más suave para ver el poster */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/80" />
             
