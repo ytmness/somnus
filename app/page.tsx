@@ -182,23 +182,27 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen regia-bg-main overflow-x-hidden">
-      {/* HERO SECTION - Estilo Flyer Cuernavaca */}
+      {/* HERO SECTION - Estilo Flyer Cuernavaca con Video de Fondo */}
       <section className="relative w-full min-h-screen flex flex-col items-center justify-end overflow-hidden bg-black">
-        {/* Imagen de fondo con silueta dramática */}
+        {/* Video de fondo */}
         {featuredEvent && (
           <div className="absolute inset-0 z-0">
             <div className="w-full h-full flex items-center justify-center">
               <div className="relative w-full max-w-[98%] lg:max-w-[2400px] h-full">
-                <Image
-                  src={featuredEvent.image}
-                  alt={featuredEvent.artist}
-                  fill
-                  className="object-contain"
-                  priority
-                />
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-contain"
+                  poster={featuredEvent.image}
+                >
+                  <source src="/assets/hero-video.mp4" type="video/mp4" />
+                  {/* Fallback a imagen si el video no se soporta */}
+                </video>
               </div>
             </div>
-            {/* Overlay oscuro con gradiente - más suave para ver el poster */}
+            {/* Overlay oscuro con gradiente - más suave para ver el video */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/80" />
             
             {/* Efecto de neblina dorada (simulado con gradientes radiales) */}
