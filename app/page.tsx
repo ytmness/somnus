@@ -162,9 +162,9 @@ export default function HomePage() {
   const featuredEvent = concerts.length > 0 ? concerts[0] : null;
 
   return (
-    <div className="min-h-screen regia-bg-main">
+    <div className="min-h-screen regia-bg-main overflow-x-hidden">
       {/* HERO SECTION - Estilo Flyer Cuernavaca */}
-      <section className="relative min-h-[120vh] flex flex-col items-center justify-end overflow-visible">
+      <section className="relative min-h-[120vh] w-full flex flex-col items-center justify-end overflow-hidden">
         {/* Imagen de fondo con silueta dramática */}
         {featuredEvent && (
           <div className="absolute inset-0 z-0">

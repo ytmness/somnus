@@ -77,8 +77,16 @@
   * {
     @apply border-border;
   }
-  body {
+  html, body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+  
+  /* Prevenir scroll horizontal en móvil */
+  body {
+    position: relative;
+    width: 100%;
   }
 }
 

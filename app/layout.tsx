@@ -33,6 +33,12 @@ export const metadata: Metadata = {
   description: "Sistema de venta de boletos para eventos de Grupo Regia",
   keywords: ["boletos", "eventos", "conciertos", "Grupo Regia", "Rico o Muerto"],
   authors: [{ name: "Grupo Regia" }],
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
   openGraph: {
     title: "Boletera Regia - Grupo Regia",
     description: "Sistema de venta de boletos para eventos de Grupo Regia",
