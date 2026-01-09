@@ -244,11 +244,15 @@ export default function HomePage() {
               </button>
             </nav>
 
-            {/* Mouse Scroll Indicator - Centro */}
+            {/* Estrella decorativa - Centro */}
             <div className="hidden md:flex absolute left-1/2 -translate-x-1/2">
-              <div className="w-6 h-10 border-2 border-regia-gold-old rounded-full flex justify-center p-1">
-                <div className="w-1 h-3 bg-regia-gold-bright rounded-full animate-pulse"></div>
-              </div>
+              <Image 
+                src="/assets/estrella.png" 
+                alt="Estrella" 
+                width={64} 
+                height={64} 
+                className="animate-pulse opacity-90" 
+              />
             </div>
 
             {/* Navegación Derecha */}
