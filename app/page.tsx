@@ -167,15 +167,16 @@ export default function HomePage() {
       <section className="relative min-h-screen md:h-[85vh] flex items-center justify-center overflow-hidden">
         {/* Imagen de fondo con silueta dramática */}
         {featuredEvent && (
-          <div className="absolute inset-0 z-0">
-            <Image
-              src={featuredEvent.image}
-              alt={featuredEvent.artist}
-              fill
-              className="object-cover object-center"
-              priority
-              style={{ objectPosition: 'center 35%' }}
-            />
+          <div className="absolute inset-0 z-0 flex items-center justify-center">
+            <div className="relative w-full h-full md:w-[90%] md:h-[95%]">
+              <Image
+                src={featuredEvent.image}
+                alt={featuredEvent.artist}
+                fill
+                className="object-contain md:object-cover"
+                priority
+              />
+            </div>
             {/* Overlay oscuro con gradiente */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/60 to-black/90" />
             
