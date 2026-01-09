@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Calendar, MapPin, Clock, Music, Users } from "lucide-react";
+import { Calendar, MapPin, Clock, Music, Users, User, LogIn, Shield, Scan } from "lucide-react";
 import { toast } from "sonner";
 import { Cart } from "@/components/eventos/Cart";
 import { CartItem, Concert } from "@/components/eventos/types";
@@ -68,6 +68,25 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  // Cargar sesión del usuario
+  useEffect(() => {
+    const loadSession = async () => {
+      try {
+        const response = await fetch("/api/auth/session");
+        const data = await response.json();
+        if (data.success && data.data) {
+          setUser(data.data.user);
+          setUserRole(data.data.user?.role || null);
+        }
+      } catch (error) {
+        console.error("Error al cargar sesión:", error);
+      }
+    };
+    loadSession();
+  }, []);
 
   // Cargar eventos desde la base de datos
   useEffect(() => {
@@ -187,53 +206,119 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Header flotante con logos */}
+        {/* Header flotante con logos y navegación */}
         <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-8 py-6">
-          <div className="max-w-7xl mx-auto flex items-center justify-between relative">
-            {/* Logo GRUPO REGIA - Izquierda */}
-            <div className="flex-shrink-0">
-              <Image
-                src="/assets/logo-grupo-regia.png"
-                alt="Grupo Regia"
-                width={160}
-                height={90}
-                className="opacity-90"
-              />
+          <div className="max-w-7xl mx-auto">
+            {/* Fila 1: Logos, Estrellas y Rico o Muerto */}
+            <div className="flex items-center justify-between relative mb-4">
+              {/* Logo GRUPO REGIA - Izquierda */}
+              <div className="flex-shrink-0">
+                <Image
+                  src="/assets/logo-grupo-regia.png"
+                  alt="Grupo Regia"
+                  width={160}
+                  height={90}
+                  className="opacity-90 cursor-pointer"
+                  onClick={() => router.push("/")}
+                />
+              </div>
+
+              {/* Elemento decorativo central - 3 estrellas */}
+              <div className="hidden md:flex items-center gap-5 absolute left-1/2 -translate-x-1/2">
+                <Image 
+                  src="/assets/estrella.png" 
+                  alt="Estrella" 
+                  width={64} 
+                  height={64} 
+                  className="animate-pulse opacity-90" 
+                />
+                <Image 
+                  src="/assets/estrella.png" 
+                  alt="Estrella" 
+                  width={72} 
+                  height={72} 
+                  className="animate-pulse opacity-95" 
+                  style={{ animationDelay: '0.3s' }}
+                />
+                <Image 
+                  src="/assets/estrella.png" 
+                  alt="Estrella" 
+                  width={64} 
+                  height={64} 
+                  className="animate-pulse opacity-90" 
+                  style={{ animationDelay: '0.6s' }}
+                />
+              </div>
+
+              {/* Logo secundario - Derecha */}
+              <div className="flex-shrink-0 text-right">
+                <h2 className="text-regia-gold-old font-bold text-sm sm:text-base md:text-lg tracking-[0.25em] uppercase leading-tight">
+                  RICO O<br/>MUERTO
+                </h2>
+              </div>
             </div>
 
-            {/* Elemento decorativo central - 3 estrellas */}
-            <div className="hidden md:flex items-center gap-5 absolute left-1/2 -translate-x-1/2">
-              <Image 
-                src="/assets/estrella.png" 
-                alt="Estrella" 
-                width={64} 
-                height={64} 
-                className="animate-pulse opacity-90" 
-              />
-              <Image 
-                src="/assets/estrella.png" 
-                alt="Estrella" 
-                width={72} 
-                height={72} 
-                className="animate-pulse opacity-95" 
-                style={{ animationDelay: '0.3s' }}
-              />
-              <Image 
-                src="/assets/estrella.png" 
-                alt="Estrella" 
-                width={64} 
-                height={64} 
-                className="animate-pulse opacity-90" 
-                style={{ animationDelay: '0.6s' }}
-              />
-            </div>
+            {/* Fila 2: Navegación Transparente */}
+            <nav className="flex items-center justify-center gap-6 lg:gap-8">
+              {/* Eventos */}
+              <a
+                href="#eventos"
+                className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+              >
+                <Calendar className="w-4 h-4" />
+                <span className="hidden sm:inline">Eventos</span>
+              </a>
 
-            {/* Logo secundario - Derecha */}
-            <div className="flex-shrink-0 text-right">
-              <h2 className="text-regia-gold-old font-bold text-sm sm:text-base md:text-lg tracking-[0.25em] uppercase leading-tight">
-                RICO O<br/>MUERTO
-              </h2>
-            </div>
+              {/* Mis Boletos */}
+              <button
+                onClick={() => router.push("/mis-boletos")}
+                className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+              >
+                <Music className="w-4 h-4" />
+                <span className="hidden sm:inline">Mis Boletos</span>
+              </button>
+
+              {/* Admin (solo si es admin) */}
+              {userRole === "ADMIN" && (
+                <button
+                  onClick={() => router.push("/admin")}
+                  className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+                >
+                  <Shield className="w-4 h-4" />
+                  <span className="hidden sm:inline">Admin</span>
+                </button>
+              )}
+
+              {/* Accesos (solo si es operador o admin) */}
+              {(userRole === "ACCESOS" || userRole === "ADMIN") && (
+                <button
+                  onClick={() => router.push("/accesos")}
+                  className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+                >
+                  <Scan className="w-4 h-4" />
+                  <span className="hidden sm:inline">Accesos</span>
+                </button>
+              )}
+
+              {/* Login / User */}
+              {user ? (
+                <button
+                  onClick={() => router.push("/login")}
+                  className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+                >
+                  <User className="w-4 h-4" />
+                  <span className="hidden sm:inline">{user.name || user.email}</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => router.push("/login")}
+                  className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span className="hidden sm:inline">Login</span>
+                </button>
+              )}
+            </nav>
           </div>
         </header>
 
