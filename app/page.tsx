@@ -70,61 +70,51 @@ export default function HomePage() {
   const [showCart, setShowCart] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
-  const [videoPlaying, setVideoPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Forzar reproducción del video
+  // Forzar reproducción del video en móvil
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    // Función para intentar reproducir el video
+    // Intentar reproducir el video
     const attemptPlay = async () => {
       try {
-        video.load(); // Forzar carga del video
         await video.play();
-        setVideoPlaying(true);
       } catch (error) {
-        console.log("Autoplay bloqueado, esperando interacción");
+        console.log("Autoplay bloqueado, esperando interacción del usuario");
       }
     };
 
-    // Evento cuando el video puede reproducirse
+    // Intentar reproducir cuando el video esté listo
     const handleCanPlay = () => {
       attemptPlay();
     };
 
-    // Evento cuando el video empieza a reproducirse
-    const handlePlaying = () => {
-      setVideoPlaying(true);
-    };
-
     video.addEventListener('canplay', handleCanPlay);
-    video.addEventListener('playing', handlePlaying);
 
     // Intentar reproducir inmediatamente
     attemptPlay();
 
-    // Reproducir en la primera interacción con TODA la página
-    const playOnInteraction = () => {
-      if (!videoPlaying) {
-        video.play().then(() => {
-          setVideoPlaying(true);
-        }).catch(err => console.log("Error al reproducir:", err));
+    // Reproducir en la primera interacción con la página
+    const playOnInteraction = async () => {
+      try {
+        await video.play();
+      } catch (err) {
+        console.log("Error al reproducir:", err);
       }
     };
 
-    // Escuchar clicks/touches en toda la página
+    // Escuchar clicks/touches en toda la página (solo una vez)
     document.addEventListener('touchstart', playOnInteraction, { once: true, passive: true });
     document.addEventListener('click', playOnInteraction, { once: true });
 
     return () => {
       video.removeEventListener('canplay', handleCanPlay);
-      video.removeEventListener('playing', handlePlaying);
       document.removeEventListener('touchstart', playOnInteraction);
       document.removeEventListener('click', playOnInteraction);
     };
-  }, [videoPlaying]);
+  }, []);
 
   // Cargar sesión del usuario
   useEffect(() => {
@@ -242,14 +232,6 @@ export default function HomePage() {
         {/* Video de fondo */}
         {featuredEvent && (
           <div className="absolute inset-0 z-0">
-            {/* Poster de fondo que desaparece cuando el video se reproduce */}
-            {!videoPlaying && (
-              <div 
-                className="absolute inset-0 w-full h-full bg-cover bg-center"
-                style={{ backgroundImage: 'url(/assets/flyerfinal-10-1-25.jpg)' }}
-              />
-            )}
-            
             <video
               ref={videoRef}
               autoPlay
@@ -257,6 +239,7 @@ export default function HomePage() {
               muted
               playsInline
               preload="auto"
+              poster="/assets/flyerfinal-10-1-25.jpg"
               className="w-full h-full object-cover"
               webkit-playsinline="true"
               x5-playsinline="true"
