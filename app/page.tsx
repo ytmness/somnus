@@ -247,7 +247,6 @@ export default function HomePage() {
               muted
               playsInline
               preload="auto"
-              poster="/assets/flyerfinal-10-1-25.jpg"
               className="hidden lg:block w-full h-full object-cover hero-video-no-controls"
               webkit-playsinline="true"
               x5-playsinline="true"
