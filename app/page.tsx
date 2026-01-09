@@ -126,7 +126,7 @@ export default function HomePage() {
             paused: video.paused
           });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("❌ [DEBUG] Video play FAILED", {
           error: String(error),
           errorName: error?.name,
