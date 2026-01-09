@@ -358,6 +358,17 @@ export default function HomePage() {
                   </div>
                 )}
               </div>
+
+              {/* Scroll indicator - Estrella centrada respecto al contenido */}
+              <div className="mt-12 md:mt-16 flex justify-center animate-bounce">
+                <Image 
+                  src="/assets/estrella.png" 
+                  alt="Scroll" 
+                  width={48} 
+                  height={48} 
+                  className="opacity-90" 
+                />
+              </div>
             </>
           ) : (
             <div className="text-center">
@@ -369,17 +380,6 @@ export default function HomePage() {
               </p>
             </div>
           )}
-        </div>
-
-        {/* Scroll indicator - Estrella con más separación */}
-        <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce">
-          <Image 
-            src="/assets/estrella.png" 
-            alt="Scroll" 
-            width={48} 
-            height={48} 
-            className="opacity-90" 
-          />
         </div>
       </section>
 
