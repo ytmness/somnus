@@ -187,21 +187,16 @@ export default function HomePage() {
         {/* Video de fondo */}
         {featuredEvent && (
           <div className="absolute inset-0 z-0">
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="relative w-full max-w-[98%] lg:max-w-[2400px] h-full">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-contain"
-                  poster={featuredEvent.image}
-                >
-                  <source src="/assets/hero-video.mp4" type="video/mp4" />
-                  {/* Fallback a imagen si el video no se soporta */}
-                </video>
-              </div>
-            </div>
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              className="w-full h-full object-cover"
+            >
+              <source src="/assets/hero-video.mp4" type="video/mp4" />
+            </video>
             {/* Overlay oscuro con gradiente - más suave para ver el video */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/80" />
             
@@ -215,22 +210,22 @@ export default function HomePage() {
         )}
 
         {/* Header flotante con logos y navegación integrada */}
-        <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-8 py-6">
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-            {/* Logo GRUPO REGIA - Izquierda */}
+        <header className="absolute top-0 left-0 right-0 z-30 px-8 sm:px-12 lg:px-16 py-6">
+          <div className="w-full flex items-center justify-between">
+            {/* Logo GRUPO REGIA - Extremo Izquierdo */}
             <div className="flex-shrink-0">
               <Image
                 src="/assets/logo-grupo-regia.png"
                 alt="Grupo Regia"
-                width={140}
-                height={80}
+                width={120}
+                height={70}
                 className="opacity-90 cursor-pointer"
                 onClick={() => router.push("/")}
               />
             </div>
 
-            {/* Navegación Izquierda */}
-            <nav className="hidden lg:flex items-center gap-4">
+            {/* Navegación Izquierda con espacio */}
+            <nav className="hidden lg:flex items-center gap-8 ml-12">
               <a
                 href="#eventos"
                 className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
@@ -248,19 +243,19 @@ export default function HomePage() {
               </button>
             </nav>
 
-            {/* Estrella decorativa - Centro */}
+            {/* Estrella decorativa - Centro Absoluto */}
             <div className="hidden md:flex absolute left-1/2 -translate-x-1/2">
               <Image 
                 src="/assets/estrella.png" 
                 alt="Estrella" 
-                width={64} 
-                height={64} 
+                width={60} 
+                height={60} 
                 className="animate-pulse opacity-90" 
               />
             </div>
 
-            {/* Navegación Derecha */}
-            <nav className="hidden lg:flex items-center gap-4">
+            {/* Navegación Derecha con espacio */}
+            <nav className="hidden lg:flex items-center gap-8 mr-12">
               {userRole === "ADMIN" && (
                 <button
                   onClick={() => router.push("/admin")}
@@ -300,9 +295,9 @@ export default function HomePage() {
               )}
             </nav>
 
-            {/* Logo secundario - Derecha */}
+            {/* Logo RICO O MUERTO - Extremo Derecho */}
             <div className="flex-shrink-0 text-right">
-              <h2 className="text-regia-gold-old font-bold text-sm sm:text-base md:text-lg tracking-[0.25em] uppercase leading-tight">
+              <h2 className="text-regia-gold-old font-bold text-xs sm:text-sm tracking-[0.3em] uppercase leading-tight">
                 RICO O<br/>MUERTO
               </h2>
             </div>
