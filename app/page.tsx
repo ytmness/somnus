@@ -242,17 +242,6 @@ export default function HomePage() {
               <span>Mis Boletos</span>
             </button>
 
-            {/* Estrella en el flujo normal */}
-            <div className="flex items-center">
-              <Image 
-                src="/assets/estrella.png" 
-                alt="Estrella" 
-                width={56} 
-                height={56} 
-                className="animate-pulse opacity-90" 
-              />
-            </div>
-
             {/* Admin - solo si tiene rol */}
             {userRole === "ADMIN" && (
               <button
@@ -382,11 +371,15 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* Scroll indicator */}
+        {/* Scroll indicator - Estrella */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce">
-          <div className="w-6 h-10 border-2 border-regia-gold-old rounded-full flex justify-center p-1">
-            <div className="w-1 h-3 bg-regia-gold-bright rounded-full animate-pulse" />
-          </div>
+          <Image 
+            src="/assets/estrella.png" 
+            alt="Scroll" 
+            width={48} 
+            height={48} 
+            className="opacity-90" 
+          />
         </div>
       </section>
 
