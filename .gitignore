@@ -104,6 +104,9 @@ IMPLEMENTACION_*.md
 ACTUALIZACION_*.md
 INICIO_RAPIDO_*.md
 
+# Carpeta de actualización visual (solo documentación/ejemplos)
+/actualizacionvisual/
+
 # Imágenes temporales/de trabajo
 *.png.old
 *_old.png
