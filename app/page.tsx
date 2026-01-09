@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Calendar, MapPin, Clock, Music, Users, User, LogIn, Shield, Scan } from "lucide-react";
@@ -70,6 +70,31 @@ export default function HomePage() {
   const [showCart, setShowCart] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Forzar reproducción del video en móvil
+  useEffect(() => {
+    const playVideo = async () => {
+      if (videoRef.current) {
+        try {
+          await videoRef.current.play();
+        } catch (error) {
+          console.log("Autoplay bloqueado, se requiere interacción del usuario");
+          // Intentar reproducir después del primer touch/click
+          const playOnInteraction = () => {
+            videoRef.current?.play();
+            document.removeEventListener('touchstart', playOnInteraction);
+            document.removeEventListener('click', playOnInteraction);
+          };
+          document.addEventListener('touchstart', playOnInteraction, { once: true });
+          document.addEventListener('click', playOnInteraction, { once: true });
+        }
+      }
+    };
+    
+    // Esperar un momento para que el DOM esté listo
+    setTimeout(playVideo, 100);
+  }, []);
 
   // Cargar sesión del usuario
   useEffect(() => {
@@ -188,11 +213,13 @@ export default function HomePage() {
         {featuredEvent && (
           <div className="absolute inset-0 z-0">
             <video
+              ref={videoRef}
               autoPlay
               loop
               muted
               playsInline
-              preload="auto"
+              preload="metadata"
+              poster="/assets/flyerfinal-10-1-25.jpg"
               className="w-full h-full object-cover"
               webkit-playsinline="true"
               x5-playsinline="true"
@@ -215,7 +242,25 @@ export default function HomePage() {
         )}
 
         {/* Header flotante con logos y navegación integrada */}
-        <header className="absolute top-0 left-0 right-0 z-30 px-6 sm:px-8 lg:px-12 py-6">
+        <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-6">
+          {/* Versión móvil - Logos simplificados */}
+          <div className="w-full flex lg:hidden items-center justify-between">
+            <Image
+              src="/assets/logo-grupo-regia.png"
+              alt="Grupo Regia"
+              width={80}
+              height={48}
+              className="opacity-90"
+            />
+            <button
+              onClick={() => router.push("/login")}
+              className="text-regia-gold-old hover:text-regia-gold-bright transition-colors"
+            >
+              <LogIn className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Versión desktop - Navegación completa */}
           <div className="w-full hidden lg:flex items-center justify-between">
             {/* Logo GRUPO REGIA */}
             <div className="flex-shrink-0">
