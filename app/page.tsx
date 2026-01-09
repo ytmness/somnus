@@ -72,47 +72,20 @@ export default function HomePage() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Reproducción automática para desktop (móvil usa imagen estática)
+  // Asegurar reproducción automática inmediata
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    // Asegurar que esté silenciado (requerido para autoplay)
+    // Solo asegurar que esté silenciado (el autoPlay nativo se encarga del resto)
     video.muted = true;
     video.volume = 0;
     video.defaultMuted = true;
     
-    // Flag para evitar múltiples llamadas simultáneas
-    let isPlaying = false;
-    
-    const attemptPlay = async () => {
-      if (isPlaying) return;
-      isPlaying = true;
-      
-      try {
-        video.muted = true;
-        video.volume = 0;
-        await video.play();
-        console.log("✅ Video reproduciéndose automáticamente");
-        return true;
-      } catch (error) {
-        console.log("⏸️ Autoplay bloqueado:", error);
-        isPlaying = false;
-        return false;
-      }
-    };
-
-    // Solo usar el evento más confiable
-    const handleCanPlay = () => {
-      console.log("▶️ Video listo para reproducir");
-      attemptPlay();
-    };
-
-    video.addEventListener('canplay', handleCanPlay);
-    
-    return () => {
-      video.removeEventListener('canplay', handleCanPlay);
-    };
+    // Intentar reproducir inmediatamente si el video ya tiene datos
+    if (video.readyState >= 2) {
+      video.play().catch(() => {});
+    }
   }, []);
 
   // Cargar sesión del usuario
@@ -238,7 +211,7 @@ export default function HomePage() {
               loop
               muted
               playsInline
-              preload="metadata"
+              preload="auto"
               poster="/assets/flyerfinal-10-1-25.jpg"
               className="hidden lg:block w-full h-full object-cover hero-video-no-controls"
               webkit-playsinline="true"
