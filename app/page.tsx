@@ -435,7 +435,7 @@ export default function HomePage() {
         </header>
 
         {/* Contenido principal - flujo vertical normal */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-6xl flex flex-col items-center justify-center px-4 pt-24" style={{ transform: 'translate(-48%, -50%)' }}>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-6xl flex flex-col items-center justify-center px-4 pt-24">
           {featuredEvent ? (
             <>
               {/* Nombre del evento - Victor Mendivil (MÁS GRANDE) */}
@@ -453,67 +453,70 @@ export default function HomePage() {
                 />
               </div>
 
-              {/* Fecha - 28 de marzo */}
-              <div className="w-full flex justify-center mb-8">
-                <Image
-                  src="/assets/fecha-evento.png"
-                  alt="28 de marzo de 2026"
-                  width={1689}
-                  height={202}
-                  className="w-full max-w-lg h-auto"
-                  style={{ 
-                    filter: 'drop-shadow(0 0 15px rgba(244, 208, 63, 0.5))'
-                  }}
-                  priority
-                />
-              </div>
-
-              {/* Botón CTA - Comprar Boletos */}
-              <div className="mb-4">
-                <button
-                  onClick={() => handleSelectConcert(featuredEvent)}
-                  className="group relative inline-flex items-center gap-3 px-10 py-4 text-base md:text-lg font-bold uppercase tracking-widest overflow-hidden transition-all duration-300 hover:-translate-y-1"
-                  style={{
-                    background: 'linear-gradient(135deg, #C5A059 0%, #F4D03F 100%)',
-                    color: '#0A0A0A',
-                    borderRadius: '50px',
-                    boxShadow: '0 8px 32px rgba(244, 208, 63, 0.4)',
-                  }}
-                >
-                  Comprar Boletos
-                </button>
-              </div>
-
-              {/* Info adicional */}
-              <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6 mb-4">
-                <div className="flex items-center gap-2 text-regia-cream/80 text-sm">
-                  <MapPin className="w-4 h-4 text-regia-gold-old" />
-                  <span>{featuredEvent.venue}</span>
+              {/* Contenedor para fecha, botón, info y estrella - desplazado a la derecha */}
+              <div className="w-full flex flex-col items-center" style={{ paddingLeft: '5%' }}>
+                {/* Fecha - 28 de marzo */}
+                <div className="w-full flex justify-center mb-8">
+                  <Image
+                    src="/assets/fecha-evento.png"
+                    alt="28 de marzo de 2026"
+                    width={1689}
+                    height={202}
+                    className="w-full max-w-lg h-auto"
+                    style={{ 
+                      filter: 'drop-shadow(0 0 15px rgba(244, 208, 63, 0.5))'
+                    }}
+                    priority
+                  />
                 </div>
-                {featuredEvent.time && (
-                  <div className="flex items-center gap-2 text-regia-cream/80 text-sm">
-                    <Clock className="w-4 h-4 text-regia-gold-old" />
-                    <span>{featuredEvent.time}</span>
-                  </div>
-                )}
-              </div>
 
-              {/* Scroll indicator - Estrella */}
-              <div className="mt-4 animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300">
-                <Image 
-                  src="/assets/estrella.png" 
-                  alt="Scroll" 
-                  width={60} 
-                  height={60} 
-                  className="opacity-90"
-                  style={{ 
-                    filter: 'drop-shadow(0 0 10px rgba(244, 208, 63, 0.4))'
-                  }}
-                  onClick={() => {
-                    const nextSection = document.getElementById('info-evento');
-                    nextSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }}
-                />
+                {/* Botón CTA - Comprar Boletos */}
+                <div className="mb-4">
+                  <button
+                    onClick={() => handleSelectConcert(featuredEvent)}
+                    className="group relative inline-flex items-center gap-3 px-10 py-4 text-base md:text-lg font-bold uppercase tracking-widest overflow-hidden transition-all duration-300 hover:-translate-y-1"
+                    style={{
+                      background: 'linear-gradient(135deg, #C5A059 0%, #F4D03F 100%)',
+                      color: '#0A0A0A',
+                      borderRadius: '50px',
+                      boxShadow: '0 8px 32px rgba(244, 208, 63, 0.4)',
+                    }}
+                  >
+                    Comprar Boletos
+                  </button>
+                </div>
+
+                {/* Info adicional */}
+                <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6 mb-4">
+                  <div className="flex items-center gap-2 text-regia-cream/80 text-sm">
+                    <MapPin className="w-4 h-4 text-regia-gold-old" />
+                    <span>{featuredEvent.venue}</span>
+                  </div>
+                  {featuredEvent.time && (
+                    <div className="flex items-center gap-2 text-regia-cream/80 text-sm">
+                      <Clock className="w-4 h-4 text-regia-gold-old" />
+                      <span>{featuredEvent.time}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Scroll indicator - Estrella */}
+                <div className="mt-4 animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300">
+                  <Image 
+                    src="/assets/estrella.png" 
+                    alt="Scroll" 
+                    width={60} 
+                    height={60} 
+                    className="opacity-90"
+                    style={{ 
+                      filter: 'drop-shadow(0 0 10px rgba(244, 208, 63, 0.4))'
+                    }}
+                    onClick={() => {
+                      const nextSection = document.getElementById('info-evento');
+                      nextSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                  />
+                </div>
               </div>
             </>
           ) : (
