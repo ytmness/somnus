@@ -422,10 +422,14 @@ export default function HomePage() {
             )}
 
             {/* Logo RICO O MUERTO */}
-            <div className="flex-shrink-0 text-right">
-              <h2 className="text-regia-gold-old font-bold text-xs tracking-[0.3em] uppercase leading-tight">
-                RICO O<br/>MUERTO
-              </h2>
+            <div className="flex-shrink-0">
+              <Image
+                src="/assets/rico-muerto-logo.png"
+                alt="Rico o Muerto"
+                width={100}
+                height={50}
+                className="opacity-90 hover:opacity-100 transition-opacity"
+              />
             </div>
           </div>
         </header>
@@ -434,21 +438,17 @@ export default function HomePage() {
         <div className="absolute bottom-32 md:bottom-40 left-1/2 -translate-x-1/2 z-20 w-full max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
           {featuredEvent ? (
             <>
-              {/* Nombre del evento - Tipografía gótica/vintage */}
-              <h1 
-                className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase mb-4 md:mb-6"
-                style={{
-                  background: 'linear-gradient(135deg, #F4D03F 0%, #C5A059 50%, #8B7355 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  textShadow: '0 0 80px rgba(244, 208, 63, 0.3)',
-                  letterSpacing: '0.05em',
-                  lineHeight: '0.9',
-                }}
-              >
-                {featuredEvent.artist}
-              </h1>
+              {/* Nombre del evento - Imagen del artista */}
+              <div className="mb-4 md:mb-6 flex justify-center">
+                <Image
+                  src="/assets/victor-mendivil-title.png"
+                  alt={featuredEvent.artist}
+                  width={800}
+                  height={200}
+                  className="w-full max-w-4xl h-auto"
+                  priority
+                />
+              </div>
 
               {/* Fecha - Tipografía elegante */}
               <p className="text-xl sm:text-2xl md:text-3xl font-bold text-regia-gold-old mb-6 md:mb-8 tracking-[0.2em] uppercase">
