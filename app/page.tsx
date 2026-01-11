@@ -434,36 +434,42 @@ export default function HomePage() {
           </div>
         </header>
 
-        {/* Contenido principal - capas superpuestas */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full h-full flex items-center justify-center">
+        {/* Contenido principal - flujo vertical normal */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-5xl flex flex-col items-center justify-center px-4">
           {featuredEvent ? (
-            <div className="relative w-full h-[700px] flex items-center justify-center">
-              {/* Nombre del evento - MÁS ARRIBA (DESTACADO) */}
-              <div className="absolute top-[8%] left-1/2 -translate-x-1/2 w-full max-w-6xl px-4">
+            <>
+              {/* Nombre del evento - Victor Mendivil */}
+              <div className="w-full max-w-4xl mb-2">
                 <Image
                   src="/assets/victor-mendivil-title.png"
                   alt={featuredEvent.artist}
-                  width={1400}
-                  height={300}
+                  width={1200}
+                  height={250}
                   className="w-full h-auto"
+                  style={{ 
+                    filter: 'drop-shadow(0 0 20px rgba(244, 208, 63, 0.6))'
+                  }}
                   priority
                 />
               </div>
 
-              {/* Fecha - MISMO LUGAR PERO MÁS PEQUEÑA (SECUNDARIA) */}
-              <div className="absolute top-[42%] left-1/2 -translate-x-1/2 w-full max-w-2xl px-4">
+              {/* Fecha - 28 de marzo */}
+              <div className="w-full max-w-lg mb-6">
                 <Image
                   src="/assets/fecha-evento.png"
                   alt="28 de marzo de 2026"
-                  width={700}
-                  height={90}
+                  width={500}
+                  height={60}
                   className="w-full h-auto"
+                  style={{ 
+                    filter: 'drop-shadow(0 0 15px rgba(244, 208, 63, 0.5))'
+                  }}
                   priority
                 />
               </div>
 
-              {/* Botón CTA - MÁS ABAJO */}
-              <div className="absolute top-[65%] left-1/2 -translate-x-1/2">
+              {/* Botón CTA - Comprar Boletos */}
+              <div className="mb-4">
                 <button
                   onClick={() => handleSelectConcert(featuredEvent)}
                   className="group relative inline-flex items-center gap-3 px-10 py-4 text-base md:text-lg font-bold uppercase tracking-widest overflow-hidden transition-all duration-300 hover:-translate-y-1"
@@ -478,8 +484,8 @@ export default function HomePage() {
                 </button>
               </div>
 
-              {/* Info adicional - MÁS ABAJO */}
-              <div className="absolute top-[75%] left-1/2 -translate-x-1/2 flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6">
+              {/* Info adicional */}
+              <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6 mb-4">
                 <div className="flex items-center gap-2 text-regia-cream/80 text-sm">
                   <MapPin className="w-4 h-4 text-regia-gold-old" />
                   <span>{featuredEvent.venue}</span>
@@ -492,21 +498,24 @@ export default function HomePage() {
                 )}
               </div>
 
-              {/* Scroll indicator - Estrella AL FONDO */}
-              <div className="absolute top-[88%] left-1/2 -translate-x-1/2 animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300">
+              {/* Scroll indicator - Estrella */}
+              <div className="mt-4 animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300">
                 <Image 
                   src="/assets/estrella.png" 
                   alt="Scroll" 
-                  width={80} 
-                  height={80} 
-                  className="opacity-90" 
+                  width={60} 
+                  height={60} 
+                  className="opacity-90"
+                  style={{ 
+                    filter: 'drop-shadow(0 0 10px rgba(244, 208, 63, 0.4))'
+                  }}
                   onClick={() => {
                     const nextSection = document.getElementById('info-evento');
                     nextSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }}
                 />
               </div>
-            </div>
+            </>
           ) : (
             <div className="text-center">
               <h1 className="text-6xl mb-6 font-black text-regia-gold-bright">
