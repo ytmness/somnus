@@ -435,7 +435,7 @@ export default function HomePage() {
         </header>
 
         {/* Contenido principal - flujo vertical normal */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-6xl flex flex-col items-center justify-center px-4 pt-16">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-6xl flex flex-col items-center justify-center px-4 pt-24">
           {featuredEvent ? (
             <>
               {/* Nombre del evento - Victor Mendivil (MÁS GRANDE) */}
@@ -453,8 +453,8 @@ export default function HomePage() {
                 />
               </div>
 
-              {/* Fecha - 28 de marzo */}
-              <div className="w-full flex justify-center mb-8">
+              {/* Fecha - 28 de marzo (DESPLAZADA A LA DERECHA) */}
+              <div className="w-full flex justify-center mb-8 ml-auto mr-0 pr-4 md:pr-20">
                 <Image
                   src="/assets/fecha-evento.png"
                   alt="28 de marzo de 2026"
@@ -468,8 +468,8 @@ export default function HomePage() {
                 />
               </div>
 
-              {/* Botón CTA - Comprar Boletos */}
-              <div className="mb-4">
+              {/* Botón CTA - Comprar Boletos (DESPLAZADO A LA DERECHA) */}
+              <div className="mb-4 self-center md:self-end md:mr-20">
                 <button
                   onClick={() => handleSelectConcert(featuredEvent)}
                   className="group relative inline-flex items-center gap-3 px-10 py-4 text-base md:text-lg font-bold uppercase tracking-widest overflow-hidden transition-all duration-300 hover:-translate-y-1"
@@ -498,8 +498,8 @@ export default function HomePage() {
                 )}
               </div>
 
-              {/* Scroll indicator - Estrella */}
-              <div className="mt-4 animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300">
+              {/* Scroll indicator - Estrella (DESPLAZADA A LA DERECHA) */}
+              <div className="mt-4 animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300 self-center md:self-end md:mr-20">
                 <Image 
                   src="/assets/estrella.png" 
                   alt="Scroll" 
