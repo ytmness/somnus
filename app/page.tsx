@@ -434,50 +434,52 @@ export default function HomePage() {
           </div>
         </header>
 
-        {/* Contenido principal - centrado vertical */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+        {/* Contenido principal - capas superpuestas */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full h-full flex items-center justify-center">
           {featuredEvent ? (
-            <>
-              {/* Nombre del evento - Imagen del artista (DESTACADO) */}
-              <div className="mb-8 flex justify-center">
+            <div className="relative w-full h-[600px] flex items-center justify-center">
+              {/* Nombre del evento - Capa superior (DESTACADO) */}
+              <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-full max-w-6xl px-4">
                 <Image
                   src="/assets/victor-mendivil-title.png"
                   alt={featuredEvent.artist}
                   width={1400}
                   height={300}
-                  className="w-full max-w-5xl h-auto"
+                  className="w-full h-auto"
                   priority
                 />
               </div>
 
-              {/* Fecha - Imagen (SECUNDARIA) */}
-              <div className="mb-10 flex justify-center">
+              {/* Fecha - Capa inferior, más cerca (SECUNDARIA) */}
+              <div className="absolute top-[48%] left-1/2 -translate-x-1/2 w-full max-w-3xl px-4">
                 <Image
                   src="/assets/fecha-evento.png"
                   alt="28 de marzo de 2026"
-                  width={800}
+                  width={900}
                   height={120}
-                  className="w-full max-w-2xl h-auto"
+                  className="w-full h-auto"
                   priority
                 />
               </div>
 
-              {/* Botón CTA principal */}
-              <button
-                onClick={() => handleSelectConcert(featuredEvent)}
-                className="group relative inline-flex items-center gap-3 px-10 py-4 text-base md:text-lg font-bold uppercase tracking-widest overflow-hidden transition-all duration-300 hover:-translate-y-1"
-                style={{
-                  background: 'linear-gradient(135deg, #C5A059 0%, #F4D03F 100%)',
-                  color: '#0A0A0A',
-                  borderRadius: '50px',
-                  boxShadow: '0 8px 32px rgba(244, 208, 63, 0.4)',
-                }}
-              >
-                Comprar Boletos
-              </button>
+              {/* Botón CTA - Capa más abajo */}
+              <div className="absolute top-[68%] left-1/2 -translate-x-1/2">
+                <button
+                  onClick={() => handleSelectConcert(featuredEvent)}
+                  className="group relative inline-flex items-center gap-3 px-10 py-4 text-base md:text-lg font-bold uppercase tracking-widest overflow-hidden transition-all duration-300 hover:-translate-y-1"
+                  style={{
+                    background: 'linear-gradient(135deg, #C5A059 0%, #F4D03F 100%)',
+                    color: '#0A0A0A',
+                    borderRadius: '50px',
+                    boxShadow: '0 8px 32px rgba(244, 208, 63, 0.4)',
+                  }}
+                >
+                  Comprar Boletos
+                </button>
+              </div>
 
-              {/* Info adicional debajo del botón */}
-              <div className="mt-6 md:mt-8 flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6">
+              {/* Info adicional - Capa inferior */}
+              <div className="absolute top-[80%] left-1/2 -translate-x-1/2 flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6">
                 <div className="flex items-center gap-2 text-regia-cream/80 text-sm">
                   <MapPin className="w-4 h-4 text-regia-gold-old" />
                   <span>{featuredEvent.venue}</span>
@@ -490,13 +492,13 @@ export default function HomePage() {
                 )}
               </div>
 
-              {/* Scroll indicator - Estrella centrada respecto al contenido */}
+              {/* Scroll indicator - Estrella */}
               <button
                 onClick={() => {
                   const nextSection = document.getElementById('info-evento');
                   nextSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}
-                className="mt-12 md:mt-16 mx-auto flex justify-center animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300"
+                className="absolute bottom-[-20%] left-1/2 -translate-x-1/2 animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300"
                 aria-label="Scroll hacia abajo"
               >
                 <Image 
@@ -507,7 +509,7 @@ export default function HomePage() {
                   className="opacity-90" 
                 />
               </button>
-            </>
+            </div>
           ) : (
             <div className="text-center">
               <h1 className="text-6xl mb-6 font-black text-regia-gold-bright">
