@@ -439,21 +439,28 @@ export default function HomePage() {
           {featuredEvent ? (
             <>
               {/* Nombre del evento - Imagen del artista */}
-              <div className="mb-4 md:mb-6 flex justify-center">
+              <div className="mb-6 md:mb-8 flex justify-center">
                 <Image
                   src="/assets/victor-mendivil-title.png"
                   alt={featuredEvent.artist}
-                  width={800}
-                  height={200}
-                  className="w-full max-w-4xl h-auto"
+                  width={700}
+                  height={150}
+                  className="w-full max-w-2xl h-auto"
                   priority
                 />
               </div>
 
-              {/* Fecha - Tipografía elegante */}
-              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-regia-gold-old mb-6 md:mb-8 tracking-[0.2em] uppercase">
-                {featuredEvent.date}
-              </p>
+              {/* Fecha - Imagen */}
+              <div className="mb-6 md:mb-8 flex justify-center">
+                <Image
+                  src="/assets/fecha-evento.png"
+                  alt="28 de marzo de 2026"
+                  width={600}
+                  height={80}
+                  className="w-full max-w-xl h-auto"
+                  priority
+                />
+              </div>
 
               {/* Botón CTA principal */}
               <button
