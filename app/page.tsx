@@ -438,8 +438,8 @@ export default function HomePage() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full h-full flex items-center justify-center">
           {featuredEvent ? (
             <div className="relative w-full h-[700px] flex items-center justify-center">
-              {/* Nombre del evento - ARRIBA (DESTACADO) */}
-              <div className="absolute top-[15%] left-1/2 -translate-x-1/2 w-full max-w-6xl px-4">
+              {/* Nombre del evento - MÁS ARRIBA (DESTACADO) */}
+              <div className="absolute top-[8%] left-1/2 -translate-x-1/2 w-full max-w-6xl px-4">
                 <Image
                   src="/assets/victor-mendivil-title.png"
                   alt={featuredEvent.artist}
@@ -450,20 +450,20 @@ export default function HomePage() {
                 />
               </div>
 
-              {/* Fecha - EN MEDIO (SECUNDARIA) */}
-              <div className="absolute top-[42%] left-1/2 -translate-x-1/2 w-full max-w-3xl px-4">
+              {/* Fecha - MISMO LUGAR PERO MÁS PEQUEÑA (SECUNDARIA) */}
+              <div className="absolute top-[42%] left-1/2 -translate-x-1/2 w-full max-w-2xl px-4">
                 <Image
                   src="/assets/fecha-evento.png"
                   alt="28 de marzo de 2026"
-                  width={900}
-                  height={120}
+                  width={700}
+                  height={90}
                   className="w-full h-auto"
                   priority
                 />
               </div>
 
-              {/* Botón CTA - ABAJO DEL CENTRO */}
-              <div className="absolute top-[58%] left-1/2 -translate-x-1/2">
+              {/* Botón CTA - MÁS ABAJO */}
+              <div className="absolute top-[65%] left-1/2 -translate-x-1/2">
                 <button
                   onClick={() => handleSelectConcert(featuredEvent)}
                   className="group relative inline-flex items-center gap-3 px-10 py-4 text-base md:text-lg font-bold uppercase tracking-widest overflow-hidden transition-all duration-300 hover:-translate-y-1"
@@ -479,7 +479,7 @@ export default function HomePage() {
               </div>
 
               {/* Info adicional - MÁS ABAJO */}
-              <div className="absolute top-[68%] left-1/2 -translate-x-1/2 flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6">
+              <div className="absolute top-[75%] left-1/2 -translate-x-1/2 flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6">
                 <div className="flex items-center gap-2 text-regia-cream/80 text-sm">
                   <MapPin className="w-4 h-4 text-regia-gold-old" />
                   <span>{featuredEvent.venue}</span>
@@ -493,22 +493,19 @@ export default function HomePage() {
               </div>
 
               {/* Scroll indicator - Estrella AL FONDO */}
-              <button
-                onClick={() => {
-                  const nextSection = document.getElementById('info-evento');
-                  nextSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }}
-                className="absolute top-[85%] left-1/2 -translate-x-1/2 animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300"
-                aria-label="Scroll hacia abajo"
-              >
+              <div className="absolute top-[88%] left-1/2 -translate-x-1/2 animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300">
                 <Image 
                   src="/assets/estrella.png" 
                   alt="Scroll" 
-                  width={96} 
-                  height={96} 
+                  width={80} 
+                  height={80} 
                   className="opacity-90" 
+                  onClick={() => {
+                    const nextSection = document.getElementById('info-evento');
+                    nextSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
                 />
-              </button>
+              </div>
             </div>
           ) : (
             <div className="text-center">
