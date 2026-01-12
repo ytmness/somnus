@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { IndividualTablesMap } from "@/components/eventos/IndividualTablesMap";
-import { IndividualTable, VIP_TABLES, NON_VIP_SECTIONS } from "@/lib/patriotas-individual-tables";
+import { PatriotasTablesMap } from "@/components/eventos/PatriotasTablesMap";
+import { IndividualTable, VIP_TABLES_162, NON_VIP_SECTIONS_162 } from "@/lib/patriotas-tables-162";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Trash2, ArrowLeft, MapPin, Users, CreditCard, Ticket, Info, X } from "lucide-react";
 import { toast } from "sonner";
@@ -33,8 +33,8 @@ export default function EventMesasPage() {
   const eventId = params.id as string;
 
   const [event, setEvent] = useState<any>(null);
-  const [tables, setTables] = useState<IndividualTable[]>(VIP_TABLES);
-  const [sections, setSections] = useState<Section[]>(NON_VIP_SECTIONS);
+  const [tables, setTables] = useState<IndividualTable[]>(VIP_TABLES_162);
+  const [sections, setSections] = useState<Section[]>(NON_VIP_SECTIONS_162 as Section[]);
   const [isLoading, setIsLoading] = useState(true);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
@@ -52,7 +52,7 @@ export default function EventMesasPage() {
           setTables(data.data.tables);
         } else {
           console.warn("No se encontraron mesas en la respuesta, usando mesas por defecto");
-          setTables(VIP_TABLES);
+          setTables(VIP_TABLES_162);
         }
         if (data.data.sections) {
           console.log(`[LoadTables] Cargadas ${data.data.sections.length} secciones desde BD`);
@@ -61,14 +61,14 @@ export default function EventMesasPage() {
       } else {
         // Si no hay mesas configuradas, usar las por defecto
         console.warn("No se encontraron mesas en BD:", data.error || data.details);
-        setTables(VIP_TABLES);
-        setSections(NON_VIP_SECTIONS);
+        setTables(VIP_TABLES_162);
+        setSections(NON_VIP_SECTIONS_162 as Section[]);
       }
     } catch (error) {
       console.error("Error al cargar mesas:", error);
       // En caso de error, usar mesas por defecto
-      setTables(VIP_TABLES);
-      setSections(NON_VIP_SECTIONS);
+      setTables(VIP_TABLES_162);
+      setSections(NON_VIP_SECTIONS_162 as Section[]);
     }
   };
 
@@ -295,7 +295,7 @@ export default function EventMesasPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-[#c4a905]/20">
               <p className="text-white/70 text-sm mb-1">Total Mesas VIP</p>
-              <p className="text-2xl font-bold text-white">144</p>
+              <p className="text-2xl font-bold text-white">162</p>
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-[#c4a905]/20">
               <p className="text-white/70 text-sm mb-1">Precio por Mesa</p>
@@ -307,7 +307,7 @@ export default function EventMesasPage() {
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-[#c4a905]/20">
               <p className="text-white/70 text-sm mb-1">Capacidad Total</p>
-              <p className="text-2xl font-bold text-white">576</p>
+              <p className="text-2xl font-bold text-white">648</p>
             </div>
           </div>
         </div>
@@ -316,13 +316,14 @@ export default function EventMesasPage() {
         <div className="mb-6 p-4 bg-[#c4a905]/10 border border-[#c4a905]/30 rounded-lg">
           <p className="text-white text-sm">
             💡 <strong>Instrucciones:</strong> Haz click en cualquier mesa
-            disponible (color dorado) para agregarla al carrito. Las mesas
-            vendidas aparecen en gris y no se pueden seleccionar.
+            disponible (dorada) para agregarla al carrito. También puedes seleccionar
+            las secciones GENERAL, PREFERENTE A o PREFERENTE B. Las mesas
+            vendidas aparecen en gris.
           </p>
         </div>
 
-        {/* Mapa interactivo con 144 mesas */}
-        <IndividualTablesMap
+        {/* Mapa interactivo con 162 mesas */}
+        <PatriotasTablesMap
           eventName={event.name}
           eventDate={formattedDate}
           tables={tables}
@@ -351,7 +352,7 @@ export default function EventMesasPage() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#c4a905] mt-1">•</span>
-                <span><strong>Zona Trasera</strong> (Filas 7-8): Vista completa</span>
+                <span><strong>Zona Trasera</strong> (Filas 7-9): Vista completa</span>
               </li>
             </ul>
           </div>
