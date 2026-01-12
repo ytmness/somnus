@@ -49,7 +49,7 @@ export function PatriotasTablesMap({
   const [hoveredTable, setHoveredTable] = useState<number | null>(null);
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const [zoom, setZoom] = useState(0.6); // Zoom inicial
+  const [zoom, setZoom] = useState(1); // Zoom inicial al 100%
   const [showLegend, setShowLegend] = useState(true);
   
   // Controles de ajuste manual - Valores calibrados para PATRIOTASDORADO.png
@@ -124,6 +124,13 @@ export function PatriotasTablesMap({
     return 0.9;
   };
 
+  // Manejar zoom con scroll del mouse
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    setZoom((prevZoom) => Math.max(0.3, Math.min(2.5, prevZoom + delta)));
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto">
       {/* Header */}
@@ -160,7 +167,7 @@ export function PatriotasTablesMap({
           <Button
             size="sm"
             variant="outline"
-            onClick={() => setZoom(Math.min(1.2, zoom + 0.1))}
+            onClick={() => setZoom(Math.min(2.5, zoom + 0.1))}
             className="border-[#c4a905]/50 text-white bg-transparent hover:bg-white/10"
           >
             <ZoomIn className="w-4 h-4" />
@@ -176,10 +183,10 @@ export function PatriotasTablesMap({
           <Button
             size="sm"
             variant="outline"
-            onClick={() => setZoom(0.6)}
+            onClick={() => setZoom(1)}
             className="border-[#c4a905]/50 text-white bg-transparent hover:bg-white/10"
           >
-            Reset
+            Reset (100%)
           </Button>
           <Button
             size="sm"
@@ -202,7 +209,7 @@ export function PatriotasTablesMap({
         </div>
 
         <div className="text-white/70 text-sm">
-          Click en una mesa para seleccionar | Zoom: {(zoom * 100).toFixed(0)}%
+          🖱️ Usa la rueda del mouse para zoom | Actual: {(zoom * 100).toFixed(0)}%
         </div>
       </div>
 
@@ -274,7 +281,11 @@ export function PatriotasTablesMap({
       )}
 
       {/* Mapa con imagen de fondo y overlay SVG */}
-      <div className="relative bg-[#1a1a1a] rounded-xl border border-[#c4a905]/20 overflow-auto">
+      <div 
+        className="relative bg-[#1a1a1a] rounded-xl border border-[#c4a905]/20 overflow-auto"
+        onWheel={handleWheel}
+        style={{ cursor: "grab" }}
+      >
         <div 
           style={{ 
             transform: `scale(${zoom})`, 
@@ -304,46 +315,48 @@ export function PatriotasTablesMap({
             style={{ pointerEvents: "none" }}
           >
             {/* Secciones GENERAL, PREFERENTE A y B - más visibles */}
-            {sections.map((section) => {
-              if (!section.x || !section.y || !section.width || !section.height) return null;
-              const isSelected = selectedSection?.id === section.id;
-              const isHovered = hoveredSection === section.id;
-              const isClickable = section.type !== "PROTECCION";
+            <g transform={`translate(${offsetX}, ${offsetY}) scale(${scale})`}>
+              {sections.map((section) => {
+                if (!section.x || !section.y || !section.width || !section.height) return null;
+                const isSelected = selectedSection?.id === section.id;
+                const isHovered = hoveredSection === section.id;
+                const isClickable = section.type !== "PROTECCION";
 
-              return (
-                <g key={section.id}>
-                  <rect
-                    x={section.x}
-                    y={section.y}
-                    width={section.width}
-                    height={section.height}
-                    fill={isSelected ? "#FFD700" : isHovered ? "#FFA500" : "#c4a905"}
-                    stroke="#FFD700"
-                    strokeWidth={isSelected ? 6 : isHovered ? 4 : 2}
-                    opacity={isHovered || isSelected ? 0.6 : 0.2}
-                    className={isClickable ? "cursor-pointer transition-all" : ""}
-                    style={{ pointerEvents: isClickable ? "all" : "none" }}
-                    onMouseEnter={() => isClickable && setHoveredSection(section.id)}
-                    onMouseLeave={() => isClickable && setHoveredSection(null)}
-                    onClick={() => isClickable && handleSectionClick(section)}
-                  />
-                  {(isHovered || isSelected) && (
-                    <text
-                      x={section.x + section.width / 2}
-                      y={section.y + section.height / 2}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      fill="#fff"
-                      fontSize="40"
-                      fontWeight="bold"
-                      pointerEvents="none"
-                    >
-                      {section.name}
-                    </text>
-                  )}
-                </g>
-              );
-            })}
+                return (
+                  <g key={section.id}>
+                    <rect
+                      x={section.x}
+                      y={section.y}
+                      width={section.width}
+                      height={section.height}
+                      fill={isSelected ? "#FFD700" : isHovered ? "#FFA500" : "#c4a905"}
+                      stroke="#FFD700"
+                      strokeWidth={isSelected ? 6 : isHovered ? 4 : 2}
+                      opacity={isHovered || isSelected ? 0.6 : 0.2}
+                      className={isClickable ? "cursor-pointer transition-all" : ""}
+                      style={{ pointerEvents: isClickable ? "all" : "none" }}
+                      onMouseEnter={() => isClickable && setHoveredSection(section.id)}
+                      onMouseLeave={() => isClickable && setHoveredSection(null)}
+                      onClick={() => isClickable && handleSectionClick(section)}
+                    />
+                    {(isHovered || isSelected) && (
+                      <text
+                        x={section.x + section.width / 2}
+                        y={section.y + section.height / 2}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fill="#fff"
+                        fontSize="40"
+                        fontWeight="bold"
+                        pointerEvents="none"
+                      >
+                        {section.name}
+                      </text>
+                    )}
+                  </g>
+                );
+              })}
+            </g>
 
             {/* Grupo de mesas con transformación aplicada */}
             <g transform={`translate(${offsetX}, ${offsetY}) scale(${scale})`}>
