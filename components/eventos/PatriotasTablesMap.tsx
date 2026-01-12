@@ -49,7 +49,7 @@ export function PatriotasTablesMap({
   const [hoveredTable, setHoveredTable] = useState<number | null>(null);
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const [zoom, setZoom] = useState(1); // Zoom inicial al 100%
+  const [zoom, setZoom] = useState(0.4); // Zoom inicial al 40% para ver completo
   const [showLegend, setShowLegend] = useState(true);
   
   // Controles de ajuste manual - Valores calibrados para PATRIOTASDORADO.png
@@ -183,10 +183,18 @@ export function PatriotasTablesMap({
           <Button
             size="sm"
             variant="outline"
-            onClick={() => setZoom(1)}
+            onClick={() => setZoom(0.4)}
             className="border-[#c4a905]/50 text-white bg-transparent hover:bg-white/10"
           >
-            Reset (100%)
+            Vista Completa
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setZoom(0.8)}
+            className="border-[#c4a905]/50 text-white bg-transparent hover:bg-white/10"
+          >
+            Vista Media
           </Button>
           <Button
             size="sm"
@@ -209,7 +217,7 @@ export function PatriotasTablesMap({
         </div>
 
         <div className="text-white/70 text-sm">
-          🖱️ Usa la rueda del mouse para zoom | Actual: {(zoom * 100).toFixed(0)}%
+          🖱️ Rueda del mouse sobre el mapa = Zoom | Actual: {(zoom * 100).toFixed(0)}%
         </div>
       </div>
 
@@ -259,10 +267,11 @@ export function PatriotasTablesMap({
                 setOffsetX(441);
                 setOffsetY(-517);
                 setScale(1.84);
+                setZoom(0.4);
               }}
               className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm transition"
             >
-              Resetear a Calibrado
+              Resetear Todo
             </button>
             <button
               onClick={() => {
@@ -282,14 +291,18 @@ export function PatriotasTablesMap({
 
       {/* Mapa con imagen de fondo y overlay SVG */}
       <div 
-        className="relative bg-[#1a1a1a] rounded-xl border border-[#c4a905]/20 overflow-auto"
+        className="relative bg-[#1a1a1a] rounded-xl border border-[#c4a905]/20 overflow-auto flex items-center justify-center"
         onWheel={handleWheel}
-        style={{ cursor: "grab" }}
+        style={{ 
+          cursor: "grab",
+          minHeight: "600px",
+          maxHeight: "800px",
+        }}
       >
         <div 
           style={{ 
             transform: `scale(${zoom})`, 
-            transformOrigin: "top left",
+            transformOrigin: "center center",
             transition: "transform 0.2s ease",
             width: `${SVG_VIEWPORT_162.width}px`,
             height: `${SVG_VIEWPORT_162.height}px`,
