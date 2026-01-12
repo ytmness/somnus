@@ -215,8 +215,8 @@ export function PatriotasTablesMap({
               <label className="text-white/70 text-sm block mb-1">Offset X: {offsetX}px</label>
               <input
                 type="range"
-                min="-500"
-                max="500"
+                min="-1000"
+                max="1000"
                 value={offsetX}
                 onChange={(e) => setOffsetX(parseInt(e.target.value))}
                 className="w-full"
@@ -226,8 +226,8 @@ export function PatriotasTablesMap({
               <label className="text-white/70 text-sm block mb-1">Offset Y: {offsetY}px</label>
               <input
                 type="range"
-                min="-500"
-                max="500"
+                min="-1000"
+                max="1000"
                 value={offsetY}
                 onChange={(e) => setOffsetY(parseInt(e.target.value))}
                 className="w-full"
@@ -237,8 +237,8 @@ export function PatriotasTablesMap({
               <label className="text-white/70 text-sm block mb-1">Escala: {scale.toFixed(2)}</label>
               <input
                 type="range"
-                min="0.5"
-                max="2"
+                min="0.3"
+                max="3"
                 step="0.01"
                 value={scale}
                 onChange={(e) => setScale(parseFloat(e.target.value))}
@@ -246,8 +246,29 @@ export function PatriotasTablesMap({
               />
             </div>
           </div>
+          <div className="mt-4 flex gap-4">
+            <button
+              onClick={() => {
+                setOffsetX(0);
+                setOffsetY(0);
+                setScale(1);
+              }}
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm transition"
+            >
+              Resetear
+            </button>
+            <button
+              onClick={() => {
+                console.log(`Valores ajustados: offsetX=${offsetX}, offsetY=${offsetY}, scale=${scale}`);
+                alert(`Valores guardados en consola:\nOffset X: ${offsetX}\nOffset Y: ${offsetY}\nEscala: ${scale}`);
+              }}
+              className="px-4 py-2 bg-[#c4a905] hover:bg-[#d4b815] text-white rounded-lg text-sm transition"
+            >
+              Copiar Valores
+            </button>
+          </div>
           <div className="mt-2 text-white/60 text-xs">
-            💡 Usa estos controles para alinear las mesas con la imagen de fondo
+            💡 Usa estos controles para alinear las mesas con la imagen de fondo. Cuando esté perfecto, haz click en "Copiar Valores"
           </div>
         </div>
       )}
