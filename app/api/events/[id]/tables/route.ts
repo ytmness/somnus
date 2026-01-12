@@ -103,9 +103,9 @@ export async function GET(
 
     console.log(`[Tables API] Evento ${params.id}: ${soldTableNumbers.size} mesas vendidas`, Array.from(soldTableNumbers));
 
-    // Generar las 144 mesas base (estructura fija del plano)
+    // Generar las 162 mesas base (estructura fija del plano: 9 filas × 18 columnas)
     // Esto debería venir de la configuración del evento, pero por ahora usamos la estructura estándar
-    const ROWS = 8;
+    const ROWS = 9;
     const COLS = 18;
     const TABLE_WIDTH = 22;
     const TABLE_HEIGHT = 22;
