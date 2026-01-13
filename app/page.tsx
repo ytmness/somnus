@@ -41,13 +41,70 @@ function convertEventToConcert(event: any): Concert {
     ? Math.min(...event.ticketTypes.map((tt: any) => Number(tt.price)))
     : 0;
 
-  const sections = event.ticketTypes.map((tt: any) => ({
-    id: tt.id,
-    name: tt.name,
-    description: tt.description || "",
-    price: Number(tt.price),
-    available: Math.max(0, tt.maxQuantity - (tt.soldQuantity || 0)),
-  }));
+  // Separar tipos de boletos
+  const generalTypes = event.ticketTypes.filter((tt: any) => tt.category === "GENERAL");
+  const preferenteTypes = event.ticketTypes.filter((tt: any) => 
+    tt.category === "PREFERENTE" && 
+    (tt.name.toLowerCase().includes("a") || tt.name.toLowerCase().includes("b"))
+  );
+  const vipTypes = event.ticketTypes.filter((tt: any) => tt.category === "VIP");
+  const otherTypes = event.ticketTypes.filter((tt: any) => 
+    tt.category !== "GENERAL" && 
+    tt.category !== "VIP" && 
+    !(tt.category === "PREFERENTE" && (tt.name.toLowerCase().includes("a") || tt.name.toLowerCase().includes("b")))
+  );
+
+  const sections: any[] = [];
+
+  // General
+  generalTypes.forEach((tt: any) => {
+    sections.push({
+      id: tt.id,
+      name: tt.name,
+      description: tt.description || "",
+      price: Number(tt.price),
+      available: Math.max(0, tt.maxQuantity - (tt.soldQuantity || 0)),
+    });
+  });
+
+  // Preferente A y B combinados
+  if (preferenteTypes.length > 0) {
+    const totalPreferenteQuantity = preferenteTypes.reduce((sum: number, tt: any) => 
+      sum + Math.max(0, tt.maxQuantity - (tt.soldQuantity || 0)), 0
+    );
+    const preferentePrice = preferenteTypes[0]?.price || 0;
+    const preferenteDescription = preferenteTypes[0]?.description || "Asientos numerados, excelente vista";
+
+    sections.push({
+      id: `preferente-combined-${event.id}`,
+      name: "Preferente A y B",
+      description: preferenteDescription,
+      price: Number(preferentePrice),
+      available: totalPreferenteQuantity,
+    });
+  }
+
+  // VIP
+  vipTypes.forEach((tt: any) => {
+    sections.push({
+      id: tt.id,
+      name: tt.name,
+      description: tt.description || "",
+      price: Number(tt.price),
+      available: Math.max(0, tt.maxQuantity - (tt.soldQuantity || 0)),
+    });
+  });
+
+  // Otros tipos
+  otherTypes.forEach((tt: any) => {
+    sections.push({
+      id: tt.id,
+      name: tt.name,
+      description: tt.description || "",
+      price: Number(tt.price),
+      available: Math.max(0, tt.maxQuantity - (tt.soldQuantity || 0)),
+    });
+  });
 
   return {
     id: event.id,
