@@ -511,15 +511,15 @@ export default function HomePage() {
               </div>
 
               {/* Contenedor para fecha, botón, info y estrella - ligeramente a la derecha */}
-              <div className="w-full flex flex-col items-center pl-0 md:pl-12 lg:pl-16">
+              <div className="w-full flex flex-col items-center pl-0 md:pl-8 lg:pl-12 xl:pl-16 px-2 sm:px-4">
                 {/* Fecha - 28 de marzo */}
-                <div className="w-full flex justify-center mb-4 sm:mb-6 lg:mb-8">
+                <div className="w-full flex justify-center mb-3 sm:mb-4 md:mb-5 lg:mb-6 xl:mb-8">
                   <Image
                     src="/assets/fecha-evento.png"
                     alt="28 de marzo de 2026"
                     width={1689}
                     height={202}
-                    className="w-full max-w-[85%] sm:max-w-sm md:max-w-md lg:max-w-lg h-auto"
+                    className="w-full max-w-[70%] xs:max-w-[75%] sm:max-w-[80%] md:max-w-sm lg:max-w-md xl:max-w-lg h-auto"
                     style={{ 
                       filter: 'drop-shadow(0 0 15px rgba(244, 208, 63, 0.5))'
                     }}
@@ -528,10 +528,10 @@ export default function HomePage() {
                 </div>
 
                 {/* Botón CTA - Comprar Boletos */}
-                <div className="mb-4">
+                <div className="mb-3 sm:mb-3 md:mb-4">
                   <button
                     onClick={() => handleSelectConcert(featuredEvent)}
-                    className="group relative inline-flex items-center gap-3 px-10 py-4 text-base md:text-lg font-bold uppercase tracking-widest overflow-hidden transition-all duration-300 hover:-translate-y-1"
+                    className="group relative inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 md:px-10 py-2.5 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-wider sm:tracking-widest overflow-hidden transition-all duration-300 hover:-translate-y-1"
                     style={{
                       background: 'linear-gradient(135deg, #C5A059 0%, #F4D03F 100%)',
                       color: '#0A0A0A',
@@ -544,27 +544,27 @@ export default function HomePage() {
                 </div>
 
                 {/* Info adicional */}
-                <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6 mb-4">
-                  <div className="flex items-center gap-2 text-regia-cream/80 text-sm">
-                    <MapPin className="w-4 h-4 text-regia-gold-old" />
-                    <span>{featuredEvent.venue}</span>
+                <div className="flex flex-col md:flex-row items-center justify-center gap-2 sm:gap-2.5 md:gap-3 lg:gap-6 mb-3 sm:mb-3 md:mb-4">
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-regia-cream/80 text-xs sm:text-sm">
+                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-regia-gold-old" />
+                    <span className="text-center sm:text-left">{featuredEvent.venue}</span>
                   </div>
                   {featuredEvent.time && (
-                    <div className="flex items-center gap-2 text-regia-cream/80 text-sm">
-                      <Clock className="w-4 h-4 text-regia-gold-old" />
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-regia-cream/80 text-xs sm:text-sm">
+                      <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-regia-gold-old" />
                       <span>{featuredEvent.time}</span>
                     </div>
                   )}
                 </div>
 
                 {/* Scroll indicator - Estrella */}
-                <div className="mt-4 sm:mt-6 md:mt-8 ml-2 animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300">
+                <div className="mt-3 sm:mt-4 md:mt-6 lg:mt-8 ml-0 sm:ml-2 animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300">
                   <Image 
                     src="/assets/estrella.png" 
                     alt="Scroll" 
                     width={80} 
                     height={80} 
-                    className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 opacity-90"
+                    className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 opacity-90"
                     style={{ 
                       filter: 'drop-shadow(0 0 15px rgba(244, 208, 63, 0.6))'
                     }}
