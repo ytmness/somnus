@@ -453,8 +453,8 @@ export default function HomePage() {
                 />
               </div>
 
-              {/* Contenedor para fecha, botón, info y estrella */}
-              <div className="w-full flex flex-col items-center">
+              {/* Contenedor para fecha, botón, info y estrella - ligeramente a la derecha */}
+              <div className="w-full flex flex-col items-center pl-0 md:pl-12 lg:pl-16">
                 {/* Fecha - 28 de marzo */}
                 <div className="w-full flex justify-center mb-8">
                   <Image
@@ -505,11 +505,11 @@ export default function HomePage() {
                   <Image 
                     src="/assets/estrella.png" 
                     alt="Scroll" 
-                    width={60} 
-                    height={60} 
+                    width={80} 
+                    height={80} 
                     className="opacity-90"
                     style={{ 
-                      filter: 'drop-shadow(0 0 10px rgba(244, 208, 63, 0.4))'
+                      filter: 'drop-shadow(0 0 15px rgba(244, 208, 63, 0.6))'
                     }}
                     onClick={() => {
                       const nextSection = document.getElementById('info-evento');
