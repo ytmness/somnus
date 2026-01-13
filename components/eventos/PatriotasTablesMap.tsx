@@ -318,7 +318,7 @@ export function PatriotasTablesMap({
             className="absolute top-0 left-0 w-full h-full"
             style={{ pointerEvents: "none" }}
           >
-            {/* Secciones GENERAL, PREFERENTE A y B - más visibles */}
+            {/* Secciones GENERAL, PREFERENTE A y B - visibles y clickeables */}
             <g transform={`translate(${offsetX}, ${offsetY}) scale(${scale})`}>
               {sections.map((section) => {
                 if (!section.x || !section.y || !section.width || !section.height) return null;
@@ -328,6 +328,7 @@ export function PatriotasTablesMap({
 
                 return (
                   <g key={section.id}>
+                    {/* Área clickeable de la sección */}
                     <rect
                       x={section.x}
                       y={section.y}
@@ -335,28 +336,31 @@ export function PatriotasTablesMap({
                       height={section.height}
                       fill={isSelected ? "#FFD700" : isHovered ? "#FFA500" : "#c4a905"}
                       stroke="#FFD700"
-                      strokeWidth={isSelected ? 6 : isHovered ? 4 : 2}
-                      opacity={isHovered || isSelected ? 0.6 : 0.2}
+                      strokeWidth={isSelected ? 8 : isHovered ? 6 : 3}
+                      opacity={isHovered || isSelected ? 0.7 : 0.35}
                       className={isClickable ? "cursor-pointer transition-all" : ""}
                       style={{ pointerEvents: isClickable ? "all" : "none" }}
                       onMouseEnter={() => isClickable && setHoveredSection(section.id)}
                       onMouseLeave={() => isClickable && setHoveredSection(null)}
                       onClick={() => isClickable && handleSectionClick(section)}
                     />
-                    {(isHovered || isSelected) && (
-                      <text
-                        x={section.x + section.width / 2}
-                        y={section.y + section.height / 2}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        fill="#fff"
-                        fontSize="40"
-                        fontWeight="bold"
-                        pointerEvents="none"
-                      >
-                        {section.name}
-                      </text>
-                    )}
+                    {/* Texto del nombre de la sección - siempre visible */}
+                    <text
+                      x={section.x + section.width / 2}
+                      y={section.y + section.height / 2}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fill={isHovered || isSelected ? "#fff" : "#FFD700"}
+                      fontSize={isHovered || isSelected ? "50" : "35"}
+                      fontWeight="bold"
+                      pointerEvents="none"
+                      opacity={isHovered || isSelected ? 1 : 0.8}
+                      style={{
+                        textShadow: "0 0 10px rgba(0,0,0,0.8), 0 0 20px rgba(255,215,0,0.5)"
+                      }}
+                    >
+                      {section.name}
+                    </text>
                   </g>
                 );
               })}
