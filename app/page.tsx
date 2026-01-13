@@ -798,7 +798,7 @@ export default function HomePage() {
               src="/assets/porque-grupo-regia-titulo.png"
               alt="¿Por qué Grupo Regia?"
               width={1456}
-              height={271}
+              height={244}
               className="w-full max-w-4xl h-auto"
               style={{ 
                 filter: 'drop-shadow(0 0 15px rgba(244, 208, 63, 0.4))'
