@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Header } from "@/components/eventos/Header";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Ticket, Calendar, MapPin, User, ArrowLeft, Download, QrCode } from "lucide-react";
+import { Ticket, Calendar, MapPin, User, ArrowLeft, Download, QrCode, Music, Shield, Scan, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -46,6 +46,7 @@ export default function MisBoletosPage() {
   const [tickets, setTickets] = useState<TicketData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     const loadTickets = async () => {
@@ -79,6 +80,7 @@ export default function MisBoletosPage() {
         }
 
         setUser(sessionData.user);
+        setUserRole(sessionData.user?.role || null);
 
         // Cargar boletos
         const response = await fetch("/api/tickets/my-tickets");
@@ -109,19 +111,6 @@ export default function MisBoletosPage() {
     });
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "VALID":
-        return "text-green-400";
-      case "USED":
-        return "text-yellow-400";
-      case "CANCELLED":
-        return "text-red-400";
-      default:
-        return "text-white/70";
-    }
-  };
-
   const getStatusText = (status: string) => {
     switch (status) {
       case "VALID":
@@ -137,12 +126,41 @@ export default function MisBoletosPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#2a2c30] to-[#49484e]">
-        <Header cartItemsCount={0} onCartClick={() => {}} />
-        <main className="w-full py-8">
+      <div className="min-h-screen regia-bg-main">
+        <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-6">
+          <div className="w-full flex lg:hidden items-center justify-between">
+            <Image
+              src="/assets/logo-grupo-regia.png"
+              alt="Grupo Regia"
+              width={80}
+              height={48}
+              className="opacity-90 cursor-pointer"
+              onClick={() => router.push("/")}
+            />
+          </div>
+          <div className="w-full hidden lg:flex items-center justify-between">
+            <Image
+              src="/assets/logo-grupo-regia.png"
+              alt="Grupo Regia"
+              width={110}
+              height={65}
+              className="opacity-90 cursor-pointer"
+              onClick={() => router.push("/")}
+            />
+            <Image
+              src="/assets/rico-muerto-logo.png"
+              alt="Rico o Muerto"
+              width={100}
+              height={50}
+              className="opacity-90"
+            />
+          </div>
+        </header>
+        <main className="w-full py-8 pt-24 lg:pt-32">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center py-20">
-              <p className="text-white/70 text-xl">Cargando tus boletos...</p>
+              <div className="w-16 h-16 border-4 border-regia-gold-bright border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="regia-text-body text-xl">Cargando tus boletos...</p>
             </div>
           </div>
         </main>
@@ -151,29 +169,132 @@ export default function MisBoletosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2a2c30] to-[#49484e]">
-      <Header cartItemsCount={0} onCartClick={() => {}} />
+    <div className="min-h-screen regia-bg-main overflow-x-hidden">
+      {/* Header flotante con logos y navegación integrada */}
+      <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-6">
+        {/* Versión móvil - Logos simplificados */}
+        <div className="w-full flex lg:hidden items-center justify-between">
+          <Image
+            src="/assets/logo-grupo-regia.png"
+            alt="Grupo Regia"
+            width={80}
+            height={48}
+            className="opacity-90 cursor-pointer"
+            onClick={() => router.push("/")}
+          />
+          <button
+            onClick={() => router.push("/")}
+            className="text-regia-gold-old hover:text-regia-gold-bright transition-colors"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Versión desktop - Navegación completa */}
+        <div className="w-full hidden lg:flex items-center justify-between">
+          {/* Logo GRUPO REGIA */}
+          <div className="flex-shrink-0">
+            <Image
+              src="/assets/logo-grupo-regia.png"
+              alt="Grupo Regia"
+              width={110}
+              height={65}
+              className="opacity-90 cursor-pointer"
+              onClick={() => router.push("/")}
+            />
+          </div>
+
+          {/* Eventos */}
+          <button
+            onClick={() => router.push("/#eventos")}
+            className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+          >
+            <Calendar className="w-4 h-4" />
+            <span>Eventos</span>
+          </button>
+
+          {/* Mis Boletos */}
+          <button
+            onClick={() => router.push("/mis-boletos")}
+            className="flex items-center gap-2 text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+          >
+            <Music className="w-4 h-4" />
+            <span>Mis Boletos</span>
+          </button>
+
+          {/* Admin - solo si tiene rol */}
+          {userRole === "ADMIN" && (
+            <button
+              onClick={() => router.push("/admin")}
+              className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+            >
+              <Shield className="w-4 h-4" />
+              <span>Admin</span>
+            </button>
+          )}
+
+          {/* Accesos - solo si tiene rol */}
+          {(userRole === "ACCESOS" || userRole === "ADMIN") && (
+            <button
+              onClick={() => router.push("/accesos")}
+              className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+            >
+              <Scan className="w-4 h-4" />
+              <span>Accesos</span>
+            </button>
+          )}
+
+          {/* Login / User */}
+          {user ? (
+            <button
+              onClick={() => router.push("/login")}
+              className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+            >
+              <User className="w-4 h-4" />
+              <span>{user.name || user.email}</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => router.push("/login")}
+              className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>Login</span>
+            </button>
+          )}
+
+          {/* Logo RICO O MUERTO */}
+          <div className="flex-shrink-0">
+            <Image
+              src="/assets/rico-muerto-logo.png"
+              alt="Rico o Muerto"
+              width={100}
+              height={50}
+              className="opacity-90 hover:opacity-100 transition-opacity"
+            />
+          </div>
+        </div>
+      </header>
       
-      <main className="w-full py-8">
+      <main className="w-full py-8 pt-20 sm:pt-24 lg:pt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mb-8">
-            <Button
+            <button
               onClick={() => router.push("/")}
-              variant="outline"
-              className="mb-6 border-white/30 text-white bg-transparent hover:bg-white/10"
+              className="inline-flex items-center gap-2 regia-text-body hover:text-regia-gold-bright transition-colors mb-6"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="w-4 h-4" />
               Volver a Eventos
-            </Button>
+            </button>
 
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-4xl font-bold text-white mb-2">
+                <h1 className="regia-title-main text-3xl sm:text-4xl mb-2">
                   Mis Boletos
                 </h1>
                 {user && (
-                  <p className="text-white/70">
+                  <p className="regia-text-body">
                     {user.name} • {user.email}
                   </p>
                 )}
@@ -183,17 +304,19 @@ export default function MisBoletosPage() {
 
           {/* Lista de boletos */}
           {tickets.length === 0 ? (
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-12 border border-[#c4a905]/20 text-center">
-              <Ticket className="w-16 h-16 text-white/30 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">
+            <div className="regia-ticket-card p-12 text-center">
+              <div className="w-20 h-20 regia-gold-gradient rounded-full flex items-center justify-center mx-auto mb-6">
+                <Ticket className="w-10 h-10 text-regia-black" />
+              </div>
+              <h3 className="regia-title-secondary text-2xl mb-3">
                 No tienes boletos aún
               </h3>
-              <p className="text-white/70 mb-6">
+              <p className="regia-text-body mb-6">
                 Compra boletos para tus eventos favoritos
               </p>
               <Button
                 onClick={() => router.push("/")}
-                className="bg-[#c4a905] text-white hover:bg-[#d4b815]"
+                className="regia-btn-primary"
               >
                 Ver Eventos
               </Button>
@@ -203,7 +326,7 @@ export default function MisBoletosPage() {
               {tickets.map((ticket) => (
                 <div
                   key={ticket.id}
-                  className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-[#c4a905]/20"
+                  className="regia-ticket-card p-6"
                 >
                   <div className="flex flex-col md:flex-row gap-6">
                     {/* Imagen del evento */}
@@ -221,43 +344,47 @@ export default function MisBoletosPage() {
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-4">
                         <div>
-                          <h3 className="text-2xl font-bold text-white mb-2">
+                          <h3 className="regia-title-secondary text-2xl mb-2">
                             {ticket.event.name}
                           </h3>
-                          <p className="text-white/70 mb-1">
+                          <p className="regia-text-body mb-1">
                             {ticket.event.artist}
                           </p>
                         </div>
                         <span
-                          className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                            ticket.status
-                          )} bg-white/10`}
+                          className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            ticket.status === "VALID" 
+                              ? "text-green-400 bg-green-400/20" 
+                              : ticket.status === "USED"
+                              ? "text-yellow-400 bg-yellow-400/20"
+                              : "text-red-400 bg-red-400/20"
+                          }`}
                         >
                           {getStatusText(ticket.status)}
                         </span>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div className="flex items-center gap-2 text-white/70">
-                          <Calendar className="w-5 h-5 text-[#c4a905]" />
+                        <div className="flex items-center gap-2 regia-text-body">
+                          <Calendar className="w-5 h-5 text-regia-gold-bright" />
                           <span>
                             {formatDate(ticket.event.eventDate)} •{" "}
                             {ticket.event.eventTime}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 text-white/70">
-                          <MapPin className="w-5 h-5 text-[#c4a905]" />
+                        <div className="flex items-center gap-2 regia-text-body">
+                          <MapPin className="w-5 h-5 text-regia-gold-bright" />
                           <span>{ticket.event.venue}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-white/70">
-                          <Ticket className="w-5 h-5 text-[#c4a905]" />
+                        <div className="flex items-center gap-2 regia-text-body">
+                          <Ticket className="w-5 h-5 text-regia-gold-bright" />
                           <span>
                             {ticket.ticketType.name} ({ticket.ticketType.category})
                           </span>
                         </div>
                         {ticket.tableNumber && (
-                          <div className="flex items-center gap-2 text-white/70">
-                            <User className="w-5 h-5 text-[#c4a905]" />
+                          <div className="flex items-center gap-2 regia-text-body">
+                            <User className="w-5 h-5 text-regia-gold-bright" />
                             <span>
                               {ticket.tableNumber}
                               {ticket.seatNumber && ` • Asiento ${ticket.seatNumber}`}
@@ -266,18 +393,17 @@ export default function MisBoletosPage() {
                         )}
                       </div>
 
-                      <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                      <div className="flex items-center justify-between pt-4 border-t border-regia-gold-old/20">
                         <div>
-                          <p className="text-white/70 text-sm">Número de boleto</p>
-                          <p className="text-[#c4a905] font-bold">
+                          <p className="regia-text-body text-sm">Número de boleto</p>
+                          <p className="text-regia-gold-bright font-bold text-lg">
                             {ticket.ticketNumber}
                           </p>
                         </div>
                         {ticket.pdfUrl && (
                           <Button
                             onClick={() => window.open(ticket.pdfUrl!, "_blank")}
-                            variant="outline"
-                            className="border-white/30 text-white bg-transparent hover:bg-white/10"
+                            className="regia-btn-secondary"
                           >
                             <Download className="w-4 h-4 mr-2" />
                             Descargar PDF
@@ -286,14 +412,14 @@ export default function MisBoletosPage() {
                       </div>
 
                       {/* Código QR para acceso */}
-                      <div className="mt-6 pt-6 border-t border-white/10">
+                      <div className="mt-6 pt-6 border-t border-regia-gold-old/20">
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <QrCode className="w-5 h-5 text-[#c4a905]" />
-                              <p className="text-white font-medium">Código QR de Acceso</p>
+                              <QrCode className="w-5 h-5 text-regia-gold-bright" />
+                              <p className="regia-title-secondary">Código QR de Acceso</p>
                             </div>
-                            <p className="text-white/70 text-sm">
+                            <p className="regia-text-body text-sm">
                               Presenta este código QR en la entrada del evento para validar tu boleto
                             </p>
                           </div>
