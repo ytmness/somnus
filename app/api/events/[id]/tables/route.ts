@@ -148,7 +148,7 @@ export async function GET(
       (tt) => !tt.isTable && (tt.category === "GENERAL" || tt.category === "PREFERENTE")
     );
 
-    // Mapear secciones desde la BD
+    // Mapear secciones desde la BD con coordenadas para el mapa
     const sections: Array<{
       id: string;
       name: string;
@@ -158,11 +158,45 @@ export async function GET(
       sold: number;
       color: string;
       description: string;
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
     }> = sectionTicketTypes.map((tt) => {
       // Mapear colores según categoría
       let color = "#95a5a6"; // Default gris
-      if (tt.category === "GENERAL") color = "#95a5a6";
-      if (tt.category === "PREFERENTE") color = "#4a90e2";
+      let coords = {};
+      
+      if (tt.category === "GENERAL") {
+        color = "#8B7355";
+        // Coordenadas del image-map para GENERAL: (1859, 1486, 859, 952)
+        coords = {
+          x: 859,
+          y: 952,
+          width: 1859 - 859, // 1000px
+          height: 1486 - 952, // 534px
+        };
+      } else if (tt.category === "PREFERENTE") {
+        color = "#C5A059";
+        // Determinar si es PREFERENTE A o B según el nombre
+        if (tt.name.includes("A") || tt.name.toLowerCase().includes("izquierda")) {
+          // PREFERENTE A - Izquierda: (859, 754, 1342, 905)
+          coords = {
+            x: 859,
+            y: 754,
+            width: 1342 - 859, // 483px
+            height: 905 - 754, // 151px
+          };
+        } else {
+          // PREFERENTE B - Derecha: (1861, 908, 1375, 756)
+          coords = {
+            x: 1375,
+            y: 756,
+            width: 1861 - 1375, // 486px
+            height: 908 - 756, // 152px
+          };
+        }
+      }
 
       return {
         id: tt.id,
@@ -173,6 +207,7 @@ export async function GET(
         sold: tt.soldQuantity,
         color,
         description: tt.description || "",
+        ...coords,
       };
     });
 
