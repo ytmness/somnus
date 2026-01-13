@@ -49,7 +49,7 @@ export function PatriotasTablesMap({
   const [hoveredTable, setHoveredTable] = useState<number | null>(null);
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const [zoom, setZoom] = useState(0.4); // Zoom inicial al 40% para ver completo
+  const [zoom, setZoom] = useState(1); // Zoom inicial al 100%
   const [showLegend, setShowLegend] = useState(true);
   
   // Controles de ajuste manual - Valores calibrados para PATRIOTASDORADO.png
