@@ -703,47 +703,68 @@ export default function HomePage() {
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {concerts.slice(1).map((concert) => (
-                <div
-                  key={concert.id}
-                  className="regia-card-glow group cursor-pointer"
-                  onClick={() => handleSelectConcert(concert)}
-                >
-                  <div className="relative h-80 overflow-hidden rounded-t-2xl">
-                    <Image
-                      src={concert.image}
-                      alt={concert.artist}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-                    
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <h3 className="text-3xl font-bold text-regia-gold-bright mb-2">
-                        {concert.artist}
-                      </h3>
-                      <p className="text-regia-cream text-sm">{concert.date}</p>
+              {concerts.slice(1).map((concert) => {
+                const isMystery = concert.artist === 'Artista por Confirmar' || concert.artist.toLowerCase().includes('por confirmar');
+                
+                return (
+                  <div
+                    key={concert.id}
+                    className="regia-card-glow group cursor-pointer"
+                    onClick={() => handleSelectConcert(concert)}
+                  >
+                    <div className="relative h-80 overflow-hidden rounded-t-2xl bg-gradient-to-br from-regia-black via-regia-metallic-gray to-regia-black">
+                      {isMystery ? (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center">
+                            <p className="text-regia-gold-bright text-6xl font-bold mb-4">?????</p>
+                            <p className="text-regia-cream/60 text-sm">Próximamente</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <Image
+                            src={concert.image}
+                            alt={concert.artist}
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                        </>
+                      )}
+                      
+                      <div className="absolute bottom-0 left-0 right-0 p-6">
+                        <h3 className="text-3xl font-bold text-regia-gold-bright mb-2">
+                          {isMystery ? '?????' : concert.artist}
+                        </h3>
+                        <p className="text-regia-cream text-sm">{isMystery ? '?????' : concert.date}</p>
+                      </div>
+                    </div>
+
+                    <div className="p-6">
+                      <div className="flex items-center gap-2 text-regia-cream/80 text-sm mb-4">
+                        <MapPin className="w-4 h-4 text-regia-gold-old" />
+                        <span>{isMystery ? '?????' : concert.venue}</span>
+                      </div>
+
+                      {!isMystery && concert.minPrice > 0 && (
+                        <p className="text-regia-gold-bright text-xl font-bold mb-4">
+                          Desde ${concert.minPrice.toLocaleString('es-MX')} MXN
+                        </p>
+                      )}
+
+                      {isMystery && (
+                        <p className="text-regia-gold-bright text-xl font-bold mb-4">
+                          ?????
+                        </p>
+                      )}
+
+                      <button className="regia-btn-secondary w-full">
+                        {isMystery ? 'Próximamente' : 'Ver Boletos'}
+                      </button>
                     </div>
                   </div>
-
-                  <div className="p-6">
-                    <div className="flex items-center gap-2 text-regia-cream/80 text-sm mb-4">
-                      <MapPin className="w-4 h-4 text-regia-gold-old" />
-                      <span>{concert.venue}</span>
-                    </div>
-
-                    {concert.minPrice > 0 && (
-                      <p className="text-regia-gold-bright text-xl font-bold mb-4">
-                        Desde ${concert.minPrice.toLocaleString('es-MX')} MXN
-                      </p>
-                    )}
-
-                    <button className="regia-btn-secondary w-full">
-                      Ver Boletos
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
