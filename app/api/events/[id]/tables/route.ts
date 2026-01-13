@@ -148,7 +148,7 @@ export async function GET(
       (tt) => !tt.isTable && (tt.category === "GENERAL" || tt.category === "PREFERENTE")
     );
 
-    // Mapear secciones desde la BD con coordenadas para el mapa
+    // Crear secciones con coordenadas fijas (siempre 3: GENERAL, PREFERENTE A, PREFERENTE B)
     const sections: Array<{
       id: string;
       name: string;
@@ -158,58 +158,66 @@ export async function GET(
       sold: number;
       color: string;
       description: string;
-      x?: number;
-      y?: number;
-      width?: number;
-      height?: number;
-    }> = sectionTicketTypes.map((tt) => {
-      // Mapear colores según categoría
-      let color = "#95a5a6"; // Default gris
-      let coords = {};
-      
-      if (tt.category === "GENERAL") {
-        color = "#8B7355";
-        // Coordenadas del image-map para GENERAL: (1859, 1486, 859, 952)
-        coords = {
-          x: 859,
-          y: 952,
-          width: 1859 - 859, // 1000px
-          height: 1486 - 952, // 534px
-        };
-      } else if (tt.category === "PREFERENTE") {
-        color = "#C5A059";
-        // Determinar si es PREFERENTE A o B según el nombre
-        if (tt.name.includes("A") || tt.name.toLowerCase().includes("izquierda")) {
-          // PREFERENTE A - Izquierda: (859, 754, 1342, 905)
-          coords = {
-            x: 859,
-            y: 754,
-            width: 1342 - 859, // 483px
-            height: 905 - 754, // 151px
-          };
-        } else {
-          // PREFERENTE B - Derecha: (1861, 908, 1375, 756)
-          coords = {
-            x: 1375,
-            y: 756,
-            width: 1861 - 1375, // 486px
-            height: 908 - 756, // 152px
-          };
-        }
-      }
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }> = [];
 
-      return {
-        id: tt.id,
-        name: tt.name,
-        type: tt.category as "GENERAL" | "PREFERENTE",
-        price: Number(tt.price),
-        capacity: tt.maxQuantity,
-        sold: tt.soldQuantity,
-        color,
-        description: tt.description || "",
-        ...coords,
-      };
-    });
+    // Buscar sección GENERAL en BD
+    const generalTicketType = sectionTicketTypes.find(tt => tt.category === "GENERAL");
+    if (generalTicketType) {
+      sections.push({
+        id: generalTicketType.id,
+        name: "GENERAL",
+        type: "GENERAL",
+        price: Number(generalTicketType.price),
+        capacity: generalTicketType.maxQuantity,
+        sold: generalTicketType.soldQuantity,
+        color: "#8B7355",
+        description: generalTicketType.description || "Zona general de pie",
+        x: 859,
+        y: 952,
+        width: 1000,
+        height: 534,
+      });
+    }
+
+    // Buscar sección PREFERENTE en BD (la dividiremos en A y B)
+    const preferenteTicketType = sectionTicketTypes.find(tt => tt.category === "PREFERENTE");
+    if (preferenteTicketType) {
+      // PREFERENTE A
+      sections.push({
+        id: `${preferenteTicketType.id}-a`,
+        name: "PREFERENTE A",
+        type: "PREFERENTE",
+        price: Number(preferenteTicketType.price),
+        capacity: Math.floor(preferenteTicketType.maxQuantity / 2),
+        sold: Math.floor(preferenteTicketType.soldQuantity / 2),
+        color: "#C5A059",
+        description: "Zona preferente izquierda",
+        x: 859,
+        y: 754,
+        width: 483,
+        height: 151,
+      });
+
+      // PREFERENTE B
+      sections.push({
+        id: `${preferenteTicketType.id}-b`,
+        name: "PREFERENTE B",
+        type: "PREFERENTE",
+        price: Number(preferenteTicketType.price),
+        capacity: Math.ceil(preferenteTicketType.maxQuantity / 2),
+        sold: Math.ceil(preferenteTicketType.soldQuantity / 2),
+        color: "#C5A059",
+        description: "Zona preferente derecha",
+        x: 1375,
+        y: 756,
+        width: 486,
+        height: 152,
+      });
+    }
 
     // Agregar sección de protección civil (siempre estática)
     sections.push({
