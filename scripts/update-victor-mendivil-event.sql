@@ -10,7 +10,7 @@ WHERE id = '4c875499-c609-4b11-9bdf-1ce5a9295b5c';
 -- 2. ACTUALIZAR INFORMACIÓN DEL EVENTO DE VÍCTOR MENDIVIL
 UPDATE "Event"
 SET 
-  venue = 'Campo La Union Patriotas',
+  venue = 'Campo La Unión Patriotas',
   "eventDate" = '2026-03-26 21:00:00'::timestamp,
   "eventTime" = '21:00 hrs',
   "updatedAt" = NOW()

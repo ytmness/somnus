@@ -422,7 +422,7 @@ export default function HomePage() {
             {/* Eventos */}
             <a
               href="#eventos"
-              className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+              className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-colors text-sm font-medium uppercase tracking-wider"
             >
               <Calendar className="w-4 h-4" />
               <span>Eventos</span>
@@ -431,7 +431,7 @@ export default function HomePage() {
             {/* Mis Boletos */}
             <button
               onClick={() => router.push("/mis-boletos")}
-              className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+              className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-colors text-sm font-medium uppercase tracking-wider"
             >
               <Music className="w-4 h-4" />
               <span>Mis Boletos</span>
@@ -441,7 +441,7 @@ export default function HomePage() {
             {userRole === "ADMIN" && (
               <button
                 onClick={() => router.push("/admin")}
-                className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+                className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-colors text-sm font-medium uppercase tracking-wider"
               >
                 <Shield className="w-4 h-4" />
                 <span>Admin</span>
@@ -452,7 +452,7 @@ export default function HomePage() {
             {(userRole === "ACCESOS" || userRole === "ADMIN") && (
               <button
                 onClick={() => router.push("/accesos")}
-                className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+                className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-colors text-sm font-medium uppercase tracking-wider"
               >
                 <Scan className="w-4 h-4" />
                 <span>Accesos</span>
@@ -463,7 +463,7 @@ export default function HomePage() {
             {user ? (
               <button
                 onClick={() => router.push("/login")}
-                className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+                className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-colors text-sm font-medium uppercase tracking-wider"
               >
                 <User className="w-4 h-4" />
                 <span>{user.name || user.email}</span>
@@ -471,7 +471,7 @@ export default function HomePage() {
             ) : (
               <button
                 onClick={() => router.push("/login")}
-                className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
+                className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-colors text-sm font-medium uppercase tracking-wider"
               >
                 <LogIn className="w-4 h-4" />
                 <span>Login</span>
@@ -558,7 +558,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Scroll indicator - Estrella */}
-                <div className="mt-3 sm:mt-4 md:mt-6 lg:mt-8 ml-0 sm:ml-2 animate-bounce cursor-pointer hover:scale-110 transition-transform duration-300">
+                <div className="mt-3 sm:mt-4 md:mt-6 lg:mt-8 ml-0 sm:ml-2 cursor-pointer">
                   <Image 
                     src="/assets/estrella.png" 
                     alt="Scroll" 
@@ -606,7 +606,7 @@ export default function HomePage() {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
               {/* Fecha */}
               <div className="text-center p-8 regia-ticket-card">
                 <Calendar className="w-12 h-12 text-regia-gold-bright mx-auto mb-4" />
@@ -630,6 +630,28 @@ export default function HomePage() {
                 <h3 className="regia-title-secondary text-xl mb-2">Artista</h3>
                 <p className="regia-text-body">{featuredEvent.artist}</p>
               </div>
+            </div>
+
+            {/* Mapa del evento */}
+            <div className="regia-ticket-card p-4 sm:p-6 overflow-hidden">
+              <h3 className="regia-title-secondary text-xl mb-4 text-center">
+                Ubicación del Evento
+              </h3>
+              <div className="w-full h-64 sm:h-80 md:h-96 rounded-lg overflow-hidden">
+                <iframe
+                  src={`https://www.google.com/maps?q=${encodeURIComponent(featuredEvent.venue)}&output=embed`}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="w-full h-full"
+                />
+              </div>
+              <p className="regia-text-body text-sm text-center mt-4">
+                {featuredEvent.venue}
+              </p>
             </div>
           </div>
         </section>
