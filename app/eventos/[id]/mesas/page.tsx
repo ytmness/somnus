@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Image from "next/image";
 import { PatriotasTablesMap } from "@/components/eventos/PatriotasTablesMap";
 import { IndividualTable, VIP_TABLES_162, NON_VIP_SECTIONS_162 } from "@/lib/patriotas-tables-162";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Trash2, ArrowLeft, MapPin, Users, CreditCard, Ticket, Info, X } from "lucide-react";
+import { ShoppingCart, Trash2, ArrowLeft, MapPin, Users, CreditCard, Ticket, Info, X, Calendar, Music, LogIn, User, Shield, Scan } from "lucide-react";
 import { toast } from "sonner";
-import { NavbarMockup, FooterMockup } from "@/components/NavbarFooter";
+import { FooterMockup } from "@/components/NavbarFooter";
 
 interface Section {
   id: string;
@@ -38,6 +39,8 @@ export default function EventMesasPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   // Función para cargar mesas y secciones desde la BD
   const loadTables = async () => {
@@ -71,6 +74,23 @@ export default function EventMesasPage() {
       setSections(NON_VIP_SECTIONS_162 as Section[]);
     }
   };
+
+  // Cargar sesión del usuario
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch("/api/auth/session");
+        const data = await response.json();
+        if (data.success && data.data) {
+          setUser(data.data.user);
+          setUserRole(data.data.user?.role || null);
+        }
+      } catch (error) {
+        console.log("No hay sesión activa");
+      }
+    };
+    checkSession();
+  }, []);
 
   // Cargar evento y mesas desde la BD
   useEffect(() => {
@@ -222,16 +242,68 @@ export default function EventMesasPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col regia-bg-textured">
-        <NavbarMockup
-          cartItemsCount={cartItems.reduce((sum, item) => {
-          if (item.table) return sum + 1;
-          if (item.section && item.quantity) return sum + item.quantity;
-          return sum;
-        }, 0)}
-          onCartClick={() => setShowCart(true)}
-        />
-        <main className="flex-grow w-full py-8">
+      <div className="min-h-screen flex flex-col regia-bg-main">
+        {/* Header flotante personalizado */}
+        <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-6 bg-regia-black/80 backdrop-blur-md border-b border-regia-gold-old/20">
+          <div className="w-full flex items-center justify-between">
+            {/* Logo GRUPO REGIA */}
+            <div className="flex-shrink-0">
+              <Image
+                src="/assets/logo-grupo-regia.png"
+                alt="Grupo Regia"
+                width={110}
+                height={65}
+                className="opacity-90 cursor-pointer"
+                onClick={() => router.push("/")}
+              />
+            </div>
+
+            {/* Navegación central */}
+            <div className="hidden lg:flex items-center gap-8">
+              <a href="/#eventos" className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105">
+                <Calendar className="w-4 h-4" />
+                <span>Eventos</span>
+              </a>
+              <button onClick={() => router.push("/mis-boletos")} className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105">
+                <Music className="w-4 h-4" />
+                <span>Mis Boletos</span>
+              </button>
+              <button onClick={() => setShowCart(true)} className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105 relative">
+                <ShoppingCart className="w-4 h-4" />
+                <span>Carrito</span>
+                {cartItems.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-regia-gold-bright text-regia-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartItems.length}
+                  </span>
+                )}
+              </button>
+              {user ? (
+                <button onClick={() => router.push("/login")} className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105">
+                  <User className="w-4 h-4" />
+                  <span>{user.name || user.email}</span>
+                </button>
+              ) : (
+                <button onClick={() => router.push("/login")} className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105">
+                  <LogIn className="w-4 h-4" />
+                  <span>Login</span>
+                </button>
+              )}
+            </div>
+
+            {/* Logo RICO O MUERTO */}
+            <div className="flex-shrink-0">
+              <Image
+                src="/assets/rico-muerto-logo.png"
+                alt="Rico o Muerto"
+                width={100}
+                height={50}
+                className="opacity-90 hover:opacity-100 transition-opacity"
+              />
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-grow w-full py-8 pt-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center py-20">
               <p className="text-regia-cream/70 text-xl">Cargando evento...</p>
@@ -256,17 +328,113 @@ export default function EventMesasPage() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col regia-bg-textured">
-      <NavbarMockup
-        cartItemsCount={cartItems.reduce((sum, item) => {
-          if (item.table) return sum + 1;
-          if (item.section && item.quantity) return sum + item.quantity;
-          return sum;
-        }, 0)}
-        onCartClick={() => setShowCart(true)}
-      />
+    <div className="min-h-screen flex flex-col regia-bg-main relative">
+      {/* Header flotante personalizado - igual a la landing */}
+      <header className="fixed top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-6 bg-regia-black/80 backdrop-blur-md border-b border-regia-gold-old/20">
+        {/* Versión móvil */}
+        <div className="w-full flex lg:hidden items-center justify-between">
+          <Image
+            src="/assets/logo-grupo-regia.png"
+            alt="Grupo Regia"
+            width={80}
+            height={48}
+            className="opacity-90 cursor-pointer"
+            onClick={() => router.push("/")}
+          />
+          <div className="flex items-center gap-4">
+            <button onClick={() => setShowCart(true)} className="relative text-regia-gold-old hover:text-regia-gold-bright transition-colors">
+              <ShoppingCart className="w-6 h-6" />
+              {cartItems.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-regia-gold-bright text-regia-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartItems.length}
+                </span>
+              )}
+            </button>
+            <button onClick={() => router.push("/login")} className="text-regia-gold-old hover:text-regia-gold-bright transition-colors">
+              <LogIn className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+
+        {/* Versión desktop */}
+        <div className="w-full hidden lg:flex items-center justify-between">
+          {/* Logo GRUPO REGIA */}
+          <div className="flex-shrink-0">
+            <Image
+              src="/assets/logo-grupo-regia.png"
+              alt="Grupo Regia"
+              width={110}
+              height={65}
+              className="opacity-90 cursor-pointer"
+              onClick={() => router.push("/")}
+            />
+          </div>
+
+          {/* Navegación central */}
+          <a href="/#eventos" className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105">
+            <Calendar className="w-4 h-4" />
+            <span>Eventos</span>
+          </a>
+
+          <button onClick={() => router.push("/mis-boletos")} className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105">
+            <Music className="w-4 h-4" />
+            <span>Mis Boletos</span>
+          </button>
+
+          {/* Admin - solo si tiene rol */}
+          {userRole === "ADMIN" && (
+            <button onClick={() => router.push("/admin")} className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105">
+              <Shield className="w-4 h-4" />
+              <span>Admin</span>
+            </button>
+          )}
+
+          {/* Accesos - solo si tiene rol */}
+          {(userRole === "ACCESOS" || userRole === "ADMIN") && (
+            <button onClick={() => router.push("/accesos")} className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105">
+              <Scan className="w-4 h-4" />
+              <span>Accesos</span>
+            </button>
+          )}
+
+          {/* Carrito */}
+          <button onClick={() => setShowCart(true)} className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105 relative">
+            <ShoppingCart className="w-4 h-4" />
+            <span>Carrito</span>
+            {cartItems.length > 0 && (
+              <span className="absolute -top-2 -right-2 bg-regia-gold-bright text-regia-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {cartItems.length}
+              </span>
+            )}
+          </button>
+
+          {/* Login / User */}
+          {user ? (
+            <button onClick={() => router.push("/login")} className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105">
+              <User className="w-4 h-4" />
+              <span>{user.name || user.email}</span>
+            </button>
+          ) : (
+            <button onClick={() => router.push("/login")} className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105">
+              <LogIn className="w-4 h-4" />
+              <span>Login</span>
+            </button>
+          )}
+
+          {/* Logo RICO O MUERTO */}
+          <div className="flex-shrink-0">
+            <Image
+              src="/assets/rico-muerto-logo.png"
+              alt="Rico o Muerto"
+              width={100}
+              height={50}
+              className="opacity-90 hover:opacity-100 transition-opacity"
+            />
+          </div>
+        </div>
+      </header>
       
-      <main className="flex-grow w-full py-8">
+      <main className="flex-grow w-full py-8 pt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Botón volver */}
         <Button
