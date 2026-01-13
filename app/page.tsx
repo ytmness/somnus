@@ -387,21 +387,21 @@ export default function HomePage() {
         )}
 
         {/* Header flotante con logos y navegación integrada */}
-        <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-6">
+        <header className="absolute top-0 left-0 right-0 z-30 px-3 sm:px-4 md:px-6 lg:px-12 py-2 sm:py-3 md:py-4 lg:py-6">
           {/* Versión móvil - Logos simplificados */}
           <div className="w-full flex lg:hidden items-center justify-between">
             <Image
               src="/assets/logo-grupo-regia.png"
               alt="Grupo Regia"
-              width={80}
-              height={48}
-              className="opacity-90"
+              width={60}
+              height={36}
+              className="opacity-90 sm:w-20 sm:h-12"
             />
             <button
               onClick={() => router.push("/login")}
               className="text-regia-gold-old hover:text-regia-gold-bright transition-colors"
             >
-              <LogIn className="w-6 h-6" />
+              <LogIn className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
           </div>
 
@@ -492,17 +492,17 @@ export default function HomePage() {
         </header>
 
         {/* Contenido principal - flujo vertical normal */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-6xl flex flex-col items-center justify-center px-2 sm:px-4 pt-16 sm:pt-20 md:pt-24">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-6xl flex flex-col items-center justify-center px-2 sm:px-4" style={{ paddingTop: 'clamp(80px, 15vh, 120px)' }}>
           {featuredEvent ? (
             <>
               {/* Nombre del evento - Victor Mendivil */}
-              <div className="w-full flex justify-center mb-3 sm:mb-4 md:mb-5 lg:mb-6 px-2 sm:px-4">
+              <div className="w-full flex justify-center mb-2 sm:mb-3 md:mb-4 lg:mb-5 xl:mb-6 px-2 sm:px-4 mt-4 sm:mt-6 md:mt-8">
                 <Image
                   src="/assets/victor-mendivil-title.png"
                   alt={featuredEvent.artist}
                   width={1689}
                   height={689}
-                  className="w-full max-w-[75%] xs:max-w-[80%] sm:max-w-[85%] md:max-w-md lg:max-w-2xl xl:max-w-4xl 2xl:max-w-6xl h-auto"
+                  className="w-full max-w-[70%] xs:max-w-[75%] sm:max-w-[80%] md:max-w-md lg:max-w-2xl xl:max-w-4xl 2xl:max-w-6xl h-auto"
                   style={{ 
                     filter: 'drop-shadow(0 0 20px rgba(244, 208, 63, 0.6))'
                   }}
