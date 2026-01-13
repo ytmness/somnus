@@ -581,7 +581,7 @@ export default function HomePage() {
       {/* SECCIÓN: TIPOS DE BOLETOS */}
       {featuredEvent && featuredEvent.sections.length > 0 && (
         <section className="relative py-24 px-4 sm:px-6 lg:px-8 regia-bg-main">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-6xl mx-auto pl-0 md:pl-8 lg:pl-12">
             <h2 className="regia-title-main text-4xl md:text-5xl text-center mb-4">
               Tipos de Boletos
             </h2>
@@ -640,7 +640,7 @@ export default function HomePage() {
       {/* SECCIÓN: TODOS LOS EVENTOS (si hay más de uno) */}
       {concerts.length > 1 && (
         <section className="relative py-24 px-4 sm:px-6 lg:px-8 regia-bg-main">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-6xl mx-auto pl-0 md:pl-8 lg:pl-12">
             <h2 className="regia-title-main text-4xl md:text-5xl text-center mb-16">
               Más Eventos
             </h2>
@@ -694,7 +694,7 @@ export default function HomePage() {
 
       {/* SECCIÓN: POR QUÉ COMPRAR CON NOSOTROS */}
       <section className="relative py-24 px-4 sm:px-6 lg:px-8 regia-bg-main">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto pl-0 md:pl-8 lg:pl-12">
           <div className="flex justify-center mb-16">
             <Image
               src="/assets/porque-grupo-regia-titulo.png"
