@@ -124,13 +124,6 @@ export function PatriotasTablesMap({
     return 0.9;
   };
 
-  // Manejar zoom con scroll del mouse
-  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    setZoom((prevZoom) => Math.max(0.3, Math.min(2.5, prevZoom + delta)));
-  };
-
   return (
     <div className="w-full max-w-7xl mx-auto">
       {/* Header */}
@@ -217,7 +210,7 @@ export function PatriotasTablesMap({
         </div>
 
         <div className="text-white/70 text-sm">
-          🖱️ Rueda del mouse sobre el mapa = Zoom | Actual: {(zoom * 100).toFixed(0)}%
+          Usa los botones para hacer zoom | Actual: {(zoom * 100).toFixed(0)}%
         </div>
       </div>
 
@@ -292,9 +285,7 @@ export function PatriotasTablesMap({
       {/* Mapa con imagen de fondo y overlay SVG */}
       <div 
         className="relative bg-[#1a1a1a] rounded-xl border border-[#c4a905]/20 overflow-auto flex items-center justify-center"
-        onWheel={handleWheel}
         style={{ 
-          cursor: "grab",
           minHeight: "600px",
           maxHeight: "800px",
         }}
