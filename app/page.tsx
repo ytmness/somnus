@@ -535,7 +535,7 @@ export default function HomePage() {
       {/* SECCIÓN: INFORMACIÓN DEL EVENTO */}
       {featuredEvent && (
         <section id="info-evento" className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black via-regia-metallic-gray/30 to-black">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <div className="flex justify-center mb-16">
               <Image
                 src="/assets/info-evento-titulo.png"
@@ -640,7 +640,7 @@ export default function HomePage() {
       {/* SECCIÓN: TODOS LOS EVENTOS (si hay más de uno) */}
       {concerts.length > 1 && (
         <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black via-regia-metallic-gray/20 to-black">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <h2 className="regia-title-main text-4xl md:text-5xl text-center mb-16">
               Más Eventos
             </h2>

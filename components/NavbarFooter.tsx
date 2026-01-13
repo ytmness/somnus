@@ -153,12 +153,10 @@ export function NavbarMockup({
  */
 interface FooterProps {
   logoUrl?: string;
-  productionBy?: string;
 }
 
 export function FooterMockup({
   logoUrl = "/assets/logo.png",
-  productionBy = "ECHO VISIONS",
 }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
@@ -244,25 +242,10 @@ export function FooterMockup({
 
         {/* Bottom Bar */}
         <div className="border-t border-regia-gold-old/20 pt-8 pb-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex flex-col items-center gap-4">
             {/* Copyright */}
-            <p className="regia-footer-text">
+            <p className="regia-footer-text text-center">
               © {currentYear} Grupo Regia. Todos los derechos reservados.
-            </p>
-
-            {/* Production Credit */}
-            <p className="regia-footer-text text-xs flex items-center gap-2">
-              <span className="hidden md:inline">PRODUCTION BY:</span>
-              <span className="text-regia-gold-old font-semibold tracking-wider">
-                {productionBy}
-              </span>
-            </p>
-          </div>
-
-          {/* Verification Code (estilo mockup) */}
-          <div className="mt-6 text-center">
-            <p className="text-regia-cream/40 text-xs tracking-widest">
-              CÓDIGO DE VERIFICACIÓN: <span className="text-regia-gold-old/60 font-mono">BNAGS-TB</span>
             </p>
           </div>
         </div>
