@@ -484,9 +484,6 @@ export default function EventMesasPage() {
                 {event.name}
               </h1>
             )}
-            <p className="regia-text-body text-lg">
-              {formattedDate} • {event.eventTime}
-            </p>
             <p className="regia-text-muted text-sm">
               {event.venue}
             </p>
