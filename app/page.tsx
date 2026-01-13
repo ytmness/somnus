@@ -639,13 +639,13 @@ export default function HomePage() {
       {featuredEvent && featuredEvent.sections.length > 0 && (
         <section className="relative py-24 px-4 sm:px-6 lg:px-8 regia-bg-main">
           <div className="max-w-6xl mx-auto pl-0 md:pl-8 lg:pl-12">
-            <div className="flex justify-start mb-16">
+            <div className="flex justify-center mb-16">
               <Image
                 src="/assets/tipos-de-boletos-titulo.png"
                 alt="Tipos de Boletos"
                 width={1456}
                 height={244}
-                className="w-full max-w-3xl h-auto"
+                className="w-full max-w-2xl h-auto"
                 style={{ 
                   filter: 'drop-shadow(0 0 15px rgba(244, 208, 63, 0.4))'
                 }}
@@ -708,13 +708,13 @@ export default function HomePage() {
       {concerts.length > 1 && (
         <section className="relative py-24 px-4 sm:px-6 lg:px-8 regia-bg-main">
           <div className="max-w-6xl mx-auto pl-0 md:pl-8 lg:pl-12">
-            <div className="flex justify-start mb-16">
+            <div className="flex justify-center mb-16">
               <Image
                 src="/assets/mas-eventos-titulo.png"
                 alt="Más Eventos"
                 width={1456}
                 height={244}
-                className="w-full max-w-4xl h-auto"
+                className="w-full max-w-2xl h-auto"
                 style={{ 
                   filter: 'drop-shadow(0 0 15px rgba(244, 208, 63, 0.4))'
                 }}
