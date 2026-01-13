@@ -9,7 +9,8 @@
     "lint": "next lint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "db:update-quantities": "tsx scripts/update-ticket-quantities.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
