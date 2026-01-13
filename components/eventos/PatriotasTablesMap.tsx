@@ -318,8 +318,8 @@ export function PatriotasTablesMap({
             className="absolute top-0 left-0 w-full h-full"
             style={{ pointerEvents: "none" }}
           >
-            {/* Secciones GENERAL, PREFERENTE A y B - visibles y clickeables */}
-            <g transform={`translate(${offsetX}, ${offsetY}) scale(${scale})`}>
+            {/* Secciones GENERAL, PREFERENTE A y B - con su propia transformación */}
+            <g transform={`translate(-1, 113) scale(1.0)`}>
               {sections.map((section) => {
                 if (!section.x || !section.y || !section.width || !section.height) return null;
                 const isSelected = selectedSection?.id === section.id;

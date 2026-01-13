@@ -164,7 +164,7 @@ export async function GET(
       height: number;
     }> = [];
 
-    // Buscar sección GENERAL en BD (con offset: x-1, y+113)
+    // Buscar sección GENERAL en BD
     const generalTicketType = sectionTicketTypes.find(tt => tt.category === "GENERAL");
     if (generalTicketType) {
       sections.push({
@@ -176,14 +176,14 @@ export async function GET(
         sold: generalTicketType.soldQuantity,
         color: "#8B7355",
         description: generalTicketType.description || "Zona general de pie",
-        x: 858,
-        y: 1065,
+        x: 859,
+        y: 952,
         width: 1000,
         height: 534,
       });
     }
 
-    // Buscar sección PREFERENTE en BD (la dividiremos en A y B, con offset: x-1, y+113)
+    // Buscar sección PREFERENTE en BD (la dividiremos en A y B)
     const preferenteTicketType = sectionTicketTypes.find(tt => tt.category === "PREFERENTE");
     if (preferenteTicketType) {
       // PREFERENTE A
@@ -196,8 +196,8 @@ export async function GET(
         sold: Math.floor(preferenteTicketType.soldQuantity / 2),
         color: "#C5A059",
         description: "Zona preferente izquierda",
-        x: 858,
-        y: 867,
+        x: 859,
+        y: 754,
         width: 483,
         height: 151,
       });
@@ -212,8 +212,8 @@ export async function GET(
         sold: Math.ceil(preferenteTicketType.soldQuantity / 2),
         color: "#C5A059",
         description: "Zona preferente derecha",
-        x: 1374,
-        y: 869,
+        x: 1375,
+        y: 756,
         width: 486,
         height: 152,
       });
