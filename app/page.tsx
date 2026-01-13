@@ -645,7 +645,7 @@ export default function HomePage() {
                 alt="Tipos de Boletos"
                 width={1456}
                 height={244}
-                className="w-full max-w-4xl h-auto"
+                className="w-full max-w-3xl h-auto"
                 style={{ 
                   filter: 'drop-shadow(0 0 15px rgba(244, 208, 63, 0.4))'
                 }}
@@ -714,7 +714,7 @@ export default function HomePage() {
                 alt="Más Eventos"
                 width={1456}
                 height={244}
-                className="w-full max-w-4xl h-auto"
+                className="w-full max-w-3xl h-auto"
                 style={{ 
                   filter: 'drop-shadow(0 0 15px rgba(244, 208, 63, 0.4))'
                 }}
