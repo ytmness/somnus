@@ -346,10 +346,10 @@ export function PatriotasTablesMap({
                       y={section.y}
                       width={section.width}
                       height={section.height}
-                      fill={isSelected ? "#FFD700" : isHovered ? "#FFA500" : "#FF0000"}
-                      stroke="#00FF00"
-                      strokeWidth={isSelected ? 8 : isHovered ? 6 : 5}
-                      opacity={0.8}
+                      fill={isSelected ? "#FFD700" : isHovered ? "#c4a905" : "transparent"}
+                      stroke={isSelected ? "#FFD700" : isHovered ? "#c4a905" : "#c4a905"}
+                      strokeWidth={isSelected ? 8 : isHovered ? 6 : 3}
+                      opacity={isSelected ? 0.6 : isHovered ? 0.4 : 0.2}
                       className={isClickable ? "cursor-pointer transition-all" : ""}
                       style={{ pointerEvents: isClickable ? "all" : "none" }}
                       onMouseEnter={() => isClickable && setHoveredSection(section.id)}
@@ -362,12 +362,13 @@ export function PatriotasTablesMap({
                       y={section.y + section.height / 2}
                       textAnchor="middle"
                       dominantBaseline="middle"
-                      fill="#FFFFFF"
+                      fill={isSelected ? "#FFD700" : isHovered ? "#FFD700" : "#c4a905"}
                       fontSize="60"
                       fontWeight="bold"
                       pointerEvents="none"
+                      opacity={isSelected ? 1 : isHovered ? 0.9 : 0.6}
                       style={{
-                        textShadow: "0 0 10px rgba(0,0,0,1)"
+                        textShadow: "0 0 10px rgba(0,0,0,0.8)"
                       }}
                     >
                       {section.name}
@@ -400,19 +401,21 @@ export function PatriotasTablesMap({
                     onMouseLeave={() => setHoveredTable(null)}
                     onClick={() => handleTableClick(table)}
                   />
-                  <text
-                    x={table.x + table.width / 2}
-                    y={table.y + table.height / 2}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill="#000"
-                    fontSize="14"
-                    fontWeight="bold"
-                    pointerEvents="none"
-                    opacity={getTableOpacity(table) * 1.2}
-                  >
-                    {table.number}
-                  </text>
+                  {/* Número de mesa: solo visible cuando está seleccionada */}
+                  {selectedTable?.id === table.id && (
+                    <text
+                      x={table.x + table.width / 2}
+                      y={table.y + table.height / 2}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fill="#000"
+                      fontSize="14"
+                      fontWeight="bold"
+                      pointerEvents="none"
+                    >
+                      {table.number}
+                    </text>
+                  )}
                 </g>
               ))}
             </g>
