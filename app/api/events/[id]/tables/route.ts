@@ -229,6 +229,10 @@ export async function GET(
       sold: 0,
       color: "#e0e0e0",
       description: "Zona de emergencias",
+      x: 680,
+      y: 50,
+      width: 800,
+      height: 200,
     });
 
     return NextResponse.json({
