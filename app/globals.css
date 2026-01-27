@@ -662,40 +662,50 @@ body::-webkit-scrollbar {
 
 /* Ocultar controles nativos del video y botón de play en móvil */
 video::-webkit-media-controls,
-video.hero-video-no-controls::-webkit-media-controls {
+video.hero-video-no-controls::-webkit-media-controls,
+video.video-cupido-mobile::-webkit-media-controls {
   display: none !important;
   -webkit-appearance: none !important;
 }
 
 video::-webkit-media-controls-enclosure,
-video.hero-video-no-controls::-webkit-media-controls-enclosure {
+video.hero-video-no-controls::-webkit-media-controls-enclosure,
+video.video-cupido-mobile::-webkit-media-controls-enclosure {
   display: none !important;
 }
 
 video::-webkit-media-controls-panel,
-video.hero-video-no-controls::-webkit-media-controls-panel {
+video.hero-video-no-controls::-webkit-media-controls-panel,
+video.video-cupido-mobile::-webkit-media-controls-panel {
   display: none !important;
 }
 
 video::-webkit-media-controls-start-playback-button,
-video.hero-video-no-controls::-webkit-media-controls-start-playback-button {
+video.hero-video-no-controls::-webkit-media-controls-start-playback-button,
+video.video-cupido-mobile::-webkit-media-controls-start-playback-button {
   display: none !important;
   opacity: 0 !important;
   pointer-events: none !important;
   -webkit-appearance: none !important;
+  visibility: hidden !important;
 }
 
 video::-webkit-media-controls-play-button,
-video.hero-video-no-controls::-webkit-media-controls-play-button {
+video.hero-video-no-controls::-webkit-media-controls-play-button,
+video.video-cupido-mobile::-webkit-media-controls-play-button {
   display: none !important;
   -webkit-appearance: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 video::-webkit-media-controls-overlay-play-button,
-video.hero-video-no-controls::-webkit-media-controls-overlay-play-button {
+video.hero-video-no-controls::-webkit-media-controls-overlay-play-button,
+video.video-cupido-mobile::-webkit-media-controls-overlay-play-button {
   display: none !important;
   opacity: 0 !important;
   -webkit-appearance: none !important;
+  visibility: hidden !important;
 }
 
 /* Firefox */
@@ -712,12 +722,55 @@ video.hero-video-no-controls::-ms-media-controls {
 
 /* Asegurar que el video no tenga apariencia nativa */
 video,
-video.hero-video-no-controls {
+video.hero-video-no-controls,
+video.video-cupido-mobile {
   -webkit-appearance: none !important;
   appearance: none !important;
 }
 
 video::-internal-media-controls-overlay-cast-button,
-video.hero-video-no-controls::-internal-media-controls-overlay-cast-button {
+video.hero-video-no-controls::-internal-media-controls-overlay-cast-button,
+video.video-cupido-mobile::-internal-media-controls-overlay-cast-button {
   display: none !important;
+}
+
+/* Ocultar controles específicamente en móvil para video cupido */
+@media (max-width: 767px) {
+  video.video-cupido-mobile {
+    -webkit-appearance: none !important;
+    pointer-events: none !important;
+  }
+  
+  video.video-cupido-mobile::-webkit-media-controls {
+    display: none !important;
+  }
+  
+  video.video-cupido-mobile::-webkit-media-controls-enclosure {
+    display: none !important;
+  }
+  
+  video.video-cupido-mobile::-webkit-media-controls-panel {
+    display: none !important;
+  }
+  
+  video.video-cupido-mobile::-webkit-media-controls-play-button {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+  }
+  
+  video.video-cupido-mobile::-webkit-media-controls-start-playback-button {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+  }
+  
+  video.video-cupido-mobile::-webkit-media-controls-overlay-play-button {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+  }
 }
