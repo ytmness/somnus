@@ -523,68 +523,6 @@ export default function HomePage() {
                 </div>
               </div>
               
-              {/* Versión alternativa con imagen del artista (oculta por defecto) */}
-              <div className="w-full flex justify-center mb-2 sm:mb-3 md:mb-4 lg:mb-5 xl:mb-6 px-2 sm:px-4 mt-4 sm:mt-6 md:mt-8 hidden">
-                <Image
-                  src="/assets/victor-mendivil-title.png"
-                  alt={featuredEvent.artist}
-                  width={1689}
-                  height={689}
-                  className="w-full max-w-[70%] xs:max-w-[75%] sm:max-w-[80%] md:max-w-md lg:max-w-2xl xl:max-w-4xl 2xl:max-w-6xl h-auto"
-                  style={{ 
-                    filter: 'drop-shadow(0 0 20px rgba(244, 208, 63, 0.6))'
-                  }}
-                  priority
-                />
-              </div>
-
-              {/* Contenedor para fecha, botón, info y estrella - ligeramente a la derecha */}
-              <div className="w-full flex flex-col items-center pl-0 md:pl-8 lg:pl-12 xl:pl-16 px-2 sm:px-4">
-                {/* Fecha - 28 de marzo */}
-                <div className="w-full flex justify-center mb-3 sm:mb-4 md:mb-5 lg:mb-6 xl:mb-8">
-                  <Image
-                    src="/assets/fecha-evento.png"
-                    alt="28 de marzo de 2026"
-                    width={1689}
-                    height={202}
-                    className="w-full max-w-[70%] xs:max-w-[75%] sm:max-w-[80%] md:max-w-sm lg:max-w-md xl:max-w-lg h-auto"
-                    style={{ 
-                      filter: 'drop-shadow(0 0 15px rgba(244, 208, 63, 0.5))'
-                    }}
-                    priority
-                  />
-                </div>
-
-                {/* Botón CTA - Comprar Boletos */}
-                <div className="mb-3 sm:mb-3 md:mb-4">
-                  <button
-                    onClick={() => handleSelectConcert(featuredEvent)}
-                    className="group relative inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 md:px-10 py-2.5 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-wider sm:tracking-widest overflow-hidden transition-all duration-300 hover:-translate-y-1"
-                    style={{
-                      background: 'linear-gradient(135deg, #C5A059 0%, #F4D03F 100%)',
-                      color: '#0A0A0A',
-                      borderRadius: '50px',
-                      boxShadow: '0 8px 32px rgba(244, 208, 63, 0.4)',
-                    }}
-                  >
-                    Comprar Boletos
-                  </button>
-                </div>
-
-                {/* Info adicional */}
-                <div className="flex flex-col md:flex-row items-center justify-center gap-2 sm:gap-2.5 md:gap-3 lg:gap-6 mb-3 sm:mb-3 md:mb-4">
-                  <div className="flex items-center gap-1.5 sm:gap-2 text-white/80 text-xs sm:text-sm">
-                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-white/60" />
-                    <span className="text-center sm:text-left">{featuredEvent.venue}</span>
-                  </div>
-                  {featuredEvent.time && (
-                    <div className="flex items-center gap-1.5 sm:gap-2 text-white/80 text-xs sm:text-sm">
-                      <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-white/60" />
-                      <span>{featuredEvent.time}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
             </>
           ) : (
             <>
