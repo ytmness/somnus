@@ -605,14 +605,29 @@ export default function HomePage() {
               </div>
             </>
           ) : (
-            <div className="text-center">
-              <h1 className="text-6xl mb-6 font-black text-regia-gold-bright">
-                Próximamente
+            <>
+              {/* Título SOMNUS con efecto stencil - siempre visible */}
+              <h1 className="somnus-title text-center mb-4">
+                <span>S</span>
+                <span className="stencil-o-alt">O</span>
+                <span>M</span>
+                <span>N</span>
+                <span className="stencil-u-alt">U</span>
+                <span>S</span>
               </h1>
-              <p className="regia-text-body text-xl">
-                Nuevos eventos muy pronto
+              
+              {/* Subtítulo AWAKE IN A DREAM */}
+              <p className="somnus-subtitle">
+                AWAKE IN A DREAM
               </p>
-            </div>
+              
+              {/* Mensaje cuando no hay eventos */}
+              <div className="mt-8 text-center opacity-80">
+                <p className="text-white text-sm md:text-base font-light tracking-wider">
+                  Próximamente
+                </p>
+              </div>
+            </>
           )}
         </div>
       </section>
