@@ -130,27 +130,26 @@ export default function HomePage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const cupidoVideoRef = useRef<HTMLVideoElement>(null);
 
-  // Reproducción automática del video del cupido - optimizado
+  // Reproducción automática del video del cupido - optimizado para autoplay
   useEffect(() => {
     const cupidoVideo = cupidoVideoRef.current;
     if (!cupidoVideo) return;
 
-    // Configurar para autoplay
+    // Configurar para autoplay (muted es necesario para autoplay en móvil)
     cupidoVideo.muted = true;
     cupidoVideo.volume = 0;
     cupidoVideo.defaultMuted = true;
     cupidoVideo.setAttribute('muted', '');
     cupidoVideo.setAttribute('playsinline', '');
+    cupidoVideo.setAttribute('autoplay', '');
     
     let hasPlayed = false;
 
     const forcePlayCupido = async () => {
       if (hasPlayed || !cupidoVideo) return;
       
-      // Solo intentar si el video tiene datos suficientes
-      if (cupidoVideo.readyState < 2) return;
-      
       try {
+        // Asegurar que esté muted para autoplay
         cupidoVideo.muted = true;
         cupidoVideo.volume = 0;
         
@@ -160,26 +159,41 @@ export default function HomePage() {
           hasPlayed = true;
         }
       } catch (error: any) {
-        // Silenciar errores de reproducción
+        // Reintentar después de un breve delay
+        setTimeout(() => {
+          if (!hasPlayed && cupidoVideo) {
+            cupidoVideo.play().catch(() => {});
+          }
+        }, 500);
       }
     };
 
-    // Intentar cuando el video esté listo
-    const handleCanPlayCupido = () => {
-      forcePlayCupido();
-    };
-    
-    // Si ya está listo, reproducir inmediatamente
+    // Intentar reproducir inmediatamente si el video ya tiene datos
     if (cupidoVideo.readyState >= 2) {
       forcePlayCupido();
     }
     
-    cupidoVideo.addEventListener('canplay', handleCanPlayCupido, { once: true });
-    cupidoVideo.addEventListener('canplaythrough', handleCanPlayCupido, { once: true });
+    // Event listeners para reproducir cuando el video esté listo
+    const handleCanPlay = () => forcePlayCupido();
+    const handleLoadedData = () => forcePlayCupido();
+    const handleLoadedMetadata = () => {
+      cupidoVideo.muted = true;
+      forcePlayCupido();
+    };
+    
+    cupidoVideo.addEventListener('loadedmetadata', handleLoadedMetadata);
+    cupidoVideo.addEventListener('loadeddata', handleLoadedData);
+    cupidoVideo.addEventListener('canplay', handleCanPlay);
+    cupidoVideo.addEventListener('canplaythrough', handleCanPlay);
+
+    // Intentar reproducir después de un breve delay
+    setTimeout(forcePlayCupido, 100);
 
     return () => {
-      cupidoVideo.removeEventListener('canplay', handleCanPlayCupido);
-      cupidoVideo.removeEventListener('canplaythrough', handleCanPlayCupido);
+      cupidoVideo.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      cupidoVideo.removeEventListener('loadeddata', handleLoadedData);
+      cupidoVideo.removeEventListener('canplay', handleCanPlay);
+      cupidoVideo.removeEventListener('canplaythrough', handleCanPlay);
     };
   }, []);
 
@@ -409,7 +423,7 @@ export default function HomePage() {
             loop
             muted
             playsInline
-            preload="metadata"
+            preload="auto"
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover hero-video-no-controls video-cupido-mobile"
             style={{
               objectPosition: 'center 45%',
@@ -424,6 +438,14 @@ export default function HomePage() {
             x-webkit-airplay="allow"
             disablePictureInPicture
             controlsList="nodownload"
+            onLoadedData={(e) => {
+              const video = e.currentTarget;
+              video.play().catch(() => {});
+            }}
+            onCanPlay={(e) => {
+              const video = e.currentTarget;
+              video.play().catch(() => {});
+            }}
             onError={(e) => {
               console.error('Error cargando video:', e);
             }}
