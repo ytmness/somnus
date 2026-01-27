@@ -347,17 +347,27 @@ export default function HomePage() {
     <div className="min-h-screen somnus-bg-main overflow-x-hidden">
       {/* HERO SECTION - Estilo SOMNUS con ángel de fondo */}
       <section className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden somnus-hero">
-        {/* Imagen del ángel como fondo - posicionado para abrazar las letras */}
+        {/* Video del ángel como fondo - posicionado para abrazar las letras */}
         <div className="absolute inset-0 z-[1]">
-          <div 
-            className="absolute inset-0 bg-contain bg-center bg-no-repeat"
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className="w-full h-full object-contain object-center hero-video-no-controls"
             style={{
-              backgroundImage: 'url(/assets/cupido-angel.png)',
-              backgroundPosition: 'center 45%',
-              backgroundSize: 'contain',
+              objectPosition: 'center 45%',
               opacity: 0.9
             }}
-          />
+            webkit-playsinline="true"
+            x5-playsinline="true"
+            x-webkit-airplay="allow"
+            disablePictureInPicture
+            controlsList="nodownload"
+          >
+            <source src="/assets/cupido-angel-video.mp4" type="video/mp4" />
+          </video>
           {/* Overlay oscuro sutil para mantener legibilidad */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/30" />
         </div>
