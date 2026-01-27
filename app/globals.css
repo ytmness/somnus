@@ -26,14 +26,16 @@ body::-webkit-scrollbar {
 
 @layer base {
   :root {
-    /* === PALETA SOMNUS - Diseño Nocturno Púrpura/Magenta === */
+    /* === PALETA SOMNUS - Tema San Valentín Rosa === */
     /* Colores principales del diseño inspirado */
     --somnus-black: #0A0A0A;
-    --somnus-purple-dark: #1A011A;
-    --somnus-purple-vibrant: #8A2BE2;
-    --somnus-magenta: #FF00FF;
+    --somnus-pink-dark: #1A0014;
+    --somnus-pink-vibrant: #FF69B4;
+    --somnus-pink-bright: #FF1493;
+    --somnus-pink-soft: #FFB6C1;
+    --somnus-pink-light: #FFC0CB;
     --somnus-white: #FFFFFF;
-    --somnus-cream: #E0E0E0;
+    --somnus-cream: #FFE4E1;
     
     /* Colores legacy (mantener compatibilidad) */
     --regia-black: #0A0A0A;
@@ -125,9 +127,9 @@ body::-webkit-scrollbar {
   .regia-bg-main {
     @apply bg-[#0A0A0A];
     background: 
-      radial-gradient(ellipse at top center, rgba(138, 43, 226, 0.4) 0%, transparent 60%),
-      radial-gradient(ellipse at center, rgba(255, 0, 255, 0.3) 0%, transparent 70%),
-      radial-gradient(ellipse at bottom center, rgba(26, 1, 26, 0.9) 0%, #0A0A0A 100%),
+      radial-gradient(ellipse at top center, rgba(255, 105, 180, 0.4) 0%, transparent 60%),
+      radial-gradient(ellipse at center, rgba(255, 20, 147, 0.3) 0%, transparent 70%),
+      radial-gradient(ellipse at bottom center, rgba(26, 0, 20, 0.9) 0%, #0A0A0A 100%),
       #0A0A0A;
     background-attachment: fixed;
   }
@@ -135,9 +137,9 @@ body::-webkit-scrollbar {
   .somnus-bg-main {
     position: relative;
     background: 
-      radial-gradient(ellipse at top center, rgba(255, 105, 180, 0.3) 0%, transparent 60%),
-      radial-gradient(ellipse at center, rgba(255, 20, 147, 0.25) 0%, transparent 70%),
-      radial-gradient(ellipse at bottom center, rgba(199, 21, 133, 0.4) 0%, #0A0A0A 100%),
+      radial-gradient(ellipse at top center, rgba(255, 105, 180, 0.4) 0%, transparent 60%),
+      radial-gradient(ellipse at center, rgba(255, 20, 147, 0.3) 0%, transparent 70%),
+      radial-gradient(ellipse at bottom center, rgba(26, 0, 20, 0.9) 0%, #0A0A0A 100%),
       #0A0A0A;
     background-attachment: fixed;
   }
@@ -147,8 +149,8 @@ body::-webkit-scrollbar {
     position: absolute;
     inset: 0;
     background: 
-      radial-gradient(circle at 30% 40%, rgba(255, 105, 180, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 70% 60%, rgba(255, 20, 147, 0.2) 0%, transparent 50%);
+      radial-gradient(circle at 30% 40%, rgba(255, 105, 180, 0.25) 0%, transparent 50%),
+      radial-gradient(circle at 70% 60%, rgba(255, 20, 147, 0.25) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
   }
@@ -168,51 +170,58 @@ body::-webkit-scrollbar {
     background: linear-gradient(135deg, #C5A059 0%, #F4D03F 100%);
   }
   
-  /* ===== BOTONES SOMNUS - Tema San Valentín Rosa ===== */
+  /* ===== BOTONES SOMNUS ===== */
   .somnus-btn {
     @apply font-bold uppercase tracking-wider px-8 py-3.5 rounded-full;
     @apply transition-all duration-300 ease-in-out;
-    background: rgba(255, 105, 180, 0.2);
+    background: rgba(255, 255, 255, 0.1);
     color: #FFFFFF;
-    border: 1px solid rgba(255, 105, 180, 0.5);
+    border: 1px solid rgba(255, 105, 180, 0.4);
     backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(255, 105, 180, 0.4), 0 0 20px rgba(255, 20, 147, 0.3);
+    box-shadow: 0 8px 32px rgba(255, 105, 180, 0.3);
   }
   
   .somnus-btn:hover {
     @apply -translate-y-0.5;
-    background: rgba(255, 105, 180, 0.3);
-    border-color: rgba(255, 20, 147, 0.7);
-    box-shadow: 0 12px 40px rgba(255, 105, 180, 0.6), 0 0 30px rgba(255, 20, 147, 0.5);
+    background: rgba(255, 105, 180, 0.2);
+    border-color: rgba(255, 20, 147, 0.6);
+    box-shadow: 0 12px 40px rgba(255, 105, 180, 0.5);
   }
   
-  /* Legacy - mantener compatibilidad - Adaptado a tema rosa */
+  /* Video del cupido - ajuste móvil */
+  @media (max-width: 767px) {
+    .video-cupido-mobile {
+      object-position: 30% 45% !important;
+    }
+  }
+  
+  /* Legacy - mantener compatibilidad */
   .regia-btn-primary {
     @apply font-bold uppercase tracking-wider px-8 py-3.5 rounded-full;
     @apply transition-all duration-300 ease-in-out;
-    background: rgba(255, 105, 180, 0.2);
+    background: rgba(255, 255, 255, 0.1);
     color: #FFFFFF;
-    border: 1px solid rgba(255, 105, 180, 0.5);
+    border: 1px solid rgba(255, 105, 180, 0.4);
     backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(255, 105, 180, 0.4), 0 0 20px rgba(255, 20, 147, 0.3);
+    box-shadow: 0 8px 32px rgba(255, 105, 180, 0.3);
   }
   
   .regia-btn-primary:hover {
     @apply -translate-y-0.5;
-    background: rgba(255, 105, 180, 0.3);
-    border-color: rgba(255, 20, 147, 0.7);
-    box-shadow: 0 12px 40px rgba(255, 105, 180, 0.6), 0 0 30px rgba(255, 20, 147, 0.5);
+    background: rgba(255, 105, 180, 0.2);
+    border-color: rgba(255, 20, 147, 0.6);
+    box-shadow: 0 12px 40px rgba(255, 105, 180, 0.5);
   }
   
   .regia-btn-secondary {
     @apply font-semibold uppercase tracking-wider px-8 py-3.5 rounded-full;
     @apply transition-all duration-300 ease-in-out;
-    @apply bg-transparent text-white border-2 border-pink-500/50;
+    @apply bg-transparent text-white border-2 border-pink-500/30;
   }
   
   .regia-btn-secondary:hover {
-    @apply bg-pink-500/20 text-white border-pink-500/70;
-    box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
+    @apply bg-pink-500/10 text-white border-pink-500/50;
+    box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
   }
   
   /* Botones legacy (compatibilidad) */
@@ -409,8 +418,8 @@ body::-webkit-scrollbar {
     letter-spacing: 0.05em;
     text-shadow: 
       0 0 20px rgba(255, 255, 255, 0.5),
-      0 0 40px rgba(138, 43, 226, 0.4),
-      0 0 60px rgba(255, 0, 255, 0.3);
+      0 0 40px rgba(255, 105, 180, 0.4),
+      0 0 60px rgba(255, 20, 147, 0.3);
     animation: somnus-logo-float 3s ease-in-out infinite, somnus-glow 3s ease-in-out infinite;
     cursor: pointer;
     display: inline-block;
@@ -500,8 +509,8 @@ body::-webkit-scrollbar {
   .regia-hero {
     @apply relative min-h-screen flex items-center justify-center overflow-hidden;
     background: 
-      radial-gradient(ellipse at top, rgba(138, 43, 226, 0.4) 0%, transparent 50%),
-      radial-gradient(ellipse at center, rgba(255, 0, 255, 0.3) 0%, transparent 60%),
+      radial-gradient(ellipse at top, rgba(255, 105, 180, 0.4) 0%, transparent 50%),
+      radial-gradient(ellipse at center, rgba(255, 20, 147, 0.3) 0%, transparent 60%),
       radial-gradient(ellipse at bottom, rgba(26, 1, 26, 0.9) 0%, #0A0A0A 100%),
       #0A0A0A;
     position: relative;
@@ -512,8 +521,8 @@ body::-webkit-scrollbar {
     position: absolute;
     inset: 0;
     background-image: 
-      radial-gradient(circle at 30% 40%, rgba(138, 43, 226, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 70% 60%, rgba(255, 0, 255, 0.2) 0%, transparent 50%);
+      radial-gradient(circle at 30% 40%, rgba(255, 105, 180, 0.2) 0%, transparent 50%),
+      radial-gradient(circle at 70% 60%, rgba(255, 20, 147, 0.2) 0%, transparent 50%);
     pointer-events: none;
     z-index: 1;
   }

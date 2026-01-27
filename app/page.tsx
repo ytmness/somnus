@@ -355,7 +355,7 @@ export default function HomePage() {
             muted
             playsInline
             preload="metadata"
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover hero-video-no-controls"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover hero-video-no-controls video-cupido-mobile"
             style={{
               objectPosition: 'center 45%',
               opacity: 0.9,
@@ -477,7 +477,7 @@ export default function HomePage() {
         </header>
 
         {/* Contenido principal - Estilo SOMNUS */}
-        <div className="absolute top-[60%] left-[45%] md:left-1/2 -translate-x-[45%] md:-translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-6xl flex flex-col items-center justify-center px-2 sm:px-4">
+        <div className="absolute top-[60%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-6xl flex flex-col items-center justify-center px-2 sm:px-4">
           {featuredEvent ? (
             <>
               {/* Título SOMNUS con efecto stencil */}
@@ -510,14 +510,14 @@ export default function HomePage() {
                 <button
                   onClick={() => handleSelectConcert(featuredEvent)}
                   className="group relative inline-flex items-center gap-2 sm:gap-3 px-8 sm:px-10 md:px-12 py-3 sm:py-4 text-sm md:text-base font-bold uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    color: '#FFFFFF',
-                    borderRadius: '50px',
-                    border: '1px solid rgba(255, 255, 255, 0.3)',
-                    backdropFilter: 'blur(10px)',
-                    boxShadow: '0 8px 32px rgba(138, 43, 226, 0.3)',
-                  }}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      color: '#FFFFFF',
+                      borderRadius: '50px',
+                      border: '1px solid rgba(255, 105, 180, 0.4)',
+                      backdropFilter: 'blur(10px)',
+                      boxShadow: '0 8px 32px rgba(255, 105, 180, 0.3)',
+                    }}
                 >
                   <span>Comprar Boletos</span>
                 </button>
