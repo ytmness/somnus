@@ -168,30 +168,49 @@ body::-webkit-scrollbar {
     background: linear-gradient(135deg, #C5A059 0%, #F4D03F 100%);
   }
   
-  /* ===== BOTONES ===== */
+  /* ===== BOTONES SOMNUS ===== */
+  .somnus-btn {
+    @apply font-bold uppercase tracking-wider px-8 py-3.5 rounded-full;
+    @apply transition-all duration-300 ease-in-out;
+    background: rgba(255, 255, 255, 0.1);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(138, 43, 226, 0.3);
+  }
+  
+  .somnus-btn:hover {
+    @apply -translate-y-0.5;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 40px rgba(255, 0, 255, 0.4);
+  }
+  
+  /* Legacy - mantener compatibilidad */
   .regia-btn-primary {
     @apply font-bold uppercase tracking-wider px-8 py-3.5 rounded-full;
     @apply transition-all duration-300 ease-in-out;
-    background: linear-gradient(135deg, #C5A059 0%, #F4D03F 100%);
-    color: #0A0A0A;
-    box-shadow: 0 4px 15px rgba(244, 208, 63, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(138, 43, 226, 0.3);
   }
   
   .regia-btn-primary:hover {
     @apply -translate-y-0.5;
-    box-shadow: 0 8px 25px rgba(244, 208, 63, 0.5);
-    filter: brightness(1.1);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 40px rgba(255, 0, 255, 0.4);
   }
   
   .regia-btn-secondary {
     @apply font-semibold uppercase tracking-wider px-8 py-3.5 rounded-full;
     @apply transition-all duration-300 ease-in-out;
-    @apply bg-transparent text-[#C5A059] border-2 border-[#C5A059];
+    @apply bg-transparent text-white border-2 border-white/30;
   }
   
   .regia-btn-secondary:hover {
-    @apply bg-[#C5A059] text-[#0A0A0A] border-[#F4D03F];
-    box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
+    @apply bg-white/10 text-white border-white/50;
+    box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
   }
   
   /* Botones legacy (compatibilidad) */
@@ -203,16 +222,26 @@ body::-webkit-scrollbar {
     @apply bg-[#2a2c30] hover:bg-[#49484e] text-[#f9fbf6] border border-[#c4a905]/20 transition-all;
   }
   
-  /* ===== TARJETAS ===== */
-  .regia-ticket-card {
-    @apply bg-[#2D2D2D] border border-[#C5A059] rounded-2xl p-6;
+  /* ===== TARJETAS SOMNUS (sin recuadros, solo texto) ===== */
+  .somnus-card {
+    @apply bg-transparent border-none p-6;
     @apply transition-all duration-300 ease-in-out;
-    backdrop-filter: blur(10px);
+  }
+  
+  .somnus-card:hover {
+    @apply -translate-y-1;
+  }
+  
+  /* Legacy - mantener para compatibilidad pero sin bordes */
+  .regia-ticket-card {
+    @apply bg-transparent border-none rounded-none p-6;
+    @apply transition-all duration-300 ease-in-out;
+    backdrop-filter: none;
   }
   
   .regia-ticket-card:hover {
-    @apply border-[#F4D03F] -translate-y-1;
-    box-shadow: 0 8px 30px rgba(197, 160, 89, 0.2);
+    @apply -translate-y-1;
+    box-shadow: none;
   }
   
   .regia-card {
@@ -240,7 +269,7 @@ body::-webkit-scrollbar {
     text-shadow: 0 0 40px rgba(244, 208, 63, 0.5);
   }
   
-  /* Título SOMNUS con efecto stencil */
+  /* Título SOMNUS con efecto stencil y animación */
   .somnus-title {
     @apply font-black uppercase leading-none text-white;
     font-family: var(--font-anton, var(--font-display), 'Arial Black', sans-serif);
@@ -248,8 +277,44 @@ body::-webkit-scrollbar {
     letter-spacing: 0.05em;
     text-transform: uppercase;
     position: relative;
-    text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    text-shadow: 
+      0 0 20px rgba(255, 255, 255, 0.5),
+      0 0 40px rgba(138, 43, 226, 0.4),
+      0 0 60px rgba(255, 0, 255, 0.3);
     display: inline-block;
+    animation: somnus-glow 3s ease-in-out infinite;
+  }
+  
+  @keyframes somnus-glow {
+    0%, 100% {
+      text-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.5),
+        0 0 40px rgba(138, 43, 226, 0.4),
+        0 0 60px rgba(255, 0, 255, 0.3);
+    }
+    50% {
+      text-shadow: 
+        0 0 30px rgba(255, 255, 255, 0.7),
+        0 0 60px rgba(138, 43, 226, 0.6),
+        0 0 90px rgba(255, 0, 255, 0.5);
+    }
+  }
+  
+  .somnus-title span {
+    display: inline-block;
+    animation: letter-float 2s ease-in-out infinite;
+  }
+  
+  .somnus-title span:nth-child(1) { animation-delay: 0s; }
+  .somnus-title span:nth-child(2) { animation-delay: 0.1s; }
+  .somnus-title span:nth-child(3) { animation-delay: 0.2s; }
+  .somnus-title span:nth-child(4) { animation-delay: 0.3s; }
+  .somnus-title span:nth-child(5) { animation-delay: 0.4s; }
+  .somnus-title span:nth-child(6) { animation-delay: 0.5s; }
+  
+  @keyframes letter-float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
   }
   
   /* Efecto stencil para letras O y U usando pseudo-elementos que cortan el texto */
@@ -312,7 +377,7 @@ body::-webkit-scrollbar {
     text-shadow: none;
   }
   
-  /* Subtítulo AWAKE IN A DREAM con letter-spacing muy amplio */
+  /* Subtítulo AWAKE IN A DREAM con letter-spacing muy amplio y animación */
   .somnus-subtitle {
     @apply uppercase text-white;
     font-family: var(--font-archivo, var(--font-sans), sans-serif);
@@ -321,6 +386,12 @@ body::-webkit-scrollbar {
     text-align: center;
     margin-top: 1rem;
     font-weight: 400;
+    animation: subtitle-fade 4s ease-in-out infinite;
+  }
+  
+  @keyframes subtitle-fade {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
   }
   
   /* Header con tres elementos */
@@ -341,13 +412,25 @@ body::-webkit-scrollbar {
     font-weight: 500;
   }
   
+  .somnus-title-secondary {
+    @apply font-semibold text-white;
+    font-family: var(--font-archivo, var(--font-sans), sans-serif);
+  }
+  
+  .somnus-text-body {
+    @apply text-white/80;
+    font-family: var(--font-archivo, var(--font-sans), sans-serif);
+    line-height: 1.6;
+  }
+  
+  /* Legacy - mantener compatibilidad */
   .regia-title-secondary {
-    @apply font-semibold text-[#E0E0E0];
+    @apply font-semibold text-white;
     font-family: var(--font-archivo, var(--font-sans), sans-serif);
   }
   
   .regia-text-body {
-    @apply text-[#E0E0E0];
+    @apply text-white/80;
     font-family: var(--font-archivo, var(--font-sans), sans-serif);
     line-height: 1.6;
   }
@@ -447,7 +530,7 @@ body::-webkit-scrollbar {
     color: #E0E0E0;
   }
   
-  /* Hero section específico para SOMNUS */
+  /* Hero section específico para SOMNUS con animación */
   .somnus-hero {
     @apply relative min-h-screen flex flex-col items-center justify-center overflow-hidden;
     background: #0A0A0A;
@@ -464,6 +547,7 @@ body::-webkit-scrollbar {
       radial-gradient(ellipse at bottom center, rgba(26, 1, 26, 1) 0%, #0A0A0A 100%);
     pointer-events: none;
     z-index: 1;
+    animation: background-pulse 8s ease-in-out infinite;
   }
   
   .somnus-hero::after {
@@ -475,6 +559,27 @@ body::-webkit-scrollbar {
       radial-gradient(circle at 70% 60%, rgba(255, 0, 255, 0.3) 0%, transparent 50%);
     pointer-events: none;
     z-index: 1;
+    animation: background-shift 12s ease-in-out infinite;
+  }
+  
+  @keyframes background-pulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
+  }
+  
+  @keyframes background-shift {
+    0%, 100% {
+      background-position: 30% 40%, 70% 60%;
+    }
+    50% {
+      background-position: 40% 50%, 60% 50%;
+    }
   }
   
   .somnus-hero-content {
