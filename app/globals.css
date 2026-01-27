@@ -188,10 +188,10 @@ body::-webkit-scrollbar {
     box-shadow: 0 12px 40px rgba(255, 105, 180, 0.5);
   }
   
-  /* Video del cupido - ajuste móvil */
+  /* Video del cupido - ajuste móvil hacia la izquierda */
   @media (max-width: 767px) {
     .video-cupido-mobile {
-      object-position: 30% 45% !important;
+      object-position: 20% 45% !important;
     }
   }
   
