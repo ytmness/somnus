@@ -12,7 +12,7 @@ NEXT_PUBLIC_APP_NAME=Tu Nombre - Boletera
 ```
 
 #### `app/layout.tsx` (líneas 32-44)
-- Cambiar título: `"Boletera Regia - Grupo Regia"` → `"Tu Nombre - Tu Cliente"`
+- Cambiar título: `"Boletera Regia - Somnus"` → `"Tu Nombre - Tu Cliente"`
 - Cambiar descripción
 - Cambiar keywords
 - Cambiar authors
@@ -57,32 +57,32 @@ Actualizar las variables CSS:
 ### 4. **Textos Hardcodeados**
 
 #### `app/page.tsx`
-- Línea 395, 410, 414: `alt="Grupo Regia"` → Tu nombre
+- Línea 395, 410, 414: `alt="Somnus"` → Tu nombre
 - Línea 481, 485: `alt="Rico o Muerto"` → Tu logo secundario
-- Línea 838: `alt="¿Por qué Grupo Regia?"` → Tu pregunta
-- Línea 889: `GRUPO REGIA` → Tu nombre
+- Línea 838: `alt="¿Por qué Somnus?"` → Tu pregunta
+- Línea 889: `Somnus` → Tu nombre
 - Línea 925: `RICO O MUERTO` → Tu marca secundaria
-- Línea 933: `© ${new Date().getFullYear()} Grupo Regia...` → Tu copyright
+- Línea 933: `© ${new Date().getFullYear()} Somnus...` → Tu copyright
 
 #### `app/login/page.tsx`
-- Línea 72, 88, 92: `alt="Grupo Regia"`
+- Línea 72, 88, 92: `alt="Somnus"`
 - Línea 159, 163: `alt="Rico o Muerto"`
-- Línea 183: `Grupo Regia` en título
+- Línea 183: `Somnus` en título
 
 #### `app/register/page.tsx`
-- Línea 81, 97, 101: `alt="Grupo Regia"`
+- Línea 81, 97, 101: `alt="Somnus"`
 - Línea 168, 172: `alt="Rico o Muerto"`
-- Línea 192: `Grupo Regia` en título
+- Línea 192: `Somnus` en título
 
 #### `app/verificar-email/page.tsx`
-- Línea 134, 150, 154: `alt="Grupo Regia"`
+- Línea 134, 150, 154: `alt="Somnus"`
 - Línea 221, 225: `alt="Rico o Muerto"`
 
 #### `app/mis-boletos/page.tsx`
 - Líneas 134, 144, 152, 179, 195, 199, 266, 270: Logos y alt texts
 
 #### `app/eventos/[id]/mesas/page.tsx`
-- Línea 318: `GRUPO REGIA`
+- Línea 318: `Somnus`
 - Línea 332: `RICO O MUERTO`
 - Línea 336: Copyright
 
@@ -92,8 +92,8 @@ Actualizar las variables CSS:
 ### 5. **Emails**
 
 #### `lib/services/email.ts`
-- Línea 53: `"Código de verificación - Grupo Regia"` → Tu nombre
-- Línea 71: `<h1>Grupo Regia</h1>` → Tu nombre
+- Línea 53: `"Código de verificación - Somnus"` → Tu nombre
+- Línea 71: `<h1>Somnus</h1>` → Tu nombre
 - Línea 76: Texto del email
 - Línea 82: Copyright en email
 - Línea 89: Asunto del email plano
@@ -101,8 +101,8 @@ Actualizar las variables CSS:
 ### 6. **PDFs de Boletos**
 
 #### `lib/services/ticket-generator.ts`
-- Línea 44: `pdf.text("GRUPO REGIA", ...)` → Tu nombre
-- Línea 119: `pdf.text("✓ GRUPO REGIA", ...)` → Tu nombre
+- Línea 44: `pdf.text("Somnus", ...)` → Tu nombre
+- Línea 119: `pdf.text("✓ Somnus", ...)` → Tu nombre
 
 ### 7. **Componentes**
 
@@ -140,17 +140,17 @@ cp .env.example .env
 ### Paso 4: Personalizar marca
 1. Reemplazar logos en `public/assets/`
 2. Actualizar colores en `tailwind.config.ts` y `app/globals.css`
-3. Buscar y reemplazar "Grupo Regia" y "Rico o Muerto" en todo el proyecto
+3. Buscar y reemplazar "Somnus" y "Rico o Muerto" en todo el proyecto
 4. Actualizar textos en emails y PDFs
 
 ### Paso 5: Buscar y reemplazar masivo
 ```bash
 # En Linux/Mac
-find . -type f -name "*.tsx" -o -name "*.ts" -o -name "*.md" | xargs sed -i 's/Grupo Regia/Tu Nombre/g'
+find . -type f -name "*.tsx" -o -name "*.ts" -o -name "*.md" | xargs sed -i 's/Somnus/Tu Nombre/g'
 find . -type f -name "*.tsx" -o -name "*.ts" | xargs sed -i 's/Rico o Muerto/Tu Marca Secundaria/g'
 
 # En Windows PowerShell
-Get-ChildItem -Recurse -Include *.tsx,*.ts,*.md | ForEach-Object { (Get-Content $_.FullName) -replace 'Grupo Regia','Tu Nombre' | Set-Content $_.FullName }
+Get-ChildItem -Recurse -Include *.tsx,*.ts,*.md | ForEach-Object { (Get-Content $_.FullName) -replace 'Somnus','Tu Nombre' | Set-Content $_.FullName }
 ```
 
 ### Paso 6: Construir y probar
@@ -211,7 +211,7 @@ regia: {
 
 - [ ] Logos reemplazados en `public/assets/`
 - [ ] Colores actualizados en `tailwind.config.ts` y `globals.css`
-- [ ] Textos "Grupo Regia" reemplazados
+- [ ] Textos "Somnus" reemplazados
 - [ ] Textos "Rico o Muerto" reemplazados
 - [ ] Metadata en `layout.tsx` actualizada
 - [ ] Emails personalizados
@@ -224,8 +224,8 @@ regia: {
 
 Para encontrar todas las referencias:
 ```bash
-# Buscar "Grupo Regia"
-grep -r "Grupo Regia" --include="*.tsx" --include="*.ts" --include="*.md" .
+# Buscar "Somnus"
+grep -r "Somnus" --include="*.tsx" --include="*.ts" --include="*.md" .
 
 # Buscar "Rico o Muerto"
 grep -r "Rico o Muerto" --include="*.tsx" --include="*.ts" --include="*.md" .
@@ -240,3 +240,4 @@ grep -r "regia-" --include="*.tsx" --include="*.ts" .
 - Si cambias los nombres de clases, actualiza también `globals.css`
 - Las imágenes de títulos pueden mantenerse si solo cambias el texto en ellas
 - Revisa los comentarios en el código para referencias adicionales
+

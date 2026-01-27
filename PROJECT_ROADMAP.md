@@ -32,7 +32,7 @@
 ### UI Base
 - [x] Layout principal
 - [x] Providers (React Query)
-- [x] Homepage con diseño Grupo Regia
+- [x] Homepage con diseño Somnus
 - [x] Componentes UI básicos (Button)
 - [x] Estilos globales con variables CSS
 
@@ -293,3 +293,4 @@
 
 **Última actualización**: Diciembre 28, 2025  
 **Estado actual**: FASE 1 Completa ✅ | FASE 2 en progreso 🚧
+

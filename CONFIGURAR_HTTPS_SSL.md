@@ -301,3 +301,4 @@ systemctl restart nginx
 
 **Importante**: Sin HTTPS, la cámara NO funcionará en móviles modernos (Android/iOS). Es un requisito de seguridad del navegador.
 
+

@@ -21,13 +21,13 @@ const anton = Anton({
 });
 
 export const metadata: Metadata = {
-  title: "Boletera Regia - Grupo Regia",
-  description: "Sistema de venta de boletos para eventos de Grupo Regia",
-  keywords: ["boletos", "eventos", "conciertos", "Grupo Regia", "Rico o Muerto"],
-  authors: [{ name: "Grupo Regia" }],
+  title: "Boletera Regia - Somnus",
+  description: "Sistema de venta de boletos para eventos de Somnus",
+  keywords: ["boletos", "eventos", "conciertos", "Somnus", "Rico o Muerto"],
+  authors: [{ name: "Somnus" }],
   openGraph: {
-    title: "Boletera Regia - Grupo Regia",
-    description: "Sistema de venta de boletos para eventos de Grupo Regia",
+    title: "Boletera Regia - Somnus",
+    description: "Sistema de venta de boletos para eventos de Somnus",
     type: "website",
   },
 };
@@ -48,3 +48,4 @@ export default function RootLayout({
     </html>
   );
 }
+

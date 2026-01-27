@@ -69,7 +69,7 @@ export default function LoginPage() {
         <div className="w-full flex lg:hidden items-center justify-between">
           <Image
             src="/assets/logo-grupo-regia.png"
-            alt="Grupo Regia"
+            alt="Somnus"
             width={80}
             height={48}
             className="opacity-90 cursor-pointer"
@@ -85,11 +85,11 @@ export default function LoginPage() {
 
         {/* Versión desktop - Navegación completa */}
         <div className="w-full hidden lg:flex items-center justify-between">
-          {/* Logo GRUPO REGIA */}
+          {/* Logo Somnus */}
           <div className="flex-shrink-0">
             <Image
               src="/assets/logo-grupo-regia.png"
-              alt="Grupo Regia"
+              alt="Somnus"
               width={110}
               height={65}
               className="opacity-90 cursor-pointer"
@@ -180,7 +180,7 @@ export default function LoginPage() {
                   Bienvenido a
                 </h1>
                 <h2 className="regia-title-secondary text-3xl md:text-4xl mb-6">
-                  Grupo Regia
+                  Somnus
                 </h2>
                 <p className="regia-text-body text-lg mb-8">
                   Accede a tu cuenta para gestionar tus boletos, ver tus eventos favoritos y disfrutar de experiencias exclusivas.
@@ -308,4 +308,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
 

@@ -117,3 +117,4 @@ cd ~/boletera && git pull origin main && npm run build && pm2 restart boletera
 
 Cursor leerá este archivo automáticamente y seguirá estas reglas sin necesidad de recordárselo cada vez.
 
+

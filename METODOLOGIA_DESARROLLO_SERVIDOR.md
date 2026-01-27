@@ -269,3 +269,4 @@ htop
 **Stack**: Next.js 14 + Prisma + Supabase + PM2 + Nginx  
 **Metodología**: Git-based deployment workflow
 
+

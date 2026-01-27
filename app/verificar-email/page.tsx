@@ -131,7 +131,7 @@ function VerificarEmailContent() {
         <div className="w-full flex lg:hidden items-center justify-between">
           <Image
             src="/assets/logo-grupo-regia.png"
-            alt="Grupo Regia"
+            alt="Somnus"
             width={80}
             height={48}
             className="opacity-90 cursor-pointer"
@@ -147,11 +147,11 @@ function VerificarEmailContent() {
 
         {/* Versión desktop - Navegación completa */}
         <div className="w-full hidden lg:flex items-center justify-between">
-          {/* Logo GRUPO REGIA */}
+          {/* Logo Somnus */}
           <div className="flex-shrink-0">
             <Image
               src="/assets/logo-grupo-regia.png"
-              alt="Grupo Regia"
+              alt="Somnus"
               width={110}
               height={65}
               className="opacity-90 cursor-pointer"
@@ -424,4 +424,5 @@ export default function VerificarEmailPage() {
     </Suspense>
   );
 }
+
 

@@ -67,3 +67,4 @@ export function calculateTax(subtotal: number): number {
 export function calculateTotal(subtotal: number): number {
   return subtotal + calculateTax(subtotal);
 }
+

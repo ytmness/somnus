@@ -174,3 +174,4 @@ export const SVG_VIEWPORT_162 = {
   height: 1800, // Alto aproximado para incluir todo
   viewBox: "0 0 2720 1800",
 };
+

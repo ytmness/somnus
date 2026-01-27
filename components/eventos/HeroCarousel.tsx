@@ -185,3 +185,4 @@ export function HeroCarousel({ concerts, onSelectConcert }: HeroCarouselProps) {
   );
 }
 
+

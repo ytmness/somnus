@@ -157,3 +157,4 @@ npx prisma migrate deploy
 # Cambiar puerto en .env o package.json
 PORT=3001 npm start
 ```
+

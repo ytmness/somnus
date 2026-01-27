@@ -392,7 +392,7 @@ export default function HomePage() {
           <div className="w-full flex lg:hidden items-center justify-between">
             <Image
               src="/assets/logo-grupo-regia.png"
-              alt="Grupo Regia"
+              alt="Somnus"
               width={60}
               height={36}
               className="opacity-90 sm:w-20 sm:h-12"
@@ -407,11 +407,11 @@ export default function HomePage() {
 
           {/* Versión desktop - Navegación completa */}
           <div className="w-full hidden lg:flex items-center justify-between">
-            {/* Logo GRUPO REGIA */}
+            {/* Logo Somnus */}
             <div className="flex-shrink-0">
               <Image
                 src="/assets/logo-grupo-regia.png"
-                alt="Grupo Regia"
+                alt="Somnus"
                 width={110}
                 height={65}
                 className="opacity-90 cursor-pointer"
@@ -835,7 +835,7 @@ export default function HomePage() {
           <div className="flex justify-center mb-8 sm:mb-12 lg:mb-16">
             <Image
               src="/assets/porque-grupo-regia-titulo.png"
-              alt="¿Por qué Grupo Regia?"
+              alt="¿Por qué Somnus?"
               width={1456}
               height={244}
               className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl h-auto"
@@ -886,7 +886,7 @@ export default function HomePage() {
             {/* Columna 1: Logo y descripción */}
             <div>
               <h3 className="text-regia-gold-old font-bold text-lg mb-4 tracking-wider">
-                GRUPO REGIA
+                Somnus
               </h3>
               <p className="regia-text-body text-sm">
                 Tu plataforma de confianza para eventos en vivo exclusivos
@@ -930,7 +930,7 @@ export default function HomePage() {
           {/* Copyright */}
           <div className="border-t border-regia-gold-old/20 pt-8 pb-6 text-center">
             <p className="regia-footer-text">
-              © {new Date().getFullYear()} Grupo Regia. Todos los derechos reservados.
+              © {new Date().getFullYear()} Somnus. Todos los derechos reservados.
             </p>
           </div>
         </div>
@@ -948,3 +948,4 @@ export default function HomePage() {
     </div>
   );
 }
+

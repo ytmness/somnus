@@ -101,3 +101,4 @@ export function Cart({ items, onClose, onRemoveItem, onCheckout }: CartProps) {
   );
 }
 
+

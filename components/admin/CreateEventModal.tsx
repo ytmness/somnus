@@ -534,3 +534,4 @@ export function CreateEventModal({ onClose, onSuccess }: CreateEventModalProps) 
     </div>
   );
 }
+

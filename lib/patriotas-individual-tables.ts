@@ -201,3 +201,4 @@ export const PATRIOTAS_EVENT_CONFIG = {
   vipTables: VIP_TABLES,
   sections: NON_VIP_SECTIONS,
 };
+

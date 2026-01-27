@@ -168,3 +168,4 @@ export async function validateVIPTableCapacity(
 
   return { valid: true };
 }
+

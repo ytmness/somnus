@@ -74,3 +74,4 @@ export function parseQRPayload(qrData: string): { ticketId: string; qrHash: stri
     return null;
   }
 }
+

@@ -1,6 +1,6 @@
 # 🎫 Boletera Regia - Sistema Profesional de Boletería
 
-Sistema completo de venta y gestión de boletos para eventos en vivo, desarrollado para **Grupo Regia**.
+Sistema completo de venta y gestión de boletos para eventos en vivo, desarrollado para **Somnus**.
 
 ## 📋 Características Principales
 
@@ -242,7 +242,7 @@ boletera-regia-v2/
 - **Impresión láser**
 
 ### Contenido
-- Logo Grupo Regia
+- Logo Somnus
 - Información del evento (artista, venue, fecha, hora)
 - Zona del boleto
 - QR prominente (55x55mm)
@@ -304,14 +304,14 @@ npm run lint             # Ejecuta ESLint
 
 ## 📄 Licencia
 
-Propietario: **Grupo Regia**  
+Propietario: **Somnus**  
 Todos los derechos reservados.
 
 ---
 
 ## 👨‍💻 Equipo de Desarrollo
 
-Desarrollado para **Grupo Regia**  
+Desarrollado para **Somnus**  
 Sistema de boletería premium para eventos en vivo.
 
 ---
@@ -319,3 +319,4 @@ Sistema de boletería premium para eventos en vivo.
 ## 📞 Soporte
 
 Para dudas o soporte técnico, contactar al equipo de desarrollo.
+

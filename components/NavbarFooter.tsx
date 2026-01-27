@@ -163,7 +163,7 @@ export function FooterMockup({
   const footerSections = {
     about: {
       title: "Sobre Nosotros",
-      content: "Grupo Regia es tu plataforma de confianza para eventos en vivo. Ofrecemos una experiencia única de compra de boletos.",
+      content: "Somnus es tu plataforma de confianza para eventos en vivo. Ofrecemos una experiencia única de compra de boletos.",
     },
     quickLinks: [
       { label: "Eventos", href: "#eventos" },
@@ -245,7 +245,7 @@ export function FooterMockup({
           <div className="flex flex-col items-center gap-4">
             {/* Copyright */}
             <p className="regia-footer-text text-center">
-              © {currentYear} Grupo Regia. Todos los derechos reservados.
+              © {currentYear} Somnus. Todos los derechos reservados.
             </p>
           </div>
         </div>
@@ -283,3 +283,4 @@ export function LayoutMockup({
     </div>
   );
 }
+

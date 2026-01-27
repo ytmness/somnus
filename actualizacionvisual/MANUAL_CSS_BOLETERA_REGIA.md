@@ -708,8 +708,8 @@ const anton = Anton({
 });
 
 export const metadata: Metadata = {
-  title: "Boletera Regia - Grupo Regia",
-  description: "Sistema de venta de boletos para eventos de Grupo Regia",
+  title: "Boletera Regia - Somnus",
+  description: "Sistema de venta de boletos para eventos de Somnus",
 };
 
 export default function RootLayout({
@@ -842,7 +842,7 @@ export default function RootLayout({
           Sobre Nosotros
         </h4>
         <p className="regia-text-body text-sm">
-          Grupo Regia es tu plataforma de confianza para eventos en vivo.
+          Somnus es tu plataforma de confianza para eventos en vivo.
         </p>
       </div>
       
@@ -879,7 +879,7 @@ export default function RootLayout({
     {/* Copyright */}
     <div className="border-t border-regia-gold-old/20 pt-6">
       <p className="regia-footer-text">
-        © 2025 Grupo Regia. Todos los derechos reservados.
+        © 2025 Somnus. Todos los derechos reservados.
       </p>
       <p className="regia-footer-text mt-2 text-xs">
         PRODUCTION BY: ECHO VISIONS
@@ -973,3 +973,4 @@ export default function RootLayout({
 **Basado en**: Guía de estilo de Victoria Ramos Pérez  
 **Fecha**: Enero 2026  
 **Versión**: 1.0
+

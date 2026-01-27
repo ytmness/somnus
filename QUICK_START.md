@@ -41,7 +41,7 @@ Edita `app/globals.css` líneas 31-35 con los mismos valores.
 ./scripts/customize-brand.sh "Tu Nombre" "Tu Marca Secundaria"
 
 # Opción 2: Buscar y reemplazar manualmente
-# Busca "Grupo Regia" y "Rico o Muerto" en todos los archivos .tsx y .ts
+# Busca "Somnus" y "Rico o Muerto" en todos los archivos .tsx y .ts
 ```
 
 ### 3️⃣ Construir y Desplegar
@@ -68,7 +68,7 @@ npm start
 
 ```bash
 # Encontrar todas las referencias
-grep -r "Grupo Regia" app/ components/ lib/
+grep -r "Somnus" app/ components/ lib/
 grep -r "Rico o Muerto" app/ components/ lib/
 ```
 
@@ -79,8 +79,8 @@ grep -r "Rico o Muerto" app/ components/ lib/
 rm -rf .next
 npm run build
 
-# Ver qué archivos tienen "Grupo Regia"
-grep -r "Grupo Regia" --include="*.tsx" --include="*.ts" .
+# Ver qué archivos tienen "Somnus"
+grep -r "Somnus" --include="*.tsx" --include="*.ts" .
 
 # Actualizar desde GitHub
 git pull origin main
@@ -103,3 +103,4 @@ pm2 restart boletera
 - [ ] Build exitoso
 
 ¡Listo! 🎉
+
