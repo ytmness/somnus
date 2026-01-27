@@ -317,57 +317,15 @@ body::-webkit-scrollbar {
     50% { transform: translateY(-5px); }
   }
   
-  /* Efecto stencil para letras O y U usando pseudo-elementos que cortan el texto */
+  /* Sin efecto stencil - letras normales */
   .somnus-title .stencil-o-alt {
     position: relative;
     display: inline-block;
   }
   
-  /* Corte superior en la O */
-  .somnus-title .stencil-o-alt::before {
-    content: '';
-    position: absolute;
-    top: 20%;
-    left: 20%;
-    width: 60%;
-    height: 25%;
-    background: #0A0A0A;
-    border-radius: 50%;
-    z-index: 2;
-    pointer-events: none;
-  }
-  
-  /* Corte inferior en la O */
-  .somnus-title .stencil-o-alt::after {
-    content: '';
-    position: absolute;
-    bottom: 20%;
-    left: 20%;
-    width: 60%;
-    height: 25%;
-    background: #0A0A0A;
-    border-radius: 50%;
-    z-index: 2;
-    pointer-events: none;
-  }
-  
   .somnus-title .stencil-u-alt {
     position: relative;
     display: inline-block;
-  }
-  
-  /* Corte en la parte inferior de la U */
-  .somnus-title .stencil-u-alt::before {
-    content: '';
-    position: absolute;
-    bottom: 15%;
-    left: 25%;
-    width: 50%;
-    height: 18%;
-    background: #0A0A0A;
-    border-radius: 0 0 8px 8px;
-    z-index: 2;
-    pointer-events: none;
   }
   
   /* Alternativa usando text-stroke para efecto más sutil */
