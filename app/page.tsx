@@ -355,10 +355,14 @@ export default function HomePage() {
             muted
             playsInline
             preload="auto"
-            className="w-full h-full object-contain object-center hero-video-no-controls"
+            className="w-full h-full object-cover object-center hero-video-no-controls"
             style={{
               objectPosition: 'center 45%',
-              opacity: 0.9
+              opacity: 0.9,
+              minWidth: '100%',
+              minHeight: '100%',
+              width: '100%',
+              height: '100%'
             }}
             webkit-playsinline="true"
             x5-playsinline="true"
