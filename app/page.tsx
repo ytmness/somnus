@@ -594,16 +594,16 @@ export default function HomePage() {
         <section id="info-evento" className="relative py-24 px-4 sm:px-6 lg:px-8 regia-bg-main">
           <div className="max-w-6xl mx-auto pl-0 md:pl-8 lg:pl-12">
             <div className="flex justify-center mb-8 sm:mb-12 lg:mb-16">
-              <Image
-                src="/assets/info-evento-titulo.png"
-                alt="Información del Evento"
-                width={1456}
-                height={244}
-                className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl h-auto"
-                style={{ 
-                  filter: 'drop-shadow(0 0 15px rgba(244, 208, 63, 0.4))'
-                }}
-              />
+            <Image
+              src="/assets/info-evento-titulo.png"
+              alt="Información del Evento"
+              width={1456}
+              height={244}
+              className="w-full max-w-[280px] sm:max-w-[320px] md:max-w-[360px] lg:max-w-[500px] h-auto"
+              style={{ 
+                filter: 'drop-shadow(0 0 15px rgba(244, 208, 63, 0.4))'
+              }}
+            />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
@@ -838,7 +838,7 @@ export default function HomePage() {
               alt="¿Por qué Somnus?"
               width={1456}
               height={244}
-              className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl h-auto"
+              className="w-full max-w-[280px] sm:max-w-[320px] md:max-w-[360px] lg:max-w-[500px] h-auto"
               style={{ 
                 filter: 'drop-shadow(0 0 15px rgba(244, 208, 63, 0.4))'
               }}

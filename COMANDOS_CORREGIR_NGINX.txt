@@ -1,0 +1,67 @@
+═══════════════════════════════════════════════════════════════
+  COMANDOS PARA CORREGIR ARCHIVO NGINX
+═══════════════════════════════════════════════════════════════
+
+OPCIÓN 1: Eliminar primera línea con sed (RÁPIDO)
+───────────────────────────────────────────────────────────────
+
+sed -i '1d' /etc/nginx/sites-available/somnus
+
+# Verificar que se eliminó
+cat /etc/nginx/sites-available/somnus
+
+# Verificar sintaxis
+nginx -t
+
+───────────────────────────────────────────────────────────────
+
+OPCIÓN 2: Recrear archivo completo (MÁS SEGURO)
+───────────────────────────────────────────────────────────────
+
+# Eliminar archivo
+rm /etc/nginx/sites-available/somnus
+
+# Crear nuevo
+nano /etc/nginx/sites-available/somnus
+
+# Pegar esto (SIN la línea `nginx):
+server {
+    listen 80;
+    server_name somnus.live www.somnus.live;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+
+# Guardar: CTRL + O, ENTER, CTRL + X
+
+───────────────────────────────────────────────────────────────
+
+DESPUÉS DE CORREGIR:
+───────────────────────────────────────────────────────────────
+
+# Verificar sintaxis
+nginx -t
+
+# Si pasa, reiniciar
+systemctl restart nginx
+
+# Verificar estado
+systemctl status nginx
+
+# Detener Apache para liberar puerto 80
+systemctl stop apache2
+
+# Verificar que Nginx está usando puerto 80
+sudo ss -tlnp | grep :80
+
+═══════════════════════════════════════════════════════════════

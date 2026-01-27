@@ -1,0 +1,105 @@
+# Comandos para diagnosticar problema de dominio
+
+# ============================================
+# DESDE TU COMPUTADORA (Windows)
+# ============================================
+
+# Verificar DNS
+nslookup somnus.live
+nslookup www.somnus.live
+
+# Probar conexión HTTP
+curl http://somnus.live
+curl http://www.somnus.live
+
+# Probar conexión HTTPS
+curl https://somnus.live
+
+# ============================================
+# DESDE EL SERVIDOR (SSH)
+# ============================================
+
+ssh root@144.202.72.150
+
+# 1. Verificar Nginx
+systemctl status nginx
+nginx -t
+
+# 2. Verificar puertos
+sudo ss -tlnp | grep :80
+sudo ss -tlnp | grep :3000
+
+# 3. Ver configuración de Nginx
+cat /etc/nginx/sites-available/somnus
+grep -r "server_name" /etc/nginx/sites-enabled/
+
+# 4. Ver logs de error
+tail -50 /var/log/nginx/error.log
+tail -50 /var/log/nginx/access.log
+
+# 5. Verificar firewall
+ufw status
+
+# 6. Probar conexión local
+curl http://localhost
+curl -H "Host: somnus.live" http://localhost
+curl -H "Host: www.somnus.live" http://localhost
+
+# 7. Verificar PM2 (app Next.js)
+pm2 status
+pm2 logs somnus --lines 20
+
+# 8. Verificar DNS desde el servidor
+nslookup somnus.live
+dig somnus.live
+
+# ============================================
+# CORREGIR CONFIGURACIÓN NGINX
+# ============================================
+
+# Si la configuración está mal, recrearla:
+nano /etc/nginx/sites-available/somnus
+
+# Pegar esta configuración:
+server {
+    listen 80;
+    server_name somnus.live www.somnus.live;
+
+    access_log /var/log/nginx/somnus-access.log;
+    error_log /var/log/nginx/somnus-error.log;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+
+# Guardar: CTRL+O, ENTER, CTRL+X
+
+# Verificar y reiniciar
+nginx -t
+systemctl restart nginx
+systemctl status nginx
+
+# ============================================
+# PERMITIR FIREWALL
+# ============================================
+
+ufw allow 80/tcp
+ufw allow 443/tcp
+ufw status
+
+# ============================================
+# INSTALAR SSL (OPCIONAL PERO RECOMENDADO)
+# ============================================
+
+apt update
+apt install -y certbot python3-certbot-nginx
+certbot --nginx -d somnus.live -d www.somnus.live
