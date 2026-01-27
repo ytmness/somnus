@@ -345,28 +345,21 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen somnus-bg-main overflow-x-hidden">
-      {/* HERO SECTION - Estilo SOMNUS con ambiente nocturno */}
+      {/* HERO SECTION - Estilo SOMNUS con ángel de fondo */}
       <section className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden somnus-hero">
-        {/* Overlay con gradientes púrpura/magenta para ambiente nocturno */}
+        {/* Imagen del ángel como fondo - posicionado para abrazar las letras */}
         <div className="absolute inset-0 z-0">
-          {/* Gradientes radiales que simulan luces de neón púrpura/magenta */}
-          <div className="absolute inset-0">
-            {/* Luz principal superior central (magenta/púrpura) */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-purple-600/40 rounded-full blur-[150px] opacity-60" />
-            {/* Luces laterales */}
-            <div className="absolute top-1/3 left-1/4 w-[600px] h-[600px] bg-fuchsia-500/30 rounded-full blur-[120px] opacity-50" />
-            <div className="absolute top-1/3 right-1/4 w-[600px] h-[600px] bg-purple-500/30 rounded-full blur-[120px] opacity-50" />
-            {/* Luz inferior (más oscura) */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-purple-900/60 rounded-full blur-[180px] opacity-80" />
-          </div>
-          
-          {/* Overlay oscuro con gradiente para profundidad */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/90" />
-          
-          {/* Efecto de neblina/humo con gradientes adicionales */}
-          <div className="absolute inset-0 opacity-40">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] bg-gradient-radial from-purple-500/20 via-fuchsia-500/10 to-transparent rounded-full blur-[200px]" />
-          </div>
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: 'url(/assets/cupido-angel.png)',
+              backgroundPosition: 'center center',
+              backgroundSize: 'cover',
+              opacity: 0.9
+            }}
+          />
+          {/* Overlay oscuro sutil para mantener legibilidad */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/50" />
         </div>
         
         {/* Video de fondo opcional (solo si existe featuredEvent) - con overlay más oscuro */}
