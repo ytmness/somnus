@@ -67,8 +67,8 @@ export default function LoginPage() {
       <header className="somnus-header">
         {/* Versión móvil */}
         <div className="w-full flex lg:hidden items-center justify-between">
-          <h1 className="somnus-logo" onClick={() => router.push("/")}>
-            <span>S</span><span>O</span><span>M</span><span>N</span><span>U</span><span>S</span>
+          <h1 className="somnus-logo" onClick={() => router.push("/")} style={{ animation: 'none' }}>
+            SOMNUS
           </h1>
           <button
             onClick={() => router.push("/")}
@@ -80,8 +80,8 @@ export default function LoginPage() {
 
         {/* Versión desktop */}
         <div className="w-full hidden lg:flex items-center justify-between">
-          <h1 className="somnus-logo" onClick={() => router.push("/")}>
-            <span>S</span><span>O</span><span>M</span><span>N</span><span>U</span><span>S</span>
+          <h1 className="somnus-logo" onClick={() => router.push("/")} style={{ animation: 'none' }}>
+            SOMNUS
           </h1>
           
           <div className="flex items-center gap-6">
@@ -117,10 +117,6 @@ export default function LoginPage() {
               </button>
             )}
           </div>
-          
-          <h1 className="somnus-logo" onClick={() => router.push("/")}>
-            <span>S</span><span>O</span><span>M</span><span>N</span><span>U</span><span>S</span>
-          </h1>
         </div>
       </header>
 
@@ -134,8 +130,8 @@ export default function LoginPage() {
                 <h1 className="somnus-title-secondary text-4xl md:text-5xl mb-4 uppercase">
                   Bienvenido a
                 </h1>
-                <h2 className="somnus-title text-5xl md:text-6xl mb-6">
-                  <span>S</span><span>O</span><span>M</span><span>N</span><span>U</span><span>S</span>
+                <h2 className="somnus-title-secondary text-5xl md:text-6xl mb-6 uppercase">
+                  SOMNUS
                 </h2>
                 <p className="somnus-text-body text-lg mb-8">
                   Accede a tu cuenta para gestionar tus boletos, ver tus eventos favoritos y disfrutar de experiencias exclusivas.
