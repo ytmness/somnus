@@ -350,16 +350,17 @@ export default function HomePage() {
         {/* Imagen del ángel como fondo - posicionado para abrazar las letras */}
         <div className="absolute inset-0 z-0">
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            className="absolute inset-0 bg-contain bg-center bg-no-repeat"
             style={{
               backgroundImage: 'url(/assets/cupido-angel.png)',
-              backgroundPosition: 'center center',
-              backgroundSize: 'cover',
-              opacity: 0.9
+              backgroundPosition: 'center 45%',
+              backgroundSize: 'contain',
+              opacity: 0.85,
+              transform: 'scale(1.1)'
             }}
           />
           {/* Overlay oscuro sutil para mantener legibilidad */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40" />
         </div>
         
         {/* Video de fondo opcional (solo si existe featuredEvent) - con overlay más oscuro */}
