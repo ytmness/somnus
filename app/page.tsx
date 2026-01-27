@@ -348,21 +348,21 @@ export default function HomePage() {
       {/* HERO SECTION - Estilo SOMNUS con ángel de fondo */}
       <section className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden somnus-hero">
         {/* Video del ángel como fondo - posicionado para abrazar las letras */}
-        <div className="absolute inset-0 z-[1]">
+        <div className="absolute inset-0 z-[1] w-full h-full overflow-hidden">
           <video
             autoPlay
             loop
             muted
             playsInline
             preload="auto"
-            className="w-full h-full object-cover object-center hero-video-no-controls"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover hero-video-no-controls"
             style={{
               objectPosition: 'center 45%',
               opacity: 0.9,
-              minWidth: '100%',
-              minHeight: '100%',
-              width: '100%',
-              height: '100%'
+              width: '100vw',
+              height: '100vh',
+              minWidth: '100vw',
+              minHeight: '100vh'
             }}
             webkit-playsinline="true"
             x5-playsinline="true"
