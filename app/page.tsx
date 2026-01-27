@@ -128,6 +128,68 @@ export default function HomePage() {
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const cupidoVideoRef = useRef<HTMLVideoElement>(null);
+
+  // Reproducción automática del video del cupido
+  useEffect(() => {
+    const cupidoVideo = cupidoVideoRef.current;
+    if (!cupidoVideo) return;
+
+    // Configurar para autoplay
+    cupidoVideo.muted = true;
+    cupidoVideo.volume = 0;
+    cupidoVideo.defaultMuted = true;
+    cupidoVideo.setAttribute('muted', '');
+    cupidoVideo.setAttribute('playsinline', '');
+    
+    let hasPlayed = false;
+
+    const forcePlayCupido = async () => {
+      if (hasPlayed || !cupidoVideo) return;
+      
+      try {
+        cupidoVideo.muted = true;
+        cupidoVideo.volume = 0;
+        
+        const playPromise = cupidoVideo.play();
+        if (playPromise !== undefined) {
+          await playPromise;
+          hasPlayed = true;
+        }
+      } catch (error: any) {
+        console.error("Error reproduciendo video cupido:", error);
+      }
+    };
+
+    // Intentos múltiples
+    forcePlayCupido();
+    setTimeout(forcePlayCupido, 100);
+    setTimeout(forcePlayCupido, 300);
+    setTimeout(forcePlayCupido, 500);
+    setTimeout(forcePlayCupido, 1000);
+    
+    const handleCanPlayCupido = () => {
+      forcePlayCupido();
+    };
+    const handleLoadedDataCupido = () => {
+      forcePlayCupido();
+    };
+    const handleLoadedMetadataCupido = () => {
+      forcePlayCupido();
+    };
+    
+    cupidoVideo.addEventListener('loadedmetadata', handleLoadedMetadataCupido);
+    cupidoVideo.addEventListener('loadeddata', handleLoadedDataCupido);
+    cupidoVideo.addEventListener('canplay', handleCanPlayCupido);
+    cupidoVideo.addEventListener('canplaythrough', handleCanPlayCupido);
+
+    return () => {
+      cupidoVideo.removeEventListener('loadedmetadata', handleLoadedMetadataCupido);
+      cupidoVideo.removeEventListener('loadeddata', handleLoadedDataCupido);
+      cupidoVideo.removeEventListener('canplay', handleCanPlayCupido);
+      cupidoVideo.removeEventListener('canplaythrough', handleCanPlayCupido);
+    };
+  }, []);
 
   // Reproducción automática agresiva con DEBUG
   useEffect(() => {
@@ -350,11 +412,12 @@ export default function HomePage() {
         {/* Video del ángel como fondo - posicionado para abrazar las letras */}
         <div className="absolute inset-0 z-[1] w-full h-full overflow-hidden">
           <video
+            ref={cupidoVideoRef}
             autoPlay
             loop
             muted
             playsInline
-            preload="metadata"
+            preload="auto"
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover hero-video-no-controls video-cupido-mobile"
             style={{
               objectPosition: 'center 45%',
