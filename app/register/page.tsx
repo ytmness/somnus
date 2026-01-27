@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Mail, User, ArrowLeft, Calendar, Music, Shield, Scan, LogIn, Ticket, CheckCircle } from "lucide-react";
+import { SomnusHeader } from "@/components/SomnusHeader";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -71,112 +72,9 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen regia-bg-main overflow-x-hidden">
-      {/* Header flotante con logos y navegación integrada */}
-      <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-6">
-        {/* Versión móvil - Logos simplificados */}
-        <div className="w-full flex lg:hidden items-center justify-between">
-          <Image
-            src="/assets/logo-grupo-regia.png"
-            alt="Somnus"
-            width={80}
-            height={48}
-            className="opacity-90 cursor-pointer"
-            onClick={() => router.push("/")}
-          />
-          <button
-            onClick={() => router.push("/")}
-            className="text-regia-gold-old hover:text-regia-gold-bright transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-        </div>
-
-        {/* Versión desktop - Navegación completa */}
-        <div className="w-full hidden lg:flex items-center justify-between">
-          {/* Logo Somnus */}
-          <div className="flex-shrink-0">
-            <Image
-              src="/assets/logo-grupo-regia.png"
-              alt="Somnus"
-              width={110}
-              height={65}
-              className="opacity-90 cursor-pointer"
-              onClick={() => router.push("/")}
-            />
-          </div>
-
-          {/* Eventos */}
-          <button
-            onClick={() => router.push("/#eventos")}
-            className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
-          >
-            <Calendar className="w-4 h-4" />
-            <span>Eventos</span>
-          </button>
-
-          {/* Mis Boletos */}
-          <button
-            onClick={() => router.push("/mis-boletos")}
-            className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
-          >
-            <Music className="w-4 h-4" />
-            <span>Mis Boletos</span>
-          </button>
-
-          {/* Admin - solo si tiene rol */}
-          {userRole === "ADMIN" && (
-            <button
-              onClick={() => router.push("/admin")}
-              className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
-            >
-              <Shield className="w-4 h-4" />
-              <span>Admin</span>
-            </button>
-          )}
-
-          {/* Accesos - solo si tiene rol */}
-          {(userRole === "ACCESOS" || userRole === "ADMIN") && (
-            <button
-              onClick={() => router.push("/accesos")}
-              className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
-            >
-              <Scan className="w-4 h-4" />
-              <span>Accesos</span>
-            </button>
-          )}
-
-          {/* Login / User */}
-          {user ? (
-            <button
-              onClick={() => router.push("/login")}
-              className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
-            >
-              <User className="w-4 h-4" />
-              <span>{user.name || user.email}</span>
-            </button>
-          ) : (
-            <button
-              onClick={() => router.push("/login")}
-              className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105"
-            >
-              <LogIn className="w-4 h-4" />
-              <span>Login</span>
-            </button>
-          )}
-
-          {/* Logo Somnus */}
-          <div className="flex-shrink-0">
-            <Image
-              src="/assets/rico-muerto-logo.png"
-              alt="Somnus"
-              width={100}
-              height={50}
-              className="opacity-90 hover:opacity-100 transition-opacity"
-            />
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen somnus-bg-main overflow-x-hidden">
+      {/* Header estilo SOMNUS */}
+      <SomnusHeader user={user} userRole={userRole} showNav={true} />
 
       {/* Contenido principal */}
       <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-32">
