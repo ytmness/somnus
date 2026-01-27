@@ -478,11 +478,11 @@ export default function HomePage() {
               </button>
             )}
 
-            {/* Logo RICO O MUERTO */}
+            {/* Logo Somnus */}
             <div className="flex-shrink-0">
               <Image
                 src="/assets/rico-muerto-logo.png"
-                alt="Rico o Muerto"
+                alt="Somnus"
                 width={100}
                 height={50}
                 className="opacity-90 hover:opacity-100 transition-opacity"
@@ -919,10 +919,7 @@ export default function HomePage() {
             <div>
               <h4 className="regia-title-secondary text-base mb-4">Contacto</h4>
               <p className="regia-text-body text-sm mb-2">
-                contacto@grupoRegia.com
-              </p>
-              <p className="text-regia-gold-old text-xs font-semibold tracking-wider mt-4">
-                RICO O MUERTO
+                contacto@somnus.com
               </p>
             </div>
           </div>

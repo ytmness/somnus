@@ -218,11 +218,11 @@ function VerificarEmailContent() {
             </button>
           )}
 
-          {/* Logo RICO O MUERTO */}
+          {/* Logo Somnus */}
           <div className="flex-shrink-0">
             <Image
               src="/assets/rico-muerto-logo.png"
-              alt="Rico o Muerto"
+              alt="Somnus"
               width={100}
               height={50}
               className="opacity-90 hover:opacity-100 transition-opacity"

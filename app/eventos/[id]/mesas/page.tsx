@@ -245,11 +245,11 @@ export default function EventMesasPage() {
         {/* Header flotante personalizado */}
         <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-6 bg-regia-black/80 backdrop-blur-md border-b border-regia-gold-old/20">
           <div className="w-full flex items-center justify-between">
-            {/* Logo GRUPO REGIA */}
+            {/* Logo Somnus */}
             <div className="flex-shrink-0">
               <Image
                 src="/assets/logo-grupo-regia.png"
-                alt="Grupo Regia"
+                alt="Somnus"
                 width={110}
                 height={65}
                 className="opacity-90 cursor-pointer"
@@ -289,11 +289,11 @@ export default function EventMesasPage() {
               )}
             </div>
 
-            {/* Logo RICO O MUERTO */}
+            {/* Logo Somnus */}
             <div className="flex-shrink-0">
               <Image
                 src="/assets/rico-muerto-logo.png"
-                alt="Rico o Muerto"
+                alt="Somnus"
                 width={100}
                 height={50}
                 className="opacity-90 hover:opacity-100 transition-opacity"
@@ -315,7 +315,7 @@ export default function EventMesasPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
               <div>
-                <h3 className="text-regia-gold-old font-bold text-lg mb-4 tracking-wider">GRUPO REGIA</h3>
+                <h3 className="text-regia-gold-old font-bold text-lg mb-4 tracking-wider">SOMNUS</h3>
                 <p className="regia-text-body text-sm">Tu plataforma de confianza para eventos en vivo exclusivos</p>
               </div>
               <div>
@@ -328,12 +328,11 @@ export default function EventMesasPage() {
               </div>
               <div>
                 <h4 className="regia-title-secondary text-base mb-4">Contacto</h4>
-                <p className="regia-text-body text-sm mb-2">contacto@grupoRegia.com</p>
-                <p className="text-regia-gold-old text-xs font-semibold tracking-wider mt-4">RICO O MUERTO</p>
+                <p className="regia-text-body text-sm mb-2">contacto@somnus.com</p>
               </div>
             </div>
             <div className="border-t border-regia-gold-old/20 pt-8 pb-6 text-center">
-              <p className="regia-footer-text">© {new Date().getFullYear()} Grupo Regia. Todos los derechos reservados.</p>
+              <p className="regia-footer-text">© {new Date().getFullYear()} Somnus. Todos los derechos reservados.</p>
             </div>
           </div>
         </footer>
@@ -361,7 +360,7 @@ export default function EventMesasPage() {
         <div className="w-full flex lg:hidden items-center justify-between">
           <Image
             src="/assets/logo-grupo-regia.png"
-            alt="Grupo Regia"
+            alt="Somnus"
             width={80}
             height={48}
             className="opacity-90 cursor-pointer"
@@ -384,11 +383,11 @@ export default function EventMesasPage() {
 
         {/* Versión desktop */}
         <div className="w-full hidden lg:flex items-center justify-between">
-          {/* Logo GRUPO REGIA */}
+          {/* Logo Somnus */}
           <div className="flex-shrink-0">
             <Image
               src="/assets/logo-grupo-regia.png"
-              alt="Grupo Regia"
+              alt="Somnus"
               width={110}
               height={65}
               className="opacity-90 cursor-pointer"
@@ -447,11 +446,11 @@ export default function EventMesasPage() {
             </button>
           )}
 
-          {/* Logo RICO O MUERTO */}
+          {/* Logo Somnus */}
           <div className="flex-shrink-0">
             <Image
               src="/assets/rico-muerto-logo.png"
-              alt="Rico o Muerto"
+              alt="Somnus"
               width={100}
               height={50}
               className="opacity-90 hover:opacity-100 transition-opacity"
@@ -853,7 +852,7 @@ export default function EventMesasPage() {
             {/* Columna 1: Logo y descripción */}
             <div>
               <h3 className="text-regia-gold-old font-bold text-lg mb-4 tracking-wider">
-                GRUPO REGIA
+                SOMNUS
               </h3>
               <p className="regia-text-body text-sm">
                 Tu plataforma de confianza para eventos en vivo exclusivos
@@ -886,18 +885,18 @@ export default function EventMesasPage() {
             <div>
               <h4 className="regia-title-secondary text-base mb-4">Contacto</h4>
               <p className="regia-text-body text-sm mb-2">
-                contacto@grupoRegia.com
+                contacto@somnus.com
               </p>
               <p className="text-regia-gold-old text-xs font-semibold tracking-wider mt-4">
-                RICO O MUERTO
+                SOMNUS
               </p>
             </div>
           </div>
 
           {/* Copyright */}
           <div className="border-t border-regia-gold-old/20 pt-8 pb-6 text-center">
-            <p className="regia-footer-text">
-              © {new Date().getFullYear()} Grupo Regia. Todos los derechos reservados.
+              <p className="regia-footer-text">
+              © {new Date().getFullYear()} Somnus. Todos los derechos reservados.
             </p>
           </div>
         </div>

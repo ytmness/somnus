@@ -70,7 +70,7 @@ export function HeroExample({
           Buy Tickets
         </button>
 
-        {/* Logo (opcional, como "Rico o Muerto" en el mockup) */}
+        {/* Logo (opcional, como "Somnus" en el mockup) */}
         {logoUrl && (
           <div className="mt-12 flex justify-center">
             <Image

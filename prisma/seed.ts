@@ -64,12 +64,12 @@ async function main() {
   // #endregion
   
   const admin = await prisma.user.upsert({
-    where: { email: "admin@grupoRegia.com" },
+    where: { email: "admin@somnus.com" },
     update: {},
     create: {
-      email: "admin@grupoRegia.com",
+      email: "admin@somnus.com",
       password: adminPassword,
-      name: "Admin Regia",
+      name: "Admin Somnus",
       role: "ADMIN",
       isActive: true,
     },
@@ -80,12 +80,12 @@ async function main() {
   // Crear usuario vendedor
   const vendedorPassword = await bcrypt.hash("vendedor123", 10);
   const vendedor = await prisma.user.upsert({
-    where: { email: "vendedor@grupoRegia.com" },
+    where: { email: "vendedor@somnus.com" },
     update: {},
     create: {
-      email: "vendedor@grupoRegia.com",
+      email: "vendedor@somnus.com",
       password: vendedorPassword,
-      name: "Vendedor Regia",
+      name: "Vendedor Somnus",
       role: "VENDEDOR",
       isActive: true,
     },
@@ -147,10 +147,10 @@ async function main() {
   console.log("\n🎉 Seed completado!\n");
   console.log("📝 Credenciales de acceso:");
   console.log("   Admin:");
-  console.log("   - Email: admin@grupoRegia.com");
+  console.log("   - Email: admin@somnus.com");
   console.log("   - Password: admin123\n");
   console.log("   Vendedor:");
-  console.log("   - Email: vendedor@grupoRegia.com");
+  console.log("   - Email: vendedor@somnus.com");
   console.log("   - Password: vendedor123\n");
 }
 

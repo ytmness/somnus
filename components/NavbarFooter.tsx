@@ -36,7 +36,7 @@ export function NavbarMockup({
           <Link href="/" className="flex-shrink-0 hover:opacity-80 transition-opacity">
             <Image
               src={logoUrl}
-              alt="Rico o Muerto"
+              alt="Somnus"
               width={100}
               height={50}
               className="h-10 md:h-12 w-auto"
@@ -174,7 +174,7 @@ export function FooterMockup({
     ],
     contact: {
       title: "Contacto",
-      email: "contacto@grupoRegia.com",
+      email: "contacto@somnus.com",
       phone: "+52 (81) 1234-5678",
       hours: "Lunes a Viernes: 9:00 AM - 8:00 PM",
     },
@@ -189,7 +189,7 @@ export function FooterMockup({
           <div className="lg:col-span-2">
             <Image
               src={logoUrl}
-              alt="Rico o Muerto"
+              alt="Somnus"
               width={120}
               height={60}
               className="mb-6 opacity-90"
