@@ -345,12 +345,33 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen regia-bg-main overflow-x-hidden">
-      {/* HERO SECTION - Estilo Flyer Cuernavaca con Video de Fondo */}
-      <section className="relative w-full min-h-screen flex flex-col items-center justify-end overflow-hidden bg-black">
-        {/* Video de fondo (solo desktop) / Imagen (móvil) */}
+      {/* HERO SECTION - Estilo SOMNUS con ambiente nocturno */}
+      <section className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden somnus-hero">
+        {/* Overlay con gradientes púrpura/magenta para ambiente nocturno */}
+        <div className="absolute inset-0 z-0">
+          {/* Gradientes radiales que simulan luces de neón púrpura/magenta */}
+          <div className="absolute inset-0">
+            {/* Luz principal superior central (magenta/púrpura) */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-purple-600/40 rounded-full blur-[150px] opacity-60" />
+            {/* Luces laterales */}
+            <div className="absolute top-1/3 left-1/4 w-[600px] h-[600px] bg-fuchsia-500/30 rounded-full blur-[120px] opacity-50" />
+            <div className="absolute top-1/3 right-1/4 w-[600px] h-[600px] bg-purple-500/30 rounded-full blur-[120px] opacity-50" />
+            {/* Luz inferior (más oscura) */}
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-purple-900/60 rounded-full blur-[180px] opacity-80" />
+          </div>
+          
+          {/* Overlay oscuro con gradiente para profundidad */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/90" />
+          
+          {/* Efecto de neblina/humo con gradientes adicionales */}
+          <div className="absolute inset-0 opacity-40">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] bg-gradient-radial from-purple-500/20 via-fuchsia-500/10 to-transparent rounded-full blur-[200px]" />
+          </div>
+        </div>
+        
+        {/* Video de fondo opcional (solo si existe featuredEvent) - con overlay más oscuro */}
         {featuredEvent && (
-          <div className="absolute inset-0 z-0">
-            {/* Video solo en desktop */}
+          <div className="absolute inset-0 z-0 opacity-30">
             <video
               ref={videoRef}
               autoPlay
@@ -368,135 +389,142 @@ export default function HomePage() {
             >
               <source src="/assets/hero-video.mp4" type="video/mp4" />
             </video>
-
-            {/* Imagen estática en móvil */}
             <div 
               className="lg:hidden w-full h-full bg-cover bg-center"
               style={{ backgroundImage: 'url(/assets/flyerfinal-10-1-25.jpg)' }}
             />
-            {/* Overlay oscuro con gradiente - más suave para ver el video */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/80" />
-            
-            {/* Efecto de neblina dorada (simulado con gradientes radiales) */}
-            <div className="absolute inset-0 opacity-30">
-              <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-regia-gold-bright/20 rounded-full blur-[120px]" />
-              <div className="absolute top-1/2 left-1/3 w-[400px] h-[400px] bg-regia-gold-old/15 rounded-full blur-[100px]" />
-              <div className="absolute top-1/2 right-1/3 w-[400px] h-[400px] bg-regia-gold-old/15 rounded-full blur-[100px]" />
-            </div>
+            {/* Overlay adicional para oscurecer el video y dar más protagonismo a los gradientes */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/95" />
           </div>
         )}
 
-        {/* Header flotante con logos y navegación integrada */}
-        <header className="absolute top-0 left-0 right-0 z-30 px-3 sm:px-4 md:px-6 lg:px-12 py-2 sm:py-3 md:py-4 lg:py-6">
-          {/* Versión móvil - Logos simplificados */}
+        {/* Header estilo SOMNUS - BRAND IDENTITY | 2025 | DOBLE SS STUDIO */}
+        <header className="somnus-header">
+          {/* Versión móvil */}
           <div className="w-full flex lg:hidden items-center justify-between">
-            <Image
-              src="/assets/logo-grupo-regia.png"
-              alt="Somnus"
-              width={60}
-              height={36}
-              className="opacity-90 sm:w-20 sm:h-12"
-            />
+            <span className="somnus-header-item">BRAND IDENTITY</span>
+            <span className="somnus-header-item">2025</span>
             <button
               onClick={() => router.push("/login")}
-              className="text-regia-gold-old hover:text-regia-gold-bright transition-colors"
+              className="somnus-header-item hover:opacity-70 transition-opacity"
             >
-              <LogIn className="w-5 h-5 sm:w-6 sm:h-6" />
+              <LogIn className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Versión desktop - Navegación completa */}
+          {/* Versión desktop */}
           <div className="w-full hidden lg:flex items-center justify-between">
-            {/* Logo Somnus */}
-            <div className="flex-shrink-0">
-              <Image
-                src="/assets/logo-grupo-regia.png"
-                alt="Somnus"
-                width={110}
-                height={65}
-                className="opacity-90 cursor-pointer"
-                onClick={() => router.push("/")}
-              />
+            <span className="somnus-header-item">BRAND IDENTITY</span>
+            <span className="somnus-header-item">2025</span>
+            <div className="flex items-center gap-6">
+              {/* Navegación oculta pero funcional */}
+              <a
+                href="#eventos"
+                className="somnus-header-item hover:opacity-70 transition-opacity hidden"
+              >
+                Eventos
+              </a>
+              <button
+                onClick={() => router.push("/mis-boletos")}
+                className="somnus-header-item hover:opacity-70 transition-opacity hidden"
+              >
+                Mis Boletos
+              </button>
+              {userRole === "ADMIN" && (
+                <button
+                  onClick={() => router.push("/admin")}
+                  className="somnus-header-item hover:opacity-70 transition-opacity"
+                >
+                  Admin
+                </button>
+              )}
+              {(userRole === "ACCESOS" || userRole === "ADMIN") && (
+                <button
+                  onClick={() => router.push("/accesos")}
+                  className="somnus-header-item hover:opacity-70 transition-opacity"
+                >
+                  Accesos
+                </button>
+              )}
+              {user ? (
+                <button
+                  onClick={() => router.push("/login")}
+                  className="somnus-header-item hover:opacity-70 transition-opacity"
+                >
+                  {user.name || user.email}
+                </button>
+              ) : (
+                <button
+                  onClick={() => router.push("/login")}
+                  className="somnus-header-item hover:opacity-70 transition-opacity"
+                >
+                  Login
+                </button>
+              )}
             </div>
-
-            {/* Eventos */}
-            <a
-              href="#eventos"
-              className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-colors text-sm font-medium uppercase tracking-wider"
-            >
-              <Calendar className="w-4 h-4" />
-              <span>Eventos</span>
-            </a>
-
-            {/* Mis Boletos */}
-            <button
-              onClick={() => router.push("/mis-boletos")}
-              className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-colors text-sm font-medium uppercase tracking-wider"
-            >
-              <Music className="w-4 h-4" />
-              <span>Mis Boletos</span>
-            </button>
-
-            {/* Admin - solo si tiene rol */}
-            {userRole === "ADMIN" && (
-              <button
-                onClick={() => router.push("/admin")}
-                className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-colors text-sm font-medium uppercase tracking-wider"
-              >
-                <Shield className="w-4 h-4" />
-                <span>Admin</span>
-              </button>
-            )}
-
-            {/* Accesos - solo si tiene rol */}
-            {(userRole === "ACCESOS" || userRole === "ADMIN") && (
-              <button
-                onClick={() => router.push("/accesos")}
-                className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-colors text-sm font-medium uppercase tracking-wider"
-              >
-                <Scan className="w-4 h-4" />
-                <span>Accesos</span>
-              </button>
-            )}
-
-            {/* Login / User */}
-            {user ? (
-              <button
-                onClick={() => router.push("/login")}
-                className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-colors text-sm font-medium uppercase tracking-wider"
-              >
-                <User className="w-4 h-4" />
-                <span>{user.name || user.email}</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => router.push("/login")}
-                className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-colors text-sm font-medium uppercase tracking-wider"
-              >
-                <LogIn className="w-4 h-4" />
-                <span>Login</span>
-              </button>
-            )}
-
-            {/* Logo Somnus */}
-            <div className="flex-shrink-0">
-              <Image
-                src="/assets/rico-muerto-logo.png"
-                alt="Somnus"
-                width={100}
-                height={50}
-                className="opacity-90 hover:opacity-100 transition-opacity"
-              />
-            </div>
+            <span className="somnus-header-item">DOBLE SS STUDIO</span>
           </div>
         </header>
 
-        {/* Contenido principal - flujo vertical normal */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-6xl flex flex-col items-center justify-center px-2 sm:px-4" style={{ paddingTop: 'clamp(80px, 15vh, 120px)' }}>
+        {/* Contenido principal - Estilo SOMNUS */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-6xl flex flex-col items-center justify-center px-2 sm:px-4">
           {featuredEvent ? (
             <>
-              {/* Nombre del evento - Victor Mendivil */}
-              <div className="w-full flex justify-center mb-2 sm:mb-3 md:mb-4 lg:mb-5 xl:mb-6 px-2 sm:px-4 mt-4 sm:mt-6 md:mt-8">
+              {/* Título SOMNUS con efecto stencil */}
+              <h1 className="somnus-title text-center mb-4">
+                <span>S</span>
+                <span className="stencil-o-alt">O</span>
+                <span>M</span>
+                <span>N</span>
+                <span className="stencil-u-alt">U</span>
+                <span>S</span>
+              </h1>
+              
+              {/* Subtítulo AWAKE IN A DREAM */}
+              <p className="somnus-subtitle">
+                AWAKE IN A DREAM
+              </p>
+              
+              {/* Información del evento (opcional, más discreta) */}
+              <div className="mt-8 text-center opacity-80">
+                <p className="text-white text-sm md:text-base font-light tracking-wider mb-2">
+                  {featuredEvent.artist}
+                </p>
+                <p className="text-white/70 text-xs md:text-sm font-light">
+                  {featuredEvent.date} • {featuredEvent.venue}
+                </p>
+              </div>
+              
+              {/* Botón CTA - Comprar Boletos */}
+              <div className="mt-8">
+                <button
+                  onClick={() => handleSelectConcert(featuredEvent)}
+                  className="group relative inline-flex items-center gap-2 sm:gap-3 px-8 sm:px-10 md:px-12 py-3 sm:py-4 text-sm md:text-base font-bold uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    color: '#FFFFFF',
+                    borderRadius: '50px',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                    backdropFilter: 'blur(10px)',
+                    boxShadow: '0 8px 32px rgba(138, 43, 226, 0.3)',
+                  }}
+                >
+                  <span>Comprar Boletos</span>
+                </button>
+              </div>
+              
+              {/* Scroll indicator */}
+              <div className="mt-12 cursor-pointer animate-bounce" onClick={() => {
+                const nextSection = document.getElementById('info-evento');
+                nextSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}>
+                <div className="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2">
+                  <div className="w-1 h-3 bg-white/50 rounded-full"></div>
+                </div>
+              </div>
+              
+              {/* Versión alternativa con imagen del artista (oculta por defecto) */}
+              <div className="w-full flex justify-center mb-2 sm:mb-3 md:mb-4 lg:mb-5 xl:mb-6 px-2 sm:px-4 mt-4 sm:mt-6 md:mt-8 hidden">
                 <Image
                   src="/assets/victor-mendivil-title.png"
                   alt={featuredEvent.artist}
