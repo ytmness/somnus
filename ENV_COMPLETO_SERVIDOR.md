@@ -8,7 +8,7 @@ Copia y pega esto en `/var/www/somnus/.env`:
 # Supabase - Proyecto Somnus
 NEXT_PUBLIC_SUPABASE_URL=https://rbcqxxbddvbomwarmjvd.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiY3F4eGJkZHZib213YXJtanZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0ODQ4NjksImV4cCI6MjA4NTA2MDg2OX0.gXGvt33WNSxTPThkoJumGt97ipbbSAvkCDty6zC-er4
-SUPABASE_SERVICE_ROLE_KEY=[OBTENER-DE-SETTINGS-API-SERVICE-ROLE]
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiY3F4eGJkZHZib213YXJtanZkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTQ4NDg2OSwiZXhwIjoyMDg1MDYwODY5fQ.Cj2FfgTE6VU_Sshv-hwXQ2xNFTvM52043ew6ucwzHPc
 
 # Database - Reemplazar [TU-PASSWORD] con tu contraseña real
 DATABASE_URL=postgresql://postgres:[TU-PASSWORD]@db.rbcqxxbddvbomwarmjvd.supabase.co:5432/postgres
@@ -28,17 +28,9 @@ NODE_ENV=production
 
 ---
 
-## ⚠️ Valores que AÚN Necesitas Obtener
+## ⚠️ Valor que AÚN Necesitas Obtener
 
-### 1. SUPABASE_SERVICE_ROLE_KEY
-
-1. Ve a: https://supabase.com/dashboard/project/rbcqxxbddvbomwarmjvd
-2. Settings → API
-3. Busca "service_role" (secret)
-4. Haz clic en "Reveal" o "Show"
-5. Copia toda la clave
-
-### 2. Database Password
+### Database Password
 
 1. Ve a: Settings → Database
 2. Busca "Database password" o "Reset database password"
@@ -60,7 +52,6 @@ nano .env
 ```
 
 **Pega la configuración completa** reemplazando:
-- `[OBTENER-DE-SETTINGS-API-SERVICE-ROLE]` → Tu Service Role Key
 - `[TU-PASSWORD]` → Tu contraseña de PostgreSQL
 
 **Guardar**: `CTRL + O`, `ENTER`, `CTRL + X`
@@ -85,7 +76,7 @@ pm2 logs somnus
 
 - [x] NEXT_PUBLIC_SUPABASE_URL: `https://rbcqxxbddvbomwarmjvd.supabase.co`
 - [x] NEXT_PUBLIC_SUPABASE_ANON_KEY: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
-- [ ] SUPABASE_SERVICE_ROLE_KEY: (obtener de Settings → API)
+- [x] SUPABASE_SERVICE_ROLE_KEY: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
 - [ ] DATABASE_URL: (necesitas la contraseña)
 - [ ] DIRECT_URL: (igual que DATABASE_URL)
 
@@ -96,9 +87,9 @@ pm2 logs somnus
 ✅ **Ya configurados:**
 - Project URL: `https://rbcqxxbddvbomwarmjvd.supabase.co`
 - Anon Key: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiY3F4eGJkZHZib213YXJtanZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0ODQ4NjksImV4cCI6MjA4NTA2MDg2OX0.gXGvt33WNSxTPThkoJumGt97ipbbSAvkCDty6zC-er4`
+- Service Role Key: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiY3F4eGJkZHZib213YXJtanZkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTQ4NDg2OSwiZXhwIjoyMDg1MDYwODY5fQ.Cj2FfgTE6VU_Sshv-hwXQ2xNFTvM52043ew6ucwzHPc`
 
-⏳ **Pendientes:**
-- Service Role Key
+⏳ **Pendiente:**
 - Database Password
 
 ---
