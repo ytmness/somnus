@@ -130,12 +130,12 @@ export default function HomePage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const cupidoVideoRef = useRef<HTMLVideoElement>(null);
 
-  // Reproducción automática del video del cupido - optimizado para autoplay
+  // Reproducción automática del video del cupido
   useEffect(() => {
     const cupidoVideo = cupidoVideoRef.current;
     if (!cupidoVideo) return;
 
-    // Configurar para autoplay (muted es necesario para autoplay en móvil)
+    // Configurar para autoplay
     cupidoVideo.muted = true;
     cupidoVideo.volume = 0;
     cupidoVideo.defaultMuted = true;
@@ -149,7 +149,6 @@ export default function HomePage() {
       if (hasPlayed || !cupidoVideo) return;
       
       try {
-        // Asegurar que esté muted para autoplay
         cupidoVideo.muted = true;
         cupidoVideo.volume = 0;
         
@@ -159,39 +158,29 @@ export default function HomePage() {
           hasPlayed = true;
         }
       } catch (error: any) {
-        // Reintentar después de un breve delay
+        // Reintentar
         setTimeout(() => {
           if (!hasPlayed && cupidoVideo) {
             cupidoVideo.play().catch(() => {});
           }
-        }, 500);
+        }, 300);
       }
     };
 
-    // Intentar reproducir inmediatamente si el video ya tiene datos
-    if (cupidoVideo.readyState >= 2) {
-      forcePlayCupido();
-    }
-    
-    // Event listeners para reproducir cuando el video esté listo
-    const handleCanPlay = () => forcePlayCupido();
-    const handleLoadedData = () => forcePlayCupido();
-    const handleLoadedMetadata = () => {
-      cupidoVideo.muted = true;
+    // Intentar cuando el video esté listo
+    const handleCanPlay = () => {
       forcePlayCupido();
     };
     
-    cupidoVideo.addEventListener('loadedmetadata', handleLoadedMetadata);
-    cupidoVideo.addEventListener('loadeddata', handleLoadedData);
     cupidoVideo.addEventListener('canplay', handleCanPlay);
     cupidoVideo.addEventListener('canplaythrough', handleCanPlay);
 
-    // Intentar reproducir después de un breve delay
-    setTimeout(forcePlayCupido, 100);
+    // Intentar inmediatamente
+    forcePlayCupido();
+    setTimeout(forcePlayCupido, 200);
+    setTimeout(forcePlayCupido, 500);
 
     return () => {
-      cupidoVideo.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      cupidoVideo.removeEventListener('loadeddata', handleLoadedData);
       cupidoVideo.removeEventListener('canplay', handleCanPlay);
       cupidoVideo.removeEventListener('canplaythrough', handleCanPlay);
     };
@@ -423,7 +412,7 @@ export default function HomePage() {
             loop
             muted
             playsInline
-            preload="auto"
+            preload="none"
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover hero-video-no-controls video-cupido-mobile"
             style={{
               objectPosition: 'center 45%',
@@ -431,21 +420,14 @@ export default function HomePage() {
               width: '100vw',
               height: '100vh',
               minWidth: '100vw',
-              minHeight: '100vh'
+              minHeight: '100vh',
+              pointerEvents: 'none'
             }}
             webkit-playsinline="true"
             x5-playsinline="true"
             x-webkit-airplay="allow"
             disablePictureInPicture
             controlsList="nodownload"
-            onLoadedData={(e) => {
-              const video = e.currentTarget;
-              video.play().catch(() => {});
-            }}
-            onCanPlay={(e) => {
-              const video = e.currentTarget;
-              video.play().catch(() => {});
-            }}
             onError={(e) => {
               console.error('Error cargando video:', e);
             }}
