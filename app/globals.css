@@ -130,7 +130,6 @@ body::-webkit-scrollbar {
       radial-gradient(ellipse at bottom center, rgba(26, 1, 26, 0.9) 0%, #0A0A0A 100%),
       #0A0A0A;
     background-attachment: fixed;
-    animation: background-pulse 8s ease-in-out infinite;
   }
   
   .somnus-bg-main {
@@ -141,7 +140,6 @@ body::-webkit-scrollbar {
       radial-gradient(ellipse at bottom center, rgba(26, 1, 26, 0.9) 0%, #0A0A0A 100%),
       #0A0A0A;
     background-attachment: fixed;
-    animation: background-pulse 8s ease-in-out infinite;
   }
   
   .somnus-bg-main::before {
@@ -153,7 +151,6 @@ body::-webkit-scrollbar {
       radial-gradient(circle at 70% 60%, rgba(255, 0, 255, 0.25) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
-    animation: background-shift 12s ease-in-out infinite;
   }
   
   .regia-bg-textured {
@@ -523,7 +520,7 @@ body::-webkit-scrollbar {
     color: #E0E0E0;
   }
   
-  /* Hero section específico para SOMNUS con animación */
+  /* Hero section específico para SOMNUS */
   .somnus-hero {
     @apply relative min-h-screen flex flex-col items-center justify-center overflow-hidden;
     background: #0A0A0A;
@@ -540,7 +537,6 @@ body::-webkit-scrollbar {
       radial-gradient(ellipse at bottom center, rgba(26, 1, 26, 1) 0%, #0A0A0A 100%);
     pointer-events: none;
     z-index: 1;
-    animation: background-pulse 8s ease-in-out infinite;
   }
   
   .somnus-hero::after {
@@ -552,28 +548,8 @@ body::-webkit-scrollbar {
       radial-gradient(circle at 70% 60%, rgba(255, 0, 255, 0.3) 0%, transparent 50%);
     pointer-events: none;
     z-index: 1;
-    animation: background-shift 12s ease-in-out infinite;
   }
   
-  @keyframes background-pulse {
-    0%, 100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.8;
-      transform: scale(1.05);
-    }
-  }
-  
-  @keyframes background-shift {
-    0%, 100% {
-      background-position: 30% 40%, 70% 60%;
-    }
-    50% {
-      background-position: 40% 50%, 60% 50%;
-    }
-  }
   
   .somnus-hero-content {
     @apply relative z-[2] text-center px-8;
