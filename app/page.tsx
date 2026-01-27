@@ -477,7 +477,7 @@ export default function HomePage() {
         </header>
 
         {/* Contenido principal - Estilo SOMNUS */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-6xl flex flex-col items-center justify-center px-2 sm:px-4">
+        <div className="absolute top-[60%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-6xl flex flex-col items-center justify-center px-2 sm:px-4">
           {featuredEvent ? (
             <>
               {/* Título SOMNUS con efecto stencil */}
