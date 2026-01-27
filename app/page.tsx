@@ -412,7 +412,7 @@ export default function HomePage() {
             loop
             muted
             playsInline
-            preload="none"
+            preload="metadata"
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover hero-video-no-controls video-cupido-mobile"
             style={{
               objectPosition: 'center 45%',
