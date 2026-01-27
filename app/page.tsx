@@ -354,7 +354,7 @@ export default function HomePage() {
             loop
             muted
             playsInline
-            preload="auto"
+            preload="metadata"
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover hero-video-no-controls"
             style={{
               objectPosition: 'center 45%',
@@ -369,6 +369,9 @@ export default function HomePage() {
             x-webkit-airplay="allow"
             disablePictureInPicture
             controlsList="nodownload"
+            onError={(e) => {
+              console.error('Error cargando video:', e);
+            }}
           >
             <source src="/assets/cupido-angel-video.mp4" type="video/mp4" />
           </video>
