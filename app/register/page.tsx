@@ -83,49 +83,49 @@ export default function RegisterPage() {
             {/* Columna izquierda - Información */}
             <div className="hidden lg:flex flex-col justify-center space-y-8">
               <div>
-                <h1 className="regia-title-main text-4xl md:text-5xl mb-4">
+                <h1 className="somnus-title-secondary text-4xl md:text-5xl mb-4 uppercase">
                   Únete a
                 </h1>
-                <h2 className="regia-title-secondary text-3xl md:text-4xl mb-6">
-                  Somnus
+                <h2 className="somnus-title text-5xl md:text-6xl mb-6">
+                  <span>S</span><span>O</span><span>M</span><span>N</span><span>U</span><span>S</span>
                 </h2>
-                <p className="regia-text-body text-lg mb-8">
+                <p className="somnus-text-body text-lg mb-8">
                   Crea tu cuenta y accede a eventos exclusivos, gestiona tus boletos y disfruta de experiencias únicas.
                 </p>
               </div>
 
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 regia-gold-gradient rounded-full flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-6 h-6 text-regia-black" />
+                  <div className="w-12 h-12 border-2 border-white/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="regia-title-secondary text-lg mb-2">Registro Rápido</h3>
-                    <p className="regia-text-body text-sm">
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Registro Rápido</h3>
+                    <p className="somnus-text-body text-sm">
                       Solo necesitas tu nombre y email para comenzar
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 regia-gold-gradient rounded-full flex items-center justify-center flex-shrink-0">
-                    <Ticket className="w-6 h-6 text-regia-black" />
+                  <div className="w-12 h-12 border-2 border-white/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Ticket className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="regia-title-secondary text-lg mb-2">Acceso a Eventos</h3>
-                    <p className="regia-text-body text-sm">
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Acceso a Eventos</h3>
+                    <p className="somnus-text-body text-sm">
                       Reserva boletos para los mejores eventos en vivo
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 regia-gold-gradient rounded-full flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-6 h-6 text-regia-black" />
+                  <div className="w-12 h-12 border-2 border-white/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="regia-title-secondary text-lg mb-2">Cuenta Segura</h3>
-                    <p className="regia-text-body text-sm">
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Cuenta Segura</h3>
+                    <p className="somnus-text-body text-sm">
                       Verificación por email para proteger tu cuenta
                     </p>
                   </div>
@@ -136,26 +136,26 @@ export default function RegisterPage() {
             {/* Columna derecha - Formulario de Registro */}
             <div className="flex items-center justify-center">
               <div className="w-full max-w-md">
-                <div className="regia-ticket-card p-6 sm:p-8 lg:p-10">
+                <div className="somnus-card p-6 sm:p-8 lg:p-10">
                   {/* Título móvil */}
                   <div className="lg:hidden text-center mb-8">
-                    <h1 className="regia-title-main text-3xl mb-2">
+                    <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
                       Crear Cuenta
                     </h1>
-                    <p className="regia-text-body text-sm">
+                    <p className="somnus-text-body text-sm">
                       Ingresa tus datos y recibe un código de verificación
                     </p>
                   </div>
 
                   {/* Título desktop */}
                   <div className="hidden lg:block text-center mb-8">
-                    <div className="w-16 h-16 regia-gold-gradient rounded-full flex items-center justify-center mx-auto mb-4">
-                      <User className="w-8 h-8 text-regia-black" />
+                    <div className="w-16 h-16 border-2 border-white/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <User className="w-8 h-8 text-white" />
                     </div>
-                    <h1 className="regia-title-main text-3xl mb-2">
+                    <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
                       Crear Cuenta
                     </h1>
-                    <p className="regia-text-body">
+                    <p className="somnus-text-body">
                       Ingresa tus datos y recibe un código de verificación
                     </p>
                   </div>
@@ -163,18 +163,18 @@ export default function RegisterPage() {
                   <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Nombre */}
                     <div>
-                      <label className="block regia-title-secondary text-sm mb-2">
+                      <label className="block somnus-title-secondary text-sm mb-2 uppercase">
                         Nombre completo
                       </label>
                       <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-regia-gold-old" />
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
                         <input
                           type="text"
                           value={formData.name}
                           onChange={(e) =>
                             setFormData({ ...formData, name: e.target.value })
                           }
-                          className="w-full pl-10 pr-4 py-3 rounded-lg regia-bg-main border border-regia-gold-old/30 regia-text-body placeholder-regia-cream/50 focus:outline-none focus:ring-2 focus:ring-regia-gold-bright focus:border-regia-gold-bright transition-all"
+                          className="w-full pl-10 pr-4 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all backdrop-blur-sm"
                           placeholder="Juan Pérez"
                           required
                         />
@@ -183,18 +183,18 @@ export default function RegisterPage() {
 
                     {/* Email */}
                     <div>
-                      <label className="block regia-title-secondary text-sm mb-2">
+                      <label className="block somnus-title-secondary text-sm mb-2 uppercase">
                         Email
                       </label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-regia-gold-old" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
                         <input
                           type="email"
                           value={formData.email}
                           onChange={(e) =>
                             setFormData({ ...formData, email: e.target.value })
                           }
-                          className="w-full pl-10 pr-4 py-3 rounded-lg regia-bg-main border border-regia-gold-old/30 regia-text-body placeholder-regia-cream/50 focus:outline-none focus:ring-2 focus:ring-regia-gold-bright focus:border-regia-gold-bright transition-all"
+                          className="w-full pl-10 pr-4 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all backdrop-blur-sm"
                           placeholder="tu@email.com"
                           required
                         />
@@ -202,29 +202,29 @@ export default function RegisterPage() {
                     </div>
 
                     {/* Botón Submit */}
-                    <Button
+                    <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full regia-btn-primary text-base py-6"
+                      className="w-full somnus-btn text-base py-6 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isLoading ? (
-                        <span className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-regia-black border-t-transparent rounded-full animate-spin" />
+                        <span className="flex items-center gap-2 justify-center">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                           Registrando...
                         </span>
                       ) : (
                         "Crear Cuenta"
                       )}
-                    </Button>
+                    </button>
                   </form>
 
                   {/* Link a Login */}
-                  <div className="mt-6 pt-6 border-t border-regia-gold-old/20">
-                    <p className="regia-text-body text-center text-sm">
+                  <div className="mt-6 pt-6 border-t border-white/10">
+                    <p className="somnus-text-body text-center text-sm">
                       ¿Ya tienes cuenta?{" "}
                       <Link
                         href="/login"
-                        className="text-regia-gold-bright hover:text-regia-gold-old hover:underline transition-colors font-medium"
+                        className="text-white hover:underline transition-colors font-medium"
                       >
                         Inicia sesión
                       </Link>
