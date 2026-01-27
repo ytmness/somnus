@@ -348,19 +348,18 @@ export default function HomePage() {
       {/* HERO SECTION - Estilo SOMNUS con ángel de fondo */}
       <section className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden somnus-hero">
         {/* Imagen del ángel como fondo - posicionado para abrazar las letras */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-[1]">
           <div 
             className="absolute inset-0 bg-contain bg-center bg-no-repeat"
             style={{
               backgroundImage: 'url(/assets/cupido-angel.png)',
               backgroundPosition: 'center 45%',
               backgroundSize: 'contain',
-              opacity: 0.85,
-              transform: 'scale(1.1)'
+              opacity: 0.9
             }}
           />
           {/* Overlay oscuro sutil para mantener legibilidad */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/30" />
         </div>
         
         {/* Video de fondo opcional (solo si existe featuredEvent) - con overlay más oscuro */}
