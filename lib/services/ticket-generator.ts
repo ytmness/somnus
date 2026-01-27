@@ -37,11 +37,11 @@ export async function generateTicketPDF(ticketData: TicketPDFData): Promise<Buff
   pdf.setLineWidth(0.5);
   pdf.rect(2, 2, pageWidth - 4, pageHeight - 4);
 
-  // Logo/Header - "SOMNUS"
+  // Logo/Header - "GRUPO REGIA"
   pdf.setFontSize(16);
   pdf.setTextColor(196, 169, 5); // regia-gold
   pdf.setFont("helvetica", "bold");
-  pdf.text("SOMNUS", 10, 12);
+  pdf.text("GRUPO REGIA", 10, 12);
   
   pdf.setFontSize(8);
   pdf.setTextColor(249, 251, 246); // regia-cream
@@ -116,7 +116,7 @@ export async function generateTicketPDF(ticketData: TicketPDFData): Promise<Buff
   pdf.setTextColor(249, 251, 246);
   pdf.text("✓ BOLETERA OFICIAL", pageWidth - 45, pageHeight - 15);
   pdf.text("✓ PRODUCCIÓN OFICIAL", pageWidth - 45, pageHeight - 11);
-  pdf.text("✓ SOMNUS", pageWidth - 45, pageHeight - 7);
+  pdf.text("✓ GRUPO REGIA", pageWidth - 45, pageHeight - 7);
 
   // Convertir a buffer
   const pdfBuffer = Buffer.from(pdf.output("arraybuffer"));

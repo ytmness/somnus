@@ -94,11 +94,11 @@ export default function RegisterPage() {
 
         {/* Versión desktop - Navegación completa */}
         <div className="w-full hidden lg:flex items-center justify-between">
-          {/* Logo SOMNUS */}
+          {/* Logo GRUPO REGIA */}
           <div className="flex-shrink-0">
             <Image
               src="/assets/logo-grupo-regia.png"
-              alt="Somnus"
+              alt="Grupo Regia"
               width={110}
               height={65}
               className="opacity-90 cursor-pointer"
@@ -189,7 +189,7 @@ export default function RegisterPage() {
                   Únete a
                 </h1>
                 <h2 className="regia-title-secondary text-3xl md:text-4xl mb-6">
-                  Somnus
+                  Grupo Regia
                 </h2>
                 <p className="regia-text-body text-lg mb-8">
                   Crea tu cuenta y accede a eventos exclusivos, gestiona tus boletos y disfruta de experiencias únicas.

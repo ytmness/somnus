@@ -50,7 +50,7 @@ export async function sendVerificationCode(
   name: string,
   code: string
 ): Promise<boolean> {
-  const subject = "Código de verificación - Somnus";
+  const subject = "Código de verificación - Grupo Regia";
   const html = `
     <!DOCTYPE html>
     <html>
@@ -68,29 +68,29 @@ export async function sendVerificationCode(
     <body>
       <div class="container">
         <div class="header">
-          <h1>Somnus</h1>
+          <h1>Grupo Regia</h1>
           <p>Verificación de Email</p>
         </div>
         <div class="content">
           <h2>Hola ${name},</h2>
-          <p>Gracias por registrarte en Somnus. Para completar tu registro, por favor ingresa el siguiente código de verificación:</p>
+          <p>Gracias por registrarte en Grupo Regia. Para completar tu registro, por favor ingresa el siguiente código de verificación:</p>
           <div class="code">${code}</div>
           <p>Este código expira en 24 horas.</p>
           <p>Si no solicitaste este código, puedes ignorar este email.</p>
         </div>
         <div class="footer">
-          <p>© ${new Date().getFullYear()} Somnus. Todos los derechos reservados.</p>
+          <p>© ${new Date().getFullYear()} Grupo Regia. Todos los derechos reservados.</p>
         </div>
       </div>
     </body>
     </html>
   `;
   const text = `
-    Somnus - Código de Verificación
+    Grupo Regia - Código de Verificación
     
     Hola ${name},
     
-    Gracias por registrarte en Somnus. Tu código de verificación es:
+    Gracias por registrarte en Grupo Regia. Tu código de verificación es:
     
     ${code}
     

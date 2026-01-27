@@ -245,11 +245,11 @@ export default function EventMesasPage() {
         {/* Header flotante personalizado */}
         <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-6 bg-regia-black/80 backdrop-blur-md border-b border-regia-gold-old/20">
           <div className="w-full flex items-center justify-between">
-            {/* Logo SOMNUS */}
+            {/* Logo GRUPO REGIA */}
             <div className="flex-shrink-0">
               <Image
                 src="/assets/logo-grupo-regia.png"
-                alt="Somnus"
+                alt="Grupo Regia"
                 width={110}
                 height={65}
                 className="opacity-90 cursor-pointer"
@@ -333,7 +333,7 @@ export default function EventMesasPage() {
               </div>
             </div>
             <div className="border-t border-regia-gold-old/20 pt-8 pb-6 text-center">
-              <p className="regia-footer-text">© {new Date().getFullYear()} Somnus. Todos los derechos reservados.</p>
+              <p className="regia-footer-text">© {new Date().getFullYear()} Grupo Regia. Todos los derechos reservados.</p>
             </div>
           </div>
         </footer>
@@ -853,7 +853,7 @@ export default function EventMesasPage() {
             {/* Columna 1: Logo y descripción */}
             <div>
               <h3 className="text-regia-gold-old font-bold text-lg mb-4 tracking-wider">
-                SOMNUS
+                GRUPO REGIA
               </h3>
               <p className="regia-text-body text-sm">
                 Tu plataforma de confianza para eventos en vivo exclusivos
@@ -897,7 +897,7 @@ export default function EventMesasPage() {
           {/* Copyright */}
           <div className="border-t border-regia-gold-old/20 pt-8 pb-6 text-center">
             <p className="regia-footer-text">
-              © {new Date().getFullYear()} Somnus. Todos los derechos reservados.
+              © {new Date().getFullYear()} Grupo Regia. Todos los derechos reservados.
             </p>
           </div>
         </div>

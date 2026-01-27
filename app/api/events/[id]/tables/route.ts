@@ -222,7 +222,7 @@ export async function GET(
     } 
     // Si solo existe un "Preferente" genérico, dividirlo en A y B
     else if (preferenteGeneric) {
-    sections.push({
+      sections.push({
         id: `${preferenteGeneric.id}-a`,
         name: "PREFERENTE A",
         type: "PREFERENTE",
@@ -250,7 +250,7 @@ export async function GET(
         y: 756,
         width: 486,
         height: 152,
-    });
+      });
     }
 
     return NextResponse.json({

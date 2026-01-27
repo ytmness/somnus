@@ -29,10 +29,10 @@ const cinzel = Cinzel({
 });
 
 export const metadata: Metadata = {
-  title: "Boletera Somnus",
-  description: "Sistema de venta de boletos para eventos de Somnus",
-  keywords: ["boletos", "eventos", "conciertos", "Somnus"],
-  authors: [{ name: "Somnus" }],
+  title: "Boletera Regia - Grupo Regia",
+  description: "Sistema de venta de boletos para eventos de Grupo Regia",
+  keywords: ["boletos", "eventos", "conciertos", "Grupo Regia", "Rico o Muerto"],
+  authors: [{ name: "Grupo Regia" }],
   viewport: {
     width: "device-width",
     initialScale: 1,
@@ -40,8 +40,8 @@ export const metadata: Metadata = {
     userScalable: true,
   },
   openGraph: {
-    title: "Boletera Somnus",
-    description: "Sistema de venta de boletos para eventos de Somnus",
+    title: "Boletera Regia - Grupo Regia",
+    description: "Sistema de venta de boletos para eventos de Grupo Regia",
     type: "website",
   },
 };

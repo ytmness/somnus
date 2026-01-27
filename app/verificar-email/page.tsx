@@ -147,11 +147,11 @@ function VerificarEmailContent() {
 
         {/* Versión desktop - Navegación completa */}
         <div className="w-full hidden lg:flex items-center justify-between">
-          {/* Logo SOMNUS */}
+          {/* Logo GRUPO REGIA */}
           <div className="flex-shrink-0">
             <Image
               src="/assets/logo-grupo-regia.png"
-              alt="Somnus"
+              alt="Grupo Regia"
               width={110}
               height={65}
               className="opacity-90 cursor-pointer"

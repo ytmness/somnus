@@ -36,7 +36,7 @@ export function NavbarMockup({
           <Link href="/" className="flex-shrink-0 hover:opacity-80 transition-opacity">
             <Image
               src={logoUrl}
-              alt="Somnus"
+              alt="Rico o Muerto"
               width={100}
               height={50}
               className="h-10 md:h-12 w-auto"
@@ -163,7 +163,7 @@ export function FooterMockup({
   const footerSections = {
     about: {
       title: "Sobre Nosotros",
-      content: "Somnus es tu plataforma de confianza para eventos en vivo. Ofrecemos una experiencia única de compra de boletos.",
+      content: "Grupo Regia es tu plataforma de confianza para eventos en vivo. Ofrecemos una experiencia única de compra de boletos.",
     },
     quickLinks: [
       { label: "Eventos", href: "#eventos" },
@@ -189,7 +189,7 @@ export function FooterMockup({
           <div className="lg:col-span-2">
             <Image
               src={logoUrl}
-              alt="Somnus"
+              alt="Rico o Muerto"
               width={120}
               height={60}
               className="mb-6 opacity-90"
@@ -245,7 +245,7 @@ export function FooterMockup({
           <div className="flex flex-col items-center gap-4">
             {/* Copyright */}
             <p className="regia-footer-text text-center">
-              © {currentYear} Somnus. Todos los derechos reservados.
+              © {currentYear} Grupo Regia. Todos los derechos reservados.
             </p>
           </div>
         </div>

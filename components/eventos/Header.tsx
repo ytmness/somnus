@@ -56,7 +56,7 @@ export function Header({ cartItemsCount, onCartClick }: HeaderProps) {
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20 py-3">
           <Link href="/" className="flex items-center gap-2 sm:gap-3 h-full" onClick={closeMobileMenu}>
-            <img src="/assets/logo.png" alt="Somnus" className="h-full w-auto object-contain" />
+            <img src="/assets/logo.png" alt="Grupo Regia" className="h-full w-auto object-contain" />
           </Link>
           
           {/* Desktop Navigation */}
