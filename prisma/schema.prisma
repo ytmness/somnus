@@ -1,0 +1,323 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// =====================================================
+// USUARIOS Y AUTENTICACIÓN
+// =====================================================
+
+enum UserRole {
+  ADMIN       // Control total del sistema
+  VENDEDOR    // Puede vender e imprimir boletos
+  SUPERVISOR  // Puede ver reportes y cortes
+  ACCESOS     // Solo puede escanear boletos
+  CLIENTE     // Cliente que puede ver sus boletos comprados
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String
+  name          String
+  role          UserRole @default(VENDEDOR)
+  isActive      Boolean  @default(true)
+  
+  // Verificación de email
+  emailVerified Boolean  @default(false)
+  verificationCode String?
+  verificationCodeExpires DateTime?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relaciones
+  sales         Sale[]
+  scans         TicketScan[]
+  reprints      TicketReprint[]
+  auditLogs     AuditLog[]
+
+  @@index([email])
+  @@index([role])
+  @@index([emailVerified])
+}
+
+// =====================================================
+// EVENTOS
+// =====================================================
+
+model Event {
+  id                String   @id @default(uuid())
+  name              String
+  description       String?
+  artist            String
+  tour              String?
+  venue             String
+  address           String?
+  eventDate         DateTime
+  eventTime         String
+  imageUrl          String?
+  maxCapacity       Int      // Aforo máximo autorizado (ej: 5000)
+  isActive          Boolean  @default(true)
+  salesStartDate    DateTime
+  salesEndDate      DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relaciones
+  ticketTypes       TicketType[]
+  sales             Sale[]
+
+  @@index([eventDate])
+  @@index([isActive])
+}
+
+// =====================================================
+// TIPOS DE BOLETO (GENERAL, PREFERENTE, VIP)
+// =====================================================
+
+enum TicketCategory {
+  GENERAL
+  PREFERENTE
+  VIP
+}
+
+model TicketType {
+  id            String         @id @default(uuid())
+  eventId       String
+  name          String         // ej: "General A", "VIP Mesa 4 personas"
+  description   String?
+  category      TicketCategory
+  price         Decimal        @db.Decimal(10, 2)
+  maxQuantity   Int            // Cupo máximo para este tipo
+  soldQuantity  Int            @default(0) // Cantidad vendida
+  isActive      Boolean        @default(true)
+  
+  // Para VIP - si es mesa de 4 personas
+  isTable       Boolean        @default(false)
+  seatsPerTable Int?           // ej: 4 para mesas VIP
+  
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Relaciones
+  event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  tickets       Ticket[]
+
+  @@index([eventId])
+  @@index([category])
+  @@index([isActive])
+}
+
+// =====================================================
+// VENTAS (TRANSACCIONES)
+// =====================================================
+
+enum SaleChannel {
+  ONLINE  // Venta web
+  POS     // Punto de venta físico
+}
+
+enum SaleStatus {
+  PENDING    // Pendiente de pago
+  COMPLETED  // Pagada y confirmada
+  CANCELLED  // Cancelada
+  REFUNDED   // Reembolsada
+}
+
+model Sale {
+  id            String      @id @default(uuid())
+  eventId       String
+  userId        String?     // Vendedor (null si es online sin vendedor asignado)
+  channel       SaleChannel
+  status        SaleStatus  @default(PENDING)
+  
+  subtotal      Decimal     @db.Decimal(10, 2)
+  tax           Decimal     @db.Decimal(10, 2) // IVA
+  total         Decimal     @db.Decimal(10, 2)
+  
+  // Info del comprador
+  buyerName     String
+  buyerEmail    String
+  buyerPhone    String?
+  
+  // Pago
+  paymentMethod String?     // "efectivo", "tarjeta", "stripe", etc
+  paymentId     String?     // ID de pago externo (Stripe, MercadoPago)
+  paidAt        DateTime?
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  // Relaciones
+  event         Event       @relation(fields: [eventId], references: [id])
+  user          User?       @relation(fields: [userId], references: [id])
+  tickets       Ticket[]
+
+  @@index([eventId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([buyerEmail])
+}
+
+// =====================================================
+// BOLETOS INDIVIDUALES
+// =====================================================
+
+enum TicketStatus {
+  VALID     // Válido, no usado
+  USED      // Ya se usó (escaneado en acceso)
+  CANCELLED // Cancelado
+  REPRINTED // Fue reimpreso
+}
+
+model Ticket {
+  id              String        @id @default(uuid())
+  saleId          String
+  ticketTypeId    String
+  
+  // Identificación única
+  ticketNumber    String        @unique // Folio único incremental
+  qrCode          String        @unique // Hash único para QR
+  
+  status          TicketStatus  @default(VALID)
+  
+  // Para mesas VIP - identificar asiento dentro de la mesa
+  tableNumber     String?       // ej: "Mesa 5"
+  seatNumber      Int?          // ej: 1, 2, 3, 4 (para mesa de 4)
+  
+  // PDF generado
+  pdfUrl          String?       // URL del PDF en storage
+  
+  // Control de acceso
+  scannedAt       DateTime?
+  scannedBy       String?       // userId que escaneó
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relaciones
+  sale            Sale          @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  ticketType      TicketType    @relation(fields: [ticketTypeId], references: [id])
+  scans           TicketScan[]
+  reprints        TicketReprint[]
+
+  @@index([qrCode])
+  @@index([ticketNumber])
+  @@index([status])
+  @@index([saleId])
+}
+
+// =====================================================
+// ESCANEOS DE BOLETOS (ACCESOS)
+// =====================================================
+
+enum ScanResult {
+  SUCCESS          // Escaneo exitoso
+  ALREADY_USED     // Ya fue usado
+  INVALID          // QR inválido
+  CANCELLED        // Boleto cancelado
+  EVENT_MISMATCH   // No corresponde a este evento
+}
+
+model TicketScan {
+  id          String     @id @default(uuid())
+  ticketId    String
+  scannedBy   String     // userId del staff de accesos
+  result      ScanResult
+  notes       String?    // Notas adicionales
+  scannedAt   DateTime   @default(now())
+  
+  // Metadata
+  deviceInfo  String?    // Info del dispositivo que escaneó
+  location    String?    // Carril de acceso
+
+  // Relaciones
+  ticket      Ticket     @relation(fields: [ticketId], references: [id])
+  user        User       @relation(fields: [scannedBy], references: [id])
+
+  @@index([ticketId])
+  @@index([scannedAt])
+  @@index([result])
+}
+
+// =====================================================
+// REIMPRESIONES (CONTROL DE AUDITORÍA)
+// =====================================================
+
+model TicketReprint {
+  id            String   @id @default(uuid())
+  ticketId      String
+  authorizedBy  String   // userId del Admin que autorizó
+  reason        String   // Motivo de la reimpresión
+  reprintedAt   DateTime @default(now())
+
+  // Relaciones
+  ticket        Ticket   @relation(fields: [ticketId], references: [id])
+  user          User     @relation(fields: [authorizedBy], references: [id])
+
+  @@index([ticketId])
+  @@index([reprintedAt])
+}
+
+// =====================================================
+// REGISTRO DE AUDITORÍA (LOGS DEL SISTEMA)
+// =====================================================
+
+enum AuditAction {
+  USER_LOGIN
+  USER_LOGOUT
+  SALE_CREATED
+  SALE_COMPLETED
+  SALE_CANCELLED
+  TICKET_GENERATED
+  TICKET_SCANNED
+  TICKET_REPRINTED
+  INVENTORY_UPDATED
+  PRICE_CHANGED
+  EVENT_CREATED
+  EVENT_UPDATED
+  EVENT_DELETED
+}
+
+model AuditLog {
+  id          String      @id @default(uuid())
+  userId      String?
+  action      AuditAction
+  entityType  String      // "Sale", "Ticket", "Event", etc
+  entityId    String      // ID de la entidad afectada
+  changes     Json?       // Objeto JSON con los cambios realizados
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime    @default(now())
+
+  // Relaciones
+  user        User?       @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([entityType, entityId])
+}
+
+// =====================================================
+// CONFIGURACIÓN DEL SISTEMA
+// =====================================================
+
+model SystemConfig {
+  id          String   @id @default(uuid())
+  key         String   @unique // "tax_rate", "max_tickets_per_sale", etc
+  value       String   // Valor de la configuración
+  description String?
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+}

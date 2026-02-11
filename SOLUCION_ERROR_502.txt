@@ -1,0 +1,153 @@
+═══════════════════════════════════════════════════════════════
+  SOLUCIÓN: Error 502 Bad Gateway
+═══════════════════════════════════════════════════════════════
+
+PROBLEMA:
+- Error 502 significa que Nginx no puede conectarse a la app
+- La aplicación Next.js no está corriendo en puerto 3000
+- O la aplicación se cayó después del rebuild
+
+SOLUCIÓN PASO A PASO:
+───────────────────────────────────────────────────────────────
+
+1. CONECTAR AL SERVIDOR
+───────────────────────────────────────────────────────────────
+ssh root@144.202.72.150
+
+───────────────────────────────────────────────────────────────
+
+2. VERIFICAR ESTADO DE PM2
+───────────────────────────────────────────────────────────────
+pm2 status
+
+# Si muestra "somnus" como "stopped" o "errored", hay problema
+
+───────────────────────────────────────────────────────────────
+
+3. VER LOGS DE ERRORES
+───────────────────────────────────────────────────────────────
+pm2 logs somnus --err --lines 50
+
+# Esto mostrará los errores que impiden que la app inicie
+
+───────────────────────────────────────────────────────────────
+
+4. VERIFICAR QUE EL PUERTO 3000 ESTÁ LIBRE
+───────────────────────────────────────────────────────────────
+sudo ss -tlnp | grep :3000
+
+# Si muestra algo, hay un proceso usando el puerto
+
+───────────────────────────────────────────────────────────────
+
+5. VERIFICAR QUE EL BUILD EXISTE
+───────────────────────────────────────────────────────────────
+cd /var/www/somnus
+ls -la .next
+
+# Debe existir la carpeta .next con archivos
+
+───────────────────────────────────────────────────────────────
+
+6. INTENTAR INICIAR/REINICIAR LA APLICACIÓN
+───────────────────────────────────────────────────────────────
+# Si está detenida:
+pm2 start somnus
+
+# Si existe pero está con error:
+pm2 delete somnus
+pm2 start npm --name "somnus" -- start
+
+# Ver logs inmediatamente:
+pm2 logs somnus --lines 30
+
+───────────────────────────────────────────────────────────────
+
+7. SI HAY ERRORES EN LOS LOGS, VERIFICAR:
+───────────────────────────────────────────────────────────────
+
+# A) Verificar que .env existe y tiene las variables correctas
+cat .env | grep DATABASE_URL
+cat .env | grep DIRECT_URL
+
+# B) Verificar que el build se completó
+ls -la .next/static | head -10
+
+# C) Si falta build, reconstruir:
+rm -rf .next
+npm run build
+pm2 restart somnus
+
+───────────────────────────────────────────────────────────────
+
+8. VERIFICAR QUE LA APP RESPONDE LOCALMENTE
+───────────────────────────────────────────────────────────────
+curl http://localhost:3000
+
+# Debe mostrar HTML, no error de conexión
+
+───────────────────────────────────────────────────────────────
+
+9. VERIFICAR CONFIGURACIÓN DE NGINX
+───────────────────────────────────────────────────────────────
+sudo nginx -t
+
+# Debe decir "syntax is ok"
+
+# Ver configuración:
+sudo cat /etc/nginx/sites-available/somnus | grep proxy_pass
+
+# Debe mostrar: proxy_pass http://localhost:3000;
+
+───────────────────────────────────────────────────────────────
+
+10. REINICIAR NGINX (si es necesario)
+───────────────────────────────────────────────────────────────
+sudo systemctl restart nginx
+sudo systemctl status nginx
+
+───────────────────────────────────────────────────────────────
+
+═══════════════════════════════════════════════════════════════
+  COMANDOS RÁPIDOS DE DIAGNÓSTICO
+═══════════════════════════════════════════════════════════════
+
+# Ver estado completo
+pm2 status && echo "---" && pm2 logs somnus --err --lines 20 --nostream && echo "---" && curl -s http://localhost:3000 | head -5
+
+───────────────────────────────────────────────────────────────
+
+═══════════════════════════════════════════════════════════════
+  SOLUCIÓN COMPLETA SI LA APP NO INICIA
+═══════════════════════════════════════════════════════════════
+
+cd /var/www/somnus
+pm2 delete somnus
+rm -rf .next
+git pull origin main
+npm run build
+pm2 start npm --name "somnus" -- start
+pm2 save
+pm2 logs somnus --lines 30
+
+───────────────────────────────────────────────────────────────
+
+═══════════════════════════════════════════════════════════════
+  ERRORES COMUNES Y SOLUCIONES
+═══════════════════════════════════════════════════════════════
+
+ERROR: "Cannot find module"
+→ Ejecutar: npm install --legacy-peer-deps
+
+ERROR: "Database connection failed"
+→ Verificar .env tiene DATABASE_URL y DIRECT_URL correctos
+
+ERROR: "Port 3000 already in use"
+→ Ejecutar: pm2 delete all
+→ Luego: pm2 start npm --name "somnus" -- start
+
+ERROR: "Build failed"
+→ Verificar que no hay errores de sintaxis
+→ Ejecutar: npm run build  (y ver errores completos)
+
+───────────────────────────────────────────────────────────────

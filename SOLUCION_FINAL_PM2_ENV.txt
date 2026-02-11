@@ -1,0 +1,69 @@
+# Solución final: PM2 no carga .env correctamente
+
+# El problema: Next.js necesita las variables en tiempo de ejecución
+# pero PM2 no las está cargando del .env
+
+# Opción 1: Usar dotenv-cli (RECOMENDADO)
+npm install -g dotenv-cli
+
+# Detener PM2
+pm2 stop somnus
+pm2 delete somnus
+
+# Iniciar con dotenv-cli
+cd /var/www/somnus
+pm2 start "dotenv -e .env -- npm start" --name "somnus"
+
+# Guardar
+pm2 save
+
+# Ver logs
+sleep 5
+pm2 logs somnus --lines 30
+
+# ============================================
+# Opción 2: Si dotenv-cli no funciona, usar script mejorado
+# ============================================
+
+# Crear script mejorado
+cat > /var/www/somnus/start.sh << 'EOF'
+#!/bin/bash
+cd /var/www/somnus
+
+# Cargar variables de entorno del .env
+set -a
+source .env
+set +a
+
+# Iniciar Next.js
+npm start
+EOF
+
+chmod +x /var/www/somnus/start.sh
+
+# Detener y reiniciar
+pm2 stop somnus
+pm2 delete somnus
+pm2 start /var/www/somnus/start.sh --name "somnus"
+pm2 save
+
+# ============================================
+# Opción 3: Verificar que Prisma Client se regeneró con las variables correctas
+# ============================================
+
+# Regenerar Prisma Client para asegurar que tiene las variables correctas
+cd /var/www/somnus
+npm run db:generate
+
+# Reiniciar PM2
+pm2 restart somnus
+
+# ============================================
+# Opción 4: Verificar variables en tiempo de ejecución
+# ============================================
+
+# Agregar log temporal en la app para ver qué variables tiene
+# O verificar desde PM2:
+pm2 env 0
+
+# Esto mostrará todas las variables de entorno que PM2 tiene

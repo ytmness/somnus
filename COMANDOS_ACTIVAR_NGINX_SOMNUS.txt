@@ -1,0 +1,70 @@
+# Comandos para activar configuración de Nginx para somnus.live
+
+# 1. Ver qué archivos existen
+ls -la /etc/nginx/sites-available/
+ls -la /etc/nginx/sites-enabled/
+
+# 2. Ver contenido del archivo somnus (si existe)
+cat /etc/nginx/sites-available/somnus
+
+# 3. Si el archivo NO existe o está vacío, crearlo:
+nano /etc/nginx/sites-available/somnus
+
+# Pegar esta configuración COMPLETA:
+server {
+    listen 80;
+    server_name somnus.live www.somnus.live;
+
+    access_log /var/log/nginx/somnus-access.log;
+    error_log /var/log/nginx/somnus-error.log;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+}
+
+# Guardar: CTRL+O, ENTER, CTRL+X
+
+# 4. Crear enlace simbólico (activar el sitio)
+ln -sf /etc/nginx/sites-available/somnus /etc/nginx/sites-enabled/
+
+# 5. Verificar que el enlace se creó
+ls -la /etc/nginx/sites-enabled/somnus
+
+# 6. Verificar sintaxis de Nginx
+nginx -t
+
+# 7. Si hay error, ver qué dice
+# Si pasa correctamente, deberías ver:
+# nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+# 8. Reiniciar Nginx
+systemctl restart nginx
+
+# 9. Verificar estado
+systemctl status nginx
+
+# 10. Verificar que ahora está activo
+grep -r "server_name" /etc/nginx/sites-enabled/
+
+# Debe mostrar: somnus.live www.somnus.live
+
+# 11. Probar conexión
+curl http://localhost
+curl -H "Host: somnus.live" http://localhost
+
+# 12. Ver logs si hay problemas
+tail -20 /var/log/nginx/error.log
+tail -20 /var/log/nginx/somnus-error.log

@@ -1,0 +1,113 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+/node_modules/
+package-lock.json
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+/dist
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env
+.env*.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# prisma
+/prisma/migrations
+/prisma/*.db
+/prisma/*.db-journal
+
+# IDE - VSCode, Cursor, WebStorm, etc.
+.vscode/
+.cursor/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+Thumbs.db
+.DS_Store
+Desktop.ini
+$RECYCLE.BIN/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+.cache/
+
+# Scripts personales de desarrollo
+ejecutar-dev.ps1
+*.ps1
+
+# Archivos SQL temporales
+queries_*.sql
+query_*.sql
+
+# Archivos de documentación temporal
+*_COMPLETADA.md
+*_COMPLETADO.md
+MIGRACION*.md
+CONFIGURACION*.md
+GUIA_*.md
+TEMPLATES_*.md
+SOLUCION_*.md
+IMPLEMENTACION_*.md
+ACTUALIZACION_*.md
+INICIO_RAPIDO_*.md
+
+# Carpeta de actualización visual (solo documentación/ejemplos)
+/actualizacionvisual/
+
+# Imágenes temporales/de trabajo
+*.png.old
+*_old.png
+*_backup.*
