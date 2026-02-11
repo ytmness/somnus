@@ -87,7 +87,7 @@ export default function RegisterPage() {
                   Únete a
                 </h1>
                 <div className="mb-6">
-                  <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={640} height={192} className="w-[32rem] md:w-[40rem] h-auto object-contain" priority />
+                  <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={448} height={134} className="w-[22.4rem] md:w-[28rem] h-auto object-contain" priority />
                 </div>
                 <p className="somnus-text-body text-lg mb-8">
                   Crea tu cuenta y accede a eventos exclusivos, gestiona tus boletos y disfruta de experiencias únicas.
