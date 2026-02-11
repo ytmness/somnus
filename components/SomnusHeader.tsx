@@ -18,7 +18,7 @@ export function SomnusHeader({ user, userRole, showNav = false }: SomnusHeaderPr
       {/* Versión móvil */}
       <div className="w-full flex lg:hidden items-center justify-between">
         <button type="button" className="somnus-logo flex items-center cursor-pointer" onClick={() => router.push("/")} aria-label="SOMNUS - Inicio">
-          <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={200} height={60} className="h-12 w-auto object-contain" priority />
+          <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={400} height={120} className="h-24 w-auto object-contain" priority />
         </button>
         {showNav && (
           <button
@@ -33,7 +33,7 @@ export function SomnusHeader({ user, userRole, showNav = false }: SomnusHeaderPr
       {/* Versión desktop */}
       <div className="w-full hidden lg:flex items-center justify-between">
         <button type="button" className="somnus-logo flex items-center cursor-pointer" onClick={() => router.push("/")} aria-label="SOMNUS - Inicio">
-          <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={200} height={60} className="h-12 w-auto object-contain" priority />
+          <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={400} height={120} className="h-24 w-auto object-contain" priority />
         </button>
         
         {showNav && (
@@ -73,7 +73,7 @@ export function SomnusHeader({ user, userRole, showNav = false }: SomnusHeaderPr
         )}
         
         <button type="button" className="somnus-logo flex items-center cursor-pointer" onClick={() => router.push("/")} aria-label="SOMNUS - Inicio">
-          <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={200} height={60} className="h-12 w-auto object-contain" priority />
+          <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={400} height={120} className="h-24 w-auto object-contain" priority />
         </button>
       </div>
     </header>

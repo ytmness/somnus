@@ -68,7 +68,7 @@ export default function LoginPage() {
         {/* Versión móvil */}
         <div className="w-full flex lg:hidden items-center justify-between">
           <button type="button" className="somnus-logo flex items-center cursor-pointer" onClick={() => router.push("/")} aria-label="SOMNUS - Inicio" style={{ animation: 'none' }}>
-            <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={200} height={60} className="h-12 w-auto object-contain" priority />
+            <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={400} height={120} className="h-24 w-auto object-contain" priority />
           </button>
           <button
             onClick={() => router.push("/")}
@@ -81,7 +81,7 @@ export default function LoginPage() {
         {/* Versión desktop */}
         <div className="w-full hidden lg:flex items-center justify-between">
           <button type="button" className="somnus-logo flex items-center cursor-pointer" onClick={() => router.push("/")} aria-label="SOMNUS - Inicio" style={{ animation: 'none' }}>
-            <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={200} height={60} className="h-12 w-auto object-contain" priority />
+            <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={400} height={120} className="h-24 w-auto object-contain" priority />
           </button>
           
           <div className="flex items-center gap-6">
@@ -131,7 +131,7 @@ export default function LoginPage() {
                   Bienvenido a
                 </h1>
                 <div className="mb-6">
-                  <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={320} height={96} className="w-64 md:w-80 h-auto object-contain" priority />
+                  <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={640} height={192} className="w-[32rem] md:w-[40rem] h-auto object-contain" priority />
                 </div>
                 <p className="somnus-text-body text-lg mb-8">
                   Accede a tu cuenta para gestionar tus boletos, ver tus eventos favoritos y disfrutar de experiencias exclusivas.
