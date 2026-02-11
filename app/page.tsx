@@ -506,7 +506,7 @@ export default function HomePage() {
             <>
               {/* Logo SOMNUS */}
               <div className="flex justify-center mb-4">
-                <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={320} height={96} className="w-64 sm:w-80 md:w-96 h-auto object-contain" priority />
+                <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={400} height={120} className="w-80 sm:w-[22rem] md:w-[28rem] lg:w-[32rem] h-auto object-contain" priority />
               </div>
               
               {/* Subtítulo AWAKE IN A DREAM */}
@@ -557,7 +557,7 @@ export default function HomePage() {
             <>
               {/* Logo SOMNUS - siempre visible */}
               <div className="flex justify-center mb-4">
-                <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={320} height={96} className="w-64 sm:w-80 md:w-96 h-auto object-contain" priority />
+                <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={400} height={120} className="w-80 sm:w-[22rem] md:w-[28rem] lg:w-[32rem] h-auto object-contain" priority />
               </div>
               
               {/* Subtítulo AWAKE IN A DREAM */}
