@@ -15,9 +15,9 @@ export function Cart({ items, onClose, onRemoveItem, onCheckout }: CartProps) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-[#c4a905]/20 p-6 flex items-center justify-between">
+        <div className="sticky top-0 bg-white border-b border-[#5B8DEF]/20 p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <ShoppingBag className="w-6 h-6 text-[#c4a905]" />
+            <ShoppingBag className="w-6 h-6 text-[#5B8DEF]" />
             <h2 className="text-[#49484e]">Tu Carrito</h2>
           </div>
           <button
@@ -40,7 +40,7 @@ export function Cart({ items, onClose, onRemoveItem, onCheckout }: CartProps) {
               {items.map((item, index) => (
                 <div
                   key={index}
-                  className="border border-[#c4a905]/20 rounded-lg p-4 hover:border-[#c4a905] transition-colors"
+                  className="border border-[#5B8DEF]/20 rounded-lg p-4 hover:border-[#5B8DEF] transition-colors"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">
@@ -60,7 +60,7 @@ export function Cart({ items, onClose, onRemoveItem, onCheckout }: CartProps) {
                       <p className="text-[#49484e]/70">{item.section}</p>
                       <p className="text-[#49484e]/50">Cantidad: {item.quantity}</p>
                     </div>
-                    <p className="text-[#c4a905]">
+                    <p className="text-[#5B8DEF]">
                       ${(item.price * item.quantity).toLocaleString()} MXN
                     </p>
                   </div>
@@ -71,7 +71,7 @@ export function Cart({ items, onClose, onRemoveItem, onCheckout }: CartProps) {
         </div>
 
         {items.length > 0 && (
-          <div className="sticky bottom-0 bg-white border-t border-[#c4a905]/20 p-6">
+          <div className="sticky bottom-0 bg-white border-t border-[#5B8DEF]/20 p-6">
             <div className="space-y-3 mb-4">
               <div className="flex items-center justify-between text-[#49484e]/60">
                 <span>Subtotal ({totalItems} boletos)</span>
@@ -81,16 +81,16 @@ export function Cart({ items, onClose, onRemoveItem, onCheckout }: CartProps) {
                 <span>Cargo por servicio</span>
                 <span>${(total * 0.1).toLocaleString()} MXN</span>
               </div>
-              <div className="border-t border-[#c4a905]/20 pt-3 flex items-center justify-between">
+              <div className="border-t border-[#5B8DEF]/20 pt-3 flex items-center justify-between">
                 <span className="text-[#49484e]">Total</span>
-                <span className="text-[#c4a905]">
+                <span className="text-[#5B8DEF]">
                   ${(total * 1.1).toLocaleString()} MXN
                 </span>
               </div>
             </div>
             <button
               onClick={onCheckout}
-              className="w-full py-3 rounded-lg bg-[#c4a905] text-[#f9fbf6] hover:bg-[#d4b815] transition-colors"
+              className="w-full py-3 rounded-lg bg-[#5B8DEF] text-[#f9fbf6] hover:bg-[#7BA3E8] transition-colors"
             >
               Proceder al Pago
             </button>

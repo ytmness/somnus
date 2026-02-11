@@ -251,7 +251,7 @@ boletera-regia-v2/
 - Sellos oficiales
 
 ### Colores Brand
-- **Oro Regia**: #c4a905
+- **Azul Somnus**: #5B8DEF
 - **Negro Regia**: #2a2c30
 - **Gris Regia**: #49484e
 - **Crema**: #f9fbf6

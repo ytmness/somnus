@@ -107,12 +107,12 @@ export function PatriotasTablesMap({
   const getTableColor = (table: IndividualTable) => {
     if (table.status === "sold") return "#666";
     if (table.status === "reserved") return "#ff9800";
-    if (selectedTable?.id === table.id) return "#FFD700";
+    if (selectedTable?.id === table.id) return "#5B8DEF";
     if (hoveredTable === table.number) return "#FFA500";
 
     // Color por zona (9 filas: 1-3 frontal, 4-6 media, 7-9 trasera)
-    if (table.row <= 3) return "#c4a905"; // Frontal
-    if (table.row <= 6) return "#d4b815"; // Media
+    if (table.row <= 3) return "#5B8DEF"; // Frontal
+    if (table.row <= 6) return "#7BA3E8"; // Media
     return "#e4c825"; // Trasera
   };
 
@@ -137,7 +137,7 @@ export function PatriotasTablesMap({
           {/* Stats */}
           <div className="flex gap-4">
             <div className="text-center">
-              <p className="text-2xl font-bold text-[#c4a905]">
+              <p className="text-2xl font-bold text-[#5B8DEF]">
                 {stats.available}
               </p>
               <p className="text-xs text-white/70">Disponibles</p>
@@ -161,7 +161,7 @@ export function PatriotasTablesMap({
             size="sm"
             variant="outline"
             onClick={() => setZoom(Math.min(2.5, zoom + 0.1))}
-            className="border-[#c4a905]/50 text-white bg-transparent hover:bg-white/10"
+            className="border-[#5B8DEF]/50 text-white bg-transparent hover:bg-white/10"
           >
             <ZoomIn className="w-4 h-4" />
           </Button>
@@ -169,7 +169,7 @@ export function PatriotasTablesMap({
             size="sm"
             variant="outline"
             onClick={() => setZoom(Math.max(0.3, zoom - 0.1))}
-            className="border-[#c4a905]/50 text-white bg-transparent hover:bg-white/10"
+            className="border-[#5B8DEF]/50 text-white bg-transparent hover:bg-white/10"
           >
             <ZoomOut className="w-4 h-4" />
           </Button>
@@ -177,7 +177,7 @@ export function PatriotasTablesMap({
             size="sm"
             variant="outline"
             onClick={() => setZoom(0.4)}
-            className="border-[#c4a905]/50 text-white bg-transparent hover:bg-white/10"
+            className="border-[#5B8DEF]/50 text-white bg-transparent hover:bg-white/10"
           >
             Vista Completa
           </Button>
@@ -185,7 +185,7 @@ export function PatriotasTablesMap({
             size="sm"
             variant="outline"
             onClick={() => setZoom(0.8)}
-            className="border-[#c4a905]/50 text-white bg-transparent hover:bg-white/10"
+            className="border-[#5B8DEF]/50 text-white bg-transparent hover:bg-white/10"
           >
             Vista Media
           </Button>
@@ -193,7 +193,7 @@ export function PatriotasTablesMap({
             size="sm"
             variant="outline"
             onClick={() => setShowLegend(!showLegend)}
-            className="border-[#c4a905]/50 text-white bg-transparent hover:bg-white/10"
+            className="border-[#5B8DEF]/50 text-white bg-transparent hover:bg-white/10"
           >
             <Info className="w-4 h-4 mr-2" />
             {showLegend ? "Ocultar" : "Mostrar"} Leyenda
@@ -202,7 +202,7 @@ export function PatriotasTablesMap({
             size="sm"
             variant="outline"
             onClick={() => setDebugMode(!debugMode)}
-            className="border-[#c4a905]/50 text-white bg-transparent hover:bg-white/10"
+            className="border-[#5B8DEF]/50 text-white bg-transparent hover:bg-white/10"
           >
             <Move className="w-4 h-4 mr-2" />
             {debugMode ? "Ocultar" : "Ajustar"} Posición
@@ -216,7 +216,7 @@ export function PatriotasTablesMap({
 
       {/* Panel de ajuste manual */}
       {debugMode && (
-        <div className="mb-4 p-4 bg-[#c4a905]/10 border border-[#c4a905]/30 rounded-lg">
+        <div className="mb-4 p-4 bg-[#5B8DEF]/10 border border-[#5B8DEF]/30 rounded-lg">
           <h3 className="text-white font-bold mb-3">Ajuste Manual de Posición</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -271,7 +271,7 @@ export function PatriotasTablesMap({
                 console.log(`Valores ajustados: offsetX=${offsetX}, offsetY=${offsetY}, scale=${scale}`);
                 alert(`Valores guardados en consola:\nOffset X: ${offsetX}\nOffset Y: ${offsetY}\nEscala: ${scale}`);
               }}
-              className="px-4 py-2 bg-[#c4a905] hover:bg-[#d4b815] text-white rounded-lg text-sm transition"
+              className="px-4 py-2 bg-[#5B8DEF] hover:bg-[#7BA3E8] text-white rounded-lg text-sm transition"
             >
               Copiar Valores
             </button>
@@ -284,7 +284,7 @@ export function PatriotasTablesMap({
 
       {/* Mapa con imagen de fondo y overlay SVG */}
       <div 
-        className="relative bg-[#1a1a1a] rounded-xl border border-[#c4a905]/20 overflow-auto flex items-center justify-center"
+        className="relative bg-[#1a1a1a] rounded-xl border border-[#5B8DEF]/20 overflow-auto flex items-center justify-center"
         style={{ 
           minHeight: "600px",
           maxHeight: "800px",
@@ -346,8 +346,8 @@ export function PatriotasTablesMap({
                       y={section.y}
                       width={section.width}
                       height={section.height}
-                      fill={isSelected ? "#FFD700" : isHovered ? "#c4a905" : "transparent"}
-                      stroke={isSelected ? "#FFD700" : isHovered ? "#c4a905" : "#c4a905"}
+                      fill={isSelected ? "#5B8DEF" : isHovered ? "#5B8DEF" : "transparent"}
+                      stroke={isSelected ? "#5B8DEF" : isHovered ? "#5B8DEF" : "#5B8DEF"}
                       strokeWidth={isSelected ? 8 : isHovered ? 6 : 3}
                       opacity={isSelected ? 0.6 : isHovered ? 0.4 : 0.2}
                       className={isClickable ? "cursor-pointer transition-all" : ""}
@@ -376,7 +376,7 @@ export function PatriotasTablesMap({
                     opacity={getTableOpacity(table)}
                     className={
                       table.status === "available"
-                        ? "cursor-pointer transition-all hover:stroke-[#FFD700] hover:stroke-4"
+                        ? "cursor-pointer transition-all hover:stroke-[#5B8DEF] hover:stroke-4"
                         : "cursor-not-allowed"
                     }
                     style={{ pointerEvents: "all" }}
@@ -408,15 +408,15 @@ export function PatriotasTablesMap({
 
       {/* Leyenda */}
       {showLegend && (
-        <div className="mt-6 bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-[#c4a905]/20">
+        <div className="mt-6 bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-[#5B8DEF]/20">
           <h3 className="text-white font-bold mb-3">Leyenda</h3>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-[#c4a905]"></div>
+              <div className="w-4 h-4 rounded-full bg-[#5B8DEF]"></div>
               <span className="text-white/70 text-sm">Disponible (Frontal)</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-[#d4b815]"></div>
+              <div className="w-4 h-4 rounded-full bg-[#7BA3E8]"></div>
               <span className="text-white/70 text-sm">Disponible (Media)</span>
             </div>
             <div className="flex items-center gap-2">
@@ -428,7 +428,7 @@ export function PatriotasTablesMap({
               <span className="text-white/70 text-sm">Vendida</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-[#c4a905]" style={{ opacity: 0.3 }}></div>
+              <div className="w-4 h-4 rounded bg-[#5B8DEF]" style={{ opacity: 0.3 }}></div>
               <span className="text-white/70 text-sm">Secciones (hover)</span>
             </div>
           </div>
@@ -448,7 +448,7 @@ export function PatriotasTablesMap({
 
       {/* Panel de selección de mesa */}
       {selectedTable && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-[#2a2c30] border-2 border-[#c4a905] rounded-lg shadow-2xl p-6 z-50 w-full max-w-md mx-4">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-[#2a2c30] border-2 border-[#5B8DEF] rounded-lg shadow-2xl p-6 z-50 w-full max-w-md mx-4">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-white font-bold text-xl mb-1">
@@ -478,7 +478,7 @@ export function PatriotasTablesMap({
             </div>
             <div className="flex items-center justify-between">
               <span className="text-white/70">Precio:</span>
-              <span className="text-[#c4a905] font-bold text-2xl">
+              <span className="text-[#5B8DEF] font-bold text-2xl">
                 ${selectedTable.price.toLocaleString()}
               </span>
             </div>
@@ -486,7 +486,7 @@ export function PatriotasTablesMap({
 
           <Button
             onClick={handleConfirm}
-            className="w-full bg-[#c4a905] text-white hover:bg-[#d4b815] h-12 text-lg"
+            className="w-full bg-[#5B8DEF] text-white hover:bg-[#7BA3E8] h-12 text-lg"
           >
             Agregar al Carrito
           </Button>
@@ -495,7 +495,7 @@ export function PatriotasTablesMap({
 
       {/* Panel de selección de sección */}
       {selectedSection && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-[#2a2c30] border-2 border-[#c4a905] rounded-lg shadow-2xl p-6 z-50 w-full max-w-md mx-4">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-[#2a2c30] border-2 border-[#5B8DEF] rounded-lg shadow-2xl p-6 z-50 w-full max-w-md mx-4">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-white font-bold text-xl mb-1">
@@ -522,7 +522,7 @@ export function PatriotasTablesMap({
             </div>
             <div className="flex items-center justify-between mb-4">
               <span className="text-white/70">Precio unitario:</span>
-              <span className="text-[#c4a905] font-bold text-xl">
+              <span className="text-[#5B8DEF] font-bold text-xl">
                 ${selectedSection.price.toLocaleString()}
               </span>
             </div>
@@ -537,13 +537,13 @@ export function PatriotasTablesMap({
                 max={selectedSection.capacity - selectedSection.sold}
                 value={quantity}
                 onChange={(e) => setQuantity(Math.max(1, Math.min(selectedSection.capacity - selectedSection.sold, parseInt(e.target.value) || 1)))}
-                className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-[#c4a905]"
+                className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-[#5B8DEF]"
               />
             </div>
 
             <div className="flex items-center justify-between pt-3 border-t border-white/10">
               <span className="text-white/70">Total:</span>
-              <span className="text-[#c4a905] font-bold text-2xl">
+              <span className="text-[#5B8DEF] font-bold text-2xl">
                 ${(selectedSection.price * quantity).toLocaleString()}
               </span>
             </div>
@@ -551,7 +551,7 @@ export function PatriotasTablesMap({
 
           <Button
             onClick={handleConfirmSection}
-            className="w-full bg-[#c4a905] text-white hover:bg-[#d4b815] h-12 text-lg"
+            className="w-full bg-[#5B8DEF] text-white hover:bg-[#7BA3E8] h-12 text-lg"
           >
             Agregar al Carrito
           </Button>

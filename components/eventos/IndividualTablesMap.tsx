@@ -96,12 +96,12 @@ export function IndividualTablesMap({
   const getTableColor = (table: IndividualTable) => {
     if (table.status === "sold") return "#666";
     if (table.status === "reserved") return "#ff9800";
-    if (selectedTable?.id === table.id) return "#c4a905";
-    if (hoveredTable === table.number) return "#d4b815";
+    if (selectedTable?.id === table.id) return "#5B8DEF";
+    if (hoveredTable === table.number) return "#7BA3E8";
 
     // Color por zona (8 filas: 1-3 frontal, 4-6 media, 7-8 trasera)
-    if (table.row <= 3) return "#c4a905"; // Frontal (filas 1-3) - Oro
-    if (table.row <= 6) return "#d4b815"; // Media (filas 4-6) - Oro claro
+    if (table.row <= 3) return "#5B8DEF"; // Frontal (filas 1-3) - Oro
+    if (table.row <= 6) return "#7BA3E8"; // Media (filas 4-6) - Oro claro
     return "#e4c825"; // Trasera (filas 7-8) - Amarillo
   };
 
@@ -126,7 +126,7 @@ export function IndividualTablesMap({
           {/* Stats */}
           <div className="flex gap-4">
             <div className="text-center">
-              <p className="text-2xl font-bold text-[#c4a905]">
+              <p className="text-2xl font-bold text-[#5B8DEF]">
                 {stats.available}
               </p>
               <p className="text-xs text-white/70">Disponibles</p>
@@ -150,7 +150,7 @@ export function IndividualTablesMap({
             size="sm"
             variant="outline"
             onClick={() => setZoom(Math.min(1.5, zoom + 0.1))}
-            className="border-[#c4a905]/50 text-white bg-transparent hover:bg-white/10"
+            className="border-[#5B8DEF]/50 text-white bg-transparent hover:bg-white/10"
           >
             <ZoomIn className="w-4 h-4" />
           </Button>
@@ -158,7 +158,7 @@ export function IndividualTablesMap({
             size="sm"
             variant="outline"
             onClick={() => setZoom(Math.max(0.5, zoom - 0.1))}
-            className="border-[#c4a905]/50 text-white bg-transparent hover:bg-white/10"
+            className="border-[#5B8DEF]/50 text-white bg-transparent hover:bg-white/10"
           >
             <ZoomOut className="w-4 h-4" />
           </Button>
@@ -166,7 +166,7 @@ export function IndividualTablesMap({
             size="sm"
             variant="outline"
             onClick={() => setZoom(0.75)}
-            className="border-[#c4a905]/50 text-white bg-transparent hover:bg-white/10"
+            className="border-[#5B8DEF]/50 text-white bg-transparent hover:bg-white/10"
           >
             Reset
           </Button>
@@ -174,7 +174,7 @@ export function IndividualTablesMap({
             size="sm"
             variant="outline"
             onClick={() => setShowLegend(!showLegend)}
-            className="border-[#c4a905]/50 text-white bg-transparent hover:bg-white/10"
+            className="border-[#5B8DEF]/50 text-white bg-transparent hover:bg-white/10"
           >
             <Info className="w-4 h-4 mr-2" />
             {showLegend ? "Ocultar" : "Mostrar"} Leyenda
@@ -187,7 +187,7 @@ export function IndividualTablesMap({
       </div>
 
       {/* Mapa con scroll */}
-      <div className="relative bg-[#2a2c30] rounded-xl border border-[#c4a905]/20 overflow-auto flex items-center justify-center min-h-[500px]">
+      <div className="relative bg-[#2a2c30] rounded-xl border border-[#5B8DEF]/20 overflow-auto flex items-center justify-center min-h-[500px]">
         <div 
           style={{ 
             transform: `scale(${zoom})`, 
@@ -232,7 +232,7 @@ export function IndividualTablesMap({
                     y="120" 
                     width="760" 
                     height="260" 
-                    fill={isSelected ? "#c4a905" : isHovered ? "#b0b0b0" : generalSection.color || "#95a5a6"} 
+                    fill={isSelected ? "#5B8DEF" : isHovered ? "#b0b0b0" : generalSection.color || "#95a5a6"} 
                     stroke="#f9fbf6" 
                     strokeWidth={isSelected ? "4" : "3"} 
                     opacity={isHovered || isSelected ? 0.9 : 0.7}
@@ -264,7 +264,7 @@ export function IndividualTablesMap({
                       y="400" 
                       width="365" 
                       height="80" 
-                      fill={selectedSection?.id === preferenteA.id ? "#c4a905" : hoveredSection === preferenteA.id ? "#5a9ff2" : preferenteA.color || "#4a90e2"} 
+                      fill={selectedSection?.id === preferenteA.id ? "#5B8DEF" : hoveredSection === preferenteA.id ? "#5a9ff2" : preferenteA.color || "#4a90e2"} 
                       stroke="#f9fbf6" 
                       strokeWidth={selectedSection?.id === preferenteA.id ? "4" : "3"} 
                       opacity={hoveredSection === preferenteA.id || selectedSection?.id === preferenteA.id ? 0.9 : 0.7}
@@ -283,7 +283,7 @@ export function IndividualTablesMap({
                       y="400" 
                       width="365" 
                       height="80" 
-                      fill={selectedSection?.id === preferenteB.id ? "#c4a905" : hoveredSection === preferenteB.id ? "#5a9ff2" : preferenteB.color || "#4a90e2"} 
+                      fill={selectedSection?.id === preferenteB.id ? "#5B8DEF" : hoveredSection === preferenteB.id ? "#5a9ff2" : preferenteB.color || "#4a90e2"} 
                       stroke="#f9fbf6" 
                       strokeWidth={selectedSection?.id === preferenteB.id ? "4" : "3"} 
                       opacity={hoveredSection === preferenteB.id || selectedSection?.id === preferenteB.id ? 0.9 : 0.7}
@@ -310,7 +310,7 @@ export function IndividualTablesMap({
                       y="400" 
                       width="760" 
                       height="80" 
-                      fill={isSelected ? "#c4a905" : isHovered ? "#5a9ff2" : preferenteA.color || "#4a90e2"} 
+                      fill={isSelected ? "#5B8DEF" : isHovered ? "#5a9ff2" : preferenteA.color || "#4a90e2"} 
                       stroke="#f9fbf6" 
                       strokeWidth={isSelected ? "4" : "3"} 
                       opacity={isHovered || isSelected ? 0.9 : 0.7}
@@ -437,7 +437,7 @@ export function IndividualTablesMap({
             })}
 
             {/* TARIMA - Más abajo, separada de las mesas */}
-            <rect x="300" y="710" width="400" height="60" fill="#c4a905" stroke="#f9fbf6" strokeWidth="3" rx="3" />
+            <rect x="300" y="710" width="400" height="60" fill="#5B8DEF" stroke="#f9fbf6" strokeWidth="3" rx="3" />
             <text x="500" y="745" textAnchor="middle" fill="#2a2c30" fontSize="24" fontWeight="bold">
               TARIMA
             </text>
@@ -458,7 +458,7 @@ export function IndividualTablesMap({
 
         {/* Tooltip hover */}
         {(hoveredTable || hoveredSection) && !selectedTable && !selectedSection && (
-          <div className="absolute top-4 right-4 bg-black/95 text-white p-4 rounded-lg shadow-xl border border-[#c4a905]/30 min-w-[220px] pointer-events-none z-10">
+          <div className="absolute top-4 right-4 bg-black/95 text-white p-4 rounded-lg shadow-xl border border-[#5B8DEF]/30 min-w-[220px] pointer-events-none z-10">
             {hoveredTable && (() => {
               const table = tables.find((t) => t.number === hoveredTable);
               if (!table) return null;
@@ -468,7 +468,7 @@ export function IndividualTablesMap({
                   <p className="text-sm text-white/70 mb-1">
                     Fila {table.row} • Columna {table.column}
                   </p>
-                  <p className="text-[#c4a905] text-xl font-bold mb-2">
+                  <p className="text-[#5B8DEF] text-xl font-bold mb-2">
                     ${table.price.toLocaleString()} MXN
                   </p>
                   <p className="text-sm text-white/80">
@@ -505,7 +505,7 @@ export function IndividualTablesMap({
               return (
                 <div>
                   <h4 className="font-bold text-lg mb-2">{section.name}</h4>
-                  <p className="text-[#c4a905] text-xl font-bold mb-2">
+                  <p className="text-[#5B8DEF] text-xl font-bold mb-2">
                     ${section.price.toLocaleString()} MXN
                   </p>
                   <p className="text-sm text-white/80 mb-1">
@@ -525,14 +525,14 @@ export function IndividualTablesMap({
       {showLegend && (
         <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5">
-            <div className="w-8 h-8 rounded bg-[#c4a905]" />
+            <div className="w-8 h-8 rounded bg-[#5B8DEF]" />
             <div>
               <p className="text-white text-sm font-medium">Zona Frontal</p>
               <p className="text-white/60 text-xs">Filas 1-4</p>
             </div>
           </div>
           <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5">
-            <div className="w-8 h-8 rounded bg-[#d4b815]" />
+            <div className="w-8 h-8 rounded bg-[#7BA3E8]" />
             <div>
               <p className="text-white text-sm font-medium">Zona Media</p>
               <p className="text-white/60 text-xs">Filas 5-8</p>
@@ -565,7 +565,7 @@ export function IndividualTablesMap({
       {/* Modal de confirmación */}
       {selectedTable && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#2a2c30] rounded-xl border border-[#c4a905]/30 max-w-md w-full p-6">
+          <div className="bg-[#2a2c30] rounded-xl border border-[#5B8DEF]/30 max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-white">
                 Mesa #{selectedTable.number}
@@ -610,7 +610,7 @@ export function IndividualTablesMap({
                 <div className="border-t border-white/10 pt-2 mt-2">
                   <div className="flex justify-between">
                     <span className="text-white font-bold">Total:</span>
-                    <span className="text-[#c4a905] font-bold text-2xl">
+                    <span className="text-[#5B8DEF] font-bold text-2xl">
                       ${(selectedTable.price * 1.16).toLocaleString()}
                     </span>
                   </div>
@@ -630,7 +630,7 @@ export function IndividualTablesMap({
               >
                 Cancelar
               </Button>
-              <Button onClick={handleConfirm} className="flex-1 bg-[#c4a905] text-white hover:bg-[#d4b815]">
+              <Button onClick={handleConfirm} className="flex-1 bg-[#5B8DEF] text-white hover:bg-[#7BA3E8]">
                 Agregar al Carrito
               </Button>
             </div>
@@ -641,7 +641,7 @@ export function IndividualTablesMap({
       {/* Modal de confirmación para secciones */}
       {selectedSection && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#2a2c30] rounded-xl border border-[#c4a905]/30 max-w-md w-full p-6">
+          <div className="bg-[#2a2c30] rounded-xl border border-[#5B8DEF]/30 max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-white">{selectedSection.name}</h3>
               <button
@@ -653,7 +653,7 @@ export function IndividualTablesMap({
             </div>
 
             <div className="mb-6">
-              <p className="text-[#c4a905] text-3xl font-bold mb-2">
+              <p className="text-[#5B8DEF] text-3xl font-bold mb-2">
                 ${selectedSection.price.toLocaleString()} MXN
               </p>
               <p className="text-white/70 mb-4">
@@ -705,7 +705,7 @@ export function IndividualTablesMap({
                 <div className="border-t border-white/10 pt-2 mt-2">
                   <div className="flex justify-between">
                     <span className="text-white font-bold">Total:</span>
-                    <span className="text-[#c4a905] font-bold text-2xl">
+                    <span className="text-[#5B8DEF] font-bold text-2xl">
                       ${(selectedSection.price * quantity * 1.16).toLocaleString()}
                     </span>
                   </div>
@@ -723,7 +723,7 @@ export function IndividualTablesMap({
               </Button>
               <Button
                 onClick={handleConfirmSection}
-                className="flex-1 bg-[#c4a905] text-white hover:bg-[#d4b815]"
+                className="flex-1 bg-[#5B8DEF] text-white hover:bg-[#7BA3E8]"
                 disabled={!onSelectSection}
               >
                 Agregar al Carrito

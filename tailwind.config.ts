@@ -12,15 +12,15 @@ const config: Config = {
       colors: {
         // === NUEVA PALETA BOLETERA REGIA ===
         regia: {
-          // Colores principales del mockup
+          // Colores principales - Azul media noche
           black: "#0A0A0A",           // Negro Profundo - Fondo principal
-          'gold-old': "#C5A059",      // Dorado Antiguo - Botones, detalles
+          'gold-old': "#5B8DEF",      // Azul media noche - Botones, detalles
           cream: "#E0E0E0",           // Blanco Crudo - Textos
           'metallic-gray': "#2D2D2D", // Gris Metálico - Tarjetas
-          'gold-bright': "#F4D03F",   // Brillo de Oro - Efectos glow/hover
+          'gold-bright': "#7BA3E8",   // Azul acero - Efectos glow/hover
           
-          // Colores legacy (mantener compatibilidad)
-          gold: "#c4a905",
+          // Colores legacy (compatibilidad)
+          gold: "#5B8DEF",
           dark: "#2a2c30",
           gray: "#49484e",
           cream2: "#f9fbf6", // Mantener como cream2 para no romper código existente

@@ -533,9 +533,9 @@ export default function HomePage() {
                       background: 'rgba(255, 255, 255, 0.1)',
                       color: '#FFFFFF',
                       borderRadius: '50px',
-                      border: '1px solid rgba(255, 105, 180, 0.4)',
+                      border: '1px solid rgba(91, 141, 239, 0.4)',
                       backdropFilter: 'blur(10px)',
-                      boxShadow: '0 8px 32px rgba(255, 105, 180, 0.3)',
+                      boxShadow: '0 8px 32px rgba(91, 141, 239, 0.3)',
                     }}
                 >
                   <span>Comprar Boletos</span>

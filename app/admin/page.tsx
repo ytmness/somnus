@@ -71,7 +71,7 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen regia-gradient">
       {/* Header */}
-      <header className="bg-[#49484e] border-b border-[#c4a905]/20">
+      <header className="bg-[#49484e] border-b border-[#5B8DEF]/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>

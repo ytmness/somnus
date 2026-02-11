@@ -64,7 +64,7 @@ export function ConcertCarousel({ concerts, onSelectConcert }: ConcertCarouselPr
         <>
           <button
             onClick={scrollPrev}
-            className="absolute -left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#c4a905] text-white flex items-center justify-center shadow-lg hover:bg-[#d4b815] transition-all z-10"
+            className="absolute -left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#5B8DEF] text-white flex items-center justify-center shadow-lg hover:bg-[#7BA3E8] transition-all z-10"
             aria-label="Anterior"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
@@ -74,7 +74,7 @@ export function ConcertCarousel({ concerts, onSelectConcert }: ConcertCarouselPr
 
           <button
             onClick={scrollNext}
-            className="absolute -right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#c4a905] text-white flex items-center justify-center shadow-lg hover:bg-[#d4b815] transition-all z-10"
+            className="absolute -right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#5B8DEF] text-white flex items-center justify-center shadow-lg hover:bg-[#7BA3E8] transition-all z-10"
             aria-label="Siguiente"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">

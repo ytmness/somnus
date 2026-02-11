@@ -55,7 +55,7 @@ export function TicketSelector({ concert, onClose, onAddToCart }: TicketSelector
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-[#c4a905]/20 p-6 flex items-start justify-between">
+        <div className="sticky top-0 bg-white border-b border-[#5B8DEF]/20 p-6 flex items-start justify-between">
           <div>
             <h2 className="text-[#49484e] mb-1">{concert.artist}</h2>
             <p className="text-[#49484e]/60">{concert.tour}</p>
@@ -85,13 +85,13 @@ export function TicketSelector({ concert, onClose, onAddToCart }: TicketSelector
           {concert.sections.map((section) => (
             <div
               key={section.id}
-              className="border border-[#c4a905]/20 rounded-lg p-4 hover:border-[#c4a905] transition-colors"
+              className="border border-[#5B8DEF]/20 rounded-lg p-4 hover:border-[#5B8DEF] transition-colors"
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex-1">
                   <h4 className="text-[#49484e]">{section.name}</h4>
                   <p className="text-[#49484e]/60">{section.description}</p>
-                  <p className="text-[#c4a905] mt-2">${section.price.toLocaleString()} MXN</p>
+                  <p className="text-[#5B8DEF] mt-2">${section.price.toLocaleString()} MXN</p>
                   <p className="text-[#49484e]/50">
                     {section.available} boletos disponibles
                   </p>
@@ -123,16 +123,16 @@ export function TicketSelector({ concert, onClose, onAddToCart }: TicketSelector
           ))}
         </div>
 
-        <div className="sticky bottom-0 bg-white border-t border-[#c4a905]/20 p-6">
+        <div className="sticky bottom-0 bg-white border-t border-[#5B8DEF]/20 p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-[#49484e]/60">Total ({totalItems} boletos)</p>
-              <p className="text-[#c4a905]">${totalPrice.toLocaleString()} MXN</p>
+              <p className="text-[#5B8DEF]">${totalPrice.toLocaleString()} MXN</p>
             </div>
             <button
               onClick={handleAddToCart}
               disabled={totalItems === 0}
-              className="px-8 py-3 rounded-lg bg-[#c4a905] text-[#f9fbf6] hover:bg-[#d4b815] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-3 rounded-lg bg-[#5B8DEF] text-[#f9fbf6] hover:bg-[#7BA3E8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Agregar al Carrito
             </button>

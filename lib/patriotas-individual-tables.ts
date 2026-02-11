@@ -71,13 +71,13 @@ export const TABLE_ZONES = {
     name: "Zona Frontal",
     description: "Vista directa al escenario",
     tables: VIP_TABLES.filter((t) => t.row <= 3), // Filas 1-3 (54 mesas)
-    color: "#c4a905",
+    color: "#5B8DEF",
   },
   middle: {
     name: "Zona Media",
     description: "Excelente vista",
     tables: VIP_TABLES.filter((t) => t.row > 3 && t.row <= 6), // Filas 4-6 (54 mesas)
-    color: "#d4b815",
+    color: "#7BA3E8",
   },
   back: {
     name: "Zona Trasera",

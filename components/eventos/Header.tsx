@@ -52,7 +52,7 @@ export function Header({ cartItemsCount, onCartClick }: HeaderProps) {
   };
 
   return (
-    <header className="bg-[#49484e] border-b border-[#c4a905]/20 sticky top-0 z-50">
+    <header className="bg-[#49484e] border-b border-[#5B8DEF]/20 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20 py-3">
           <Link href="/" className="flex items-center gap-2 sm:gap-3 h-full" onClick={closeMobileMenu}>
@@ -61,15 +61,15 @@ export function Header({ cartItemsCount, onCartClick }: HeaderProps) {
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-            <Link href="/#eventos" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#c4a905] transition-colors text-base font-medium">
+            <Link href="/#eventos" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#5B8DEF] transition-colors text-base font-medium">
               <Calendar className="w-5 h-5" />
               <span>Eventos</span>
             </Link>
-            <Link href="/#nosotros" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#c4a905] transition-colors text-base font-medium">
+            <Link href="/#nosotros" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#5B8DEF] transition-colors text-base font-medium">
               <Info className="w-5 h-5" />
               <span>Nosotros</span>
             </Link>
-            <Link href="/#contacto" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#c4a905] transition-colors text-base font-medium">
+            <Link href="/#contacto" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#5B8DEF] transition-colors text-base font-medium">
               <Mail className="w-5 h-5" />
               <span>Contacto</span>
             </Link>
@@ -78,13 +78,13 @@ export function Header({ cartItemsCount, onCartClick }: HeaderProps) {
                 {user ? (
                   <>
                     {user.role === "CLIENTE" && (
-                      <Link href="/mis-boletos" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#c4a905] transition-colors text-base font-medium">
+                      <Link href="/mis-boletos" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#5B8DEF] transition-colors text-base font-medium">
                         <Ticket className="w-5 h-5" />
                         <span>Mis Boletos</span>
                       </Link>
                     )}
                     {(user.role === "ACCESOS" || user.role === "ADMIN") && (
-                      <Link href="/accesos" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#c4a905] transition-colors text-base font-medium">
+                      <Link href="/accesos" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#5B8DEF] transition-colors text-base font-medium">
                         <ScanLine className="w-5 h-5" />
                         <span>Escáner</span>
                       </Link>
@@ -95,14 +95,14 @@ export function Header({ cartItemsCount, onCartClick }: HeaderProps) {
                     </div>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#c4a905] transition-colors text-base font-medium"
+                      className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#5B8DEF] transition-colors text-base font-medium"
                     >
                       <LogOut className="w-5 h-5" />
                       <span>Salir</span>
                     </button>
                   </>
                 ) : (
-                  <Link href="/login" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#c4a905] transition-colors text-base font-medium">
+                  <Link href="/login" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#5B8DEF] transition-colors text-base font-medium">
                     <User className="w-5 h-5" />
                     <span>Mi Cuenta</span>
                   </Link>
@@ -116,7 +116,7 @@ export function Header({ cartItemsCount, onCartClick }: HeaderProps) {
             {/* Cart Button */}
             <button
               onClick={onCartClick}
-              className="relative flex items-center gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-[#c4a905] text-[#f9fbf6] hover:bg-[#d4b815] active:bg-[#b49805] transition-colors font-medium text-sm sm:text-base"
+              className="relative flex items-center gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-[#5B8DEF] text-[#f9fbf6] hover:bg-[#7BA3E8] active:bg-[#4a7bd9] transition-colors font-medium text-sm sm:text-base"
             >
               <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="hidden sm:inline">Carrito</span>
@@ -145,14 +145,14 @@ export function Header({ cartItemsCount, onCartClick }: HeaderProps) {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#2a2c30] border-t border-[#c4a905]/20">
+        <div className="md:hidden bg-[#2a2c30] border-t border-[#5B8DEF]/20">
           <nav className="max-w-7xl mx-auto px-3 py-4 flex flex-col gap-1">
             <Link 
               href="/#eventos" 
               onClick={closeMobileMenu}
               className="flex items-center gap-3 px-4 py-3 text-[#f9fbf6] hover:bg-[#49484e] rounded-lg transition-colors"
             >
-              <Calendar className="w-5 h-5 text-[#c4a905]" />
+              <Calendar className="w-5 h-5 text-[#5B8DEF]" />
               <span className="font-medium">Eventos</span>
             </Link>
             
@@ -161,7 +161,7 @@ export function Header({ cartItemsCount, onCartClick }: HeaderProps) {
               onClick={closeMobileMenu}
               className="flex items-center gap-3 px-4 py-3 text-[#f9fbf6] hover:bg-[#49484e] rounded-lg transition-colors"
             >
-              <Info className="w-5 h-5 text-[#c4a905]" />
+              <Info className="w-5 h-5 text-[#5B8DEF]" />
               <span className="font-medium">Nosotros</span>
             </Link>
             
@@ -170,7 +170,7 @@ export function Header({ cartItemsCount, onCartClick }: HeaderProps) {
               onClick={closeMobileMenu}
               className="flex items-center gap-3 px-4 py-3 text-[#f9fbf6] hover:bg-[#49484e] rounded-lg transition-colors"
             >
-              <Mail className="w-5 h-5 text-[#c4a905]" />
+              <Mail className="w-5 h-5 text-[#5B8DEF]" />
               <span className="font-medium">Contacto</span>
             </Link>
 
@@ -180,7 +180,7 @@ export function Header({ cartItemsCount, onCartClick }: HeaderProps) {
                   <>
                     <div className="border-t border-[#49484e] my-2"></div>
                     
-                    <div className="flex items-center gap-3 px-4 py-3 text-[#c4a905]">
+                    <div className="flex items-center gap-3 px-4 py-3 text-[#5B8DEF]">
                       <User className="w-5 h-5" />
                       <span className="font-medium">{user.name}</span>
                     </div>
@@ -191,7 +191,7 @@ export function Header({ cartItemsCount, onCartClick }: HeaderProps) {
                         onClick={closeMobileMenu}
                         className="flex items-center gap-3 px-4 py-3 text-[#f9fbf6] hover:bg-[#49484e] rounded-lg transition-colors"
                       >
-                        <Ticket className="w-5 h-5 text-[#c4a905]" />
+                        <Ticket className="w-5 h-5 text-[#5B8DEF]" />
                         <span className="font-medium">Mis Boletos</span>
                       </Link>
                     )}
@@ -202,7 +202,7 @@ export function Header({ cartItemsCount, onCartClick }: HeaderProps) {
                         onClick={closeMobileMenu}
                         className="flex items-center gap-3 px-4 py-3 text-[#f9fbf6] hover:bg-[#49484e] rounded-lg transition-colors"
                       >
-                        <ScanLine className="w-5 h-5 text-[#c4a905]" />
+                        <ScanLine className="w-5 h-5 text-[#5B8DEF]" />
                         <span className="font-medium">Escáner</span>
                       </Link>
                     )}
@@ -223,7 +223,7 @@ export function Header({ cartItemsCount, onCartClick }: HeaderProps) {
                       onClick={closeMobileMenu}
                       className="flex items-center gap-3 px-4 py-3 text-[#f9fbf6] hover:bg-[#49484e] rounded-lg transition-colors"
                     >
-                      <User className="w-5 h-5 text-[#c4a905]" />
+                      <User className="w-5 h-5 text-[#5B8DEF]" />
                       <span className="font-medium">Mi Cuenta</span>
                     </Link>
                   </>

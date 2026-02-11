@@ -8,7 +8,7 @@ interface ConcertCardProps {
 
 export function ConcertCard({ concert, onSelectConcert }: ConcertCardProps) {
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-[#c4a905]/20 h-full">
+    <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-[#5B8DEF]/20 h-full">
       <div className="relative h-44 overflow-hidden">
         <img 
           src={concert.image} 
@@ -18,7 +18,7 @@ export function ConcertCard({ concert, onSelectConcert }: ConcertCardProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-[#49484e]/80 to-transparent" />
         <div className="absolute bottom-4 left-4 right-4">
           <h3 className="text-white mb-1">{concert.artist}</h3>
-          <p className="text-[#c4a905]">{concert.tour}</p>
+          <p className="text-[#5B8DEF]">{concert.tour}</p>
         </div>
       </div>
       
@@ -40,7 +40,7 @@ export function ConcertCard({ concert, onSelectConcert }: ConcertCardProps) {
         
         <div className="pt-2">
           <p className="text-[#49484e]/60 mb-2">Desde</p>
-          <p className="text-[#c4a905] mb-3">${concert.minPrice.toLocaleString()} MXN</p>
+          <p className="text-[#5B8DEF] mb-3">${concert.minPrice.toLocaleString()} MXN</p>
         </div>
         
         <button

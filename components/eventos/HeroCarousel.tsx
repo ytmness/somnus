@@ -87,13 +87,13 @@ export function HeroCarousel({ concerts, onSelectConcert }: HeroCarouselProps) {
                 
                 <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12">
                   <div className="max-w-4xl">
-                    <p className="text-[#c4a905] text-sm md:text-base font-semibold mb-2 uppercase tracking-wider">
+                    <p className="text-[#5B8DEF] text-sm md:text-base font-semibold mb-2 uppercase tracking-wider">
                       Evento Destacado
                     </p>
                     <h2 className="text-white text-4xl md:text-6xl font-bold mb-3">
                       {concert.artist}
                     </h2>
-                    <p className="text-[#c4a905] text-xl md:text-2xl mb-6">
+                    <p className="text-[#5B8DEF] text-xl md:text-2xl mb-6">
                       {concert.tour}
                     </p>
                     
@@ -115,7 +115,7 @@ export function HeroCarousel({ concerts, onSelectConcert }: HeroCarouselProps) {
                     <div className="flex items-center gap-4">
                       <div>
                         <p className="text-white/70 text-sm">Desde</p>
-                        <p className="text-[#c4a905] text-2xl md:text-3xl font-bold">
+                        <p className="text-[#5B8DEF] text-2xl md:text-3xl font-bold">
                           ${concert.minPrice.toLocaleString()} MXN
                         </p>
                       </div>
@@ -124,7 +124,7 @@ export function HeroCarousel({ concerts, onSelectConcert }: HeroCarouselProps) {
                           e.stopPropagation();
                           onSelectConcert(concert);
                         }}
-                        className="px-6 py-3 bg-[#c4a905] text-[#f9fbf6] rounded-lg font-semibold hover:bg-[#d4b815] transition-colors"
+                        className="px-6 py-3 bg-[#5B8DEF] text-[#f9fbf6] rounded-lg font-semibold hover:bg-[#7BA3E8] transition-colors"
                       >
                         Comprar Boletos
                       </button>
@@ -141,7 +141,7 @@ export function HeroCarousel({ concerts, onSelectConcert }: HeroCarouselProps) {
         <>
           <button
             onClick={scrollPrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-[#c4a905]/90 text-white flex items-center justify-center shadow-lg hover:bg-[#d4b815] transition-all z-10 backdrop-blur-sm"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-[#5B8DEF]/90 text-white flex items-center justify-center shadow-lg hover:bg-[#7BA3E8] transition-all z-10 backdrop-blur-sm"
             aria-label="Anterior"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-7 h-7">
@@ -151,7 +151,7 @@ export function HeroCarousel({ concerts, onSelectConcert }: HeroCarouselProps) {
 
           <button
             onClick={scrollNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-[#c4a905]/90 text-white flex items-center justify-center shadow-lg hover:bg-[#d4b815] transition-all z-10 backdrop-blur-sm"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-[#5B8DEF]/90 text-white flex items-center justify-center shadow-lg hover:bg-[#7BA3E8] transition-all z-10 backdrop-blur-sm"
             aria-label="Siguiente"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-7 h-7">
@@ -168,7 +168,7 @@ export function HeroCarousel({ concerts, onSelectConcert }: HeroCarouselProps) {
             onClick={() => scrollTo(index)}
             className={`transition-all ${
               index === selectedIndex
-                ? "w-8 h-2 bg-[#c4a905]"
+                ? "w-8 h-2 bg-[#5B8DEF]"
                 : "w-2 h-2 bg-white/50 hover:bg-white/80"
             } rounded-full`}
             aria-label={`Ir al slide ${index + 1}`}

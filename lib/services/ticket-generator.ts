@@ -32,14 +32,14 @@ export async function generateTicketPDF(ticketData: TicketPDFData): Promise<Buff
   pdf.setFillColor(42, 44, 48); // regia-dark
   pdf.rect(0, 0, pageWidth, pageHeight, "F");
 
-  // Borde dorado
-  pdf.setDrawColor(196, 169, 5); // regia-gold
+  // Borde azul media noche
+  pdf.setDrawColor(91, 141, 239); // somnus-blue
   pdf.setLineWidth(0.5);
   pdf.rect(2, 2, pageWidth - 4, pageHeight - 4);
 
   // Logo/Header - "Somnus"
   pdf.setFontSize(16);
-  pdf.setTextColor(196, 169, 5); // regia-gold
+  pdf.setTextColor(91, 141, 239); // somnus-blue
   pdf.setFont("helvetica", "bold");
   pdf.text("Somnus", 10, 12);
   
@@ -48,7 +48,7 @@ export async function generateTicketPDF(ticketData: TicketPDFData): Promise<Buff
   pdf.text("BOLETERA OFICIAL", 10, 17);
 
   // Línea divisoria
-  pdf.setDrawColor(196, 169, 5);
+  pdf.setDrawColor(91, 141, 239);
   pdf.setLineWidth(0.3);
   pdf.line(10, 20, pageWidth - 10, 20);
 
@@ -107,7 +107,7 @@ export async function generateTicketPDF(ticketData: TicketPDFData): Promise<Buff
 
   // Texto debajo del QR
   pdf.setFontSize(7);
-  pdf.setTextColor(196, 169, 5);
+  pdf.setTextColor(91, 141, 239);
   const qrTextX = qrX + (qrSize / 2);
   pdf.text("ESCANEAR EN ACCESO", qrTextX, qrY + qrSize + 5, { align: "center" });
 
