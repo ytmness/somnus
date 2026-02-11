@@ -183,6 +183,26 @@ export default function HomePage() {
     setCurrentVideoIndex((prev) => (prev + 1) % shuffledVideos.length);
   };
 
+  // Preload next video when current is ~80% through (evita cargar todo de golpe)
+  useEffect(() => {
+    const v = heroVideoRef.current;
+    if (!v) return;
+    const onTimeUpdate = () => {
+      const dur = v.duration;
+      if (dur > 0 && v.currentTime > dur * 0.8) {
+        const nextIdx = (currentVideoIndex + 1) % shuffledVideos.length;
+        const link = document.createElement("link");
+        link.rel = "preload";
+        link.as = "video";
+        link.href = shuffledVideos[nextIdx];
+        document.head.appendChild(link);
+        v.removeEventListener("timeupdate", onTimeUpdate);
+      }
+    };
+    v.addEventListener("timeupdate", onTimeUpdate);
+    return () => v.removeEventListener("timeupdate", onTimeUpdate);
+  }, [currentVideoIndex, shuffledVideos]);
+
   useEffect(() => {
     const loadSession = async () => {
       try {
@@ -296,7 +316,8 @@ export default function HomePage() {
             autoPlay
             muted
             playsInline
-            preload="auto"
+            preload="metadata"
+            poster="/assets/hero-cuernavaca.jpg"
             onEnded={handleVideoEnded}
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover hero-video-no-controls video-cupido-mobile"
             style={{
@@ -489,6 +510,7 @@ export default function HomePage() {
                             fill
                             className="object-cover group-hover:scale-105 transition-transform duration-500"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            loading="lazy"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
                         </>

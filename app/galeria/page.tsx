@@ -7,6 +7,10 @@ import { SomnusHeader } from "@/components/SomnusHeader";
 import { gallerySections } from "@/lib/gallery-images";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
+// Placeholder blur para carga progresiva (10x10 gris)
+const BLUR_DATA =
+  "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBEQACEQADAAAD/wD/2Q==";
+
 export default function GaleriaPage() {
   const router = useRouter();
   const [activeSection, setActiveSection] = useState("panorama");
@@ -106,7 +110,9 @@ export default function GaleriaPage() {
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                 className="object-cover"
-                unoptimized
+                placeholder="blur"
+                blurDataURL={BLUR_DATA}
+                loading="lazy"
               />
             </button>
           ))}
@@ -153,7 +159,8 @@ export default function GaleriaPage() {
               width={1200}
               height={800}
               className="max-w-full max-h-[85vh] w-auto h-auto object-contain rounded"
-              unoptimized
+              placeholder="blur"
+              blurDataURL={BLUR_DATA}
               priority
             />
           </div>
