@@ -835,6 +835,11 @@ export default function HomePage() {
                     Contacto
                   </a>
                 </li>
+                <li>
+                  <a href="/galeria" className="somnus-text-body text-sm hover:text-white transition-colors">
+                    Galería
+                  </a>
+                </li>
               </ul>
             </div>
 

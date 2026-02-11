@@ -18,6 +18,11 @@ package-lock.json
 /build
 /dist
 
+# Galería - fotos se suben al servidor con rsync/scp
+/public/assets/panorama-photo-download-1of1*/
+/public/assets/somnus-1-photo-download-1of1/
+/public/assets/somnus-photo-download-1of1/
+
 # misc
 .DS_Store
 *.pem

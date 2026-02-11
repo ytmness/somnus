@@ -324,6 +324,7 @@ export default function EventMesasPage() {
                   <li><a href="/#eventos" className="regia-text-body text-sm hover:text-regia-gold-bright transition-colors">Eventos</a></li>
                   <li><button onClick={() => router.push("/mis-boletos")} className="regia-text-body text-sm hover:text-regia-gold-bright transition-colors text-left">Mis Boletos</button></li>
                   <li><a href="/#contacto" className="regia-text-body text-sm hover:text-regia-gold-bright transition-colors">Contacto</a></li>
+                  <li><a href="/galeria" className="regia-text-body text-sm hover:text-regia-gold-bright transition-colors">Galería</a></li>
                 </ul>
               </div>
               <div>
@@ -876,6 +877,11 @@ export default function EventMesasPage() {
                 <li>
                   <a href="/#contacto" className="regia-text-body text-sm hover:text-regia-gold-bright transition-colors">
                     Contacto
+                  </a>
+                </li>
+                <li>
+                  <a href="/galeria" className="regia-text-body text-sm hover:text-regia-gold-bright transition-colors">
+                    Galería
                   </a>
                 </li>
               </ul>
