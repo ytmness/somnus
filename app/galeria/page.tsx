@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { SomnusHeader } from "@/components/SomnusHeader";
 import { gallerySections } from "@/lib/gallery-images";
@@ -16,7 +16,15 @@ const LOAD_MORE_STEP = 12;
 
 export default function GaleriaPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const sectionParam = searchParams.get("section");
   const [activeSection, setActiveSection] = useState("panorama");
+
+  useEffect(() => {
+    if (["panorama", "somnus-1", "somnus-2"].includes(sectionParam || "")) {
+      setActiveSection(sectionParam!);
+    }
+  }, [sectionParam]);
   const [visibleCount, setVisibleCount] = useState(INITIAL_LOAD);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [lightboxSection, setLightboxSection] = useState<string | null>(null);

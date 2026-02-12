@@ -24,16 +24,43 @@ body::-webkit-scrollbar {
   display: none;
 }
 
+/* Animaciones cinemáticas de reveal */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes reveal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.reveal-on-scroll.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 @layer base {
   :root {
-    /* === PALETA SOMNUS - Azul Media Noche === */
+    /* === PALETA SOMNUS - Blanco y Negro === */
     --somnus-black: #0A0A0A;
-    --somnus-blue-dark: #0D1624;
-    --somnus-blue-midnight: #5B8DEF;
-    --somnus-blue-bright: #7BA3E8;
-    --somnus-blue-soft: #8BB3F0;
+    --somnus-charcoal: #141414;
+    --somnus-gray: #1A1A1A;
     --somnus-white: #FFFFFF;
-    --somnus-cream: #E8EEF5;
+    --somnus-offwhite: #F5F5F5;
+    --somnus-cream: #E5E5E5;
     
     /* Colores legacy (compatibilidad - tonos azules) */
     --regia-black: #0A0A0A;
@@ -135,9 +162,8 @@ body::-webkit-scrollbar {
   .somnus-bg-main {
     position: relative;
     background: 
-      radial-gradient(ellipse at top center, rgba(91, 141, 239, 0.2) 0%, transparent 60%),
-      radial-gradient(ellipse at center, rgba(123, 163, 232, 0.15) 0%, transparent 70%),
-      radial-gradient(ellipse at bottom center, rgba(13, 22, 36, 0.95) 0%, #0A0A0A 100%),
+      radial-gradient(ellipse at top center, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom center, rgba(0, 0, 0, 0.4) 0%, #0A0A0A 100%),
       #0A0A0A;
     background-attachment: fixed;
   }
@@ -146,11 +172,13 @@ body::-webkit-scrollbar {
     content: '';
     position: absolute;
     inset: 0;
-    background: 
-      radial-gradient(circle at 30% 40%, rgba(91, 141, 239, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 70% 60%, rgba(123, 163, 232, 0.2) 0%, transparent 50%);
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
     pointer-events: none;
     z-index: 0;
+    opacity: 0.5;
   }
   
   .regia-bg-textured {
@@ -170,20 +198,17 @@ body::-webkit-scrollbar {
   
   /* ===== BOTONES SOMNUS ===== */
   .somnus-btn {
-    @apply font-bold uppercase tracking-wider px-8 py-3.5 rounded-full;
-    @apply transition-all duration-300 ease-in-out;
-    background: rgba(255, 255, 255, 0.1);
-    color: #FFFFFF;
-    border: 1px solid rgba(91, 141, 239, 0.4);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(91, 141, 239, 0.3);
+    @apply font-bold uppercase tracking-wider px-8 py-3.5 rounded-none;
+    @apply transition-all duration-200 ease-out;
+    background: #FFFFFF;
+    color: #0A0A0A;
+    border: 1px solid rgba(255, 255, 255, 0.3);
   }
   
   .somnus-btn:hover {
-    @apply -translate-y-0.5;
-    background: rgba(91, 141, 239, 0.2);
-    border-color: rgba(123, 163, 232, 0.6);
-    box-shadow: 0 12px 40px rgba(91, 141, 239, 0.5);
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
   }
   
   /* Video del cupido - ajuste móvil hacia la izquierda */

@@ -1,6 +1,15 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Calendar, MapPin, ChevronDown } from "lucide-react";
+import { toast } from "sonner";
+import { Cart } from "@/components/eventos/Cart";
+import { CartItem, Concert } from "@/components/eventos/types";
+import { GALLERY_EVENTS } from "@/lib/gallery-events";
+import { RevealSection } from "@/components/RevealSection";
 
 const SOMNUS_VIDEOS = [
   "/assets/PANORAMA SOMNUSNIGHTS AFTERMOVIE 4.0.mp4",
@@ -17,12 +26,6 @@ function shuffleArray<T>(array: T[]): T[] {
   }
   return arr;
 }
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { Calendar, MapPin, ChevronDown } from "lucide-react";
-import { toast } from "sonner";
-import { Cart } from "@/components/eventos/Cart";
-import { CartItem, Concert } from "@/components/eventos/types";
 
 function convertEventToConcert(event: any): Concert {
   const eventDate = new Date(event.eventDate);
@@ -158,6 +161,18 @@ export default function HomePage() {
   const router = useRouter();
   const [concerts, setConcerts] = useState<Concert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showLoader, setShowLoader] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const seen = sessionStorage.getItem("somnus-loaded");
+    if (!seen) {
+      setShowLoader(true);
+      sessionStorage.setItem("somnus-loaded", "1");
+      const t = setTimeout(() => setShowLoader(false), 1200);
+      return () => clearTimeout(t);
+    }
+  }, []);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -293,17 +308,27 @@ export default function HomePage() {
     return (
       <div className="min-h-screen somnus-bg-main flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="somnus-text-body text-xl">Cargando eventos...</p>
+          <div className="w-16 h-16 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white/70 text-xl">Cargando eventos...</p>
         </div>
       </div>
     );
   }
 
   const nextEvent = concerts.length > 0 ? concerts[0] : null;
+  const displayEvents = concerts.length > 0 ? concerts : GALLERY_EVENTS;
+  const isGalleryMode = concerts.length === 0;
 
   return (
     <div className="min-h-screen somnus-bg-main overflow-x-hidden">
+      {/* Loader entrada - una vez por sesión */}
+      {showLoader && (
+        <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center">
+          <p className="text-white text-lg uppercase tracking-[0.5em] animate-pulse">
+            SOMNUS
+          </p>
+        </div>
+      )}
       {/* 1. HERO INMERSIVO - Full-height, impacto inmediato */}
       <section
         id="hero"
@@ -431,9 +456,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. NEXT EVENT STRIP - Barra conversión directa (solo si hay evento) */}
+      {/* 2. NEXT EVENT STRIP - Solo si hay evento con boletos */}
       {nextEvent && (
-        <section className="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b border-white/10">
+        <section className="sticky top-0 z-40 bg-black/95 backdrop-blur-md border-b border-white/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-4 sm:gap-8 text-white">
               <span className="text-sm uppercase tracking-wider text-white/80">
@@ -460,31 +485,43 @@ export default function HomePage() {
       )}
 
       {/* 3. FEATURED EVENTS - Grid premium */}
-      <section id="eventos" className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="somnus-title-secondary text-center text-3xl md:text-4xl mb-4 uppercase tracking-wider">
-            Eventos
-          </h2>
-          <p className="somnus-text-body text-center mb-14 max-w-xl mx-auto">
-            Experiencias en vivo exclusivas
-          </p>
+      <RevealSection>
+        <section id="eventos" className="py-28 sm:py-36 lg:py-44 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="somnus-title-secondary text-center text-4xl md:text-5xl mb-6 uppercase tracking-wider">
+              Eventos
+            </h2>
+            <p className="somnus-text-body text-center mb-20 max-w-2xl mx-auto text-lg">
+              Experiencias en vivo exclusivas
+            </p>
 
-          {concerts.length === 0 ? (
-            <div className="text-center py-16 somnus-card max-w-md mx-auto">
-              <p className="somnus-text-body text-lg">Próximamente nuevos eventos</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {concerts.map((concert) => {
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12">
+              {displayEvents.map((item) => {
+                const concert = item as Concert;
+                const galleryEvent = item as (typeof GALLERY_EVENTS)[0];
+                const isConcert = "sections" in concert;
                 const isMystery =
-                  concert.artist === "Artista por Confirmar" ||
-                  concert.artist.toLowerCase().includes("por confirmar");
-                const status = getEventStatus(concert);
+                  isConcert &&
+                  (concert.artist === "Artista por Confirmar" ||
+                    concert.artist.toLowerCase().includes("por confirmar"));
+                const status = isConcert ? getEventStatus(concert) : null;
+                const image = isConcert ? concert.image : galleryEvent.image;
+                const artist = isConcert ? concert.artist : galleryEvent.artist;
+                const date = isConcert ? concert.date : galleryEvent.date;
+                const venue = isConcert ? concert.venue : galleryEvent.venue;
 
                 return (
                   <article
-                    key={concert.id}
-                    onClick={() => !isMystery && handleSelectConcert(concert)}
+                    key={item.id}
+                    onClick={() => {
+                      if (isGalleryMode) {
+                        router.push(
+                          (item as (typeof GALLERY_EVENTS)[0]).galleryUrl
+                        );
+                      } else if (!isMystery) {
+                        handleSelectConcert(concert);
+                      }
+                    }}
                     className={`group somnus-card overflow-hidden ${
                       isMystery ? "cursor-default" : "cursor-pointer"
                     }`}
@@ -497,147 +534,149 @@ export default function HomePage() {
                       ) : (
                         <>
                           <Image
-                            src={concert.image}
-                            alt={concert.artist}
+                            src={image}
+                            alt={artist}
                             fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                            sizes="(max-width: 768px) 100vw, 33vw"
                             loading="lazy"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
                         </>
                       )}
 
-                      {/* Badge ciudad/venue arriba */}
-                      <span className="absolute top-4 left-4 text-xs font-medium uppercase tracking-wider text-white/90">
-                        {isMystery ? "—" : concert.venue}
+                      <span className="absolute top-6 left-6 text-xs font-medium uppercase tracking-wider text-white/90">
+                        {isMystery ? "—" : venue}
                       </span>
 
-                      {/* Badge estado */}
                       {status && (
                         <span
-                          className={`absolute top-4 right-4 text-xs font-bold uppercase tracking-wider px-2 py-1 rounded ${
+                          className={`absolute top-6 right-6 text-xs font-bold uppercase tracking-wider px-2 py-1 ${
                             status === "Agotado"
                               ? "bg-white/20 text-white"
-                              : "bg-[#5B8DEF]/90 text-white"
+                              : "bg-white/90 text-black"
                           }`}
                         >
                           {status}
                         </span>
                       )}
 
-                      {/* Info abajo */}
-                      <div className="absolute bottom-0 left-0 right-0 p-6">
-                        <h3 className="text-2xl font-bold text-white mb-1">
-                          {isMystery ? "Próximamente" : concert.artist}
+                      <div className="absolute bottom-0 left-0 right-0 p-8">
+                        <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                          {isMystery ? "Próximamente" : artist}
                         </h3>
-                        <p className="text-white/80 text-sm">
-                          {isMystery ? "—" : concert.date}
+                        <p className="text-white/80 text-sm md:text-base">
+                          {isMystery ? "—" : date}
                         </p>
-                        {!isMystery && concert.minPrice > 0 && (
-                          <p className="text-[#7BA3E8] font-semibold mt-2">
+                        {isConcert && !isMystery && concert.minPrice > 0 && (
+                          <p className="text-white font-semibold mt-2">
                             Desde ${concert.minPrice.toLocaleString("es-MX")} MXN
                           </p>
                         )}
                       </div>
                     </div>
 
-                    <div className="p-5">
+                    <div className="p-6">
                       <span
-                        className={`somnus-btn inline-block w-full text-center text-sm py-3 ${
+                        className={`somnus-btn inline-block w-full text-center text-sm py-4 ${
                           isMystery ? "opacity-60 cursor-default" : ""
                         }`}
                       >
-                        {isMystery ? "Próximamente" : "Ver boletos"}
+                        {isGalleryMode ? "Ver galería" : isMystery ? "Próximamente" : "Ver boletos"}
                       </span>
                     </div>
                   </article>
                 );
               })}
             </div>
-          )}
-        </div>
-      </section>
 
-      {/* 4. MANIFIESTO - ¿Por qué Somnus? (sin stats inventados) */}
-      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-t border-white/5">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="somnus-title-secondary text-2xl md:text-3xl mb-6 uppercase tracking-wider">
-            ¿Por qué Somnus?
-          </h2>
-          <p className="somnus-text-body text-lg mb-14">
-            Tu plataforma de confianza para eventos en vivo exclusivos
-          </p>
+            {concerts.length === 0 && (
+              <p className="text-center text-white/50 mt-12 text-sm">
+                Próximamente nuevos eventos con venta de boletos
+              </p>
+            )}
+          </div>
+        </section>
+      </RevealSection>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div className="space-y-3">
-              <span className="text-3xl font-bold text-[#5B8DEF]">✓</span>
-              <h3 className="somnus-title-secondary text-lg uppercase">
-                Boletos garantizados
-              </h3>
-              <p className="somnus-text-body text-sm">
-                100% auténticos y verificados
-              </p>
-            </div>
-            <div className="space-y-3">
-              <span className="text-3xl font-bold text-[#5B8DEF]">★</span>
-              <h3 className="somnus-title-secondary text-lg uppercase">
-                Mejor precio
-              </h3>
-              <p className="somnus-text-body text-sm">
-                Sin comisiones ocultas
-              </p>
-            </div>
-            <div className="space-y-3">
-              <span className="text-3xl font-bold text-[#5B8DEF]">♥</span>
-              <h3 className="somnus-title-secondary text-lg uppercase">
-                Soporte
-              </h3>
-              <p className="somnus-text-body text-sm">
-                Atención cuando la necesites
-              </p>
+      {/* 4. MANIFIESTO - ¿Por qué Somnus? */}
+      <RevealSection>
+        <section className="py-28 sm:py-36 lg:py-44 px-4 sm:px-6 lg:px-8 border-t border-white/10">
+          <div className="max-w-5xl mx-auto text-center">
+            <h2 className="somnus-title-secondary text-3xl md:text-4xl mb-8 uppercase tracking-wider">
+              ¿Por qué Somnus?
+            </h2>
+            <p className="somnus-text-body text-lg md:text-xl mb-20 text-white/70">
+              Tu plataforma de confianza para eventos en vivo exclusivos
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-20">
+              <div className="space-y-4">
+                <span className="text-4xl font-bold text-white">✓</span>
+                <h3 className="somnus-title-secondary text-lg uppercase">
+                  Boletos garantizados
+                </h3>
+                <p className="somnus-text-body text-sm text-white/60">
+                  100% auténticos y verificados
+                </p>
+              </div>
+              <div className="space-y-4">
+                <span className="text-4xl font-bold text-white">★</span>
+                <h3 className="somnus-title-secondary text-lg uppercase">
+                  Mejor precio
+                </h3>
+                <p className="somnus-text-body text-sm text-white/60">
+                  Sin comisiones ocultas
+                </p>
+              </div>
+              <div className="space-y-4">
+                <span className="text-4xl font-bold text-white">♥</span>
+                <h3 className="somnus-title-secondary text-lg uppercase">
+                  Soporte
+                </h3>
+                <p className="somnus-text-body text-sm text-white/60">
+                  Atención cuando la necesites
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </RevealSection>
 
-      {/* 5. FOOTER MINIMAL */}
-      <footer className="border-t border-white/10 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex items-center">
-            <Image
-              src="/assets/SOMNUS LOGO BLANCO.png"
-              alt="SOMNUS"
-              width={120}
-              height={36}
-              className="h-8 w-auto object-contain opacity-90"
-            />
-          </div>
+      {/* 5. FOOTER */}
+      <footer className="border-t border-white/10 py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
+          <Link
+            href="/"
+            className="text-white text-xl font-bold uppercase tracking-[0.3em] hover:text-white/80 transition-colors"
+          >
+            SOMNUS
+          </Link>
 
-          <nav className="flex flex-wrap items-center justify-center gap-6 text-sm">
+          <nav className="flex flex-wrap items-center justify-center gap-8 md:gap-12 text-sm">
             <a
               href="#eventos"
-              className="somnus-text-body hover:text-white transition-colors"
+              className="text-white/60 hover:text-white transition-colors uppercase tracking-wider"
             >
               Eventos
             </a>
             <a
               href="/galeria"
-              className="somnus-text-body hover:text-white transition-colors"
+              className="text-white/60 hover:text-white transition-colors uppercase tracking-wider"
             >
               Galería
             </a>
             <a
               href="/mis-boletos"
-              className="somnus-text-body hover:text-white transition-colors"
+              className="text-white/60 hover:text-white transition-colors uppercase tracking-wider"
             >
               Mis Boletos
             </a>
           </nav>
         </div>
 
-        <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-white/10 text-center">
-          <p className="somnus-text-body text-xs">
+        <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/10 text-center">
+          <p className="text-white/40 text-xs uppercase tracking-wider">
             © {new Date().getFullYear()} Somnus
           </p>
         </div>
