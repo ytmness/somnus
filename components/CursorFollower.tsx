@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 
 const TRAIL_LENGTH = 28;
-const MAX_PARTICLES = 60;
+const MAX_PARTICLES = 120;
 
 type Particle = {
   id: number;
@@ -30,11 +30,11 @@ export function CursorFollower() {
   const lastSpawnRef = useRef(0);
   const spawnParticles = useCallback((x: number, y: number) => {
     const now = performance.now();
-    if (now - lastSpawnRef.current < 25) return;
+    if (now - lastSpawnRef.current < 12) return;
     lastSpawnRef.current = now;
 
     const newParticles: Particle[] = [];
-    const count = Math.random() > 0.6 ? 2 : 1;
+    const count = 2 + Math.floor(Math.random() * 3);
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
       const speed = 0.4 + Math.random() * 0.6;
