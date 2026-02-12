@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useCallback, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { SomnusHeader } from "@/components/SomnusHeader";
 import { gallerySections } from "@/lib/gallery-images";
@@ -14,8 +14,7 @@ const BLUR_DATA =
 const INITIAL_LOAD = 12;
 const LOAD_MORE_STEP = 12;
 
-export default function GaleriaPage() {
-  const router = useRouter();
+function GaleriaContent() {
   const searchParams = useSearchParams();
   const sectionParam = searchParams.get("section");
   const [activeSection, setActiveSection] = useState("panorama");
@@ -220,5 +219,21 @@ export default function GaleriaPage() {
         </div>
       )}
     </div>
+  );
+}
+
+function GaleriaFallback() {
+  return (
+    <div className="min-h-screen somnus-bg-main flex items-center justify-center">
+      <p className="text-white/70">Cargando galería...</p>
+    </div>
+  );
+}
+
+export default function GaleriaPage() {
+  return (
+    <Suspense fallback={<GaleriaFallback />}>
+      <GaleriaContent />
+    </Suspense>
   );
 }

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Archivo, Anton, Cinzel } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
@@ -28,17 +28,17 @@ const cinzel = Cinzel({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
   title: "Boletera Somnus",
   description: "Sistema de venta de boletos para eventos de Somnus",
   keywords: ["boletos", "eventos", "conciertos", "Somnus"],
   authors: [{ name: "Somnus" }],
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
   openGraph: {
     title: "Boletera Somnus",
     description: "Sistema de venta de boletos para eventos de Somnus",
