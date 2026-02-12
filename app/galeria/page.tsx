@@ -7,41 +7,32 @@ import { SomnusHeader } from "@/components/SomnusHeader";
 import { gallerySections } from "@/lib/gallery-images";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
-// Placeholder blur para carga progresiva (10x10 gris)
-const BLUR_DATA =
-  "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBEQACEQADAAAD/wD/2Q==";
-
-const INITIAL_LOAD = 8;
-const LOAD_MORE_STEP = 8;
-
 function GaleriaContent() {
   const searchParams = useSearchParams();
   const sectionParam = searchParams.get("section");
   const [activeSection, setActiveSection] = useState("panorama");
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (["panorama", "somnus-1", "somnus-2"].includes(sectionParam || "")) {
       setActiveSection(sectionParam!);
     }
   }, [sectionParam]);
-  const [visibleCount, setVisibleCount] = useState(INITIAL_LOAD);
+
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [lightboxSection, setLightboxSection] = useState<string | null>(null);
 
-  const allSectionImages =
+  const currentImages =
     gallerySections.find((s) => s.id === activeSection)?.images ?? [];
-  const currentImages = allSectionImages.slice(0, visibleCount);
-  const hasMore = visibleCount < allSectionImages.length;
-
-  const handleLoadMore = useCallback(() => {
-    setVisibleCount((prev) => Math.min(prev + LOAD_MORE_STEP, allSectionImages.length));
-  }, [allSectionImages.length]);
 
   const handleSectionChange = useCallback((sectionId: string) => {
     setActiveSection(sectionId);
-    setVisibleCount(INITIAL_LOAD);
     setLightboxIndex(null);
     setLightboxSection(null);
+  }, []);
+
+  const handleImageLoad = useCallback((src: string) => {
+    setLoadedImages((prev) => ({ ...prev, [src]: true }));
   }, []);
   const lightboxImages =
     lightboxSection != null
@@ -94,67 +85,62 @@ function GaleriaContent() {
     <div className="min-h-screen somnus-bg-main overflow-x-hidden">
       <SomnusHeader showNav />
 
-      <main className="pt-24 sm:pt-28 pb-16 px-4 sm:px-6 lg:px-8">
-        <h1 className="somnus-title-secondary text-center text-3xl md:text-4xl mb-2 uppercase tracking-wider">
+      <main className="pt-24 sm:pt-32 pb-24 px-4 sm:px-6 lg:px-8">
+        <h1 className="somnus-title-secondary text-center text-4xl md:text-5xl mb-3 uppercase tracking-wider">
           Galería
         </h1>
-        <p className="somnus-text-body text-center mb-10 max-w-xl mx-auto">
-          Fotos de Panorama, Somnus 1 y Somnus 2
+        <p className="somnus-text-body text-center mb-16 max-w-xl mx-auto text-white/60">
+          Panorama · Somnus 1 · Somnus 2
         </p>
 
-        {/* Tabs */}
-        <div className="flex flex-wrap justify-center gap-2 mb-10">
+        {/* Selector de evento */}
+        <nav className="relative flex justify-center gap-8 sm:gap-12 mb-16 max-w-lg mx-auto" aria-label="Secciones">
           {gallerySections.map((section) => (
             <button
               key={section.id}
               onClick={() => handleSectionChange(section.id)}
-              className={`px-5 py-2.5 rounded-full text-sm font-medium uppercase tracking-wider transition-all ${
+              className={`relative pb-2 text-sm font-medium uppercase tracking-[0.2em] transition-colors ${
                 activeSection === section.id
-                  ? "bg-white/20 text-white border border-white/40"
-                  : "bg-white/5 text-white/70 border border-white/20 hover:bg-white/10 hover:text-white"
+                  ? "text-white"
+                  : "text-white/50 hover:text-white/80"
               }`}
             >
               {section.title}
+              {activeSection === section.id && (
+                <span className="absolute bottom-0 left-0 right-0 h-px bg-white" />
+              )}
             </button>
           ))}
-        </div>
+        </nav>
 
-        {/* Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 max-w-7xl mx-auto">
+        {/* Grid 3 columnas - fotos más grandes y nítidas */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
           {currentImages.map((src, index) => (
             <button
               key={`${activeSection}-${index}`}
               type="button"
               onClick={() => openLightbox(activeSection, index)}
-              className="relative aspect-square rounded-lg overflow-hidden somnus-card border border-white/10 hover:border-white/30 hover:scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-white/50"
+              className="relative aspect-[4/5] overflow-hidden group focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]"
             >
+              {/* Skeleton mientras carga */}
+              {!loadedImages[src] && (
+                <div className="absolute inset-0 bg-white/5 animate-pulse" />
+              )}
               <Image
                 src={src}
-                alt={`Foto ${index + 1}`}
+                alt={`${gallerySections.find((s) => s.id === activeSection)?.title} - Foto ${index + 1}`}
                 fill
-                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 240px"
-                className="object-cover"
-                placeholder="blur"
-                blurDataURL={BLUR_DATA}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                className={`object-cover transition-opacity duration-500 ${
+                  loadedImages[src] ? "opacity-100" : "opacity-0"
+                } group-hover:scale-105`}
                 loading="lazy"
-                quality={55}
-                fetchPriority="low"
+                quality={80}
+                onLoad={() => handleImageLoad(src)}
               />
             </button>
           ))}
         </div>
-
-        {hasMore && (
-          <div className="text-center mt-10">
-            <button
-              type="button"
-              onClick={handleLoadMore}
-              className="somnus-btn px-8 py-3 text-sm"
-            >
-              Ver más fotos
-            </button>
-          </div>
-        )}
       </main>
 
       {/* Lightbox */}
@@ -194,14 +180,12 @@ function GaleriaContent() {
             <Image
               src={currentSrc}
               alt={`Foto ${lightboxIndex + 1}`}
-              width={1200}
-              height={800}
-              sizes="(max-width: 1200px) 100vw, 1200px"
-              className="max-w-full max-h-[85vh] w-auto h-auto object-contain rounded"
-              placeholder="blur"
-              blurDataURL={BLUR_DATA}
+              width={1400}
+              height={933}
+              sizes="(max-width: 1400px) 100vw, 1400px"
+              className="max-w-full max-h-[85vh] w-auto h-auto object-contain"
               priority
-              quality={80}
+              quality={90}
             />
           </div>
 
