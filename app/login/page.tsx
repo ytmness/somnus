@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Clock, Music, Users, User, LogIn, Shield, Scan, Mail, Lock, Ticket } from "lucide-react";
+import { Calendar, MapPin, Shield, Mail, Lock, Ticket } from "lucide-react";
 import { toast } from "sonner";
 
 export default function LoginPage() {
@@ -63,61 +63,56 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen somnus-bg-main overflow-x-hidden">
-      {/* Header estilo SOMNUS */}
-      <header className="somnus-header">
-        {/* Versión móvil */}
-        <div className="w-full flex lg:hidden items-center justify-between">
-          <button type="button" className="somnus-logo flex items-center cursor-pointer" onClick={() => router.push("/")} aria-label="SOMNUS - Inicio" style={{ animation: 'none' }}>
-            <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={280} height={84} className="h-[4.2rem] w-auto object-contain" priority />
-          </button>
+      {/* Navbar igual que landing - compacto, sin logo imagen */}
+      <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-5 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => router.push("/")}
+          className="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
+          aria-label="SOMNUS"
+        >
+          SOMNUS
+        </button>
+
+        <nav className="flex items-center gap-2 sm:gap-4 lg:gap-6">
           <button
             onClick={() => router.push("/")}
-            className="somnus-header-item hover:opacity-70 transition-opacity"
+            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
           >
-            <LogIn className="w-5 h-5" />
+            Eventos
           </button>
-        </div>
-
-        {/* Versión desktop */}
-        <div className="w-full hidden lg:flex items-center justify-between">
-          <button type="button" className="somnus-logo flex items-center cursor-pointer" onClick={() => router.push("/")} aria-label="SOMNUS - Inicio" style={{ animation: 'none' }}>
-            <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={280} height={84} className="h-[4.2rem] w-auto object-contain" priority />
+          <button
+            onClick={() => router.push("/galeria")}
+            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
+          >
+            Galería
           </button>
-          
-          <div className="flex items-center gap-6">
-            {userRole === "ADMIN" && (
-              <button
-                onClick={() => router.push("/admin")}
-                className="somnus-header-item hover:opacity-70 transition-opacity"
-              >
-                Admin
-              </button>
-            )}
-            {(userRole === "ACCESOS" || userRole === "ADMIN") && (
-              <button
-                onClick={() => router.push("/accesos")}
-                className="somnus-header-item hover:opacity-70 transition-opacity"
-              >
-                Accesos
-              </button>
-            )}
-            {user ? (
-              <button
-                onClick={() => router.push("/login")}
-                className="somnus-header-item hover:opacity-70 transition-opacity"
-              >
-                {user.name || user.email}
-              </button>
-            ) : (
-              <button
-                onClick={() => router.push("/login")}
-                className="somnus-header-item hover:opacity-70 transition-opacity"
-              >
-                Login
-              </button>
-            )}
-          </div>
-        </div>
+          {userRole === "ADMIN" && (
+            <button
+              onClick={() => router.push("/admin")}
+              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
+            >
+              Admin
+            </button>
+          )}
+          {(userRole === "ACCESOS" || userRole === "ADMIN") && (
+            <button
+              onClick={() => router.push("/accesos")}
+              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
+            >
+              Accesos
+            </button>
+          )}
+          <button
+            onClick={() => router.push("/mis-boletos")}
+            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
+          >
+            Mis Boletos
+          </button>
+          <span className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1">
+            {user?.name || user?.email || "Login"}
+          </span>
+        </nav>
       </header>
 
       {/* Contenido principal */}
@@ -131,7 +126,7 @@ export default function LoginPage() {
                   Bienvenido a
                 </h1>
                 <div className="mb-6">
-                  <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={448} height={134} className="w-[22.4rem] md:w-[28rem] h-auto object-contain" priority />
+                  <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={280} height={84} className="w-48 md:w-56 h-auto object-contain" priority />
                 </div>
                 <p className="somnus-text-body text-lg mb-8">
                   Accede a tu cuenta para gestionar tus boletos, ver tus eventos favoritos y disfrutar de experiencias exclusivas.
