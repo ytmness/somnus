@@ -12,6 +12,14 @@
   display: none; /* Chrome, Safari, Opera */
 }
 
+/* Cursor personalizado - ocultar cursor nativo en desktop */
+@media (min-width: 768px) {
+  html.custom-cursor-active,
+  html.custom-cursor-active * {
+    cursor: none !important;
+  }
+}
+
 html,
 body {
   overflow-x: hidden;

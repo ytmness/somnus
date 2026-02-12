@@ -3,6 +3,7 @@ import { Archivo, Anton, Cinzel } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "sonner";
+import { CursorFollower } from "@/components/CursorFollower";
 
 // Fuente principal para texto (según mockup)
 const archivo = Archivo({
@@ -57,6 +58,7 @@ export default function RootLayout({
         <Providers>
           {children}
           <Toaster richColors position="top-right" />
+          <CursorFollower />
         </Providers>
       </body>
     </html>

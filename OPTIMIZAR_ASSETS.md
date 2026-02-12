@@ -69,9 +69,20 @@ ffmpeg -i "public/assets/VIDEO.mp4" \
 - **Sharp (Node):**  
   `npx sharp-cli -i imagen.jpg -o imagen-opt.jpg -q 80`
 
-### Galería
+### Galería – comprimir antes de subir
 
-Las imágenes de la galería se sirven optimizadas en WebP/AVIF si usas el componente `Image` de Next.js (ya configurado). Asegúrate de no usar `unoptimized` salvo que sea necesario.
+**Si las fotos tardan mucho en cargar**, las originales probablemente pesan 3–10 MB cada una. Comprímelas:
+
+```bash
+# Con ffmpeg – redimensionar a 1200px ancho, calidad 82
+for f in public/assets/panorama-photo-download-1of1*/*/*.jpg; do
+  ffmpeg -i "$f" -vf "scale=1200:-2" -q:v 5 "$f.tmp" && mv "$f.tmp" "$f"
+done
+```
+
+O con **ImageMagick**: `mogrify -resize 1200x -quality 82 *.jpg`
+
+Objetivo: **&lt; 500 KB** por imagen de galería.
 
 ## Cambios en el código ya aplicados
 

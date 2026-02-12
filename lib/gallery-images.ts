@@ -109,7 +109,7 @@ function sampleEveryN<T>(arr: T[], maxCount: number): T[] {
   return Array.from({ length: maxCount }, (_, i) => arr[Math.floor(i * step)]);
 }
 
-const MAX_PER_SECTION = 24;
+const MAX_PER_SECTION = 10;
 
 export const gallerySections: GallerySection[] = [
   {

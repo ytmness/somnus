@@ -11,8 +11,8 @@ import { X, ChevronLeft, ChevronRight } from "lucide-react";
 const BLUR_DATA =
   "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBEQACEQADAAAD/wD/2Q==";
 
-const INITIAL_LOAD = 12;
-const LOAD_MORE_STEP = 12;
+const INITIAL_LOAD = 8;
+const LOAD_MORE_STEP = 8;
 
 function GaleriaContent() {
   const searchParams = useSearchParams();
@@ -132,11 +132,13 @@ function GaleriaContent() {
                 src={src}
                 alt={`Foto ${index + 1}`}
                 fill
-                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 240px"
                 className="object-cover"
                 placeholder="blur"
                 blurDataURL={BLUR_DATA}
                 loading="lazy"
+                quality={55}
+                fetchPriority="low"
               />
             </button>
           ))}
@@ -194,10 +196,12 @@ function GaleriaContent() {
               alt={`Foto ${lightboxIndex + 1}`}
               width={1200}
               height={800}
+              sizes="(max-width: 1200px) 100vw, 1200px"
               className="max-w-full max-h-[85vh] w-auto h-auto object-contain rounded"
               placeholder="blur"
               blurDataURL={BLUR_DATA}
               priority
+              quality={80}
             />
           </div>
 
