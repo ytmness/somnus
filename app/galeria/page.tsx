@@ -113,7 +113,7 @@ function GaleriaContent() {
           ))}
         </nav>
 
-        {/* Grid 3 columnas - fotos más grandes y nítidas */}
+        {/* Grid 3 columnas - primeras 3 eager, resto lazy */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
           {currentImages.map((src, index) => (
             <button
@@ -130,12 +130,13 @@ function GaleriaContent() {
                 src={src}
                 alt={`${gallerySections.find((s) => s.id === activeSection)?.title} - Foto ${index + 1}`}
                 fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
                 className={`object-cover transition-opacity duration-500 ${
                   loadedImages[src] ? "opacity-100" : "opacity-0"
                 } group-hover:scale-105`}
-                loading="lazy"
-                quality={80}
+                loading={index < 3 ? "eager" : "lazy"}
+                fetchPriority={index < 2 ? "high" : "low"}
+                quality={72}
                 onLoad={() => handleImageLoad(src)}
               />
             </button>

@@ -69,9 +69,9 @@ ffmpeg -i "public/assets/VIDEO.mp4" \
 - **Sharp (Node):**  
   `npx sharp-cli -i imagen.jpg -o imagen-opt.jpg -q 80`
 
-### Galería – comprimir antes de subir
+### Galería – comprimir antes de subir (IMPORTANTE)
 
-**Si las fotos tardan mucho en cargar**, las originales probablemente pesan 3–10 MB cada una. Comprímelas:
+**Si las fotos de la galería tardan mucho en cargar**, casi siempre es porque las originales pesan 3–10 MB cada una. Next.js las optimiza, pero primero debe descargarlas del servidor. Comprímelas antes de subir:
 
 ```bash
 # Con ffmpeg – redimensionar a 1200px ancho, calidad 82
