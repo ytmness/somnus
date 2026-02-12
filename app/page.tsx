@@ -317,7 +317,6 @@ export default function HomePage() {
             muted
             playsInline
             preload="metadata"
-            poster="/assets/hero-cuernavaca.jpg"
             onEnded={handleVideoEnded}
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover hero-video-no-controls video-cupido-mobile"
             style={{
@@ -344,17 +343,10 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => router.push("/")}
-            className="flex items-center"
+            className="text-white/90 text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
             aria-label="SOMNUS"
           >
-            <Image
-              src="/assets/SOMNUS LOGO BLANCO.png"
-              alt="SOMNUS"
-              width={160}
-              height={48}
-              className="h-9 sm:h-10 md:h-12 w-auto object-contain"
-              priority
-            />
+            SOMNUS
           </button>
 
           <nav className="flex items-center gap-2 sm:gap-4 lg:gap-6">

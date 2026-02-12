@@ -11,14 +11,31 @@ import { X, ChevronLeft, ChevronRight } from "lucide-react";
 const BLUR_DATA =
   "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBEQACEQADAAAD/wD/2Q==";
 
+const INITIAL_LOAD = 12;
+const LOAD_MORE_STEP = 12;
+
 export default function GaleriaPage() {
   const router = useRouter();
   const [activeSection, setActiveSection] = useState("panorama");
+  const [visibleCount, setVisibleCount] = useState(INITIAL_LOAD);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [lightboxSection, setLightboxSection] = useState<string | null>(null);
 
-  const currentImages =
+  const allSectionImages =
     gallerySections.find((s) => s.id === activeSection)?.images ?? [];
+  const currentImages = allSectionImages.slice(0, visibleCount);
+  const hasMore = visibleCount < allSectionImages.length;
+
+  const handleLoadMore = useCallback(() => {
+    setVisibleCount((prev) => Math.min(prev + LOAD_MORE_STEP, allSectionImages.length));
+  }, [allSectionImages.length]);
+
+  const handleSectionChange = useCallback((sectionId: string) => {
+    setActiveSection(sectionId);
+    setVisibleCount(INITIAL_LOAD);
+    setLightboxIndex(null);
+    setLightboxSection(null);
+  }, []);
   const lightboxImages =
     lightboxSection != null
       ? gallerySections.find((s) => s.id === lightboxSection)?.images ?? []
@@ -83,7 +100,7 @@ export default function GaleriaPage() {
           {gallerySections.map((section) => (
             <button
               key={section.id}
-              onClick={() => setActiveSection(section.id)}
+              onClick={() => handleSectionChange(section.id)}
               className={`px-5 py-2.5 rounded-full text-sm font-medium uppercase tracking-wider transition-all ${
                 activeSection === section.id
                   ? "bg-white/20 text-white border border-white/40"
@@ -117,6 +134,18 @@ export default function GaleriaPage() {
             </button>
           ))}
         </div>
+
+        {hasMore && (
+          <div className="text-center mt-10">
+            <button
+              type="button"
+              onClick={handleLoadMore}
+              className="somnus-btn px-8 py-3 text-sm"
+            >
+              Ver más fotos
+            </button>
+          </div>
+        )}
       </main>
 
       {/* Lightbox */}

@@ -102,20 +102,29 @@ function buildPanoramaImages(): string[] {
   return [...cinema, ...highlights];
 }
 
+// Reducir a ~24 fotos por sección (carga más ligera por pestaña)
+function sampleEveryN<T>(arr: T[], maxCount: number): T[] {
+  if (arr.length <= maxCount) return arr;
+  const step = arr.length / maxCount;
+  return Array.from({ length: maxCount }, (_, i) => arr[Math.floor(i * step)]);
+}
+
+const MAX_PER_SECTION = 24;
+
 export const gallerySections: GallerySection[] = [
   {
     id: "panorama",
     title: "Panorama",
-    images: buildPanoramaImages(),
+    images: sampleEveryN(buildPanoramaImages(), MAX_PER_SECTION),
   },
   {
     id: "somnus-1",
     title: "Somnus 1",
-    images: somnus1Highlights.map((f) => `${SOMNUS1_BASE}/${f}`),
+    images: sampleEveryN(somnus1Highlights.map((f) => `${SOMNUS1_BASE}/${f}`), MAX_PER_SECTION),
   },
   {
     id: "somnus-2",
     title: "Somnus 2",
-    images: somnus2Highlights.map((f) => `${SOMNUS2_BASE}/${f}`),
+    images: sampleEveryN(somnus2Highlights.map((f) => `${SOMNUS2_BASE}/${f}`), MAX_PER_SECTION),
   },
 ];
