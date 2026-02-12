@@ -73,16 +73,25 @@ ffmpeg -i "public/assets/VIDEO.mp4" \
 
 **Si las fotos de la galería tardan mucho en cargar**, casi siempre es porque las originales pesan 3–10 MB cada una. Next.js las optimiza, pero primero debe descargarlas del servidor. Comprímelas antes de subir:
 
+**Opción 1 – Script automático (recomendado):**
+
 ```bash
-# Con ffmpeg – redimensionar a 1200px ancho, calidad 82
+npm run compress-gallery
+```
+
+El script usa Sharp para redimensionar a 1200px de ancho y comprimir JPG a calidad 82. Objetivo: **&lt; 500 KB** por imagen.
+
+**Nota Windows:** Si falla con "unknown error", cierra el Explorador u otras apps que tengan la carpeta abierta y vuelve a ejecutar.
+
+**Opción 2 – ffmpeg (Linux/Mac):**
+
+```bash
 for f in public/assets/panorama-photo-download-1of1*/*/*.jpg; do
   ffmpeg -i "$f" -vf "scale=1200:-2" -q:v 5 "$f.tmp" && mv "$f.tmp" "$f"
 done
 ```
 
-O con **ImageMagick**: `mogrify -resize 1200x -quality 82 *.jpg`
-
-Objetivo: **&lt; 500 KB** por imagen de galería.
+**Opción 3 – ImageMagick:** `mogrify -resize 1200x -quality 82 *.jpg`
 
 ## Cambios en el código ya aplicados
 
