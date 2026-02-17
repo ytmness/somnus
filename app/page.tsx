@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -11,21 +11,7 @@ import { CartItem, Concert } from "@/components/eventos/types";
 import { GALLERY_EVENTS } from "@/lib/gallery-events";
 import { RevealSection } from "@/components/RevealSection";
 
-const SOMNUS_VIDEOS = [
-  "/assets/PANORAMA SOMNUSNIGHTS AFTERMOVIE 4.0.mp4",
-  "/assets/SOMNUS 30-08-25 AFTERMOVIE 2.0.mp4",
-  "/assets/SOMNUS VIVA BRUNCH 2.0.mp4",
-  "/assets/SOMNYS BLACKOUTorBLACKOUT.mp4",
-];
-
-function shuffleArray<T>(array: T[]): T[] {
-  const arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
+const HERO_VIDEO = "/assets/Adobe Express 2026-02-17 16.05.01.mp4";
 
 function convertEventToConcert(event: any): Concert {
   const eventDate = new Date(event.eventDate);
@@ -178,8 +164,6 @@ export default function HomePage() {
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
-  const shuffledVideos = useMemo(() => shuffleArray(SOMNUS_VIDEOS), []);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
 
   useEffect(() => {
     const v = heroVideoRef.current;
@@ -192,31 +176,7 @@ export default function HomePage() {
     v.addEventListener("loadeddata", tryPlay, { once: true });
     tryPlay();
     return () => v.removeEventListener("loadeddata", tryPlay);
-  }, [currentVideoIndex]);
-
-  const handleVideoEnded = () => {
-    setCurrentVideoIndex((prev) => (prev + 1) % shuffledVideos.length);
-  };
-
-  // Preload next video when current is ~80% through (evita cargar todo de golpe)
-  useEffect(() => {
-    const v = heroVideoRef.current;
-    if (!v) return;
-    const onTimeUpdate = () => {
-      const dur = v.duration;
-      if (dur > 0 && v.currentTime > dur * 0.8) {
-        const nextIdx = (currentVideoIndex + 1) % shuffledVideos.length;
-        const link = document.createElement("link");
-        link.rel = "preload";
-        link.as = "video";
-        link.href = shuffledVideos[nextIdx];
-        document.head.appendChild(link);
-        v.removeEventListener("timeupdate", onTimeUpdate);
-      }
-    };
-    v.addEventListener("timeupdate", onTimeUpdate);
-    return () => v.removeEventListener("timeupdate", onTimeUpdate);
-  }, [currentVideoIndex, shuffledVideos]);
+  }, []);
 
   useEffect(() => {
     const loadSession = async () => {
@@ -336,13 +296,12 @@ export default function HomePage() {
       >
         <div className="absolute inset-0 z-[1] w-full h-full overflow-hidden">
           <video
-            key={currentVideoIndex}
             ref={heroVideoRef}
             autoPlay
             muted
+            loop
             playsInline
             preload="metadata"
-            onEnded={handleVideoEnded}
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover hero-video-no-controls video-cupido-mobile"
             style={{
               objectPosition: "center 45%",
@@ -358,7 +317,7 @@ export default function HomePage() {
             disablePictureInPicture
             controlsList="nodownload"
           >
-            <source src={shuffledVideos[currentVideoIndex]} type="video/mp4" />
+            <source src={HERO_VIDEO} type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/30" />
         </div>
