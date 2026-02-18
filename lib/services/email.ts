@@ -1,9 +1,7 @@
 /**
  * Servicio de envío de emails
- * Usa Resend cuando RESEND_API_KEY está configurado
+ * OTP usa Supabase Auth. Este servicio está para otros emails (resend cuando se integre)
  */
-
-import { Resend } from "resend";
 
 export interface EmailOptions {
   to: string;
@@ -12,46 +10,14 @@ export interface EmailOptions {
   text?: string;
 }
 
-function getFromEmail(): string {
-  // Resend: verifica tu dominio para usar noreply@somnus.live
-  // Sin dominio verificado, usa onboarding@resend.dev (solo para pruebas)
-  return process.env.RESEND_FROM || "Somnus <onboarding@resend.dev>";
-}
-
 /**
- * Envía un email (Resend en producción, simulador si no hay API key)
+ * Envía un email (simulado - OTP real va por Supabase Auth)
  */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
-  const apiKey = process.env.RESEND_API_KEY;
-
-  if (apiKey) {
-    try {
-      const resend = new Resend(apiKey);
-      const { error } = await resend.emails.send({
-        from: getFromEmail(),
-        to: options.to,
-        subject: options.subject,
-        html: options.html,
-        text: options.text,
-      });
-
-      if (error) {
-        console.error("[EMAIL] Resend error:", error);
-        return false;
-      }
-      return true;
-    } catch (err) {
-      console.error("[EMAIL] Error enviando email:", err);
-      return false;
-    }
-  }
-
-  // Sin API key: solo log (desarrollo)
   console.log("=".repeat(50));
-  console.log("📧 EMAIL (SIMULADO - falta RESEND_API_KEY)");
+  console.log("📧 EMAIL (simulado - OTP por Supabase Auth)");
   console.log("Para:", options.to);
   console.log("Asunto:", options.subject);
-  console.log("Código/cuerpo:", options.text || options.html?.substring(0, 100) + "...");
   console.log("=".repeat(50));
   return true;
 }
