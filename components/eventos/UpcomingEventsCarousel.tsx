@@ -56,7 +56,7 @@ export function UpcomingEventsCarousel({
 
   return (
     <div
-      className={`relative w-full group ${className}`}
+      className={`relative w-full group pl-16 pr-16 md:pl-24 md:pr-24 ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -68,11 +68,16 @@ export function UpcomingEventsCarousel({
               <div
                 key={index}
                 className="min-w-0 shrink-0 flex-[0_0_100%] md:flex-[0_0_calc((100%-2.5rem)/3)] lg:flex-[0_0_calc((100%-3rem)/3)]"
-                style={{ zIndex: isActive ? 10 : 1 }}
+                style={{
+                  zIndex: isActive ? 10 : 1,
+                  marginRight: "-1.5rem",
+                }}
               >
                 <div
                   className={`transition-transform duration-500 ease-out ${
-                    isActive ? "scale-[1.02]" : "scale-[0.98] opacity-90"
+                    isActive
+                      ? "scale-[1.05]"
+                      : "scale-95 opacity-85"
                   }`}
                 >
                   {child}
@@ -106,12 +111,12 @@ export function UpcomingEventsCarousel({
         ))}
       </div>
 
-      {/* Flechas opcionales - visible en hover en desktop */}
+      {/* Flechas - posicionadas fuera del carrusel, siempre visibles */}
       {children.length > 1 && (
         <>
           <button
             onClick={scrollPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center opacity-0 md:group-hover:opacity-100 md:opacity-60 transition-opacity z-10"
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center opacity-80 hover:opacity-100 transition-all z-10 shadow-lg"
             aria-label="Previous"
           >
             <svg
@@ -120,7 +125,7 @@ export function UpcomingEventsCarousel({
               viewBox="0 0 24 24"
               strokeWidth={2}
               stroke="currentColor"
-              className="w-5 h-5"
+              className="w-6 h-6"
             >
               <path
                 strokeLinecap="round"
@@ -131,7 +136,7 @@ export function UpcomingEventsCarousel({
           </button>
           <button
             onClick={scrollNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center opacity-0 md:group-hover:opacity-100 md:opacity-60 transition-opacity z-10"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center opacity-80 hover:opacity-100 transition-all z-10 shadow-lg"
             aria-label="Next"
           >
             <svg
@@ -140,7 +145,7 @@ export function UpcomingEventsCarousel({
               viewBox="0 0 24 24"
               strokeWidth={2}
               stroke="currentColor"
-              className="w-5 h-5"
+              className="w-6 h-6"
             >
               <path
                 strokeLinecap="round"
