@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient as createSSRClient } from "@supabase/ssr";
 import { prisma } from "@/lib/db/prisma";
-import { supabaseAdmin } from "@/lib/db/supabase";
 import { otpVerifySchema } from "@/lib/validations/schemas";
-import { verifyOtpCode } from "@/lib/auth/otp";
 
 export const dynamic = "force-dynamic";
 
 /**
  * POST /api/auth/otp/verify
- * Verificar código OTP de 8 dígitos (propio) y establecer sesión Supabase
+ * Verificar código OTP (6 dígitos) via Supabase Auth
  */
 export async function POST(request: NextRequest) {
   const response = new NextResponse();
@@ -26,65 +24,6 @@ export async function POST(request: NextRequest) {
 
     const { email, token } = result.data;
 
-    // 1. Verificar nuestro código OTP (User.verificationCode)
-    const { valid, error: verifyError } = await verifyOtpCode(email, token);
-    if (!valid) {
-      return NextResponse.json(
-        { error: verifyError || "Código OTP inválido o expirado" },
-        { status: 400 }
-      );
-    }
-
-    // 2. Obtener usuario y limpiar código usado
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "Usuario no encontrado" }, { status: 400 });
-    }
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        verificationCode: null,
-        verificationCodeExpires: null,
-        emailVerified: true,
-      },
-    });
-
-    // 3. Asegurar que existe en Supabase Auth (createUser no envía email si ya existe)
-    const { error: createErr } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      email_confirm: true,
-      user_metadata: { name: user.name },
-    });
-    // Ignorar error si el usuario ya existe
-    if (createErr && !createErr.message?.toLowerCase().includes("already")) {
-      console.error("[OTP VERIFY] Error creando usuario Supabase:", createErr);
-      return NextResponse.json(
-        { error: "Error al crear sesión" },
-        { status: 500 }
-      );
-    }
-
-    // 4. Generar magic link (solo para obtener token, no envía email)
-    const { data: linkData, error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
-      type: "magiclink",
-      email,
-    });
-
-    if (linkErr || !linkData?.properties?.hashed_token) {
-      console.error("[OTP VERIFY] Error generateLink:", linkErr);
-      return NextResponse.json(
-        { error: "Error al crear sesión" },
-        { status: 500 }
-      );
-    }
-
-    const tokenHash = linkData.properties.hashed_token;
-
-    // 5. Establecer sesión via verifyOtp en el cliente SSR (cookies)
     const supabase = createSSRClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -102,17 +41,41 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    const { error: verifyErr } = await supabase.auth.verifyOtp({
-      token_hash: tokenHash,
-      type: "magiclink",
+    const { data: authData, error: authError } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: "email",
     });
 
-    if (verifyErr) {
-      console.error("[OTP VERIFY] Error verifyOtp:", verifyErr);
+    if (authError || !authData.user) {
+      console.error("[OTP VERIFY] Error:", authError);
       return NextResponse.json(
-        { error: "Error al crear sesión" },
-        { status: 500 }
+        { error: authError?.message || "Código OTP inválido o expirado" },
+        { status: 400 }
       );
+    }
+
+    let user = await prisma.user.findUnique({
+      where: { email },
+    }) as any;
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email,
+          name: email.split("@")[0],
+          role: "CLIENTE",
+          isActive: true,
+          password: "",
+          emailVerified: true,
+        } as any,
+      });
+    } else if (!user.emailVerified) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { emailVerified: true } as any,
+      });
+      user.emailVerified = true;
     }
 
     const { data: { session } } = await supabase.auth.getSession();
@@ -125,7 +88,7 @@ export async function POST(request: NextRequest) {
         email: user.email,
         name: user.name,
         role: user.role,
-        emailVerified: true,
+        emailVerified: user.emailVerified,
       },
       session: session
         ? { access_token: session.access_token, refresh_token: session.refresh_token }

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@/lib/auth/supabase-auth";
 import { prisma } from "@/lib/db/prisma";
 import { registerSchema } from "@/lib/validations/schemas";
-import { sendOtpToEmail } from "@/lib/auth/otp";
 
 /**
  * POST /api/auth/register
- * Registrar un nuevo usuario y enviar código OTP de 8 dígitos
+ * Registrar usuario en tabla User + enviar OTP (6 dígitos) via Supabase Auth
  */
 export async function POST(request: NextRequest) {
   try {
@@ -32,7 +32,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Crear usuario en nuestra tabla User
     const user = await prisma.user.create({
       data: {
         email,
@@ -44,20 +43,23 @@ export async function POST(request: NextRequest) {
       } as any,
     }) as any;
 
-    // Enviar código OTP de 8 dígitos (usa User.verificationCode)
-    const { success, error: otpError } = await sendOtpToEmail(email, name);
+    const supabase = createServerClient();
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: true },
+    });
 
-    if (!success) {
+    if (otpError) {
       await prisma.user.delete({ where: { id: user.id } }).catch(() => {});
       return NextResponse.json(
-        { error: otpError || "Error al enviar código de verificación" },
+        { error: otpError.message || "Error al enviar código de verificación" },
         { status: 400 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      message: "Usuario registrado. Verifica tu email con el código de 8 dígitos enviado.",
+      message: "Usuario registrado. Verifica tu email con el código de 6 dígitos enviado.",
       requiresVerification: true,
       user: {
         id: user.id,
@@ -75,4 +77,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

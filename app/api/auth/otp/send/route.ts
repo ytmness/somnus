@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@/lib/auth/supabase-auth";
 import { z } from "zod";
-import { sendOtpToEmail } from "@/lib/auth/otp";
 
 const sendOtpSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -8,7 +8,7 @@ const sendOtpSchema = z.object({
 
 /**
  * POST /api/auth/otp/send
- * Enviar código OTP de 8 dígitos
+ * Reenviar código OTP (6 dígitos) via Supabase Auth
  */
 export async function POST(request: NextRequest) {
   try {
@@ -22,11 +22,16 @@ export async function POST(request: NextRequest) {
     }
 
     const { email } = result.data;
-    const { success, error } = await sendOtpToEmail(email);
+    const supabase = createServerClient();
 
-    if (!success) {
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: true },
+    });
+
+    if (error) {
       return NextResponse.json(
-        { error: error || "Error al enviar código OTP" },
+        { error: error.message || "Error al enviar código OTP" },
         { status: 400 }
       );
     }
@@ -36,7 +41,7 @@ export async function POST(request: NextRequest) {
       message: "Código OTP enviado a tu email",
     });
   } catch (error: any) {
-    console.error("[OTP SEND] Error general:", error);
+    console.error("[OTP SEND] Error:", error);
     return NextResponse.json(
       { error: "Error al enviar código OTP", details: error.message },
       { status: 500 }

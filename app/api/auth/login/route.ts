@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@/lib/auth/supabase-auth";
 import { loginSchema } from "@/lib/validations/schemas";
-import { sendOtpToEmail } from "@/lib/auth/otp";
 
 /**
  * POST /api/auth/login
- * Enviar código OTP de 8 dígitos para iniciar sesión
+ * Enviar código OTP (6 dígitos) via Supabase Auth
  */
 export async function POST(request: NextRequest) {
   try {
@@ -18,11 +18,19 @@ export async function POST(request: NextRequest) {
     }
 
     const { email } = result.data;
-    const { success, error } = await sendOtpToEmail(email);
+    const supabase = createServerClient();
 
-    if (!success) {
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: true,
+      },
+    });
+
+    if (error) {
+      console.error("[LOGIN] Error:", error);
       return NextResponse.json(
-        { error: error || "Error al enviar código de verificación" },
+        { error: error.message || "Error al enviar código de verificación" },
         { status: 400 }
       );
     }

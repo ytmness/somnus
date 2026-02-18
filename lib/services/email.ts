@@ -1,7 +1,9 @@
 /**
  * Servicio de envío de emails
- * Por ahora simulado, en producción integrar con Resend, SendGrid, etc.
+ * Usa Resend cuando RESEND_API_KEY está configurado
  */
+
+import { Resend } from "resend";
 
 export interface EmailOptions {
   to: string;
@@ -10,29 +12,48 @@ export interface EmailOptions {
   text?: string;
 }
 
+function getFromEmail(): string {
+  // Resend: verifica tu dominio para usar noreply@somnus.live
+  // Sin dominio verificado, usa onboarding@resend.dev (solo para pruebas)
+  return process.env.RESEND_FROM || "Somnus <onboarding@resend.dev>";
+}
+
 /**
- * Envía un email (simulado por ahora)
- * TODO: Integrar con servicio real (Resend, SendGrid, etc.)
+ * Envía un email (Resend en producción, simulador si no hay API key)
  */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
-  try {
-    // Por ahora solo logueamos el email
-    // En producción, aquí iría la integración con el servicio de email
-    console.log("=".repeat(50));
-    console.log("📧 EMAIL ENVIADO (SIMULADO)");
-    console.log("Para:", options.to);
-    console.log("Asunto:", options.subject);
-    console.log("Contenido:", options.text || options.html);
-    console.log("=".repeat(50));
+  const apiKey = process.env.RESEND_API_KEY;
 
-    // Simular delay de envío
-    await new Promise((resolve) => setTimeout(resolve, 500));
+  if (apiKey) {
+    try {
+      const resend = new Resend(apiKey);
+      const { error } = await resend.emails.send({
+        from: getFromEmail(),
+        to: options.to,
+        subject: options.subject,
+        html: options.html,
+        text: options.text,
+      });
 
-    return true;
-  } catch (error) {
-    console.error("Error al enviar email:", error);
-    return false;
+      if (error) {
+        console.error("[EMAIL] Resend error:", error);
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error("[EMAIL] Error enviando email:", err);
+      return false;
+    }
   }
+
+  // Sin API key: solo log (desarrollo)
+  console.log("=".repeat(50));
+  console.log("📧 EMAIL (SIMULADO - falta RESEND_API_KEY)");
+  console.log("Para:", options.to);
+  console.log("Asunto:", options.subject);
+  console.log("Código/cuerpo:", options.text || options.html?.substring(0, 100) + "...");
+  console.log("=".repeat(50));
+  return true;
 }
 
 /**
@@ -73,7 +94,7 @@ export async function sendVerificationCode(
         </div>
         <div class="content">
           <h2>Hola ${name},</h2>
-          <p>Gracias por registrarte en Somnus. Para completar tu registro, por favor ingresa el siguiente código de verificación:</p>
+          <p>Tu código de verificación para iniciar sesión en Somnus:</p>
           <div class="code">${code}</div>
           <p>Este código expira en 10 minutos.</p>
           <p>Si no solicitaste este código, puedes ignorar este email.</p>
@@ -86,17 +107,15 @@ export async function sendVerificationCode(
     </html>
   `;
   const text = `
-    Somnus - Código de Verificación
-    
-    Hola ${name},
-    
-    Gracias por registrarte en Somnus. Tu código de verificación es:
-    
-    ${code}
-    
-    Este código expira en 10 minutos.
-    
-    Si no solicitaste este código, puedes ignorar este email.
+Somnus - Código de Verificación
+
+Hola ${name},
+
+Tu código de verificación es: ${code}
+
+Este código expira en 10 minutos.
+
+Si no solicitaste este código, ignora este email.
   `;
 
   return sendEmail({
@@ -106,5 +125,3 @@ export async function sendVerificationCode(
     text,
   });
 }
-
-
