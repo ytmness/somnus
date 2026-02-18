@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * POST /api/auth/otp/verify
- * Verificar código OTP (6 dígitos) via Supabase Auth
+ * Verificar código OTP (8 dígitos) via Supabase Auth
  */
 export async function POST(request: NextRequest) {
   const response = new NextResponse();

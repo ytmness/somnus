@@ -116,8 +116,11 @@ export function ClipCheckoutForm({
     setIsPaying(true);
     try {
       const tokenResult = await cardRef.current.cardToken();
-      const token = tokenResult?.id;
-      if (!token) throw new Error("No se obtuvo el token de la tarjeta");
+      // Clip SDK puede devolver { id } o { token } según versión
+      const token = tokenResult?.id ?? (tokenResult as { token?: string })?.token;
+      if (!token || typeof token !== "string") {
+        throw new Error("No se obtuvo el token de la tarjeta. Intenta de nuevo.");
+      }
 
       const res = await fetch("/api/payments/clip/create-charge", {
         method: "POST",

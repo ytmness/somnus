@@ -8,7 +8,7 @@ const sendOtpSchema = z.object({
 
 /**
  * POST /api/auth/otp/send
- * Reenviar código OTP (6 dígitos) via Supabase Auth
+ * Reenviar código OTP (8 dígitos) via Supabase Auth
  */
 export async function POST(request: NextRequest) {
   try {

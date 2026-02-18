@@ -56,9 +56,13 @@ export async function createClipCharge(
   const data = await res.json();
 
   if (!res.ok) {
-    const msg = data?.message || data?.error || "Error al procesar pago con Clip";
-    throw new Error(msg);
+    const msg =
+      data?.message ||
+      data?.error ||
+      (typeof data?.errors === "string" ? data.errors : null) ||
+      "Error al procesar pago con Clip";
+    throw new Error(String(msg));
   }
 
-  return data;
+  return data as ClipChargeResponse;
 }

@@ -5,7 +5,7 @@ import { registerSchema } from "@/lib/validations/schemas";
 
 /**
  * POST /api/auth/register
- * Registrar usuario en tabla User + enviar OTP (6 dígitos) via Supabase Auth
+ * Registrar usuario en tabla User + enviar OTP (8 dígitos) via Supabase Auth
  */
 export async function POST(request: NextRequest) {
   try {

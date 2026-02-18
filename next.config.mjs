@@ -10,6 +10,7 @@ const nextConfig = {
       { protocol: 'https', hostname: '**.supabase.co', pathname: '/storage/**' },
       { protocol: 'https', hostname: 'www.lifeder.com' },
       { protocol: 'https', hostname: 'lifeder.com' },
+      { protocol: 'https', hostname: 'i.pinimg.com' },
     ],
   },
   // Aumentar límites para archivos grandes como videos 4K

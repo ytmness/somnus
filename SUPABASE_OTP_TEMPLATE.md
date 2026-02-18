@@ -1,6 +1,8 @@
 # Configurar plantilla OTP en Supabase (solo código, sin magic link)
 
-Supabase envía el OTP por defecto con un **magic link**. Para mostrar solo el **código de 6 dígitos** (sin link):
+**Para que TODOS los usuarios (clientes, admin, nuevos) reciban el código OTP en vez del magic link**, hay que editar la plantilla en Supabase.
+
+Supabase envía por defecto un **magic link**. Para que todos reciban solo el **código de 8 dígitos** (sin link):
 
 ## 1. Editar plantilla Magic Link
 
@@ -131,7 +133,7 @@ Tu código de acceso - Somnus
 </div>
 ```
 
-**Importante:** usa solo `{{ .Token }}`. No incluyas `{{ .ConfirmationURL }}` (ese es el magic link).
+**Importante:** usa solo `{{ .Token }}`. **NO incluyas** `{{ .ConfirmationURL }}` (ese es el magic link). Si lo quitas, nadie recibirá el link y todos verán solo el código.
 
 ---
 
@@ -145,4 +147,4 @@ En **Authentication** → **URL Configuration**:
 
 ## Nota sobre los dígitos
 
-Supabase genera siempre un **OTP de 6 dígitos**. No se puede configurar a 8 en el panel ni en la API.
+Supabase genera el **OTP de 8 dígitos** en la plantilla `{{ .Token }}`.

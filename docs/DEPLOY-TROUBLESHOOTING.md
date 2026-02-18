@@ -84,3 +84,33 @@ pm2 logs
 ```
 
 Ahí verás el error real (ej. "column does not exist", "connection refused").
+
+---
+
+## Clip create-charge: Error "Unauthorized" (401)
+
+La API de Clip rechaza la petición. Revisa:
+
+1. **CLIP_AUTH_TOKEN en el servidor**: Debe estar en `.env` en `/var/www/somnus`:
+   ```bash
+   grep CLIP_AUTH_TOKEN /var/www/somnus/.env
+   ```
+   Si no aparece, añade:
+   ```
+   CLIP_AUTH_TOKEN=tu_token_de_clip
+   ```
+
+2. **Token válido**: El token puede haber expirado. Genera uno nuevo en el panel de Clip (developer.clip.mx o similar).
+
+3. **Reiniciar tras cambiar .env**:
+   ```bash
+   pm2 restart somnus --update-env
+   ```
+
+---
+
+## Login: Rate limit exceeded / 400
+
+Supabase limita OTP (códigos por email): ~30/hora global, 60 segundos entre intentos al mismo email.
+
+Si el usuario ve "Demasiados intentos", debe esperar 1 minuto. En Supabase Dashboard (Authentication → Rate limits) puedes ajustar los límites.

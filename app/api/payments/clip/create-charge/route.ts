@@ -48,9 +48,26 @@ export async function POST(request: NextRequest) {
       description
     );
 
-    if (!clipRes.paid) {
+    // Clip puede devolver paid: true o status: "captured"/"completed"
+    const isPaid =
+      clipRes?.paid === true ||
+      clipRes?.status === "captured" ||
+      clipRes?.status === "completed" ||
+      clipRes?.status === "paid";
+    if (!isPaid) {
       return NextResponse.json(
-        { error: "El pago no se completó", status: clipRes.status },
+        {
+          error: "El pago no se completó",
+          status: clipRes?.status || "unknown",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!sale.saleItems?.length) {
+      console.error("Clip create-charge: saleItems vacío para saleId", saleId);
+      return NextResponse.json(
+        { error: "Error en la orden: no hay ítems. Contacta al administrador." },
         { status: 400 }
       );
     }
