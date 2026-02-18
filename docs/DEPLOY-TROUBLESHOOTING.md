@@ -59,3 +59,28 @@ Si usas Cloudflare u otro CDN:
 chown -R $(whoami):$(whoami) .next
 chmod -R 755 .next
 ```
+
+---
+
+## GET /api/events devuelve 500 (Internal Server Error)
+
+### 1. Esquema de base de datos desactualizado
+Si cambiaste el schema de Prisma (ej. agregaste `showQR`), la base de datos en producción debe actualizarse:
+
+```bash
+cd /var/www/somnus
+npx prisma db push
+pm2 restart all
+```
+
+### 2. Variables de entorno
+Verifica que `DATABASE_URL` y `DIRECT_URL` estén en `.env` y apunten a la BD correcta.
+
+### 3. Ver logs del servidor
+```bash
+pm2 logs somnus --lines 50
+# O si usas otro nombre:
+pm2 logs
+```
+
+Ahí verás el error real (ej. "column does not exist", "connection refused").

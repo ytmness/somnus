@@ -30,7 +30,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: events });
   } catch (error) {
-    console.error("Get events error:", error);
+    const err = error instanceof Error ? error : new Error(String(error));
+    console.error("Get events error:", err.message, err.stack);
     return NextResponse.json(
       { error: "Error al obtener eventos" },
       { status: 500 }
