@@ -5,7 +5,7 @@
 const CLIP_API = "https://api.payclip.com";
 
 export interface ClipChargeRequest {
-  amount: number; // En PESOS (no centavos)
+  amount: number; // En CENTAVOS (Clip requiere enteros)
   currency: string;
   description: string;
   payment_method: { token: string };
@@ -33,8 +33,10 @@ export async function createClipCharge(
     throw new Error("CLIP_AUTH_TOKEN no configurado");
   }
 
+  // Clip espera el monto en centavos (ej: $10.45 → 1045)
+  const amountCentavos = Math.round(Number(totalAmount) * 100);
   const body: ClipChargeRequest = {
-    amount: Number(totalAmount),
+    amount: amountCentavos,
     currency: "MXN",
     description: description || `Venta Somnus - ${saleId.slice(0, 8)}`,
     payment_method: { token },

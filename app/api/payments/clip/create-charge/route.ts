@@ -109,9 +109,10 @@ export async function POST(request: NextRequest) {
       data: { saleId, paid: true },
     });
   } catch (error: any) {
-    console.error("Clip create-charge error:", error);
+    const errMsg = error?.message || String(error);
+    console.error("Clip create-charge error:", errMsg, error?.stack);
     return NextResponse.json(
-      { error: error.message || "Error al procesar pago" },
+      { error: errMsg || "Error al procesar pago" },
       { status: 500 }
     );
   }

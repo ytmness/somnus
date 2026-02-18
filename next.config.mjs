@@ -8,6 +8,8 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: '**.supabase.co', pathname: '/storage/**' },
+      { protocol: 'https', hostname: 'www.lifeder.com' },
+      { protocol: 'https', hostname: 'lifeder.com' },
     ],
   },
   // Aumentar límites para archivos grandes como videos 4K
