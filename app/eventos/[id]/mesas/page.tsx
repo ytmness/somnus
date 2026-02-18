@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 import { PatriotasTablesMap } from "@/components/eventos/PatriotasTablesMap";
 import { IndividualTable, VIP_TABLES_162, NON_VIP_SECTIONS_162 } from "@/lib/patriotas-tables-162";
@@ -412,12 +413,15 @@ export default function EventMesasPage() {
             <span>Mis Boletos</span>
           </button>
 
-          {/* Admin - solo si tiene rol */}
+          {/* Panel - solo si es admin */}
           {userRole === "ADMIN" && (
-            <button onClick={() => router.push("/admin")} className="flex items-center gap-2 text-regia-cream/90 hover:text-regia-gold-bright transition-all duration-300 text-sm font-medium uppercase tracking-wider hover:scale-105">
+            <Link
+              href="/admin"
+              className="flex items-center gap-2 text-regia-cream/90 hover:text-white transition-all duration-300 text-sm font-medium uppercase tracking-wider"
+            >
               <Shield className="w-4 h-4" />
-              <span>Admin</span>
-            </button>
+              <span>Panel</span>
+            </Link>
           )}
 
           {/* Accesos - solo si tiene rol */}

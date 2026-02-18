@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 import { Ticket, Calendar, MapPin, User, ArrowLeft, Download, QrCode, Shield, Scan, LogIn } from "lucide-react";
 import { toast } from "sonner";
@@ -181,12 +182,12 @@ export default function MisBoletosPage() {
             Galería
           </button>
           {userRole === "ADMIN" && (
-            <button
-              onClick={() => router.push("/admin")}
+            <Link
+              href="/admin"
               className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
             >
-              Admin
-            </button>
+              Panel
+            </Link>
           )}
           {(userRole === "ACCESOS" || userRole === "ADMIN") && (
             <button

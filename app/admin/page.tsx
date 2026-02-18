@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus, Calendar, Ticket, Users, ImageIcon } from "lucide-react";
 import { EventsTable } from "@/components/admin/EventsTable";
@@ -16,9 +17,16 @@ interface SessionUser {
   role: string;
 }
 
+interface AdminStats {
+  totalEvents: number;
+  ticketsSold: number;
+  activeUsers: number;
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const [user, setUser] = useState<SessionUser | null>(null);
+  const [stats, setStats] = useState<AdminStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -27,6 +35,10 @@ export default function AdminPage() {
   useEffect(() => {
     checkAuth();
   }, []);
+
+  useEffect(() => {
+    if (user) void fetchStats();
+  }, [user, refreshKey]);
 
   const checkAuth = async () => {
     try {
@@ -46,6 +58,18 @@ export default function AdminPage() {
     }
   };
 
+  const fetchStats = async () => {
+    try {
+      const res = await fetch("/api/admin/stats");
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data);
+      }
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
@@ -60,7 +84,11 @@ export default function AdminPage() {
     setShowCreateModal(false);
     setRefreshKey((prev) => prev + 1);
     toast.success("Evento creado exitosamente");
+    fetchStats();
   };
+
+  const formatNumber = (n: number) =>
+    new Intl.NumberFormat("es-MX").format(n);
 
   if (isLoading) {
     return (
@@ -94,9 +122,12 @@ export default function AdminPage() {
           >
             Galería
           </button>
-          <span className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1">
-            Admin
-          </span>
+          <Link
+            href="/admin"
+            className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1 uppercase tracking-wider"
+          >
+            Panel
+          </Link>
           <button
             onClick={() => router.push("/accesos")}
             className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
@@ -141,54 +172,60 @@ export default function AdminPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
+        {/* Stats Cards - Liquid Glass con datos reales */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="somnus-card p-6">
+          <div className="liquid-glass p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white/70 text-sm mb-1">Total Eventos</p>
-                <p className="text-3xl font-bold text-white">12</p>
+                <p className="text-3xl font-bold text-white">
+                  {stats !== null ? formatNumber(stats.totalEvents) : "—"}
+                </p>
               </div>
-              <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 liquid-glass rounded-xl flex items-center justify-center">
                 <Calendar className="w-6 h-6 text-white" />
               </div>
             </div>
           </div>
 
-          <div className="somnus-card p-6">
+          <div className="liquid-glass p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white/70 text-sm mb-1">Boletos Vendidos</p>
-                <p className="text-3xl font-bold text-white">2,450</p>
+                <p className="text-3xl font-bold text-white">
+                  {stats !== null ? formatNumber(stats.ticketsSold) : "—"}
+                </p>
               </div>
-              <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 liquid-glass rounded-xl flex items-center justify-center">
                 <Ticket className="w-6 h-6 text-white" />
               </div>
             </div>
           </div>
 
-          <div className="somnus-card p-6">
+          <div className="liquid-glass p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white/70 text-sm mb-1">Usuarios Activos</p>
-                <p className="text-3xl font-bold text-white">8</p>
+                <p className="text-3xl font-bold text-white">
+                  {stats !== null ? formatNumber(stats.activeUsers) : "—"}
+                </p>
               </div>
-              <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 liquid-glass rounded-xl flex items-center justify-center">
                 <Users className="w-6 h-6 text-white" />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Tabs */}
+        {/* Tabs - Liquid glass */}
         <div className="flex gap-2 mb-6">
           <button
             type="button"
             onClick={() => setActiveTab("eventos")}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-4 py-2 rounded-xl font-medium transition-all ${
               activeTab === "eventos"
-                ? "bg-white text-black"
-                : "bg-white/10 text-white/80 hover:bg-white/20"
+                ? "liquid-glass bg-white text-black"
+                : "liquid-glass text-white/80 hover:text-white"
             }`}
           >
             <Calendar className="w-4 h-4 inline mr-2" />
@@ -197,10 +234,10 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => setActiveTab("galeria")}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-4 py-2 rounded-xl font-medium transition-all ${
               activeTab === "galeria"
-                ? "bg-white text-black"
-                : "bg-white/10 text-white/80 hover:bg-white/20"
+                ? "liquid-glass bg-white text-black"
+                : "liquid-glass text-white/80 hover:text-white"
             }`}
           >
             <ImageIcon className="w-4 h-4 inline mr-2" />
@@ -209,7 +246,7 @@ export default function AdminPage() {
         </div>
 
         {activeTab === "eventos" && (
-          <div className="somnus-card p-6">
+          <div className="liquid-glass p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-white">Eventos</h2>
             </div>
@@ -218,7 +255,7 @@ export default function AdminPage() {
         )}
 
         {activeTab === "galeria" && (
-          <div className="somnus-card p-6">
+          <div className="liquid-glass p-6">
             <h2 className="text-xl font-bold text-white mb-6">Galería</h2>
             <p className="text-white/70 text-sm mb-6">
               Crea secciones y agrega fotos por URL. Las imágenes deben estar en{" "}

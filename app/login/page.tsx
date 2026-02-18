@@ -88,12 +88,12 @@ export default function LoginPage() {
             Galería
           </button>
           {userRole === "ADMIN" && (
-            <button
-              onClick={() => router.push("/admin")}
+            <Link
+              href="/admin"
               className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
             >
-              Admin
-            </button>
+              Panel
+            </Link>
           )}
           {(userRole === "ACCESOS" || userRole === "ADMIN") && (
             <button
