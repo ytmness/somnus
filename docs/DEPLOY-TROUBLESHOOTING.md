@@ -113,4 +113,17 @@ La API de Clip rechaza la petición. Revisa:
 
 Supabase limita OTP (códigos por email): ~30/hora global, 60 segundos entre intentos al mismo email.
 
-Si el usuario ve "Demasiados intentos", debe esperar 1 minuto. En Supabase Dashboard (Authentication → Rate limits) puedes ajustar los límites.
+Si el usuario ve "Demasiados intentos", debe esperar 1 minuto. La UI muestra un countdown de 60 segundos. En Supabase Dashboard (Authentication → Rate limits) puedes ajustar los límites.
+
+---
+
+## Errores 404 en recursos
+
+Si ves "Failed to load resource: 404" en la consola:
+
+1. Abre DevTools (F12) → pestaña **Network**
+2. Filtra por "404" o busca requests en rojo
+3. Revisa la URL exacta que falla:
+   - `/_next/static/chunks/...` → Chunk antiguo, haz hard refresh (Ctrl+Shift+R) o redeploy
+   - `/_next/image?url=...` → La imagen externa no está en remotePatterns de next.config
+   - `/api/...` → La ruta no existe o hay error en el servidor

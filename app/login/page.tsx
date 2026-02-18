@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [rateLimitCooldown, setRateLimitCooldown] = useState(0); // segundos restantes
 
   // Cargar sesión del usuario
   useEffect(() => {
@@ -32,8 +33,18 @@ export default function LoginPage() {
     loadSession();
   }, []);
 
+  // Countdown cuando hay rate limit
+  useEffect(() => {
+    if (rateLimitCooldown <= 0) return;
+    const t = setInterval(() => {
+      setRateLimitCooldown((s) => (s <= 1 ? 0 : s - 1));
+    }, 1000);
+    return () => clearInterval(t);
+  }, [rateLimitCooldown]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (rateLimitCooldown > 0) return;
     setIsLoading(true);
 
     try {
@@ -46,12 +57,16 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Error al enviar código de verificación");
+        if (response.status === 429) {
+          setRateLimitCooldown(60);
+          toast.error("Demasiados intentos. Espera 1 minuto.", { duration: 6000 });
+        } else {
+          throw new Error(data.error || "Error al enviar código de verificación");
+        }
+        return;
       }
 
       toast.success("¡Código de verificación enviado! Revisa tu email");
-      
-      // Redirigir a la página de verificación
       router.push(`/verificar-email?email=${encodeURIComponent(email)}`);
       router.refresh();
     } catch (error: any) {
@@ -221,9 +236,14 @@ export default function LoginPage() {
                       </div>
                     </div>
 
+                    {rateLimitCooldown > 0 && (
+                      <p className="text-amber-400/90 text-sm text-center">
+                        Espera {rateLimitCooldown} segundos antes de intentar de nuevo
+                      </p>
+                    )}
                     <button
                       type="submit"
-                      disabled={isLoading}
+                      disabled={isLoading || rateLimitCooldown > 0}
                       className="w-full somnus-btn text-base py-6 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isLoading ? (
@@ -231,6 +251,8 @@ export default function LoginPage() {
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                           Enviando código...
                         </span>
+                      ) : rateLimitCooldown > 0 ? (
+                        `Reintentar en ${rateLimitCooldown}s`
                       ) : (
                         "Enviar Código de Verificación"
                       )}
