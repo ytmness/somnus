@@ -294,25 +294,27 @@ export default function HomePage() {
           const withTickets = data.data.filter(
             (e: any) => e.ticketTypes && e.ticketTypes.length > 0
           );
-          // Activo = isActive y fecha futura (o hoy)
-          const activeEvents = withTickets.filter(
-            (e: any) =>
-              e.isActive &&
-              new Date(e.eventDate) >= new Date(now.getFullYear(), now.getMonth(), now.getDate())
+          // Futuros = fecha futura o hoy (mostrar todos, activos o no)
+          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          const futureEvents = withTickets.filter(
+            (e: any) => new Date(e.eventDate) >= today
           );
           // Pasados = ya pasó la fecha
           const pastEvents = withTickets.filter(
-            (e: any) => new Date(e.eventDate) < new Date(now.getFullYear(), now.getMonth(), now.getDate())
+            (e: any) => new Date(e.eventDate) < today
           );
-          // Ordenar: activo primero, luego pasados por fecha descendente
-          const activeConverted = activeEvents
-            .sort((a: any, b: any) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime())
+          // Ordenar: primero los activos (para hero), luego por fecha. Pasados por fecha desc.
+          const futureConverted = futureEvents
+            .sort((a: any, b: any) => {
+              if (a.isActive !== b.isActive) return a.isActive ? -1 : 1;
+              return new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime();
+            })
             .map(convertEventToConcert);
           const pastConverted = pastEvents
             .sort((a: any, b: any) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime())
             .map(convertEventToConcert);
-          setConcerts(activeConverted.concat(pastConverted));
-          setActiveConcerts(activeConverted);
+          setConcerts(futureConverted.concat(pastConverted));
+          setActiveConcerts(futureConverted);
           setPastConcerts(pastConverted);
         }
       } catch (error) {
