@@ -212,7 +212,7 @@ export default function EventMesasPage() {
           buyerName: checkoutData.buyerName,
           buyerEmail: checkoutData.buyerEmail,
           buyerPhone: checkoutData.buyerPhone,
-          paymentMethod: "simulado", // Por ahora simulado
+          paymentMethod: "clip",
         }),
       });
 
@@ -222,15 +222,20 @@ export default function EventMesasPage() {
         throw new Error(data.error || "Error al procesar la orden");
       }
 
+      if (data.data?.saleId) {
+        toast.success("Redirigiendo a pago con tarjeta...");
+        setCartItems([]);
+        setShowCart(false);
+        setShowCheckoutModal(false);
+        router.push(`/checkout/${data.data.saleId}`);
+        return;
+      }
+
       toast.success("¡Orden creada exitosamente! Te enviaremos un correo con tus boletos.");
-      
-      // Limpiar carrito
       setCartItems([]);
       setShowCart(false);
       setShowCheckoutModal(false);
       setCheckoutData({ buyerName: "", buyerEmail: "", buyerPhone: "" });
-
-      // Recargar mesas para actualizar estado desde BD
       await loadTables();
     } catch (error: any) {
       toast.error(error.message || "Error al procesar la orden");

@@ -160,12 +160,27 @@ model Sale {
   // Relaciones
   event         Event       @relation(fields: [eventId], references: [id])
   user          User?       @relation(fields: [userId], references: [id])
+  saleItems     SaleItem[]
   tickets       Ticket[]
 
   @@index([eventId])
   @@index([status])
   @@index([createdAt])
   @@index([buyerEmail])
+}
+
+// Líneas de la venta (antes de pagar, para recrear tickets)
+model SaleItem {
+  id            String   @id @default(uuid())
+  saleId        String
+  ticketTypeId  String
+  quantity      Int
+  isTable       Boolean  @default(false)
+  tableNumber   String?
+
+  sale          Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([saleId])
 }
 
 // =====================================================
@@ -306,6 +321,33 @@ model AuditLog {
   @@index([action])
   @@index([createdAt])
   @@index([entityType, entityId])
+}
+
+// =====================================================
+// GALERÍA (secciones y fotos gestionadas desde admin)
+// =====================================================
+
+model GallerySection {
+  id        String   @id @default(uuid())
+  title     String   // ej: "Panorama", "Somnus 1"
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  images    GalleryImage[]
+}
+
+model GalleryImage {
+  id         String   @id @default(uuid())
+  sectionId  String
+  url        String   // /assets/... o URL externa
+  sortOrder  Int      @default(0)
+  alt        String?
+  createdAt  DateTime @default(now())
+
+  section    GallerySection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId])
 }
 
 // =====================================================

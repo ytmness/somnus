@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Plus, LogOut, Calendar, Ticket, Users } from "lucide-react";
+import { Plus, LogOut, Calendar, Ticket, Users, ImageIcon } from "lucide-react";
 import { EventsTable } from "@/components/admin/EventsTable";
 import { CreateEventModal } from "@/components/admin/CreateEventModal";
+import { GalleryManager } from "@/components/admin/GalleryManager";
 import { toast } from "sonner";
 
 interface SessionUser {
@@ -21,6 +22,7 @@ export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [activeTab, setActiveTab] = useState<"eventos" | "galeria">("eventos");
 
   useEffect(() => {
     checkAuth();
@@ -140,13 +142,53 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Events Section */}
-        <div className="regia-card p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-white">Eventos</h2>
-          </div>
-          <EventsTable key={refreshKey} />
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6">
+          <button
+            type="button"
+            onClick={() => setActiveTab("eventos")}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              activeTab === "eventos"
+                ? "bg-regia-gold text-white"
+                : "bg-white/10 text-white/80 hover:bg-white/20"
+            }`}
+          >
+            <Calendar className="w-4 h-4 inline mr-2" />
+            Eventos
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("galeria")}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              activeTab === "galeria"
+                ? "bg-regia-gold text-white"
+                : "bg-white/10 text-white/80 hover:bg-white/20"
+            }`}
+          >
+            <ImageIcon className="w-4 h-4 inline mr-2" />
+            Galería
+          </button>
         </div>
+
+        {activeTab === "eventos" && (
+          <div className="regia-card p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white">Eventos</h2>
+            </div>
+            <EventsTable key={refreshKey} />
+          </div>
+        )}
+
+        {activeTab === "galeria" && (
+          <div className="regia-card p-6">
+            <h2 className="text-xl font-bold text-white mb-6">Galería</h2>
+            <p className="text-white/70 text-sm mb-6">
+              Crea secciones y agrega fotos por URL. Las imágenes deben estar en{" "}
+              <code className="bg-white/10 px-1 rounded">/assets/</code> o en una URL pública.
+            </p>
+            <GalleryManager />
+          </div>
+        )}
       </main>
 
       {showCreateModal && (

@@ -13,7 +13,7 @@ import { RevealSection } from "@/components/RevealSection";
 
 const HERO_VIDEO = "/assets/Adobe Express 2026-02-17 16.05.01.mp4";
 
-function convertEventToConcert(event: any): Concert {
+function convertEventToConcert(event: any): Concert & { eventDate?: string } {
   const eventDate = new Date(event.eventDate);
   const formattedDate = eventDate.toLocaleDateString("es-MX", {
     day: "numeric",
@@ -130,10 +130,95 @@ function convertEventToConcert(event: any): Concert {
     image: heroImage,
     minPrice,
     sections,
+    eventDate: event.eventDate,
   };
 }
 
-function getEventStatus(concert: Concert): string | null {
+function EventCard({
+  concert,
+  isPast,
+  onSelect,
+}: {
+  concert: Concert & { eventDate?: string };
+  isPast: boolean;
+  onSelect: () => void;
+}) {
+  const status = getEventStatus(concert);
+  const isMystery =
+    concert.artist === "Artista por Confirmar" ||
+    concert.artist.toLowerCase().includes("por confirmar");
+
+  return (
+    <article
+      onClick={() => { if (!isMystery) onSelect(); }}
+      className={`group somnus-card overflow-hidden ${
+        isPast || isMystery ? "cursor-default opacity-90" : "cursor-pointer"
+      }`}
+    >
+      <div className="relative aspect-[3/4] overflow-hidden">
+        {isMystery ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/70">
+            <p className="text-5xl font-bold text-white/60">?</p>
+          </div>
+        ) : (
+          <>
+            <Image
+              src={concert.image}
+              alt={concert.artist}
+              fill
+              className={`object-cover transition-transform duration-700 ${
+                isPast ? "" : "group-hover:scale-105"
+              }`}
+              sizes={isPast ? "(max-width: 768px) 100vw, 25vw" : "(max-width: 768px) 100vw, 33vw"}
+              loading="lazy"
+              quality={65}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+          </>
+        )}
+        <span className="absolute top-4 left-4 text-xs font-medium uppercase tracking-wider text-white/90">
+          {concert.venue}
+        </span>
+        {status && (
+          <span
+            className={`absolute top-4 right-4 text-xs font-bold uppercase tracking-wider px-2 py-1 ${
+              status === "Evento pasado" || status === "Agotado"
+                ? "bg-white/20 text-white"
+                : "bg-white/90 text-black"
+            }`}
+          >
+            {status}
+          </span>
+        )}
+        <div className="absolute bottom-0 left-0 right-0 p-6">
+          <h3 className="text-xl md:text-2xl font-bold text-white mb-1">
+            {isMystery ? "Próximamente" : concert.artist}
+          </h3>
+          <p className="text-white/80 text-sm">{concert.date}</p>
+          {!isMystery && concert.minPrice > 0 && (
+            <p className="text-white font-semibold mt-1 text-sm">
+              Desde ${concert.minPrice.toLocaleString("es-MX")} MXN
+            </p>
+          )}
+        </div>
+      </div>
+      <div className="p-4">
+        <span
+          className={`somnus-btn inline-block w-full text-center text-sm py-3 ${
+            isPast || isMystery ? "opacity-60 cursor-default" : ""
+          }`}
+        >
+          {isPast ? "Evento pasado" : isMystery ? "Próximamente" : "Comprar boletos"}
+        </span>
+      </div>
+    </article>
+  );
+}
+
+function getEventStatus(concert: Concert & { eventDate?: string }): string | null {
+  if (concert.eventDate && new Date(concert.eventDate) < new Date()) {
+    return "Evento pasado";
+  }
   const totalAvailable = concert.sections?.reduce(
     (sum, s) => sum + (s.available || 0),
     0
@@ -146,6 +231,8 @@ function getEventStatus(concert: Concert): string | null {
 export default function HomePage() {
   const router = useRouter();
   const [concerts, setConcerts] = useState<Concert[]>([]);
+  const [activeConcerts, setActiveConcerts] = useState<Concert[]>([]);
+  const [pastConcerts, setPastConcerts] = useState<Concert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showLoader, setShowLoader] = useState(false);
 
@@ -198,18 +285,35 @@ export default function HomePage() {
     const loadEvents = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("/api/events?isActive=true");
+        // Traer todos: activo (para hero) + pasados (para sección eventos)
+        const response = await fetch("/api/events");
         const data = await response.json();
 
         if (data.success && data.data) {
-          const activeEvents = data.data.filter((event: any) => {
-            const hasTicketTypes =
-              event.ticketTypes && event.ticketTypes.length > 0;
-            return event.isActive && hasTicketTypes;
-          });
-
-          const convertedConcerts = activeEvents.map(convertEventToConcert);
-          setConcerts(convertedConcerts);
+          const now = new Date();
+          const withTickets = data.data.filter(
+            (e: any) => e.ticketTypes && e.ticketTypes.length > 0
+          );
+          // Activo = isActive y fecha futura (o hoy)
+          const activeEvents = withTickets.filter(
+            (e: any) =>
+              e.isActive &&
+              new Date(e.eventDate) >= new Date(now.getFullYear(), now.getMonth(), now.getDate())
+          );
+          // Pasados = ya pasó la fecha
+          const pastEvents = withTickets.filter(
+            (e: any) => new Date(e.eventDate) < new Date(now.getFullYear(), now.getMonth(), now.getDate())
+          );
+          // Ordenar: activo primero, luego pasados por fecha descendente
+          const activeConverted = activeEvents
+            .sort((a: any, b: any) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime())
+            .map(convertEventToConcert);
+          const pastConverted = pastEvents
+            .sort((a: any, b: any) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime())
+            .map(convertEventToConcert);
+          setConcerts(activeConverted.concat(pastConverted));
+          setActiveConcerts(activeConverted);
+          setPastConcerts(pastConverted);
         }
       } catch (error) {
         console.error("Error al cargar eventos:", error);
@@ -275,7 +379,7 @@ export default function HomePage() {
     );
   }
 
-  const nextEvent = concerts.length > 0 ? concerts[0] : null;
+  const nextEvent = activeConcerts.length > 0 ? activeConcerts[0] : null;
   const displayEvents = concerts.length > 0 ? concerts : GALLERY_EVENTS;
   const isGalleryMode = concerts.length === 0;
 
@@ -392,12 +496,22 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="#eventos"
-              className="somnus-btn px-10 py-4 text-base inline-flex items-center gap-2"
-            >
-              Ver eventos
-            </a>
+            {nextEvent ? (
+              <button
+                type="button"
+                onClick={() => handleSelectConcert(nextEvent)}
+                className="somnus-btn px-10 py-4 text-base inline-flex items-center gap-2"
+              >
+                Comprar boletos
+              </button>
+            ) : (
+              <a
+                href="#eventos"
+                className="somnus-btn px-10 py-4 text-base inline-flex items-center gap-2"
+              >
+                Ver eventos
+              </a>
+            )}
           </div>
 
           {/* Scroll indicator */}
@@ -443,117 +557,89 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* 3. FEATURED EVENTS - Grid premium */}
+      {/* 3. EVENTOS ACTUALES - Próximos eventos */}
       <RevealSection>
         <section id="eventos" className="py-28 sm:py-36 lg:py-44 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <h2 className="somnus-title-secondary text-center text-4xl md:text-5xl mb-6 uppercase tracking-wider">
-              Eventos
+              Eventos actuales
             </h2>
-            <p className="somnus-text-body text-center mb-20 max-w-2xl mx-auto text-lg">
-              Experiencias en vivo exclusivas
+            <p className="somnus-text-body text-center mb-16 max-w-2xl mx-auto text-lg">
+              Próximos eventos con venta de boletos
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12">
-              {displayEvents.map((item) => {
-                const concert = item as Concert;
-                const galleryEvent = item as (typeof GALLERY_EVENTS)[0];
-                const isConcert = "sections" in concert;
-                const isMystery =
-                  isConcert &&
-                  (concert.artist === "Artista por Confirmar" ||
-                    concert.artist.toLowerCase().includes("por confirmar"));
-                const status = isConcert ? getEventStatus(concert) : null;
-                const image = isConcert ? concert.image : galleryEvent.image;
-                const artist = isConcert ? concert.artist : galleryEvent.artist;
-                const date = isConcert ? concert.date : galleryEvent.date;
-                const venue = isConcert ? concert.venue : galleryEvent.venue;
-
-                return (
+            {activeConcerts.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+                {activeConcerts.map((concert) => (
+                  <EventCard
+                    key={concert.id}
+                    concert={concert}
+                    isPast={false}
+                    onSelect={() => handleSelectConcert(concert)}
+                  />
+                ))}
+              </div>
+            ) : !isGalleryMode ? (
+              <p className="text-center text-white/50 py-12">
+                No hay eventos próximos por el momento
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12">
+                {GALLERY_EVENTS.map((item) => (
                   <article
                     key={item.id}
-                    onClick={() => {
-                      if (isGalleryMode) {
-                        router.push(
-                          (item as (typeof GALLERY_EVENTS)[0]).galleryUrl
-                        );
-                      } else if (!isMystery) {
-                        handleSelectConcert(concert);
-                      }
-                    }}
-                    className={`group somnus-card overflow-hidden ${
-                      isMystery ? "cursor-default" : "cursor-pointer"
-                    }`}
+                    onClick={() => router.push(item.galleryUrl)}
+                    className="group somnus-card overflow-hidden cursor-pointer"
                   >
                     <div className="relative aspect-[3/4] overflow-hidden">
-                      {isMystery ? (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/70">
-                          <p className="text-5xl font-bold text-white/60">?</p>
-                        </div>
-                      ) : (
-                        <>
-                          <Image
-                            src={image}
-                            alt={artist}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                            sizes="(max-width: 768px) 100vw, 33vw"
-                            loading="lazy"
-                            quality={65}
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-                        </>
-                      )}
-
+                      <Image
+                        src={item.image}
+                        alt={item.artist}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-700"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
                       <span className="absolute top-6 left-6 text-xs font-medium uppercase tracking-wider text-white/90">
-                        {isMystery ? "—" : venue}
+                        {item.venue}
                       </span>
-
-                      {status && (
-                        <span
-                          className={`absolute top-6 right-6 text-xs font-bold uppercase tracking-wider px-2 py-1 ${
-                            status === "Agotado"
-                              ? "bg-white/20 text-white"
-                              : "bg-white/90 text-black"
-                          }`}
-                        >
-                          {status}
-                        </span>
-                      )}
-
                       <div className="absolute bottom-0 left-0 right-0 p-8">
                         <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                          {isMystery ? "Próximamente" : artist}
+                          {item.artist}
                         </h3>
-                        <p className="text-white/80 text-sm md:text-base">
-                          {isMystery ? "—" : date}
-                        </p>
-                        {isConcert && !isMystery && concert.minPrice > 0 && (
-                          <p className="text-white font-semibold mt-2">
-                            Desde ${concert.minPrice.toLocaleString("es-MX")} MXN
-                          </p>
-                        )}
+                        <p className="text-white/80 text-sm">{item.date}</p>
                       </div>
                     </div>
-
                     <div className="p-6">
-                      <span
-                        className={`somnus-btn inline-block w-full text-center text-sm py-4 ${
-                          isMystery ? "opacity-60 cursor-default" : ""
-                        }`}
-                      >
-                        {isGalleryMode ? "Ver galería" : isMystery ? "Próximamente" : "Ver boletos"}
+                      <span className="somnus-btn inline-block w-full text-center text-sm py-4">
+                        Ver galería
                       </span>
                     </div>
                   </article>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
 
-            {concerts.length === 0 && (
-              <p className="text-center text-white/50 mt-12 text-sm">
-                Próximamente nuevos eventos con venta de boletos
-              </p>
+            {/* 4. EVENTOS PASADOS */}
+            {pastConcerts.length > 0 && (
+              <div className="mt-24 pt-24 border-t border-white/10">
+                <h2 className="somnus-title-secondary text-center text-3xl md:text-4xl mb-4 uppercase tracking-wider">
+                  Eventos pasados
+                </h2>
+                <p className="somnus-text-body text-center mb-12 max-w-xl mx-auto text-white/60">
+                  Eventos que ya se realizaron
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {pastConcerts.map((concert) => (
+                    <EventCard
+                      key={concert.id}
+                      concert={concert}
+                      isPast
+                      onSelect={() => toast.info("Este evento ya pasó")}
+                    />
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </section>

@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
     const ticketDetails: Array<{
       ticketTypeId: string;
       quantity: number;
+      isTable: boolean;
       tableNumber?: string;
     }> = [];
 
@@ -77,6 +78,7 @@ export async function POST(request: NextRequest) {
         ticketDetails.push({
           ticketTypeId: ticketType.id,
           quantity: 1,
+          isTable: true,
           tableNumber: `Mesa ${item.table.number}`,
         });
       } else if (item.section && item.quantity) {
@@ -105,6 +107,7 @@ export async function POST(request: NextRequest) {
         ticketDetails.push({
           ticketTypeId: ticketType.id,
           quantity: item.quantity,
+          isTable: false,
         });
       }
     }
@@ -116,25 +119,52 @@ export async function POST(request: NextRequest) {
     const user = await getSession();
     const userId = user?.id || null;
 
+    const useClip = paymentMethod === "clip" && !!process.env.CLIP_AUTH_TOKEN;
+
+    if (paymentMethod === "clip" && !process.env.CLIP_AUTH_TOKEN) {
+      return NextResponse.json(
+        { error: "El pago con tarjeta no está disponible. Contacta al administrador." },
+        { status: 503 }
+      );
+    }
+
     // Crear la venta
     const sale = await prisma.sale.create({
       data: {
         eventId,
         userId,
         channel: "ONLINE",
-        status: paymentMethod === "simulado" ? "COMPLETED" : "PENDING",
+        status: useClip ? "PENDING" : paymentMethod === "simulado" ? "COMPLETED" : "PENDING",
         subtotal: subtotal,
         tax: tax,
         total: total,
         buyerName,
         buyerEmail,
         buyerPhone: buyerPhone || null,
-        paymentMethod: paymentMethod || "simulado",
-        paidAt: paymentMethod === "simulado" ? new Date() : null,
+        paymentMethod: useClip ? null : paymentMethod || "simulado",
+        paidAt: useClip ? null : paymentMethod === "simulado" ? new Date() : null,
       },
     });
 
-    // Crear los boletos
+    // Si es Clip: crear SaleItems y redirigir a pago
+    if (useClip) {
+      await prisma.saleItem.createMany({
+        data: ticketDetails.map((d) => ({
+          saleId: sale.id,
+          ticketTypeId: d.ticketTypeId,
+          quantity: d.quantity,
+          isTable: d.isTable ?? false,
+          tableNumber: d.tableNumber ?? null,
+        })),
+      });
+      return NextResponse.json({
+        success: true,
+        message: "Redirigiendo a pago",
+        data: { saleId: sale.id },
+      });
+    }
+
+    // Crear los boletos (flujo simulado o legacy)
     const tickets = [];
     for (const detail of ticketDetails) {
       const ticketType = await prisma.ticketType.findUnique({

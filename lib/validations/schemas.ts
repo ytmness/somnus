@@ -52,7 +52,9 @@ export const createEventSchema = z.object({
   ticketTypes: z.array(ticketTypeSchema).min(1, "Debe haber al menos un tipo de boleto"),
 });
 
-export const updateEventSchema = createEventSchema.partial();
+export const updateEventSchema = createEventSchema.partial().extend({
+  isActive: z.boolean().optional(),
+});
 
 export type CreateEventInput = z.infer<typeof createEventSchema>;
 export type UpdateEventInput = z.infer<typeof updateEventSchema>;

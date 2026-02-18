@@ -71,6 +71,12 @@ export async function POST(request: NextRequest) {
     const salesStartDate = new Date(eventData.salesStartDate);
     const salesEndDate = new Date(eventData.salesEndDate);
 
+    // Solo un evento activo a la vez: desactivar los demás
+    await prisma.event.updateMany({
+      where: { isActive: true },
+      data: { isActive: false },
+    });
+
     // Crear evento con tipos de boleto
     const event = await prisma.event.create({
       data: {

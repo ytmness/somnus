@@ -58,7 +58,23 @@ export async function PATCH(
 
     const body = await request.json();
 
-    // Validar datos
+    // Caso simple: solo toggle isActive
+    if (Object.keys(body).length === 1 && typeof body.isActive === "boolean") {
+      if (body.isActive) {
+        await prisma.event.updateMany({
+          where: { id: { not: params.id } },
+          data: { isActive: false },
+        });
+      }
+      const event = await prisma.event.update({
+        where: { id: params.id },
+        data: { isActive: body.isActive },
+        include: { ticketTypes: true },
+      });
+      return NextResponse.json({ success: true, data: event });
+    }
+
+    // Validar datos completos
     const result = updateEventSchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
@@ -68,6 +84,14 @@ export async function PATCH(
     }
 
     const { ticketTypes, ...eventData } = result.data;
+
+    // Si activamos este evento, desactivar los demás
+    if (eventData.isActive === true) {
+      await prisma.event.updateMany({
+        where: { id: { not: params.id } },
+        data: { isActive: false },
+      });
+    }
 
     // Convertir fechas si existen
     const updateData: any = { ...eventData };

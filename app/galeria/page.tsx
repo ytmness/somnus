@@ -4,26 +4,54 @@ import { useState, useCallback, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { SomnusHeader } from "@/components/SomnusHeader";
-import { gallerySections } from "@/lib/gallery-images";
+import { gallerySections as staticSections } from "@/lib/gallery-images";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+
+type GallerySection = { id: string; title: string; images: string[] };
 
 function GaleriaContent() {
   const searchParams = useSearchParams();
   const sectionParam = searchParams.get("section");
-  const [activeSection, setActiveSection] = useState("panorama");
+  const [sections, setSections] = useState<GallerySection[]>(staticSections);
+  const [activeSection, setActiveSection] = useState(staticSections[0]?.id ?? "panorama");
   const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    if (["panorama", "somnus-1", "somnus-2"].includes(sectionParam || "")) {
-      setActiveSection(sectionParam!);
+    const loadGallery = async () => {
+      try {
+        const res = await fetch("/api/gallery");
+        const data = await res.json();
+        if (data.success && data.data?.length > 0) {
+          setSections(
+            data.data.map((s: { id: string; title: string; images: string[] }) => ({
+              id: s.id,
+              title: s.title,
+              images: s.images || [],
+            }))
+          );
+          setActiveSection((prev) => {
+            const exists = data.data.some((s: { id: string }) => s.id === prev);
+            return exists ? prev : data.data[0]?.id ?? prev;
+          });
+        }
+      } catch {
+        // Usar staticSections por defecto
+      }
+    };
+    loadGallery();
+  }, []);
+
+  useEffect(() => {
+    if (sectionParam && sections.some((s) => s.id === sectionParam)) {
+      setActiveSection(sectionParam);
     }
-  }, [sectionParam]);
+  }, [sectionParam, sections]);
 
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [lightboxSection, setLightboxSection] = useState<string | null>(null);
 
   const currentImages =
-    gallerySections.find((s) => s.id === activeSection)?.images ?? [];
+    sections.find((s) => s.id === activeSection)?.images ?? [];
 
   const handleSectionChange = useCallback((sectionId: string) => {
     setActiveSection(sectionId);
@@ -36,7 +64,7 @@ function GaleriaContent() {
   }, []);
   const lightboxImages =
     lightboxSection != null
-      ? gallerySections.find((s) => s.id === lightboxSection)?.images ?? []
+      ? sections.find((s) => s.id === lightboxSection)?.images ?? []
       : [];
 
   const openLightbox = useCallback((sectionId: string, index: number) => {
@@ -52,14 +80,14 @@ function GaleriaContent() {
   const goPrev = useCallback(() => {
     if (lightboxIndex === null || lightboxSection === null) return;
     const imgs =
-      gallerySections.find((s) => s.id === lightboxSection)?.images ?? [];
+      sections.find((s) => s.id === lightboxSection)?.images ?? [];
     setLightboxIndex((lightboxIndex - 1 + imgs.length) % imgs.length);
   }, [lightboxIndex, lightboxSection]);
 
   const goNext = useCallback(() => {
     if (lightboxIndex === null || lightboxSection === null) return;
     const imgs =
-      gallerySections.find((s) => s.id === lightboxSection)?.images ?? [];
+      sections.find((s) => s.id === lightboxSection)?.images ?? [];
     setLightboxIndex((lightboxIndex + 1) % imgs.length);
   }, [lightboxIndex, lightboxSection]);
 
@@ -76,9 +104,7 @@ function GaleriaContent() {
 
   const currentSrc =
     lightboxIndex != null && lightboxSection != null
-      ? gallerySections
-          .find((s) => s.id === lightboxSection)
-          ?.images[lightboxIndex]
+      ? sections.find((s) => s.id === lightboxSection)?.images[lightboxIndex]
       : null;
 
   return (
@@ -90,12 +116,12 @@ function GaleriaContent() {
           Galería
         </h1>
         <p className="somnus-text-body text-center mb-16 max-w-xl mx-auto text-white/60">
-          Panorama · Somnus 1 · Somnus 2
+          {sections.map((s) => s.title).join(" · ") || "Galería"}
         </p>
 
-        {/* Selector de evento */}
-        <nav className="relative flex justify-center gap-8 sm:gap-12 mb-16 max-w-lg mx-auto" aria-label="Secciones">
-          {gallerySections.map((section) => (
+        {/* Selector de sección */}
+        <nav className="relative flex flex-wrap justify-center gap-6 sm:gap-8 mb-16 max-w-lg mx-auto" aria-label="Secciones">
+          {sections.map((section) => (
             <button
               key={section.id}
               onClick={() => handleSectionChange(section.id)}
@@ -128,7 +154,7 @@ function GaleriaContent() {
               )}
               <Image
                 src={src}
-                alt={`${gallerySections.find((s) => s.id === activeSection)?.title} - Foto ${index + 1}`}
+                alt={`${sections.find((s) => s.id === activeSection)?.title ?? "Foto"} - ${index + 1}`}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
                 className={`object-cover transition-opacity duration-500 ${
