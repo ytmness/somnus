@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { formatDate, formatCurrency } from "@/lib/utils";
+import { EditEventModal } from "./EditEventModal";
 
 interface Event {
   id: string;
@@ -19,12 +21,14 @@ interface Event {
     price: number;
     maxQuantity: number;
     soldQuantity: number;
+    isTable?: boolean;
   }[];
 }
 
 export function EventsTable() {
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
   useEffect(() => {
     loadEvents();
@@ -32,7 +36,7 @@ export function EventsTable() {
 
   const loadEvents = async () => {
     try {
-      const response = await fetch("/api/events");
+      const response = await fetch("/api/events", { credentials: "include" });
       const data = await response.json();
       
       if (data.success) {
@@ -53,6 +57,7 @@ export function EventsTable() {
     try {
       const response = await fetch(`/api/events/${eventId}`, {
         method: "DELETE",
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -73,6 +78,7 @@ export function EventsTable() {
       const response = await fetch(`/api/events/${eventId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ isActive: !currentStatus }),
       });
 
@@ -188,17 +194,26 @@ export function EventsTable() {
                 </td>
                 <td className="py-4 px-4">
                   <div className="flex items-center justify-end gap-2">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-white/70 hover:text-white"
+                    <Link
+                      href={
+                        event.ticketTypes.some((tt) => tt.isTable)
+                          ? `/eventos/${event.id}/mesas`
+                          : `/eventos/${event.id}/boletos`
+                      }
                     >
-                      <Eye className="w-4 h-4" />
-                    </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-white/70 hover:text-white"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    </Link>
                     <Button
                       size="sm"
                       variant="ghost"
                       className="text-regia-gold hover:text-regia-gold/80"
+                      onClick={() => setEditingEventId(event.id)}
                     >
                       <Pencil className="w-4 h-4" />
                     </Button>
@@ -217,6 +232,17 @@ export function EventsTable() {
           })}
         </tbody>
       </table>
+
+      {editingEventId && (
+        <EditEventModal
+          eventId={editingEventId}
+          onClose={() => setEditingEventId(null)}
+          onSuccess={() => {
+            setEditingEventId(null);
+            loadEvents();
+          }}
+        />
+      )}
     </div>
   );
 }
