@@ -203,7 +203,7 @@ export function ScannerFeedback({
                 <div className="flex justify-between">
                   <span className="text-sm font-medium text-gray-600">Escaneado:</span>
                   <span className="text-sm text-gray-900">
-                    {new Date(ticketInfo.scannedAt).toLocaleString("es-MX")}
+                    {new Date(ticketInfo.scannedAt).toLocaleString("en-US")}
                   </span>
                 </div>
               )}

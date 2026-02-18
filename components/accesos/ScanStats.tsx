@@ -110,7 +110,7 @@ export function ScanStats() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-medium text-gray-600">
-          Estadísticas de Hoy - {new Date(stats.date).toLocaleDateString("es-MX")}
+          Estadísticas de Hoy - {new Date(stats.date).toLocaleDateString("en-US")}
         </h2>
         <button
           onClick={refresh}

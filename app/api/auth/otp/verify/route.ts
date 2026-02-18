@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const result = otpVerifySchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
-        { error: "Datos inválidos", details: result.error.errors },
+        { error: "Invalid data", details: result.error.errors },
         { status: 400 }
       );
     }
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     if (authError || !authData.user) {
       console.error("[OTP VERIFY] Error:", authError);
       return NextResponse.json(
-        { error: authError?.message || "Código OTP inválido o expirado" },
+        { error: authError?.message || "Invalid or expired OTP code" },
         { status: 400 }
       );
     }
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 
     const jsonResponse = NextResponse.json({
       success: true,
-      message: "Código OTP verificado exitosamente",
+      message: "OTP code verified successfully",
       user: {
         id: user.id,
         email: user.email,
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error("[OTP VERIFY] Error general:", error);
     return NextResponse.json(
-      { error: "Error al verificar código OTP", details: error.message },
+      { error: "Error verifying OTP code", details: error.message },
       { status: 500 }
     );
   }

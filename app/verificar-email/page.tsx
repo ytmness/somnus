@@ -53,10 +53,10 @@ function VerificarEmailContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Error al verificar código OTP");
+        throw new Error(data.error || "Error verifying OTP code");
       }
 
-      toast.success("¡Código verificado exitosamente!");
+      toast.success("Code verified successfully!");
 
       const redirectPath = data.user?.role === "ADMIN" ? "/admin"
         : data.user?.role === "VENDEDOR" ? "/vendedor"
@@ -76,7 +76,7 @@ function VerificarEmailContent() {
 
   const handleResendCode = async () => {
     if (!formData.email) {
-      toast.error("Por favor ingresa tu email");
+      toast.error("Please enter your email");
       return;
     }
     setIsResending(true);
@@ -90,10 +90,10 @@ function VerificarEmailContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Error al reenviar código");
+        throw new Error(data.error || "Error resending code");
       }
 
-      toast.success("Código reenviado. Revisa tu email.");
+      toast.success("Code resent. Check your email.");
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -119,13 +119,13 @@ function VerificarEmailContent() {
             onClick={() => router.push("/")}
             className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
           >
-            Eventos
+            Events
           </button>
           <button
             onClick={() => router.push("/galeria")}
             className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
           >
-            Galería
+            Gallery
           </button>
           {userRole === "ADMIN" && (
             <Link
@@ -140,14 +140,14 @@ function VerificarEmailContent() {
               onClick={() => router.push("/accesos")}
               className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
             >
-              Accesos
+              Access
             </button>
           )}
           <button
             onClick={() => router.push("/mis-boletos")}
             className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
           >
-            Mis Boletos
+            My Tickets
           </button>
           <span className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1">
             {user?.name || user?.email || "Login"}
@@ -163,13 +163,13 @@ function VerificarEmailContent() {
             <div className="hidden lg:flex flex-col justify-center space-y-8">
               <div>
                 <h1 className="somnus-title-secondary text-4xl md:text-5xl mb-4 uppercase">
-                  Verifica tu
+                  Verify your
                 </h1>
                 <div className="mb-6">
                   <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="Somnus" width={280} height={84} className="w-48 md:w-56 h-auto object-contain" />
                 </div>
                 <p className="somnus-text-body text-lg mb-8">
-                  Ingresa el código de 8 dígitos que enviamos a tu correo para completar el acceso.
+                  Enter the 8-digit code we sent to your email to complete access.
                 </p>
               </div>
 
@@ -179,9 +179,9 @@ function VerificarEmailContent() {
                     <Mail className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Código de 8 Dígitos</h3>
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">8-Digit Code</h3>
                     <p className="somnus-text-body text-sm">
-                      Revisa tu bandeja de entrada y spam para encontrar el código
+                      Check your inbox and spam folder to find the code
                     </p>
                   </div>
                 </div>
@@ -191,9 +191,9 @@ function VerificarEmailContent() {
                     <Lock className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Seguridad</h3>
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Security</h3>
                     <p className="somnus-text-body text-sm">
-                      El código expira en 1 hora por tu seguridad
+                      The code expires in 1 hour for your security
                     </p>
                   </div>
                 </div>
@@ -203,9 +203,9 @@ function VerificarEmailContent() {
                     <CheckCircle className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Verificación Rápida</h3>
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Quick Verification</h3>
                     <p className="somnus-text-body text-sm">
-                      Una vez verificado, podrás acceder a todos los eventos
+                      Once verified, you can access all events
                     </p>
                   </div>
                 </div>
@@ -218,10 +218,10 @@ function VerificarEmailContent() {
                 <div className="somnus-card p-6 sm:p-8 lg:p-10">
                   <div className="lg:hidden text-center mb-8">
                     <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
-                      Verifica tu Email
+                      Verify your Email
                     </h1>
                     <p className="somnus-text-body text-sm">
-                      Ingresa el código de 8 dígitos que enviamos a tu email
+                      Enter the 8-digit code we sent to your email
                     </p>
                   </div>
 
@@ -230,10 +230,10 @@ function VerificarEmailContent() {
                       <Lock className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
-                      Verifica tu Email
+                      Verify your Email
                     </h1>
                     <p className="somnus-text-body">
-                      Ingresa el código de 8 dígitos que enviamos a tu email
+                      Enter the 8-digit code we sent to your email
                     </p>
                   </div>
 
@@ -260,7 +260,7 @@ function VerificarEmailContent() {
 
                     <div>
                       <label className="block somnus-title-secondary text-sm mb-2 uppercase">
-                        Código de Verificación
+                        Verification Code
                       </label>
                       <input
                         type="text"
@@ -278,7 +278,7 @@ function VerificarEmailContent() {
                         pattern="[0-9]{8}"
                       />
                       <p className="somnus-text-body text-sm mt-2 text-center">
-                        Ingresa el código de 8 dígitos
+                        Enter the 8-digit code
                       </p>
                     </div>
 
@@ -290,10 +290,10 @@ function VerificarEmailContent() {
                       {isLoading ? (
                         <span className="flex items-center gap-2 justify-center">
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Verificando...
+                          Verifying...
                         </span>
                       ) : (
-                        "Verificar Email"
+                        "Verify Email"
                       )}
                     </button>
                   </form>
@@ -307,15 +307,15 @@ function VerificarEmailContent() {
                       <RefreshCw
                         className={`w-4 h-4 ${isResending ? "animate-spin" : ""}`}
                       />
-                      {isResending ? "Reenviando..." : "Reenviar código"}
+                      {isResending ? "Resending..." : "Resend code"}
                     </button>
                   </div>
 
                   <div className="mt-6 pt-6 border-t border-white/10">
                     <p className="somnus-text-body text-center text-sm">
-                      ¿Volver al login?{" "}
+                      Back to login?{" "}
                       <Link href="/login" className="text-white hover:underline transition-colors font-medium">
-                        Iniciar sesión
+                        Sign in
                       </Link>
                     </p>
                   </div>
@@ -335,7 +335,7 @@ export default function VerificarEmailPage() {
       <div className="min-h-screen somnus-bg-main flex items-center justify-center p-4">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-white/50 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="somnus-text-body text-xl">Cargando...</p>
+          <p className="somnus-text-body text-xl">Loading...</p>
         </div>
       </div>
     }>

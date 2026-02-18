@@ -18,7 +18,7 @@ export const GALLERY_EVENTS: GalleryEvent[] = [
   {
     id: "panorama",
     artist: "Panorama Somnus Nights",
-    date: "Edición pasada",
+    date: "Past edition",
     venue: "Monterrey",
     image: `${PANORAMA_BASE}/CINEMA_pics/Secuencia01.00_00_20_54.Imagenfija005.jpg`,
     galleryUrl: "/galeria?section=panorama",
@@ -26,7 +26,7 @@ export const GALLERY_EVENTS: GalleryEvent[] = [
   {
     id: "somnus-1",
     artist: "Somnus 1",
-    date: "Edición pasada",
+    date: "Past edition",
     venue: "Monterrey",
     image: `${SOMNUS1_BASE}/ROM00002.jpg`,
     galleryUrl: "/galeria?section=somnus-1",
@@ -34,7 +34,7 @@ export const GALLERY_EVENTS: GalleryEvent[] = [
   {
     id: "somnus-2",
     artist: "Somnus 2",
-    date: "Edición pasada",
+    date: "Past edition",
     venue: "Monterrey",
     image: `${SOMNUS2_BASE}/ROM00002.jpg`,
     galleryUrl: "/galeria?section=somnus-2",

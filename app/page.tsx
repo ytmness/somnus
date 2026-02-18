@@ -8,6 +8,9 @@ import { Calendar, MapPin, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { Cart } from "@/components/eventos/Cart";
 import { CartItem, Concert } from "@/components/eventos/types";
+import { EventCardZamna } from "@/components/eventos/EventCardZamna";
+import { GalleryEventCardZamna } from "@/components/eventos/GalleryEventCardZamna";
+import { UpcomingEventsCarousel } from "@/components/eventos/UpcomingEventsCarousel";
 import { GALLERY_EVENTS } from "@/lib/gallery-events";
 import { RevealSection } from "@/components/RevealSection";
 
@@ -15,7 +18,7 @@ const HERO_VIDEO = "/assets/Adobe Express 2026-02-17 16.05.01.mp4";
 
 function convertEventToConcert(event: any): Concert & { eventDate?: string } {
   const eventDate = new Date(event.eventDate);
-  const formattedDate = eventDate.toLocaleDateString("es-MX", {
+  const formattedDate = eventDate.toLocaleDateString("en-US", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -134,97 +137,16 @@ function convertEventToConcert(event: any): Concert & { eventDate?: string } {
   };
 }
 
-function EventCard({
-  concert,
-  isPast,
-  onSelect,
-}: {
-  concert: Concert & { eventDate?: string };
-  isPast: boolean;
-  onSelect: () => void;
-}) {
-  const status = getEventStatus(concert);
-  const isMystery =
-    concert.artist === "Artista por Confirmar" ||
-    concert.artist.toLowerCase().includes("por confirmar");
-
-  return (
-    <article
-      onClick={() => { if (!isMystery) onSelect(); }}
-      className={`group somnus-card overflow-hidden ${
-        isPast || isMystery ? "cursor-default opacity-90" : "cursor-pointer"
-      }`}
-    >
-      <div className="relative aspect-[3/4] overflow-hidden">
-        {isMystery ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/70">
-            <p className="text-5xl font-bold text-white/60">?</p>
-          </div>
-        ) : (
-          <>
-            <Image
-              src={concert.image}
-              alt={concert.artist}
-              fill
-              className={`object-cover transition-transform duration-700 ${
-                isPast ? "" : "group-hover:scale-105"
-              }`}
-              sizes={isPast ? "(max-width: 768px) 100vw, 25vw" : "(max-width: 768px) 100vw, 33vw"}
-              loading="lazy"
-              quality={65}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-          </>
-        )}
-        <span className="absolute top-4 left-4 text-xs font-medium uppercase tracking-wider text-white/90">
-          {concert.venue}
-        </span>
-        {status && (
-          <span
-            className={`absolute top-4 right-4 text-xs font-bold uppercase tracking-wider px-2 py-1 ${
-              status === "Evento pasado" || status === "Agotado"
-                ? "bg-white/20 text-white"
-                : "bg-white/90 text-black"
-            }`}
-          >
-            {status}
-          </span>
-        )}
-        <div className="absolute bottom-0 left-0 right-0 p-6">
-          <h3 className="text-xl md:text-2xl font-bold text-white mb-1">
-            {isMystery ? "Próximamente" : concert.artist}
-          </h3>
-          <p className="text-white/80 text-sm">{concert.date}</p>
-          {!isMystery && concert.minPrice > 0 && (
-            <p className="text-white font-semibold mt-1 text-sm">
-              Desde ${concert.minPrice.toLocaleString("es-MX")} MXN
-            </p>
-          )}
-        </div>
-      </div>
-      <div className="p-4">
-        <span
-          className={`somnus-btn inline-block w-full text-center text-sm py-3 ${
-            isPast || isMystery ? "opacity-60 cursor-default" : ""
-          }`}
-        >
-          {isPast ? "Evento pasado" : isMystery ? "Próximamente" : "Comprar boletos"}
-        </span>
-      </div>
-    </article>
-  );
-}
-
 function getEventStatus(concert: Concert & { eventDate?: string }): string | null {
   if (concert.eventDate && new Date(concert.eventDate) < new Date()) {
-    return "Evento pasado";
+    return "Past event";
   }
   const totalAvailable = concert.sections?.reduce(
     (sum, s) => sum + (s.available || 0),
     0
   );
-  if (!totalAvailable) return "Agotado";
-  if (totalAvailable <= 20) return "Últimos boletos";
+  if (!totalAvailable) return "Sold out";
+  if (totalAvailable <= 20) return "Last tickets";
   return null;
 }
 
@@ -344,11 +266,11 @@ export default function HomePage() {
           router.push(`/eventos/${concert.id}/boletos`);
         }
       } else {
-        toast.error("Error al cargar información del evento");
+        toast.error("Error loading event information");
       }
     } catch (error) {
-      console.error("Error al verificar evento:", error);
-      toast.error("Error al verificar el evento");
+      console.error("Error verifying event:", error);
+      toast.error("Error verifying the event");
     }
   };
 
@@ -362,7 +284,7 @@ export default function HomePage() {
       0
     );
     alert(
-      "Funcionalidad de pago próximamente. Total: $" +
+      "Payment functionality coming soon. Total: $" +
         total.toLocaleString() +
         " MXN"
     );
@@ -373,7 +295,7 @@ export default function HomePage() {
       <div className="min-h-screen somnus-bg-main flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white/70 text-xl">Cargando eventos...</p>
+          <p className="text-white/70 text-xl">Loading events...</p>
         </div>
       </div>
     );
@@ -432,7 +354,7 @@ export default function HomePage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex flex-wrap items-center gap-4 sm:gap-8 text-white">
                 <span className="text-sm uppercase tracking-wider text-white/80">
-                  Próximo evento
+                  Next event
                 </span>
                 <span className="font-bold text-lg">{nextEvent.artist}</span>
                 <span className="flex items-center gap-1.5 text-white/80 text-sm">
@@ -448,7 +370,7 @@ export default function HomePage() {
                 onClick={() => handleSelectConcert(nextEvent)}
                 className="somnus-btn shrink-0 px-6 py-3 text-sm"
               >
-                Comprar tickets
+                Buy tickets
               </button>
             </div>
           </div>
@@ -470,13 +392,13 @@ export default function HomePage() {
               href="#eventos"
               className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
             >
-              Eventos
+              Events
             </a>
             <Link
               href="/galeria"
               className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
             >
-              Galería
+              Gallery
             </Link>
             {userRole === "ADMIN" && (
               <Link
@@ -491,14 +413,14 @@ export default function HomePage() {
                 href="/accesos"
                 className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
               >
-                Accesos
+                Access
               </Link>
             )}
             <Link
               href="/mis-boletos"
               className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
             >
-              Mis Boletos
+              My Tickets
             </Link>
             {user ? (
               <button
@@ -537,7 +459,7 @@ export default function HomePage() {
               href="#eventos"
               className="somnus-btn px-10 py-4 text-base inline-flex items-center gap-2"
             >
-              Ver eventos
+              View events
             </a>
           </div>
 
@@ -556,88 +478,67 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. EVENTOS ACTUALES - Próximos eventos */}
+      {/* 2. UPCOMING EVENTS - Carrusel centrado estilo Bresh, cards Zamna */}
       <RevealSection>
-        <section id="eventos" className="py-28 sm:py-36 lg:py-44 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="somnus-title-secondary text-center text-4xl md:text-5xl mb-6 uppercase tracking-wider">
-              Eventos actuales
+        <section
+          id="eventos"
+          className="py-28 sm:py-36 lg:py-44 px-4 sm:px-6 lg:px-8 somnus-events-bg relative"
+        >
+          <div className="max-w-7xl mx-auto relative z-10">
+            <h2 className="somnus-title-secondary text-center text-4xl md:text-5xl lg:text-6xl mb-4 uppercase tracking-wider font-bold">
+              Upcoming Events
             </h2>
             <p className="somnus-text-body text-center mb-16 max-w-2xl mx-auto text-lg">
-              Próximos eventos con venta de boletos
+              Get in the dream with us.
             </p>
 
             {activeConcerts.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-                {activeConcerts.map((concert) => (
-                  <EventCard
+              <UpcomingEventsCarousel>
+                {activeConcerts.map((concert, index) => (
+                  <EventCardZamna
                     key={concert.id}
                     concert={concert}
                     isPast={false}
+                    isFeatured={index === 0}
                     onSelect={() => handleSelectConcert(concert)}
                   />
                 ))}
-              </div>
+              </UpcomingEventsCarousel>
             ) : !isGalleryMode ? (
               <p className="text-center text-white/50 py-12">
-                No hay eventos próximos por el momento
+                No upcoming events at the moment
               </p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12">
+              <UpcomingEventsCarousel>
                 {GALLERY_EVENTS.map((item) => (
-                  <article
+                  <GalleryEventCardZamna
                     key={item.id}
-                    onClick={() => router.push(item.galleryUrl)}
-                    className="group somnus-card overflow-hidden cursor-pointer"
-                  >
-                    <div className="relative aspect-[3/4] overflow-hidden">
-                      <Image
-                        src={item.image}
-                        alt={item.artist}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-                      <span className="absolute top-6 left-6 text-xs font-medium uppercase tracking-wider text-white/90">
-                        {item.venue}
-                      </span>
-                      <div className="absolute bottom-0 left-0 right-0 p-8">
-                        <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                          {item.artist}
-                        </h3>
-                        <p className="text-white/80 text-sm">{item.date}</p>
-                      </div>
-                    </div>
-                    <div className="p-6">
-                      <span className="somnus-btn inline-block w-full text-center text-sm py-4">
-                        Ver galería
-                      </span>
-                    </div>
-                  </article>
+                    event={item}
+                    onSelect={() => router.push(item.galleryUrl)}
+                  />
                 ))}
-              </div>
+              </UpcomingEventsCarousel>
             )}
 
-            {/* 4. EVENTOS PASADOS */}
+            {/* EVENTOS PASADOS */}
             {pastConcerts.length > 0 && (
               <div className="mt-24 pt-24 border-t border-white/10">
                 <h2 className="somnus-title-secondary text-center text-3xl md:text-4xl mb-4 uppercase tracking-wider">
-                  Eventos pasados
+                  Past events
                 </h2>
                 <p className="somnus-text-body text-center mb-12 max-w-xl mx-auto text-white/60">
-                  Eventos que ya se realizaron
+                  Events that have already taken place
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <UpcomingEventsCarousel>
                   {pastConcerts.map((concert) => (
-                    <EventCard
+                    <EventCardZamna
                       key={concert.id}
                       concert={concert}
                       isPast
-                      onSelect={() => toast.info("Este evento ya pasó")}
+                      onSelect={() => toast.info("This event has already passed")}
                     />
                   ))}
-                </div>
+                </UpcomingEventsCarousel>
               </div>
             )}
           </div>

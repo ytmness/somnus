@@ -21,7 +21,7 @@ export function Cart({ items, onClose, onRemoveItem, onCheckout }: CartProps) {
         <div className="sticky top-0 bg-white border-b border-[#5B8DEF]/20 p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <ShoppingBag className="w-6 h-6 text-[#5B8DEF]" />
-            <h2 className="text-[#49484e]">Tu Carrito</h2>
+            <h2 className="text-[#49484e]">Your Cart</h2>
           </div>
           <button
             onClick={onClose}
@@ -35,8 +35,8 @@ export function Cart({ items, onClose, onRemoveItem, onCheckout }: CartProps) {
           {items.length === 0 ? (
             <div className="text-center py-12">
               <ShoppingBag className="w-16 h-16 text-[#49484e]/20 mx-auto mb-4" />
-              <p className="text-[#49484e]/60">Tu carrito está vacío</p>
-              <p className="text-[#49484e]/40 mt-2">Agrega boletos para comenzar</p>
+              <p className="text-[#49484e]/60">Your cart is empty</p>
+              <p className="text-[#49484e]/40 mt-2">Add tickets to get started</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -61,7 +61,7 @@ export function Cart({ items, onClose, onRemoveItem, onCheckout }: CartProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-[#49484e]/70">{item.section}</p>
-                      <p className="text-[#49484e]/50">Cantidad: {item.quantity}</p>
+                      <p className="text-[#49484e]/50">Quantity: {item.quantity}</p>
                     </div>
                     <p className="text-[#5B8DEF]">
                       ${(item.price * item.quantity).toLocaleString()} MXN
@@ -77,11 +77,11 @@ export function Cart({ items, onClose, onRemoveItem, onCheckout }: CartProps) {
           <div className="sticky bottom-0 bg-white border-t border-[#5B8DEF]/20 p-6">
             <div className="space-y-3 mb-4">
               <div className="flex items-center justify-between text-[#49484e]/60">
-                <span>Subtotal ({totalItems} boletos)</span>
+                <span>Subtotal ({totalItems} tickets)</span>
                 <span>${subtotal.toLocaleString()} MXN</span>
               </div>
               <div className="flex items-center justify-between text-[#49484e]/70">
-                <span>Cargo por servicio (3.9% + IVA)</span>
+                <span>Service charge (3.9% + VAT)</span>
                 <span>${totalCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN</span>
               </div>
               <div className="border-t border-[#5B8DEF]/20 pt-3 flex items-center justify-between">
@@ -95,7 +95,7 @@ export function Cart({ items, onClose, onRemoveItem, onCheckout }: CartProps) {
               onClick={onCheckout}
               className="w-full py-3 rounded-lg bg-[#5B8DEF] text-[#f9fbf6] hover:bg-[#7BA3E8] transition-colors"
             >
-              Proceder al Pago
+              Proceed to Payment
             </button>
           </div>
         )}

@@ -198,7 +198,7 @@ export default function EventBoletosPage() {
   if (!event) return null;
 
   const eventDate = event.eventDate
-    ? new Date(event.eventDate).toLocaleDateString("es-MX", {
+    ? new Date(event.eventDate).toLocaleDateString("en-US", {
         day: "numeric",
         month: "long",
         year: "numeric",
@@ -313,7 +313,7 @@ export default function EventBoletosPage() {
                         </p>
                       )}
                       <p className="text-white/80 mt-2 font-medium">
-                        ${Number(tt.price).toLocaleString("es-MX")} MXN
+                        ${Number(tt.price).toLocaleString("en-US")} MXN
                       </p>
                       <p className="text-white/50 text-xs mt-1">
                         {available} disponibles

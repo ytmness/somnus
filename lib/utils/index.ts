@@ -12,7 +12,7 @@ export function cn(...inputs: ClassValue[]) {
  * Formatea un número como moneda MXN
  */
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("es-MX", {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "MXN",
   }).format(amount);
@@ -23,7 +23,7 @@ export function formatCurrency(amount: number): string {
  */
 export function formatDate(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
-  return new Intl.DateTimeFormat("es-MX", {
+  return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -35,7 +35,7 @@ export function formatDate(date: Date | string): string {
  */
 export function formatDateTime(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
-  return new Intl.DateTimeFormat("es-MX", {
+  return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",

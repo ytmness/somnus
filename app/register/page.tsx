@@ -55,11 +55,11 @@ export default function RegisterPage() {
 
       if (!response.ok) {
         console.error("[REGISTER] Error del servidor:", data);
-        const errorMessage = data.error || data.details || "Error al registrar";
+        const errorMessage = data.error || data.details || "Registration error";
         throw new Error(errorMessage);
       }
 
-      toast.success("¡Código de verificación enviado! Revisa tu email");
+      toast.success("Verification code sent! Check your email");
       
       // Redirigir a la página de verificación
       router.push(`/verificar-email?email=${encodeURIComponent(formData.email)}`);
@@ -84,13 +84,13 @@ export default function RegisterPage() {
             <div className="hidden lg:flex flex-col justify-center space-y-8">
               <div>
                 <h1 className="somnus-title-secondary text-4xl md:text-5xl mb-4 uppercase">
-                  Únete a
+                  Join
                 </h1>
                 <div className="mb-6">
                   <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={448} height={134} className="w-[22.4rem] md:w-[28rem] h-auto object-contain" priority />
                 </div>
                 <p className="somnus-text-body text-lg mb-8">
-                  Crea tu cuenta y accede a eventos exclusivos, gestiona tus boletos y disfruta de experiencias únicas.
+                  Create your account and access exclusive events, manage your tickets and enjoy unique experiences.
                 </p>
               </div>
 
@@ -100,9 +100,9 @@ export default function RegisterPage() {
                     <CheckCircle className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Registro Rápido</h3>
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Quick Registration</h3>
                     <p className="somnus-text-body text-sm">
-                      Solo necesitas tu nombre y email para comenzar
+                      You only need your name and email to get started
                     </p>
                   </div>
                 </div>
@@ -112,9 +112,9 @@ export default function RegisterPage() {
                     <Ticket className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Acceso a Eventos</h3>
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Event Access</h3>
                     <p className="somnus-text-body text-sm">
-                      Reserva boletos para los mejores eventos en vivo
+                      Reserve tickets for the best live events
                     </p>
                   </div>
                 </div>
@@ -124,9 +124,9 @@ export default function RegisterPage() {
                     <Shield className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Cuenta Segura</h3>
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Secure Account</h3>
                     <p className="somnus-text-body text-sm">
-                      Verificación por email para proteger tu cuenta
+                      Email verification to protect your account
                     </p>
                   </div>
                 </div>
@@ -140,10 +140,10 @@ export default function RegisterPage() {
                   {/* Título móvil */}
                   <div className="lg:hidden text-center mb-8">
                     <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
-                      Crear Cuenta
+                      Create Account
                     </h1>
                     <p className="somnus-text-body text-sm">
-                      Ingresa tus datos y recibe un código de verificación
+                      Enter your details and receive a verification code
                     </p>
                   </div>
 
@@ -153,10 +153,10 @@ export default function RegisterPage() {
                       <User className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
-                      Crear Cuenta
+                      Create Account
                     </h1>
                     <p className="somnus-text-body">
-                      Ingresa tus datos y recibe un código de verificación
+                      Enter your details and receive a verification code
                     </p>
                   </div>
 
@@ -164,7 +164,7 @@ export default function RegisterPage() {
                     {/* Nombre */}
                     <div>
                       <label className="block somnus-title-secondary text-sm mb-2 uppercase">
-                        Nombre completo
+                        Full name
                       </label>
                       <div className="relative">
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
@@ -175,7 +175,7 @@ export default function RegisterPage() {
                             setFormData({ ...formData, name: e.target.value })
                           }
                           className="w-full pl-10 pr-4 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all backdrop-blur-sm"
-                          placeholder="Juan Pérez"
+                          placeholder="John Doe"
                           required
                         />
                       </div>
@@ -195,7 +195,7 @@ export default function RegisterPage() {
                             setFormData({ ...formData, email: e.target.value })
                           }
                           className="w-full pl-10 pr-4 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all backdrop-blur-sm"
-                          placeholder="tu@email.com"
+                          placeholder="you@email.com"
                           required
                         />
                       </div>
@@ -210,10 +210,10 @@ export default function RegisterPage() {
                       {isLoading ? (
                         <span className="flex items-center gap-2 justify-center">
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Registrando...
+                          Registering...
                         </span>
                       ) : (
-                        "Crear Cuenta"
+                        "Create Account"
                       )}
                     </button>
                   </form>
@@ -221,12 +221,12 @@ export default function RegisterPage() {
                   {/* Link a Login */}
                   <div className="mt-6 pt-6 border-t border-white/10">
                     <p className="somnus-text-body text-center text-sm">
-                      ¿Ya tienes cuenta?{" "}
+                      Already have an account?{" "}
                       <Link
                         href="/login"
                         className="text-white hover:underline transition-colors font-medium"
                       >
-                        Inicia sesión
+                        Sign in
                       </Link>
                     </p>
                   </div>

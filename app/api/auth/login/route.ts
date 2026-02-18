@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     const result = loginSchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
-        { error: "Email inválido", details: result.error.errors },
+        { error: "Invalid email", details: result.error.errors },
         { status: 400 }
       );
     }
@@ -35,19 +35,19 @@ export async function POST(request: NextRequest) {
         error.code === "rate_limit_exceeded" ||
         error.status === 429;
       const msg = isRateLimit
-        ? "Demasiados intentos. Espera 1 minuto y vuelve a intentar."
-        : error.message || "Error al enviar código de verificación";
+        ? "Too many attempts. Please wait 1 minute and try again."
+        : error.message || "Error sending verification code";
       return NextResponse.json({ error: msg }, { status: isRateLimit ? 429 : 400 });
     }
 
     return NextResponse.json({
       success: true,
-      message: "Código de verificación enviado a tu email",
+      message: "Verification code sent to your email",
     });
   } catch (error: any) {
     console.error("[LOGIN] Error general:", error);
     return NextResponse.json(
-      { error: "Error al enviar código de verificación" },
+      { error: "Error sending verification code" },
       { status: 500 }
     );
   }

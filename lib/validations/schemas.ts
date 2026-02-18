@@ -5,18 +5,18 @@ import { z } from "zod";
 // =====================================================
 
 export const loginSchema = z.object({
-  email: z.string().email("Email inválido"),
+  email: z.string().email("Invalid email"),
 });
 
 export const registerSchema = z.object({
-  email: z.string().email("Email inválido"),
-  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+  email: z.string().email("Invalid email"),
+  name: z.string().min(2, "Name must be at least 2 characters"),
   role: z.enum(["ADMIN", "VENDEDOR", "SUPERVISOR", "ACCESOS", "CLIENTE"]).optional(),
 });
 
 export const otpVerifySchema = z.object({
-  email: z.string().email("Email inválido"),
-  token: z.string().length(8, "El código debe tener 8 dígitos"),
+  email: z.string().email("Invalid email"),
+  token: z.string().length(8, "Code must be 8 digits"),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
@@ -27,34 +27,34 @@ export type RegisterInput = z.infer<typeof registerSchema>;
 // =====================================================
 
 export const ticketTypeSchema = z.object({
-  name: z.string().min(1, "El nombre es requerido"),
+  name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
   category: z.enum(["GENERAL", "PREFERENTE", "VIP"]),
-  price: z.number().positive("El precio debe ser mayor a 0"),
-  maxQuantity: z.number().int().positive("La cantidad debe ser mayor a 0"),
+  price: z.number().positive("Price must be greater than 0"),
+  maxQuantity: z.number().int().positive("Quantity must be greater than 0"),
   isTable: z.boolean().optional().default(false),
   seatsPerTable: z.number().int().positive().optional(),
 });
 
 export const createEventSchema = z.object({
-  name: z.string().min(1, "El nombre del evento es requerido"),
+  name: z.string().min(1, "Event name is required"),
   description: z.string().optional(),
-  artist: z.string().min(1, "El artista es requerido"),
+  artist: z.string().min(1, "Artist is required"),
   tour: z.string().optional(),
-  venue: z.string().min(1, "El venue es requerido"),
+  venue: z.string().min(1, "Venue is required"),
   address: z.string().optional(),
   eventDate: z.string().or(z.date()),
-  eventTime: z.string().min(1, "La hora es requerida"),
-  imageUrl: z.string().url("URL de imagen inválida").optional(),
-  maxCapacity: z.number().int().positive("La capacidad debe ser mayor a 0"),
+  eventTime: z.string().min(1, "Time is required"),
+  imageUrl: z.string().url("Invalid image URL").optional(),
+  maxCapacity: z.number().int().positive("Capacity must be greater than 0"),
   salesStartDate: z.string().or(z.date()),
   salesEndDate: z.string().or(z.date()),
-  ticketTypes: z.array(ticketTypeSchema).min(1, "Debe haber al menos un tipo de boleto"),
+  ticketTypes: z.array(ticketTypeSchema).min(1, "At least one ticket type is required"),
 });
 
 export const updateTicketTypeSchema = ticketTypeSchema
   .partial()
-  .extend({ id: z.string().uuid("ID de tipo de boleto inválido") });
+  .extend({ id: z.string().uuid("Invalid ticket type ID") });
 
 export const updateEventSchema = createEventSchema.partial().extend({
   isActive: z.boolean().optional(),

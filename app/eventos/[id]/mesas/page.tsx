@@ -353,7 +353,7 @@ export default function EventMesasPage() {
 
   // Formatear fecha del evento
   const eventDate = event.eventDate ? new Date(event.eventDate) : new Date();
-  const formattedDate = eventDate.toLocaleDateString("es-MX", {
+  const formattedDate = eventDate.toLocaleDateString("en-US", {
     day: "numeric",
     month: "long",
     year: "numeric",

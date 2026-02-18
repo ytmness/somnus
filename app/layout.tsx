@@ -36,13 +36,13 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Boletera Somnus",
-  description: "Sistema de venta de boletos para eventos de Somnus",
-  keywords: ["boletos", "eventos", "conciertos", "Somnus"],
+  title: "Somnus Ticket Platform",
+  description: "Ticket sales platform for Somnus events",
+  keywords: ["tickets", "events", "concerts", "Somnus"],
   authors: [{ name: "Somnus" }],
   openGraph: {
-    title: "Boletera Somnus",
-    description: "Sistema de venta de boletos para eventos de Somnus",
+    title: "Somnus Ticket Platform",
+    description: "Ticket sales platform for Somnus events",
     type: "website",
   },
 };
@@ -53,7 +53,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${archivo.variable} ${anton.variable} ${cinzel.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${archivo.variable} ${anton.variable} ${cinzel.variable}`} suppressHydrationWarning>
       <body className={`${archivo.className} antialiased`}>
         <Providers>
           {children}

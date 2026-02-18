@@ -88,7 +88,7 @@ export default function AdminPage() {
   };
 
   const formatNumber = (n: number) =>
-    new Intl.NumberFormat("es-MX").format(n);
+    new Intl.NumberFormat("en-US").format(n);
 
   if (isLoading) {
     return (

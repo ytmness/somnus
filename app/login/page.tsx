@@ -59,14 +59,14 @@ export default function LoginPage() {
       if (!response.ok) {
         if (response.status === 429) {
           setRateLimitCooldown(60);
-          toast.error("Demasiados intentos. Espera 1 minuto.", { duration: 6000 });
+          toast.error("Too many attempts. Please wait 1 minute.", { duration: 6000 });
         } else {
-          throw new Error(data.error || "Error al enviar código de verificación");
+          throw new Error(data.error || "Error sending verification code");
         }
         return;
       }
 
-      toast.success("¡Código de verificación enviado! Revisa tu email");
+      toast.success("Verification code sent! Check your email");
       router.push(`/verificar-email?email=${encodeURIComponent(email)}`);
       router.refresh();
     } catch (error: any) {
@@ -94,13 +94,13 @@ export default function LoginPage() {
             onClick={() => router.push("/")}
             className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
           >
-            Eventos
+            Events
           </button>
           <button
             onClick={() => router.push("/galeria")}
             className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
           >
-            Galería
+            Gallery
           </button>
           {userRole === "ADMIN" && (
             <Link
@@ -115,14 +115,14 @@ export default function LoginPage() {
               onClick={() => router.push("/accesos")}
               className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
             >
-              Accesos
+              Access
             </button>
           )}
           <button
             onClick={() => router.push("/mis-boletos")}
             className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
           >
-            Mis Boletos
+            My Tickets
           </button>
           <span className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1">
             {user?.name || user?.email || "Login"}
@@ -138,13 +138,13 @@ export default function LoginPage() {
             <div className="hidden lg:flex flex-col justify-center space-y-8">
               <div>
                 <h1 className="somnus-title-secondary text-4xl md:text-5xl mb-4 uppercase">
-                  Bienvenido a
+                  Welcome to
                 </h1>
                 <div className="mb-6">
                   <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="SOMNUS" width={280} height={84} className="w-48 md:w-56 h-auto object-contain" priority />
                 </div>
                 <p className="somnus-text-body text-lg mb-8">
-                  Accede a tu cuenta para gestionar tus boletos, ver tus eventos favoritos y disfrutar de experiencias exclusivas.
+                  Access your account to manage your tickets, view your favorite events and enjoy exclusive experiences.
                 </p>
               </div>
 
@@ -154,9 +154,9 @@ export default function LoginPage() {
                     <Ticket className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Gestiona tus Boletos</h3>
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Manage Your Tickets</h3>
                     <p className="somnus-text-body text-sm">
-                      Accede a todos tus boletos comprados y descárgalos cuando quieras
+                      Access all your purchased tickets and download them whenever you want
                     </p>
                   </div>
                 </div>
@@ -166,9 +166,9 @@ export default function LoginPage() {
                     <Calendar className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Eventos Exclusivos</h3>
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Exclusive Events</h3>
                     <p className="somnus-text-body text-sm">
-                      Descubre y reserva boletos para los mejores eventos en vivo
+                      Discover and reserve tickets for the best live events
                     </p>
                   </div>
                 </div>
@@ -178,9 +178,9 @@ export default function LoginPage() {
                     <Shield className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Seguridad Garantizada</h3>
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Guaranteed Security</h3>
                     <p className="somnus-text-body text-sm">
-                      Tus datos están protegidos con los más altos estándares de seguridad
+                      Your data is protected with the highest security standards
                     </p>
                   </div>
                 </div>
@@ -194,10 +194,10 @@ export default function LoginPage() {
                   {/* Título móvil */}
                   <div className="lg:hidden text-center mb-8">
                     <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
-                      Iniciar Sesión
+                      Sign In
                     </h1>
                     <p className="somnus-text-body text-sm">
-                      Ingresa tu email y recibe un código de 8 dígitos
+                      Enter your email and receive an 8-digit code
                     </p>
                   </div>
 
@@ -207,10 +207,10 @@ export default function LoginPage() {
                       <Lock className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
-                      Iniciar Sesión
+                      Sign In
                     </h1>
                     <p className="somnus-text-body">
-                      Ingresa tu email y recibe un código de 8 dígitos
+                      Enter your email and receive an 8-digit code
                     </p>
                   </div>
 
@@ -238,7 +238,7 @@ export default function LoginPage() {
 
                     {rateLimitCooldown > 0 && (
                       <p className="text-amber-400/90 text-sm text-center">
-                        Espera {rateLimitCooldown} segundos antes de intentar de nuevo
+                        Wait {rateLimitCooldown} seconds before trying again
                       </p>
                     )}
                     <button
@@ -249,21 +249,21 @@ export default function LoginPage() {
                       {isLoading ? (
                         <span className="flex items-center gap-2 justify-center">
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Enviando código...
+                          Sending code...
                         </span>
                       ) : rateLimitCooldown > 0 ? (
-                        `Reintentar en ${rateLimitCooldown}s`
+                        `Retry in ${rateLimitCooldown}s`
                       ) : (
-                        "Enviar Código de Verificación"
+                        "Send Verification Code"
                       )}
                     </button>
                   </form>
 
                   <div className="mt-6 pt-6 border-t border-white/10">
                     <p className="somnus-text-body text-center text-sm">
-                      ¿No tienes cuenta?{" "}
+                      Don&apos;t have an account?{" "}
                       <Link href="/register" className="text-white hover:underline transition-colors font-medium">
-                        Regístrate aquí
+                        Sign up here
                       </Link>
                     </p>
                   </div>

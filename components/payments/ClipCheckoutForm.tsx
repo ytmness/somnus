@@ -45,7 +45,7 @@ export function ClipCheckoutForm({
 
   useEffect(() => {
     if (!apiKey) {
-      toast.error("Clip no está configurado. Contacta al administrador.");
+      toast.error("Clip is not configured. Contact the administrator.");
       setIsLoading(false);
       return;
     }
@@ -72,7 +72,7 @@ export function ClipCheckoutForm({
         const container = await waitForContainer();
         if (!mountedRef.current) return;
         if (!container) {
-          toast.error("Error al cargar el formulario. Recarga la página.");
+          toast.error("Error loading form. Please reload the page.");
           return;
         }
         const clip = new window.ClipSDK(apiKey);
@@ -88,13 +88,13 @@ export function ClipCheckoutForm({
         setSdkReady(true);
       } catch (err: any) {
         console.error("Clip SDK init:", err);
-        toast.error("Error al cargar el formulario de pago");
+        toast.error("Error loading payment form");
       } finally {
         setIsLoading(false);
       }
     };
     script.onerror = () => {
-      toast.error("No se pudo cargar el SDK de Clip");
+      toast.error("Could not load Clip SDK");
       setIsLoading(false);
     };
     document.body.appendChild(script);
@@ -119,7 +119,7 @@ export function ClipCheckoutForm({
       // Clip SDK puede devolver { id } o { token } según versión
       const token = tokenResult?.id ?? (tokenResult as { token?: string })?.token;
       if (!token || typeof token !== "string") {
-        throw new Error("No se obtuvo el token de la tarjeta. Intenta de nuevo.");
+        throw new Error("Could not get card token. Try again.");
       }
 
       const res = await fetch("/api/payments/clip/create-charge", {
@@ -141,7 +141,7 @@ export function ClipCheckoutForm({
         throw new Error(data.error || "Error al procesar el pago");
       }
 
-      toast.success("¡Pago exitoso! Redirigiendo a tus boletos...");
+      toast.success("Payment successful! Redirecting to your tickets...");
       router.push("/mis-boletos");
     } catch (err: any) {
       toast.error(err.message || "Error al procesar el pago");
@@ -153,7 +153,7 @@ export function ClipCheckoutForm({
   if (!apiKey) {
     return (
       <div className="p-6 text-center text-white/80">
-        <p>El pago con tarjeta no está disponible. Configura NEXT_PUBLIC_CLIP_API_KEY.</p>
+        <p>Card payment is not available. Configure NEXT_PUBLIC_CLIP_API_KEY.</p>
       </div>
     );
   }
@@ -163,25 +163,25 @@ export function ClipCheckoutForm({
       <div className="rounded-lg bg-white/5 border border-white/20 p-4">
         <p className="text-white/90 text-sm mb-2">{eventName}</p>
         <p className="text-2xl font-bold text-white">
-          ${amountInPesos.toLocaleString("es-MX", { minimumFractionDigits: 2 })} MXN
+          ${amountInPesos.toLocaleString("en-US", { minimumFractionDigits: 2 })} MXN
         </p>
       </div>
 
       <div>
-        <label className="block text-white/90 text-sm mb-2">Datos del comprador</label>
+        <label className="block text-white/90 text-sm mb-2">Buyer info</label>
         <p className="text-white/70 text-sm">{buyerName}</p>
         <p className="text-white/70 text-sm">{buyerEmail}</p>
       </div>
 
       <div>
-        <label className="block text-white/90 text-sm mb-2">Datos de la tarjeta</label>
+        <label className="block text-white/90 text-sm mb-2">Card details</label>
         <div
           id="clip-card-container"
           ref={containerRef}
           className="min-h-[80px] rounded-lg bg-white/10 p-4 border border-white/20"
         />
         {isLoading && (
-          <p className="text-white/60 text-sm mt-2">Cargando formulario...</p>
+          <p className="text-white/60 text-sm mt-2">Loading form...</p>
         )}
       </div>
 
@@ -190,7 +190,7 @@ export function ClipCheckoutForm({
         disabled={!sdkReady || isPaying}
         className="w-full py-4 rounded-lg bg-white text-black font-semibold hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
-        {isPaying ? "Procesando..." : "Pagar con tarjeta"}
+        {isPaying ? "Processing..." : "Pay with card"}
       </button>
     </form>
   );
