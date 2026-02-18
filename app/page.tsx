@@ -361,7 +361,7 @@ export default function HomePage() {
     );
     alert(
       "Funcionalidad de pago próximamente. Total: $" +
-        (total * 1.16).toLocaleString() +
+        total.toLocaleString() +
         " MXN"
     );
   };

@@ -77,14 +77,10 @@ export function Cart({ items, onClose, onRemoveItem, onCheckout }: CartProps) {
                 <span>Subtotal ({totalItems} boletos)</span>
                 <span>${total.toLocaleString()} MXN</span>
               </div>
-              <div className="flex items-center justify-between text-[#49484e]/60">
-                <span>Cargo por servicio</span>
-                <span>${(total * 0.1).toLocaleString()} MXN</span>
-              </div>
               <div className="border-t border-[#5B8DEF]/20 pt-3 flex items-center justify-between">
                 <span className="text-[#49484e]">Total</span>
                 <span className="text-[#5B8DEF]">
-                  ${(total * 1.1).toLocaleString()} MXN
+                  ${total.toLocaleString()} MXN
                 </span>
               </div>
             </div>

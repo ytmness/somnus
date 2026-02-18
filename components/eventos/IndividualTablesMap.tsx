@@ -595,25 +595,11 @@ export function IndividualTablesMap({
               </div>
 
               <div className="bg-white/5 rounded-lg p-4">
-                <div className="flex justify-between mb-2">
+                <div className="flex justify-between">
                   <span className="text-white/70">Precio por mesa:</span>
-                  <span className="text-white font-bold text-xl">
+                  <span className="text-[#5B8DEF] font-bold text-2xl">
                     ${selectedTable.price.toLocaleString()}
                   </span>
-                </div>
-                <div className="flex justify-between mb-2">
-                  <span className="text-white/70">IVA (16%):</span>
-                  <span className="text-white font-bold">
-                    ${(selectedTable.price * 0.16).toLocaleString()}
-                  </span>
-                </div>
-                <div className="border-t border-white/10 pt-2 mt-2">
-                  <div className="flex justify-between">
-                    <span className="text-white font-bold">Total:</span>
-                    <span className="text-[#5B8DEF] font-bold text-2xl">
-                      ${(selectedTable.price * 1.16).toLocaleString()}
-                    </span>
-                  </div>
                 </div>
               </div>
 
@@ -690,25 +676,11 @@ export function IndividualTablesMap({
               </div>
 
               <div className="bg-white/5 rounded-lg p-4">
-                <div className="flex justify-between mb-2">
-                  <span className="text-white/70">Subtotal:</span>
-                  <span className="text-white font-bold text-xl">
+                <div className="flex justify-between">
+                  <span className="text-white/70">Total:</span>
+                  <span className="text-[#5B8DEF] font-bold text-2xl">
                     ${(selectedSection.price * quantity).toLocaleString()}
                   </span>
-                </div>
-                <div className="flex justify-between mb-2">
-                  <span className="text-white/70">IVA (16%):</span>
-                  <span className="text-white font-bold">
-                    ${(selectedSection.price * quantity * 0.16).toLocaleString()}
-                  </span>
-                </div>
-                <div className="border-t border-white/10 pt-2 mt-2">
-                  <div className="flex justify-between">
-                    <span className="text-white font-bold">Total:</span>
-                    <span className="text-[#5B8DEF] font-bold text-2xl">
-                      ${(selectedSection.price * quantity * 1.16).toLocaleString()}
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>
