@@ -270,9 +270,9 @@ export default function HomePage() {
       try {
         const response = await fetch("/api/auth/session");
         const data = await response.json();
-        if (data.success && data.data) {
-          setUser(data.data.user);
-          setUserRole(data.data.user?.role || null);
+        if (data.user) {
+          setUser(data.user);
+          setUserRole(data.user?.role || null);
         }
       } catch (error) {
         console.error("Error al cargar sesión:", error);
@@ -339,9 +339,7 @@ export default function HomePage() {
         if (hasTables) {
           router.push(`/eventos/${concert.id}/mesas`);
         } else {
-          toast.error(
-            "Este evento no tiene mesas configuradas. Próximamente podrás comprar boletos generales."
-          );
+          router.push(`/eventos/${concert.id}/boletos`);
         }
       } else {
         toast.error("Error al cargar información del evento");
@@ -423,15 +421,43 @@ export default function HomePage() {
           >
             <source src={HERO_VIDEO} type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/40" />
         </div>
 
-        {/* Header transparente sobre hero - barra nav estilo Bresh/Zamna */}
-        <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-6 flex items-center justify-between">
+        {/* Próximo evento - visible al cargar, sobre el video */}
+        {nextEvent && (
+          <div className="absolute bottom-0 left-0 right-0 z-20 liquid-glass bg-black/50 border-t border-white/10">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-8 text-white">
+                <span className="text-sm uppercase tracking-wider text-white/80">
+                  Próximo evento
+                </span>
+                <span className="font-bold text-lg">{nextEvent.artist}</span>
+                <span className="flex items-center gap-1.5 text-white/80 text-sm">
+                  <MapPin className="w-4 h-4" />
+                  {nextEvent.venue}
+                </span>
+                <span className="flex items-center gap-1.5 text-white/80 text-sm">
+                  <Calendar className="w-4 h-4" />
+                  {nextEvent.date}
+                </span>
+              </div>
+              <button
+                onClick={() => handleSelectConcert(nextEvent)}
+                className="somnus-btn shrink-0 px-6 py-3 text-sm"
+              >
+                Comprar tickets
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Navbar igual que admin */}
+        <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-5 flex items-center justify-between">
           <button
             type="button"
             onClick={() => router.push("/")}
-            className="text-white/90 text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
+            className="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
             aria-label="SOMNUS"
           >
             SOMNUS
@@ -444,12 +470,12 @@ export default function HomePage() {
             >
               Eventos
             </a>
-            <a
+            <Link
               href="/galeria"
               className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
             >
               Galería
-            </a>
+            </Link>
             {userRole === "ADMIN" && (
               <Link
                 href="/admin"
@@ -459,25 +485,34 @@ export default function HomePage() {
               </Link>
             )}
             {(userRole === "ACCESOS" || userRole === "ADMIN") && (
-              <button
-                onClick={() => router.push("/accesos")}
-                className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
+              <Link
+                href="/accesos"
+                className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
               >
                 Accesos
-              </button>
+              </Link>
             )}
-            <button
-              onClick={() => router.push("/mis-boletos")}
+            <Link
+              href="/mis-boletos"
               className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
             >
               Mis Boletos
-            </button>
-            <button
-              onClick={() => router.push("/login")}
-              className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1"
-            >
-              {user?.name || user?.email || "Login"}
-            </button>
+            </Link>
+            {user ? (
+              <button
+                onClick={() => router.push("/mis-boletos")}
+                className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1 uppercase tracking-wider"
+              >
+                {user?.name || user?.email}
+              </button>
+            ) : (
+              <button
+                onClick={() => router.push("/login")}
+                className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1 uppercase tracking-wider"
+              >
+                Login
+              </button>
+            )}
           </nav>
         </header>
 
@@ -496,22 +531,12 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            {nextEvent ? (
-              <button
-                type="button"
-                onClick={() => handleSelectConcert(nextEvent)}
-                className="somnus-btn px-10 py-4 text-base inline-flex items-center gap-2"
-              >
-                Comprar boletos
-              </button>
-            ) : (
-              <a
-                href="#eventos"
-                className="somnus-btn px-10 py-4 text-base inline-flex items-center gap-2"
-              >
-                Ver eventos
-              </a>
-            )}
+            <a
+              href="#eventos"
+              className="somnus-btn px-10 py-4 text-base inline-flex items-center gap-2"
+            >
+              Ver eventos
+            </a>
           </div>
 
           {/* Scroll indicator */}
@@ -529,35 +554,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. NEXT EVENT STRIP - Solo si hay evento con boletos */}
-      {nextEvent && (
-        <section className="sticky top-0 z-40 bg-black/95 backdrop-blur-md border-b border-white/10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-4 sm:gap-8 text-white">
-              <span className="text-sm uppercase tracking-wider text-white/80">
-                Próximo evento
-              </span>
-              <span className="font-bold text-lg">{nextEvent.artist}</span>
-              <span className="flex items-center gap-1.5 text-white/80 text-sm">
-                <MapPin className="w-4 h-4" />
-                {nextEvent.venue}
-              </span>
-              <span className="flex items-center gap-1.5 text-white/80 text-sm">
-                <Calendar className="w-4 h-4" />
-                {nextEvent.date}
-              </span>
-            </div>
-            <button
-              onClick={() => handleSelectConcert(nextEvent)}
-              className="somnus-btn shrink-0 px-6 py-3 text-sm"
-            >
-              Comprar tickets
-            </button>
-          </div>
-        </section>
-      )}
-
-      {/* 3. EVENTOS ACTUALES - Próximos eventos */}
+      {/* 2. EVENTOS ACTUALES - Próximos eventos */}
       <RevealSection>
         <section id="eventos" className="py-28 sm:py-36 lg:py-44 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
@@ -657,7 +654,7 @@ export default function HomePage() {
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-20">
-              <div className="space-y-4">
+              <div className="liquid-glass p-6 md:p-8 rounded-2xl space-y-4">
                 <span className="text-4xl font-bold text-white">✓</span>
                 <h3 className="somnus-title-secondary text-lg uppercase">
                   Boletos garantizados
@@ -666,7 +663,7 @@ export default function HomePage() {
                   100% auténticos y verificados
                 </p>
               </div>
-              <div className="space-y-4">
+              <div className="liquid-glass p-6 md:p-8 rounded-2xl space-y-4">
                 <span className="text-4xl font-bold text-white">★</span>
                 <h3 className="somnus-title-secondary text-lg uppercase">
                   Mejor precio
@@ -675,7 +672,7 @@ export default function HomePage() {
                   Sin comisiones ocultas
                 </p>
               </div>
-              <div className="space-y-4">
+              <div className="liquid-glass p-6 md:p-8 rounded-2xl space-y-4">
                 <span className="text-4xl font-bold text-white">♥</span>
                 <h3 className="somnus-title-secondary text-lg uppercase">
                   Soporte
