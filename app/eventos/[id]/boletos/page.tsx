@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, ArrowLeft, Plus, Minus, X, Ticket, Calendar, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { calculateClipCommission } from "@/lib/utils";
+import { EventMap } from "@/components/eventos/EventMap";
 
 interface CartItem {
   ticketTypeId: string;
@@ -50,12 +52,12 @@ export default function EventBoletosPage() {
             });
           setQuantities(initial);
         } else {
-          toast.error("Evento no encontrado");
+          toast.error("Event not found");
           router.push("/");
         }
       } catch (error) {
-        console.error("Error al cargar evento:", error);
-        toast.error("Error al cargar el evento");
+        console.error("Error loading event:", error);
+        toast.error("Error loading event");
         router.push("/");
       } finally {
         setIsLoading(false);
@@ -91,7 +93,7 @@ export default function EventBoletosPage() {
       }));
 
     if (toAdd.length === 0) {
-      toast.error("Selecciona al menos una cantidad");
+      toast.error("Select at least one ticket");
       return;
     }
 
@@ -112,12 +114,12 @@ export default function EventBoletosPage() {
       toAdd.forEach((item: CartItem) => (next[item.ticketTypeId] = 0));
       return next;
     });
-    toast.success("Agregado al carrito");
+    toast.success("Added to cart");
   };
 
   const handleRemoveFromCart = (index: number) => {
     setCartItems((prev) => prev.filter((_, i) => i !== index));
-    toast.success("Eliminado del carrito");
+    toast.success("Removed from cart");
   };
 
   const getSubtotal = () =>
@@ -135,11 +137,11 @@ export default function EventBoletosPage() {
 
   const handleCheckout = async () => {
     if (cartItems.length === 0) {
-      toast.error("El carrito está vacío");
+      toast.error("Cart is empty");
       return;
     }
     if (!checkoutData.buyerName || !checkoutData.buyerEmail) {
-      toast.error("Completa nombre y email");
+      toast.error("Please enter name and email");
       return;
     }
 
@@ -167,7 +169,7 @@ export default function EventBoletosPage() {
       if (!response.ok) throw new Error(data.error || "Error al procesar");
 
       if (data.data?.saleId) {
-        toast.success("Redirigiendo a pago...");
+        toast.success("Redirecting to payment...");
         setCartItems([]);
         setShowCart(false);
         setShowCheckoutModal(false);
@@ -175,13 +177,13 @@ export default function EventBoletosPage() {
         return;
       }
 
-      toast.success("¡Orden creada!");
+      toast.success("Order created!");
       setCartItems([]);
       setShowCart(false);
       setShowCheckoutModal(false);
       setCheckoutData({ buyerName: "", buyerEmail: "", buyerPhone: "" });
     } catch (error: any) {
-      toast.error(error.message || "Error al procesar");
+      toast.error(error.message || "Processing error");
     } finally {
       setIsProcessingCheckout(false);
     }
@@ -190,7 +192,7 @@ export default function EventBoletosPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen somnus-bg-main flex items-center justify-center">
-        <div className="text-white text-xl">Cargando...</div>
+        <div className="text-white text-xl">Loading...</div>
       </div>
     );
   }
@@ -199,14 +201,20 @@ export default function EventBoletosPage() {
 
   const eventDate = event.eventDate
     ? new Date(event.eventDate).toLocaleDateString("en-US", {
+        weekday: "short",
         day: "numeric",
-        month: "long",
+        month: "short",
         year: "numeric",
       })
     : "";
 
+  const eventImage =
+    event.imageUrl && !event.imageUrl.includes("unsplash")
+      ? event.imageUrl
+      : "/assets/hero-cuernavaca.jpg";
+
   return (
-    <div className="min-h-screen somnus-bg-main overflow-x-hidden">
+    <div className="min-h-screen somnus-events-bg overflow-x-hidden">
       {/* Navbar */}
       <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-5 flex items-center justify-between">
         <button
@@ -221,26 +229,26 @@ export default function EventBoletosPage() {
             href="/#eventos"
             className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
           >
-            Eventos
+            Events
           </a>
           <Link
             href="/galeria"
             className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
           >
-            Galería
+            Gallery
           </Link>
           <Link
             href="/mis-boletos"
             className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
           >
-            Mis Boletos
+            My Tickets
           </Link>
           <button
             onClick={() => setShowCart(true)}
             className="flex items-center gap-2 text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors relative"
           >
             <ShoppingCart className="w-4 h-4" />
-            Carrito
+            Cart
             {cartItems.length > 0 && (
               <span className="absolute -top-1.5 -right-1.5 bg-white text-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
                 {cartItems.reduce((s, i) => s + i.quantity, 0)}
@@ -257,114 +265,169 @@ export default function EventBoletosPage() {
       </header>
 
       <main className="pt-20 sm:pt-24 lg:pt-28 pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <button
             onClick={() => router.push("/")}
             className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-8 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Volver a Eventos
+            Back to Events
           </button>
 
-          <div className="mb-10">
-            <h1 className="somnus-title-secondary text-3xl md:text-4xl mb-2">
-              {event.artist}
-            </h1>
-            <div className="flex flex-wrap gap-4 text-white/70 text-sm">
-              <span className="flex items-center gap-1.5">
-                <MapPin className="w-4 h-4" />
-                {event.venue}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4" />
-                {eventDate} · {event.eventTime}
-              </span>
+          {/* Layout tipo Bubbl: imagen izquierda + detalles derecho */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-20">
+            {/* Columna izquierda: póster del evento */}
+            <div className="lg:col-span-5">
+              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[#1a1a1a]">
+                <Image
+                  src={eventImage}
+                  alt={event.artist}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 45vw"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+              </div>
+            </div>
+
+            {/* Columna derecha: detalles + compra */}
+            <div className="lg:col-span-7 flex flex-col">
+              <div className="mb-8">
+                <span className="inline-block text-xs uppercase tracking-widest text-white/70 mb-2">
+                  {event.venue}
+                </span>
+                <h1 className="somnus-title-secondary text-3xl md:text-4xl lg:text-5xl mb-6 uppercase tracking-wider font-bold">
+                  {event.artist}
+                </h1>
+
+                <div className="space-y-3 text-white/90 mb-6">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="w-5 h-5 text-white/70 shrink-0" />
+                    <span>
+                      {eventDate} · {event.eventTime}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-5 h-5 text-white/70 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium">{event.venue}</p>
+                      {event.address && (
+                        <p className="text-white/70 text-sm mt-0.5">
+                          {event.address}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* About */}
+                {event.description && (
+                  <div className="mb-8">
+                    <h2 className="text-white font-semibold uppercase tracking-wider text-sm mb-3">
+                      About
+                    </h2>
+                    <p className="text-white/80 text-sm leading-relaxed">
+                      {event.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* Sección de boletos */}
+                <h2 className="somnus-title-secondary text-xl mb-6">
+                  Select tickets
+                </h2>
+
+                {ticketTypes.length === 0 ? (
+                  <div className="liquid-glass p-8 rounded-2xl text-center">
+                    <Ticket className="w-12 h-12 text-white/50 mx-auto mb-4" />
+                    <p className="text-white/70">
+                      No ticket types available for this event.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-4 mb-8">
+                      {ticketTypes.map((tt: any) => {
+                        const available = getAvailable(tt);
+                        const qty = quantities[tt.id] || 0;
+                        return (
+                          <div
+                            key={tt.id}
+                            className="liquid-glass p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                          >
+                            <div className="flex-1">
+                              <h3 className="text-white font-semibold text-lg">
+                                {tt.name}
+                              </h3>
+                              {tt.description && (
+                                <p className="text-white/60 text-sm mt-1">
+                                  {tt.description}
+                                </p>
+                              )}
+                              <p className="text-white/80 mt-2 font-medium">
+                                ${Number(tt.price).toLocaleString("en-US")} MXN
+                              </p>
+                              <p className="text-white/50 text-xs mt-1">
+                                {available} available
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-1 border border-white/20 rounded-lg">
+                                <button
+                                  type="button"
+                                  onClick={() => handleQuantityChange(tt.id, -1)}
+                                  disabled={qty === 0}
+                                  className="p-2 text-white/80 hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-l-lg transition-colors"
+                                >
+                                  <Minus className="w-4 h-4" />
+                                </button>
+                                <span className="px-4 py-2 text-white font-medium min-w-[3rem] text-center">
+                                  {qty}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleQuantityChange(tt.id, 1)}
+                                  disabled={qty >= available}
+                                  className="p-2 text-white/80 hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-r-lg transition-colors"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <Button
+                        onClick={handleAddToCart}
+                        className="somnus-btn flex-1 py-4 text-base"
+                      >
+                        Buy Tickets
+                      </Button>
+                      <Button
+                        onClick={() => setShowCart(true)}
+                        variant="outline"
+                        className="border-white/30 text-white bg-transparent hover:bg-white/10 flex-1 py-4"
+                      >
+                        View Cart
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
-          <h2 className="somnus-title-secondary text-xl mb-6">
-            Elige tu tipo de boleto
-          </h2>
-
-          {ticketTypes.length === 0 ? (
-            <div className="liquid-glass p-8 rounded-2xl text-center">
-              <Ticket className="w-12 h-12 text-white/50 mx-auto mb-4" />
-              <p className="text-white/70">
-                No hay tipos de boleto disponibles para este evento.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {ticketTypes.map((tt: any) => {
-                const available = getAvailable(tt);
-                const qty = quantities[tt.id] || 0;
-                return (
-                  <div
-                    key={tt.id}
-                    className="liquid-glass p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                  >
-                    <div className="flex-1">
-                      <h3 className="text-white font-semibold text-lg">
-                        {tt.name}
-                      </h3>
-                      {tt.description && (
-                        <p className="text-white/60 text-sm mt-1">
-                          {tt.description}
-                        </p>
-                      )}
-                      <p className="text-white/80 mt-2 font-medium">
-                        ${Number(tt.price).toLocaleString("en-US")} MXN
-                      </p>
-                      <p className="text-white/50 text-xs mt-1">
-                        {available} disponibles
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1 border border-white/20 rounded-lg">
-                        <button
-                          type="button"
-                          onClick={() => handleQuantityChange(tt.id, -1)}
-                          disabled={qty === 0}
-                          className="p-2 text-white/80 hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-l-lg transition-colors"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                        <span className="px-4 py-2 text-white font-medium min-w-[3rem] text-center">
-                          {qty}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleQuantityChange(tt.id, 1)}
-                          disabled={qty >= available}
-                          className="p-2 text-white/80 hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-r-lg transition-colors"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {ticketTypes.length > 0 && (
-            <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <Button
-                onClick={handleAddToCart}
-                className="somnus-btn flex-1"
-              >
-                Agregar al carrito
-              </Button>
-              <Button
-                onClick={() => setShowCart(true)}
-                variant="outline"
-                className="border-white/30 text-white bg-transparent hover:bg-white/10 flex-1"
-              >
-                Ver carrito
-              </Button>
-            </div>
-          )}
+          {/* Sección del mapa */}
+          <div>
+            <h2 className="somnus-title-secondary text-xl mb-4">
+              Location
+            </h2>
+            <EventMap venue={event.venue} address={event.address} />
+          </div>
         </div>
       </main>
 
@@ -377,7 +440,7 @@ export default function EventBoletosPage() {
           />
           <div className="relative w-full max-w-md bg-[#0A0A0A] border-l border-white/10 overflow-y-auto">
             <div className="sticky top-0 bg-[#0A0A0A] border-b border-white/10 p-6 flex items-center justify-between">
-              <h3 className="text-white font-bold text-lg">Tu Carrito</h3>
+              <h3 className="text-white font-bold text-lg">Your Cart</h3>
               <button
                 onClick={() => setShowCart(false)}
                 className="text-white/70 hover:text-white p-2"
@@ -388,7 +451,7 @@ export default function EventBoletosPage() {
             <div className="p-6">
               {cartItems.length === 0 ? (
                 <p className="text-white/50 text-center py-8">
-                  El carrito está vacío
+                  Your cart is empty
                 </p>
               ) : (
                 <div className="space-y-4">
@@ -425,7 +488,7 @@ export default function EventBoletosPage() {
                     <span>${getSubtotal().toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-white/70">
-                    <span>Cargo por servicio (3.9% + IVA)</span>
+                    <span>Service fee (3.9% + tax)</span>
                     <span>${getCommission().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between text-white font-bold text-lg border-t border-white/10 pt-3">
@@ -439,7 +502,7 @@ export default function EventBoletosPage() {
                     }}
                     className="somnus-btn w-full mt-4"
                   >
-                    Proceder al pago
+                    Proceed to payment
                   </Button>
                 </div>
               )}
@@ -454,7 +517,7 @@ export default function EventBoletosPage() {
           <div className="liquid-glass max-w-md w-full p-6 rounded-2xl">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-white font-bold text-xl">
-                Información de compra
+                Purchase information
               </h3>
               <button
                 onClick={() => setShowCheckoutModal(false)}
@@ -466,7 +529,7 @@ export default function EventBoletosPage() {
             <div className="space-y-4 mb-6">
               <div>
                 <label className="block text-white/90 font-medium mb-2">
-                  Nombre completo *
+                  Full name *
                 </label>
                 <input
                   type="text"
@@ -475,7 +538,7 @@ export default function EventBoletosPage() {
                     setCheckoutData({ ...checkoutData, buyerName: e.target.value })
                   }
                   className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-white/40"
-                  placeholder="Juan Pérez"
+                  placeholder="John Doe"
                 />
               </div>
               <div>
@@ -489,12 +552,12 @@ export default function EventBoletosPage() {
                     setCheckoutData({ ...checkoutData, buyerEmail: e.target.value })
                   }
                   className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-white/40"
-                  placeholder="juan@ejemplo.com"
+                  placeholder="john@example.com"
                 />
               </div>
               <div>
                 <label className="block text-white/90 font-medium mb-2">
-                  Teléfono (opcional)
+                  Phone (optional)
                 </label>
                 <input
                   type="tel"
@@ -512,7 +575,7 @@ export default function EventBoletosPage() {
                   <span>${getSubtotal().toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-white/70">
-                  <span>Cargo por servicio (3.9% + IVA)</span>
+                  <span>Service fee (3.9% + tax)</span>
                   <span>${getCommission().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
                 <div className="flex justify-between text-white font-bold text-xl border-t border-white/20 pt-2">
@@ -528,14 +591,14 @@ export default function EventBoletosPage() {
                 className="flex-1 border-white/30 text-white bg-transparent hover:bg-white/10"
                 disabled={isProcessingCheckout}
               >
-                Cancelar
+                Cancel
               </Button>
               <Button
                 onClick={handleCheckout}
                 className="flex-1 somnus-btn"
                 disabled={isProcessingCheckout}
               >
-                {isProcessingCheckout ? "Procesando..." : "Confirmar compra"}
+                {isProcessingCheckout ? "Processing..." : "Confirm purchase"}
               </Button>
             </div>
           </div>
