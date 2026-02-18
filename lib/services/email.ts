@@ -36,10 +36,10 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 }
 
 /**
- * Genera un código de verificación de 6 dígitos
+ * Genera un código de verificación de 8 dígitos
  */
 export function generateVerificationCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return Math.floor(10000000 + Math.random() * 90000000).toString();
 }
 
 /**
@@ -75,7 +75,7 @@ export async function sendVerificationCode(
           <h2>Hola ${name},</h2>
           <p>Gracias por registrarte en Somnus. Para completar tu registro, por favor ingresa el siguiente código de verificación:</p>
           <div class="code">${code}</div>
-          <p>Este código expira en 24 horas.</p>
+          <p>Este código expira en 10 minutos.</p>
           <p>Si no solicitaste este código, puedes ignorar este email.</p>
         </div>
         <div class="footer">
@@ -94,7 +94,7 @@ export async function sendVerificationCode(
     
     ${code}
     
-    Este código expira en 24 horas.
+    Este código expira en 10 minutos.
     
     Si no solicitaste este código, puedes ignorar este email.
   `;

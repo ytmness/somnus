@@ -1,31 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient as createSSRClient } from "@supabase/ssr";
 import { prisma } from "@/lib/db/prisma";
+import { supabaseAdmin } from "@/lib/db/supabase";
 import { otpVerifySchema } from "@/lib/validations/schemas";
+import { verifyOtpCode } from "@/lib/auth/otp";
 
-// Marcar como dinámica porque usa cookies
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 /**
  * POST /api/auth/otp/verify
- * Verificar código OTP de 8 dígitos usando Supabase Auth
+ * Verificar código OTP de 8 dígitos (propio) y establecer sesión Supabase
  */
 export async function POST(request: NextRequest) {
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/0a40da1d-54df-4a70-9c53-c9c9e8cfa786',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/api/auth/otp/verify/route.ts:10',message:'OTP verify endpoint called',data:{hasCookies:request.headers.get('cookie')?true:false},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
-  
-  // Crear response primero para que el cliente SSR pueda establecer cookies
   const response = new NextResponse();
-  
+
   try {
     const body = await request.json();
-    
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/0a40da1d-54df-4a70-9c53-c9c9e8cfa786',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/api/auth/otp/verify/route.ts:20',message:'Request body parsed',data:{email:body.email,hasToken:!!body.token},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-    
-    // Validar datos
     const result = otpVerifySchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
@@ -36,7 +26,65 @@ export async function POST(request: NextRequest) {
 
     const { email, token } = result.data;
 
-    // Crear cliente Supabase SSR que maneja cookies correctamente
+    // 1. Verificar nuestro código OTP (User.verificationCode)
+    const { valid, error: verifyError } = await verifyOtpCode(email, token);
+    if (!valid) {
+      return NextResponse.json(
+        { error: verifyError || "Código OTP inválido o expirado" },
+        { status: 400 }
+      );
+    }
+
+    // 2. Obtener usuario y limpiar código usado
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "Usuario no encontrado" }, { status: 400 });
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        verificationCode: null,
+        verificationCodeExpires: null,
+        emailVerified: true,
+      },
+    });
+
+    // 3. Asegurar que existe en Supabase Auth (createUser no envía email si ya existe)
+    const { error: createErr } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      email_confirm: true,
+      user_metadata: { name: user.name },
+    });
+    // Ignorar error si el usuario ya existe
+    if (createErr && !createErr.message?.toLowerCase().includes("already")) {
+      console.error("[OTP VERIFY] Error creando usuario Supabase:", createErr);
+      return NextResponse.json(
+        { error: "Error al crear sesión" },
+        { status: 500 }
+      );
+    }
+
+    // 4. Generar magic link (solo para obtener token, no envía email)
+    const { data: linkData, error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
+      type: "magiclink",
+      email,
+    });
+
+    if (linkErr || !linkData?.properties?.hashed_token) {
+      console.error("[OTP VERIFY] Error generateLink:", linkErr);
+      return NextResponse.json(
+        { error: "Error al crear sesión" },
+        { status: 500 }
+      );
+    }
+
+    const tokenHash = linkData.properties.hashed_token;
+
+    // 5. Establecer sesión via verifyOtp en el cliente SSR (cookies)
     const supabase = createSSRClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -53,75 +101,22 @@ export async function POST(request: NextRequest) {
         },
       }
     );
-    
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/0a40da1d-54df-4a70-9c53-c9c9e8cfa786',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/api/auth/otp/verify/route.ts:27',message:'Before verifyOtp',data:{email},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
 
-    // Verificar código OTP
-    // Si el usuario no existe en Supabase Auth, se crea automáticamente
-    const { data: authData, error: authError } = await supabase.auth.verifyOtp({
-      email,
-      token,
-      type: 'email',
+    const { error: verifyErr } = await supabase.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: "magiclink",
     });
 
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/0a40da1d-54df-4a70-9c53-c9c9e8cfa786',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/api/auth/otp/verify/route.ts:35',message:'After verifyOtp',data:{hasUser:!!authData.user,hasSession:!!authData.session,hasError:!!authError,errorMessage:authError?.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-
-    if (authError || !authData.user) {
-      console.error("[OTP VERIFY] Error:", authError);
+    if (verifyErr) {
+      console.error("[OTP VERIFY] Error verifyOtp:", verifyErr);
       return NextResponse.json(
-        { error: authError?.message || "Código OTP inválido o expirado" },
-        { status: 400 }
+        { error: "Error al crear sesión" },
+        { status: 500 }
       );
     }
 
-    // Verificar si el usuario existe en nuestra tabla User
-    let user = await prisma.user.findUnique({
-      where: { email },
-    }) as any;
+    const { data: { session } } = await supabase.auth.getSession();
 
-    // Si el usuario no existe en nuestra tabla, significa que está registrándose
-    // En este caso, necesitamos que primero se haya llamado a /api/auth/register
-    // para guardar el nombre. Por ahora, creamos un usuario básico.
-    // TODO: Mejorar este flujo para que el nombre se pase durante el registro
-    if (!user) {
-      // Crear usuario básico (el nombre debería venir del registro previo)
-      // Por ahora usamos el email como nombre temporal
-      user = await prisma.user.create({
-        data: {
-          email,
-          name: email.split('@')[0], // Nombre temporal basado en email
-          role: "CLIENTE",
-          isActive: true,
-          password: "", // No se usa contraseña con OTP
-          emailVerified: true, // Ya está verificado por Supabase Auth
-        } as any,
-      });
-    } else {
-      // Usuario existe, actualizar emailVerified
-      if (!user.emailVerified) {
-        await prisma.user.update({
-          where: { id: user.id },
-          data: {
-            emailVerified: true,
-          } as any,
-        });
-        user.emailVerified = true;
-      }
-    }
-
-    // Las cookies de sesión se establecen automáticamente por el cliente SSR
-    // cuando se usa verifyOtp. Verificar que la sesión se estableció correctamente
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/0a40da1d-54df-4a70-9c53-c9c9e8cfa786',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/api/auth/otp/verify/route.ts:95',message:'Before response - session check',data:{hasSession:!!session,hasSessionError:!!sessionError,userId:user.id,userRole:user.role},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-
-    // Crear el JSON response usando NextResponse.json pero copiar las cookies del response anterior
     const jsonResponse = NextResponse.json({
       success: true,
       message: "Código OTP verificado exitosamente",
@@ -130,15 +125,13 @@ export async function POST(request: NextRequest) {
         email: user.email,
         name: user.name,
         role: user.role,
-        emailVerified: user.emailVerified,
+        emailVerified: true,
       },
-      session: session ? {
-        access_token: session.access_token,
-        refresh_token: session.refresh_token,
-      } : null,
+      session: session
+        ? { access_token: session.access_token, refresh_token: session.refresh_token }
+        : null,
     });
 
-    // Copiar todas las cookies del response original (que fueron establecidas por el cliente SSR)
     response.cookies.getAll().forEach((cookie) => {
       jsonResponse.cookies.set(cookie.name, cookie.value, {
         httpOnly: cookie.httpOnly,
@@ -149,11 +142,6 @@ export async function POST(request: NextRequest) {
       });
     });
 
-    // #region agent log
-    const setCookieHeader = jsonResponse.headers.get('set-cookie');
-    fetch('http://127.0.0.1:7242/ingest/0a40da1d-54df-4a70-9c53-c9c9e8cfa786',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/api/auth/otp/verify/route.ts:120',message:'Response created with cookies',data:{hasSetCookie:!!setCookieHeader,setCookieCount:setCookieHeader?setCookieHeader.split(',').length:0,responseStatus:200},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-    // #endregion
-
     return jsonResponse;
   } catch (error: any) {
     console.error("[OTP VERIFY] Error general:", error);
@@ -163,5 +151,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-

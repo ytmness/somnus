@@ -1,17 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/auth/supabase-auth";
 import { loginSchema } from "@/lib/validations/schemas";
+import { sendOtpToEmail } from "@/lib/auth/otp";
 
 /**
  * POST /api/auth/login
- * Enviar código OTP para iniciar sesión
- * Sin contraseña - solo email
+ * Enviar código OTP de 8 dígitos para iniciar sesión
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-
-    // Validar datos
     const result = loginSchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
@@ -21,23 +18,11 @@ export async function POST(request: NextRequest) {
     }
 
     const { email } = result.data;
+    const { success, error } = await sendOtpToEmail(email);
 
-    const supabase = createServerClient();
-
-    // Enviar código OTP de 6 dígitos usando Supabase Auth
-    // Supabase Auth automáticamente envía un código de 6 dígitos al email
-    const { data, error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        // En desarrollo, el código aparece en Supabase Dashboard > Authentication > Logs
-        // En producción, el código se envía por email
-      },
-    });
-
-    if (error) {
-      console.error("[LOGIN] Error al enviar OTP:", error);
+    if (!success) {
       return NextResponse.json(
-        { error: error.message || "Error al enviar código de verificación" },
+        { error: error || "Error al enviar código de verificación" },
         { status: 400 }
       );
     }
@@ -45,7 +30,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Código de verificación enviado a tu email",
-      // En desarrollo, el código aparece en Supabase Dashboard > Authentication > Logs
     });
   } catch (error: any) {
     console.error("[LOGIN] Error general:", error);
@@ -55,4 +39,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
