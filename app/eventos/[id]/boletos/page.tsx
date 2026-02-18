@@ -108,7 +108,7 @@ export default function EventBoletosPage() {
     });
     setQuantities((prev) => {
       const next = { ...prev };
-      toAdd.forEach((i) => (next[i.ticketTypeId] = 0));
+      toAdd.forEach((item: CartItem) => (next[item.ticketTypeId] = 0));
       return next;
     });
     toast.success("Agregado al carrito");
