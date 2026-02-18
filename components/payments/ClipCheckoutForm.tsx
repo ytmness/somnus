@@ -25,7 +25,10 @@ export function ClipCheckoutForm({
 }: ClipCheckoutFormProps) {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<{ cardToken: () => Promise<{ id: string }> } | null>(null);
+  const cardRef = useRef<{
+    cardToken: () => Promise<{ id: string }>;
+    unmount?: () => void;
+  } | null>(null);
   const mountedRef = useRef(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isPaying, setIsPaying] = useState(false);
@@ -77,7 +80,10 @@ export function ClipCheckoutForm({
         const card = clip.element.create("Card", {
           paymentAmount: paymentAmountPesos,
         });
-        await card.mount("#clip-card-container");
+        // Clip usa getElementById(id) internamente; pasar "#id" devuelve null -> appendChild truena
+        const el = document.getElementById("clip-card-container");
+        if (el) el.innerHTML = "";
+        card.mount("clip-card-container");
         cardRef.current = card;
         setSdkReady(true);
       } catch (err: any) {
@@ -93,6 +99,11 @@ export function ClipCheckoutForm({
     };
     document.body.appendChild(script);
     return () => {
+      try {
+        cardRef.current?.unmount?.();
+      } catch {
+        /* ignore */
+      }
       cardRef.current = null;
       if (script.parentNode) document.body.removeChild(script);
     };
