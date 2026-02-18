@@ -26,11 +26,19 @@ export function ClipCheckoutForm({
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<{ cardToken: () => Promise<{ id: string }> } | null>(null);
+  const mountedRef = useRef(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isPaying, setIsPaying] = useState(false);
   const [sdkReady, setSdkReady] = useState(false);
 
   const apiKey = process.env.NEXT_PUBLIC_CLIP_API_KEY;
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!apiKey) {
@@ -44,7 +52,26 @@ export function ClipCheckoutForm({
     script.async = true;
     script.onload = async () => {
       try {
-        if (!window.ClipSDK || !containerRef.current) return;
+        if (!window.ClipSDK) return;
+        // Esperar a que el contenedor exista en el DOM (evita appendChild null)
+        const waitForContainer = (ms = 2000): Promise<HTMLElement | null> => {
+          return new Promise((resolve) => {
+            const start = Date.now();
+            const check = () => {
+              const el = document.getElementById("clip-card-container");
+              if (el) return resolve(el);
+              if (Date.now() - start > ms) return resolve(null);
+              setTimeout(check, 50);
+            };
+            setTimeout(check, 0);
+          });
+        };
+        const container = await waitForContainer();
+        if (!mountedRef.current) return;
+        if (!container) {
+          toast.error("Error al cargar el formulario. Recarga la página.");
+          return;
+        }
         const clip = new window.ClipSDK(apiKey);
         const paymentAmountPesos = amountInPesos;
         const card = clip.element.create("Card", {
