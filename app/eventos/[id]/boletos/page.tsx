@@ -121,8 +121,8 @@ export default function EventBoletosPage() {
 
   const getSubtotal = () =>
     cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  const getTax = () => getSubtotal() * 0.16;
-  const getTotal = () => getSubtotal() + getTax();
+  // IVA 16% solo sobre comisión Clip (3.9%); no se cobra al cliente
+  const getTotal = () => getSubtotal();
 
   const handleCheckout = async () => {
     if (cartItems.length === 0) {
@@ -414,10 +414,6 @@ export default function EventBoletosPage() {
                   <div className="flex justify-between text-white/70">
                     <span>Subtotal</span>
                     <span>${getSubtotal().toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-white/70">
-                    <span>IVA (16%)</span>
-                    <span>${getTax().toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-white font-bold text-lg border-t border-white/10 pt-3">
                     <span>Total</span>

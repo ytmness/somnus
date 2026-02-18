@@ -112,8 +112,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const tax = subtotal * 0.16; // IVA 16%
-    const total = subtotal + tax;
+    // IVA 16% solo aplica a la comisión de Clip (3.9%), no al ticket. Clip lo retiene.
+    const tax = 0;
+    const total = subtotal;
 
     // Obtener usuario si está autenticado
     const user = await getSession();

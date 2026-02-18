@@ -54,8 +54,17 @@ export function CreateEventModal({ onClose, onSuccess }: CreateEventModalProps) 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const target = e.target;
+    const { name, value } = target;
+    const isCheckbox = target.type === "checkbox";
+    setFormData((prev) => ({
+      ...prev,
+      [name]: isCheckbox
+        ? (target as HTMLInputElement).checked
+        : name === "maxCapacity"
+          ? parseInt(value, 10) || 0
+          : value,
+    }));
   };
 
   const handleTicketTypeChange = (

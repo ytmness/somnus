@@ -173,13 +173,8 @@ export default function EventMesasPage() {
     }, 0);
   };
 
-  const getTax = () => {
-    return getSubtotal() * 0.16; // IVA 16%
-  };
-
-  const getTotal = () => {
-    return getSubtotal() + getTax();
-  };
+  // IVA 16% solo sobre comisión Clip (3.9%); no se cobra al cliente
+  const getTotal = () => getSubtotal();
 
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [checkoutData, setCheckoutData] = useState({
@@ -716,12 +711,6 @@ export default function EventMesasPage() {
                       <span className="regia-text-body">Subtotal:</span>
                       <span className="text-regia-cream font-bold">
                         ${getSubtotal().toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="flex justify-between mb-3">
-                      <span className="regia-text-body">IVA (16%):</span>
-                      <span className="text-regia-cream font-bold">
-                        ${getTax().toLocaleString()}
                       </span>
                     </div>
                     <div className="border-t border-regia-gold-old/10 pt-3">
