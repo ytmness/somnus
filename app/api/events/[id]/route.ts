@@ -106,13 +106,51 @@ export async function PATCH(
     }
 
     // Actualizar evento
-    const event = await prisma.event.update({
+    let event = await prisma.event.update({
       where: { id: params.id },
       data: updateData,
       include: {
         ticketTypes: true,
       },
     });
+
+    // Actualizar tipos de boleto si se enviaron
+    if (ticketTypes && ticketTypes.length > 0) {
+      for (const tt of ticketTypes) {
+        const existing = event.ticketTypes.find((t) => t.id === tt.id);
+        if (!existing) continue;
+
+        const ttData: Record<string, unknown> = {};
+        if (tt.name !== undefined) ttData.name = tt.name;
+        if (tt.description !== undefined) ttData.description = tt.description;
+        if (tt.category !== undefined) ttData.category = tt.category;
+        if (tt.price !== undefined) ttData.price = tt.price;
+        if (tt.isTable !== undefined) ttData.isTable = tt.isTable;
+        if (tt.seatsPerTable !== undefined) ttData.seatsPerTable = tt.seatsPerTable;
+        if (tt.maxQuantity !== undefined) {
+          if (tt.maxQuantity < existing.soldQuantity) {
+            return NextResponse.json(
+              {
+                error: `"${existing.name}": la cantidad máxima no puede ser menor que los vendidos (${existing.soldQuantity})`,
+              },
+              { status: 400 }
+            );
+          }
+          ttData.maxQuantity = tt.maxQuantity;
+        }
+
+        if (Object.keys(ttData).length > 0) {
+          await prisma.ticketType.update({
+            where: { id: tt.id },
+            data: ttData,
+          });
+        }
+      }
+      event = await prisma.event.findUniqueOrThrow({
+        where: { id: params.id },
+        include: { ticketTypes: true },
+      });
+    }
 
     // Log de auditoría
     await prisma.auditLog.create({

@@ -5,6 +5,18 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 
+interface TicketTypeData {
+  id: string;
+  name: string;
+  description: string | null;
+  category: string;
+  price: number;
+  maxQuantity: number;
+  soldQuantity: number;
+  isTable: boolean;
+  seatsPerTable: number | null;
+}
+
 interface EventData {
   id: string;
   name: string;
@@ -20,6 +32,7 @@ interface EventData {
   isActive: boolean;
   salesStartDate: string;
   salesEndDate: string;
+  ticketTypes?: TicketTypeData[];
 }
 
 interface EditEventModalProps {
@@ -60,6 +73,7 @@ export function EditEventModal({
     salesStartDate: "",
     salesEndDate: "",
   });
+  const [ticketTypes, setTicketTypes] = useState<TicketTypeData[]>([]);
 
   useEffect(() => {
     const loadEvent = async () => {
@@ -86,6 +100,19 @@ export function EditEventModal({
           salesStartDate: toDateTimeLocalStr(e.salesStartDate),
           salesEndDate: toDateTimeLocalStr(e.salesEndDate),
         });
+        setTicketTypes(
+          (e.ticketTypes || []).map((tt) => ({
+            id: tt.id,
+            name: tt.name,
+            description: tt.description || null,
+            category: tt.category,
+            price: typeof tt.price === "number" ? tt.price : Number(tt.price),
+            maxQuantity: tt.maxQuantity,
+            soldQuantity: tt.soldQuantity ?? 0,
+            isTable: tt.isTable ?? false,
+            seatsPerTable: tt.seatsPerTable ?? null,
+          }))
+        );
       } catch (err: any) {
         toast.error(err.message || "Error al cargar evento");
         onClose();
@@ -106,6 +133,18 @@ export function EditEventModal({
     }));
   };
 
+  const handleTicketTypeChange = (
+    index: number,
+    field: keyof TicketTypeData,
+    value: string | number | boolean | null
+  ) => {
+    setTicketTypes((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -116,6 +155,20 @@ export function EditEventModal({
       if (!formData.eventDate || !formData.eventTime) {
         throw new Error("Especifica la fecha y hora del evento");
       }
+      if (
+        ticketTypes.some(
+          (tt) => !tt.name || tt.price <= 0 || tt.maxQuantity < 0
+        )
+      ) {
+        throw new Error("Revisa los tipos de boleto: nombre, precio y cantidad");
+      }
+      ticketTypes.forEach((tt) => {
+        if (tt.maxQuantity < tt.soldQuantity) {
+          throw new Error(
+            `"${tt.name}": la cantidad no puede ser menor que los vendidos (${tt.soldQuantity})`
+          );
+        }
+      });
 
       const res = await fetch(`/api/events/${eventId}`, {
         method: "PATCH",
@@ -124,6 +177,16 @@ export function EditEventModal({
         body: JSON.stringify({
           ...formData,
           maxCapacity: formData.maxCapacity,
+          ticketTypes: ticketTypes.map((tt) => ({
+            id: tt.id,
+            name: tt.name,
+            description: tt.description || undefined,
+            category: tt.category,
+            price: tt.price,
+            maxQuantity: tt.maxQuantity,
+            isTable: tt.isTable,
+            seatsPerTable: tt.seatsPerTable ?? undefined,
+          })),
         }),
       });
       const data = await res.json();
@@ -322,6 +385,158 @@ export function EditEventModal({
                   className="w-full px-4 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white resize-none"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Tipos de Boleto */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">
+              Tipos de Boleto
+            </h3>
+            <div className="space-y-4">
+              {ticketTypes.map((ticketType, index) => (
+                <div
+                  key={ticketType.id}
+                  className="bg-white/5 border border-regia-gold/20 rounded-lg p-4"
+                >
+                  <h4 className="text-white font-medium mb-4">
+                    {ticketType.name}
+                    {ticketType.soldQuantity > 0 && (
+                      <span className="text-white/60 text-sm ml-2">
+                        ({ticketType.soldQuantity} vendidos)
+                      </span>
+                    )}
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-white/90 mb-2">
+                        Nombre *
+                      </label>
+                      <input
+                        type="text"
+                        value={ticketType.name}
+                        onChange={(e) =>
+                          handleTicketTypeChange(index, "name", e.target.value)
+                        }
+                        className="w-full px-3 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white placeholder-white/50 focus:outline-none focus:border-regia-gold text-sm"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-white/90 mb-2">
+                        Categoría *
+                      </label>
+                      <select
+                        value={ticketType.category}
+                        onChange={(e) =>
+                          handleTicketTypeChange(
+                            index,
+                            "category",
+                            e.target.value
+                          )}
+                        className="w-full px-3 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white focus:outline-none focus:border-regia-gold text-sm"
+                        required
+                      >
+                        <option value="GENERAL">General</option>
+                        <option value="PREFERENTE">Preferente</option>
+                        <option value="VIP">VIP</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-white/90 mb-2">
+                        Precio (MXN) *
+                      </label>
+                      <input
+                        type="number"
+                        value={ticketType.price}
+                        onChange={(e) =>
+                          handleTicketTypeChange(
+                            index,
+                            "price",
+                            parseFloat(e.target.value) || 0
+                          )}
+                        className="w-full px-3 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white focus:outline-none focus:border-regia-gold text-sm"
+                        min="0"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-white/90 mb-2">
+                        Cantidad Máxima *
+                      </label>
+                      <input
+                        type="number"
+                        value={ticketType.maxQuantity}
+                        onChange={(e) =>
+                          handleTicketTypeChange(
+                            index,
+                            "maxQuantity",
+                            parseInt(e.target.value) || 0
+                          )}
+                        className="w-full px-3 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white focus:outline-none focus:border-regia-gold text-sm"
+                        min={ticketType.soldQuantity}
+                        required
+                      />
+                      {ticketType.soldQuantity > 0 && (
+                        <p className="text-xs text-white/60 mt-1">
+                          Mínimo: {ticketType.soldQuantity} (vendidos)
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 text-white/90 text-sm cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={ticketType.isTable}
+                          onChange={(e) =>
+                            handleTicketTypeChange(
+                              index,
+                              "isTable",
+                              e.target.checked
+                            )
+                          }
+                          className="w-4 h-4 rounded border-regia-gold/30 bg-white/10 text-regia-gold focus:ring-regia-gold"
+                        />
+                        ¿Es Mesa VIP?
+                      </label>
+                      {ticketType.isTable && (
+                        <input
+                          type="number"
+                          value={ticketType.seatsPerTable ?? 4}
+                          onChange={(e) =>
+                            handleTicketTypeChange(
+                              index,
+                              "seatsPerTable",
+                              parseInt(e.target.value) || 4
+                            )
+                          }
+                          className="w-20 px-3 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white focus:outline-none focus:border-regia-gold text-sm"
+                          min="2"
+                        />
+                      )}
+                    </div>
+                    <div className="md:col-span-3">
+                      <label className="block text-sm font-medium text-white/90 mb-2">
+                        Descripción
+                      </label>
+                      <input
+                        type="text"
+                        value={ticketType.description || ""}
+                        onChange={(e) =>
+                          handleTicketTypeChange(
+                            index,
+                            "description",
+                            e.target.value || null
+                          )
+                        }
+                        className="w-full px-3 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white placeholder-white/50 focus:outline-none focus:border-regia-gold text-sm"
+                        placeholder="Ej: De pie, cerca del escenario"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
