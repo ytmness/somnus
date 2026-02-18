@@ -67,6 +67,7 @@ model Event {
   imageUrl          String?
   maxCapacity       Int      // Aforo máximo autorizado (ej: 5000)
   isActive          Boolean  @default(true)
+  showQR            Boolean  @default(true) // Mostrar QR en mis-boletos (control desde admin)
   salesStartDate    DateTime
   salesEndDate      DateTime
   createdAt         DateTime @default(now())

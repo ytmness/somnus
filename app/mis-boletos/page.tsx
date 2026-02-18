@@ -25,6 +25,7 @@ interface TicketData {
     eventDate: string;
     eventTime: string;
     imageUrl: string | null;
+    showQR?: boolean;
   };
   ticketType: {
     id: string;
@@ -343,34 +344,36 @@ export default function MisBoletosPage() {
                         )}
                       </div>
 
-                      <div className="mt-6 pt-6 border-t border-white/10">
-                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <QrCode className="w-5 h-5 text-white/80" />
-                              <p className="somnus-title-secondary">Código QR de Acceso</p>
+                      {ticket.event.showQR !== false && (
+                        <div className="mt-6 pt-6 border-t border-white/10">
+                          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <QrCode className="w-5 h-5 text-white/80" />
+                                <p className="somnus-title-secondary">Código QR de Acceso</p>
+                              </div>
+                              <p className="somnus-text-body text-sm">
+                                Presenta este código QR en la entrada del evento para validar tu boleto
+                              </p>
                             </div>
-                            <p className="somnus-text-body text-sm">
-                              Presenta este código QR en la entrada del evento para validar tu boleto
-                            </p>
-                          </div>
-                          <div className="bg-white p-4 rounded-lg shadow-lg">
-                            <QRCodeSVG
-                              value={JSON.stringify({
-                                ticketId: ticket.id,
-                                qrHash: ticket.qrCode,
-                                timestamp: Date.now()
-                              })}
-                              size={180}
-                              level="H"
-                              includeMargin={true}
-                            />
-                            <p className="text-center text-xs text-gray-600 mt-2 font-mono">
-                              {ticket.ticketNumber}
-                            </p>
+                            <div className="bg-white p-4 rounded-lg shadow-lg">
+                              <QRCodeSVG
+                                value={JSON.stringify({
+                                  ticketId: ticket.id,
+                                  qrHash: ticket.qrCode,
+                                  timestamp: Date.now()
+                                })}
+                                size={180}
+                                level="H"
+                                includeMargin={true}
+                              />
+                              <p className="text-center text-xs text-gray-600 mt-2 font-mono">
+                                {ticket.ticketNumber}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 </div>

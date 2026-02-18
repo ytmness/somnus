@@ -30,6 +30,7 @@ interface EventData {
   imageUrl: string | null;
   maxCapacity: number;
   isActive: boolean;
+  showQR: boolean;
   salesStartDate: string;
   salesEndDate: string;
   ticketTypes?: TicketTypeData[];
@@ -70,6 +71,7 @@ export function EditEventModal({
     eventTime: "",
     imageUrl: "",
     maxCapacity: 0,
+    showQR: true,
     salesStartDate: "",
     salesEndDate: "",
   });
@@ -97,6 +99,7 @@ export function EditEventModal({
           eventTime: e.eventTime,
           imageUrl: e.imageUrl || "",
           maxCapacity: e.maxCapacity,
+          showQR: e.showQR ?? true,
           salesStartDate: toDateTimeLocalStr(e.salesStartDate),
           salesEndDate: toDateTimeLocalStr(e.salesEndDate),
         });
@@ -126,10 +129,17 @@ export function EditEventModal({
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target;
+    const target = e.target;
+    const { name, value } = target;
+    const isCheckbox = target.type === "checkbox";
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "maxCapacity" ? parseInt(value, 10) || 0 : value,
+      [name]:
+        isCheckbox
+          ? (target as HTMLInputElement).checked
+          : name === "maxCapacity"
+            ? parseInt(value, 10) || 0
+            : value,
     }));
   };
 
@@ -177,6 +187,7 @@ export function EditEventModal({
         body: JSON.stringify({
           ...formData,
           maxCapacity: formData.maxCapacity,
+          showQR: formData.showQR,
           ticketTypes: ticketTypes.map((tt) => ({
             id: tt.id,
             name: tt.name,
@@ -346,6 +357,19 @@ export function EditEventModal({
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white"
                 />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="showQR"
+                  name="showQR"
+                  checked={formData.showQR}
+                  onChange={handleInputChange}
+                  className="w-4 h-4 rounded border-regia-gold/30 bg-white/10 text-regia-gold focus:ring-regia-gold"
+                />
+                <label htmlFor="showQR" className="text-sm font-medium text-white/90 cursor-pointer">
+                  Mostrar código QR en Mis Boletos
+                </label>
               </div>
               <div>
                 <label className="block text-sm font-medium text-white/90 mb-2">

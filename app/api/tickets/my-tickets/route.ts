@@ -46,6 +46,7 @@ export async function GET(request: NextRequest) {
             eventDate: true,
             eventTime: true,
             imageUrl: true,
+            showQR: true,
           },
         },
         tickets: {

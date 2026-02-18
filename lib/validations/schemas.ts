@@ -58,6 +58,7 @@ export const updateTicketTypeSchema = ticketTypeSchema
 
 export const updateEventSchema = createEventSchema.partial().extend({
   isActive: z.boolean().optional(),
+  showQR: z.boolean().optional(),
   ticketTypes: z.array(updateTicketTypeSchema).optional(),
 });
 
