@@ -16,8 +16,10 @@ export function UpcomingEventsCarousel({
     align: "center",
     loop: true,
     containScroll: "trimSnaps",
+    skipSnaps: false,
   });
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
@@ -37,22 +39,59 @@ export function UpcomingEventsCarousel({
     };
   }, [emblaApi]);
 
+  // Auto-play: va cambiando solo cada 4 segundos (pausa al hacer hover)
+  useEffect(() => {
+    if (!emblaApi || isHovered || children.length <= 1) return;
+    const interval = setInterval(() => {
+      if (emblaApi.canScrollNext()) {
+        emblaApi.scrollNext();
+      } else {
+        emblaApi.scrollTo(0);
+      }
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [emblaApi, isHovered, children.length]);
+
   if (!children || children.length === 0) return null;
 
   return (
-    <div className={`relative w-full group ${className}`}>
-      <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex -ml-4 md:-ml-6">
-          {children.map((child, index) => (
-            <div
-              key={index}
-              className="flex-[0_0_85%] min-w-0 pl-4 md:flex-[0_0_45%] md:pl-6 lg:flex-[0_0_36%] shrink-0"
-            >
-              {child}
-            </div>
-          ))}
+    <div
+      className={`relative w-full group ${className}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="overflow-hidden px-2" ref={emblaRef}>
+        <div className="flex touch-pan-y" style={{ marginLeft: "-0.5rem" }}>
+          {children.map((child, index) => {
+            const isActive = index === selectedIndex;
+            return (
+              <div
+                key={index}
+                className="flex-[0_0_80%] min-w-0 shrink-0 px-2 md:flex-[0_0_44%] lg:flex-[0_0_40%]"
+                style={{
+                  marginRight: "-2.5rem",
+                  zIndex: isActive ? 10 : 1,
+                }}
+              >
+                <div
+                  className={`transition-transform duration-500 ease-out ${
+                    isActive ? "scale-[1.02]" : "scale-95 opacity-90"
+                  }`}
+                >
+                  {child}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
+
+      {/* Indicador "Pausado" al hacer hover (estilo Bresh) */}
+      {isHovered && children.length > 1 && (
+        <div className="absolute top-2 right-4 md:top-4 md:right-8 bg-black/60 text-white text-xs uppercase tracking-wider px-3 py-1.5 rounded-full backdrop-blur-sm z-20">
+          Paused
+        </div>
+      )}
 
       {/* Pagination dots - estilo Bresh */}
       <div className="flex justify-center gap-2 mt-8">
