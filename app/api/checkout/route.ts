@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { getSession } from "@/lib/auth/supabase-auth";
 import { generateQRHash, generateQRPayload } from "@/lib/services/qr-generator";
+import { calculateClipCommission } from "@/lib/utils";
 
 // Marcar como dinámica porque usa cookies
 export const dynamic = 'force-dynamic';
@@ -112,14 +113,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // IVA 16% solo aplica a la comisión de Clip (3.9%), no al ticket. Clip lo retiene.
-    const tax = 0;
-    const total = subtotal;
-
-    // Obtener usuario si está autenticado
-    const user = await getSession();
-    const userId = user?.id || null;
-
     const useClip = paymentMethod === "clip" && !!process.env.CLIP_AUTH_TOKEN;
 
     if (paymentMethod === "clip" && !process.env.CLIP_AUTH_TOKEN) {
@@ -128,6 +121,15 @@ export async function POST(request: NextRequest) {
         { status: 503 }
       );
     }
+
+    // Comisión Clip (3.9%) + IVA 16% sobre la comisión: la paga el cliente
+    const { totalCommission } = calculateClipCommission(subtotal);
+    const tax = useClip ? Math.round(totalCommission * 100) / 100 : 0;
+    const total = useClip ? Math.round((subtotal + totalCommission) * 100) / 100 : subtotal;
+
+    // Obtener usuario si está autenticado
+    const user = await getSession();
+    const userId = user?.id || null;
 
     // Crear la venta
     const sale = await prisma.sale.create({

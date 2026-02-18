@@ -9,6 +9,7 @@ import { IndividualTable, VIP_TABLES_162, NON_VIP_SECTIONS_162 } from "@/lib/pat
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Trash2, ArrowLeft, MapPin, Users, CreditCard, Ticket, Info, X, Calendar, Music, LogIn, User, Shield, Scan } from "lucide-react";
 import { toast } from "sonner";
+import { calculateClipCommission } from "@/lib/utils";
 
 interface Section {
   id: string;
@@ -173,8 +174,12 @@ export default function EventMesasPage() {
     }, 0);
   };
 
-  // IVA 16% solo sobre comisión Clip (3.9%); no se cobra al cliente
-  const getTotal = () => getSubtotal();
+  // Comisión Clip (3.9%) + IVA 16% sobre comisión: la paga el cliente
+  const getCommission = () => {
+    const { totalCommission } = calculateClipCommission(getSubtotal());
+    return totalCommission;
+  };
+  const getTotal = () => getSubtotal() + getCommission();
 
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [checkoutData, setCheckoutData] = useState({
@@ -713,11 +718,17 @@ export default function EventMesasPage() {
                         ${getSubtotal().toLocaleString()}
                       </span>
                     </div>
+                    <div className="flex justify-between mb-2">
+                      <span className="regia-text-body">Cargo por servicio (3.9% + IVA):</span>
+                      <span className="text-regia-cream font-bold">
+                        ${getCommission().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
                     <div className="border-t border-regia-gold-old/10 pt-3">
                       <div className="flex justify-between items-center">
                         <span className="text-regia-cream font-bold text-lg">Total:</span>
                         <span className="text-regia-gold-bright font-bold text-2xl">
-                          ${getTotal().toLocaleString()}
+                          ${getTotal().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                       </div>
                     </div>
@@ -808,16 +819,21 @@ export default function EventMesasPage() {
                   />
                 </div>
 
-                <div className="bg-regia-cream/5 rounded-lg p-4 mt-4">
-                  <div className="flex justify-between mb-2">
-                    <span className="regia-text-body">Total:</span>
+                <div className="bg-regia-cream/5 rounded-lg p-4 mt-4 space-y-2">
+                  <div className="flex justify-between">
+                    <span className="regia-text-body">Subtotal:</span>
+                    <span className="text-regia-cream">${getSubtotal().toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="regia-text-body">Cargo por servicio (3.9% + IVA):</span>
+                    <span className="text-regia-cream">${getCommission().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="flex justify-between border-t border-regia-gold-old/10 pt-2">
+                    <span className="regia-text-body font-bold">Total:</span>
                     <span className="text-regia-gold-bright font-bold text-xl">
-                      ${getTotal().toLocaleString()} MXN
+                      ${getTotal().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN
                     </span>
                   </div>
-                  <p className="regia-text-muted text-xs mt-2">
-                    * Pago simulado - En producción se integrará con pasarela de pago
-                  </p>
                 </div>
               </div>
 

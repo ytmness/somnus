@@ -1,5 +1,6 @@
 import { X, Trash2, ShoppingBag } from "lucide-react";
 import { CartItem } from "./types";
+import { calculateClipCommission } from "@/lib/utils";
 
 interface CartProps {
   items: CartItem[];
@@ -9,7 +10,9 @@ interface CartProps {
 }
 
 export function Cart({ items, onClose, onRemoveItem, onCheckout }: CartProps) {
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const { totalCommission } = calculateClipCommission(subtotal);
+  const total = subtotal + totalCommission;
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -75,7 +78,11 @@ export function Cart({ items, onClose, onRemoveItem, onCheckout }: CartProps) {
             <div className="space-y-3 mb-4">
               <div className="flex items-center justify-between text-[#49484e]/60">
                 <span>Subtotal ({totalItems} boletos)</span>
-                <span>${total.toLocaleString()} MXN</span>
+                <span>${subtotal.toLocaleString()} MXN</span>
+              </div>
+              <div className="flex items-center justify-between text-[#49484e]/70">
+                <span>Cargo por servicio (3.9% + IVA)</span>
+                <span>${totalCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN</span>
               </div>
               <div className="border-t border-[#5B8DEF]/20 pt-3 flex items-center justify-between">
                 <span className="text-[#49484e]">Total</span>

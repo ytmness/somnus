@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, ArrowLeft, Plus, Minus, X, Ticket, Calendar, MapPin } from "lucide-react";
 import { toast } from "sonner";
+import { calculateClipCommission } from "@/lib/utils";
 
 interface CartItem {
   ticketTypeId: string;
@@ -121,8 +122,16 @@ export default function EventBoletosPage() {
 
   const getSubtotal = () =>
     cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  // IVA 16% solo sobre comisión Clip (3.9%); no se cobra al cliente
-  const getTotal = () => getSubtotal();
+  // Comisión Clip (3.9%) + IVA 16% sobre comisión: la paga el cliente
+  const getTotal = () => {
+    const sub = getSubtotal();
+    const { totalCommission } = calculateClipCommission(sub);
+    return sub + totalCommission;
+  };
+  const getCommission = () => {
+    const { totalCommission } = calculateClipCommission(getSubtotal());
+    return totalCommission;
+  };
 
   const handleCheckout = async () => {
     if (cartItems.length === 0) {
@@ -415,9 +424,13 @@ export default function EventBoletosPage() {
                     <span>Subtotal</span>
                     <span>${getSubtotal().toLocaleString()}</span>
                   </div>
+                  <div className="flex justify-between text-white/70">
+                    <span>Cargo por servicio (3.9% + IVA)</span>
+                    <span>${getCommission().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  </div>
                   <div className="flex justify-between text-white font-bold text-lg border-t border-white/10 pt-3">
                     <span>Total</span>
-                    <span>${getTotal().toLocaleString()} MXN</span>
+                    <span>${getTotal().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN</span>
                   </div>
                   <Button
                     onClick={() => {
@@ -493,12 +506,18 @@ export default function EventBoletosPage() {
                   placeholder="+52 123 456 7890"
                 />
               </div>
-              <div className="liquid-glass p-4 rounded-xl mt-4">
-                <div className="flex justify-between">
-                  <span className="text-white/70">Total</span>
-                  <span className="text-white font-bold text-xl">
-                    ${getTotal().toLocaleString()} MXN
-                  </span>
+              <div className="liquid-glass p-4 rounded-xl mt-4 space-y-2">
+                <div className="flex justify-between text-white/70">
+                  <span>Subtotal</span>
+                  <span>${getSubtotal().toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-white/70">
+                  <span>Cargo por servicio (3.9% + IVA)</span>
+                  <span>${getCommission().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+                <div className="flex justify-between text-white font-bold text-xl border-t border-white/20 pt-2">
+                  <span>Total</span>
+                  <span>${getTotal().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN</span>
                 </div>
               </div>
             </div>
