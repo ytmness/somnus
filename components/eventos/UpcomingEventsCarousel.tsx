@@ -60,22 +60,19 @@ export function UpcomingEventsCarousel({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="overflow-hidden px-2" ref={emblaRef}>
-        <div className="flex touch-pan-y" style={{ marginLeft: "-0.5rem" }}>
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex gap-4 md:gap-5 lg:gap-6">
           {children.map((child, index) => {
             const isActive = index === selectedIndex;
             return (
               <div
                 key={index}
-                className="flex-[0_0_80%] min-w-0 shrink-0 px-2 md:flex-[0_0_44%] lg:flex-[0_0_40%]"
-                style={{
-                  marginRight: "-2.5rem",
-                  zIndex: isActive ? 10 : 1,
-                }}
+                className="min-w-0 shrink-0 flex-[0_0_100%] md:flex-[0_0_calc((100%-2.5rem)/3)] lg:flex-[0_0_calc((100%-3rem)/3)]"
+                style={{ zIndex: isActive ? 10 : 1 }}
               >
                 <div
                   className={`transition-transform duration-500 ease-out ${
-                    isActive ? "scale-[1.02]" : "scale-95 opacity-90"
+                    isActive ? "scale-[1.02]" : "scale-[0.98] opacity-90"
                   }`}
                 >
                   {child}
