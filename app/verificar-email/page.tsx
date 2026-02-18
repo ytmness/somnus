@@ -169,7 +169,7 @@ function VerificarEmailContent() {
                   <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="Somnus" width={280} height={84} className="w-48 md:w-56 h-auto object-contain" />
                 </div>
                 <p className="somnus-text-body text-lg mb-8">
-                  Ingresa el código de 6 dígitos que enviamos a tu correo para completar el acceso.
+                  Ingresa el código de 8 dígitos que enviamos a tu correo para completar el acceso.
                 </p>
               </div>
 
@@ -179,7 +179,7 @@ function VerificarEmailContent() {
                     <Mail className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Código de 6 Dígitos</h3>
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Código de 8 Dígitos</h3>
                     <p className="somnus-text-body text-sm">
                       Revisa tu bandeja de entrada y spam para encontrar el código
                     </p>
@@ -221,7 +221,7 @@ function VerificarEmailContent() {
                       Verifica tu Email
                     </h1>
                     <p className="somnus-text-body text-sm">
-                      Ingresa el código de 6 dígitos que enviamos a tu email
+                      Ingresa el código de 8 dígitos que enviamos a tu email
                     </p>
                   </div>
 
@@ -233,7 +233,7 @@ function VerificarEmailContent() {
                       Verifica tu Email
                     </h1>
                     <p className="somnus-text-body">
-                      Ingresa el código de 6 dígitos que enviamos a tu email
+                      Ingresa el código de 8 dígitos que enviamos a tu email
                     </p>
                   </div>
 
@@ -268,23 +268,23 @@ function VerificarEmailContent() {
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            code: e.target.value.replace(/\D/g, "").slice(0, 6),
+                            code: e.target.value.replace(/\D/g, "").slice(0, 8),
                           })
                         }
                         className="w-full px-4 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all text-center text-2xl tracking-widest font-mono backdrop-blur-sm"
-                        placeholder="000000"
+                        placeholder="00000000"
                         required
-                        maxLength={6}
-                        pattern="[0-9]{6}"
+                        maxLength={8}
+                        pattern="[0-9]{8}"
                       />
                       <p className="somnus-text-body text-sm mt-2 text-center">
-                        Ingresa el código de 6 dígitos
+                        Ingresa el código de 8 dígitos
                       </p>
                     </div>
 
                     <button
                       type="submit"
-                      disabled={isLoading || formData.code.length !== 6}
+                      disabled={isLoading || formData.code.length !== 8}
                       className="w-full somnus-btn text-base py-6 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isLoading ? (

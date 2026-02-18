@@ -182,7 +182,7 @@ export default function LoginPage() {
                       Iniciar Sesión
                     </h1>
                     <p className="somnus-text-body text-sm">
-                      Ingresa tu email y recibe un código de 6 dígitos
+                      Ingresa tu email y recibe un código de 8 dígitos
                     </p>
                   </div>
 
@@ -195,7 +195,7 @@ export default function LoginPage() {
                       Iniciar Sesión
                     </h1>
                     <p className="somnus-text-body">
-                      Ingresa tu email y recibe un código de verificación
+                      Ingresa tu email y recibe un código de 8 dígitos
                     </p>
                   </div>
 

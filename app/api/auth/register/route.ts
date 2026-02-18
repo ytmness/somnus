@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Usuario registrado. Verifica tu email con el código de 6 dígitos enviado.",
+      message: "Usuario registrado. Verifica tu email con el código de 8 dígitos enviado.",
       requiresVerification: true,
       user: {
         id: user.id,
