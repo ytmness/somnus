@@ -30,11 +30,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Buscar todas las ventas del cliente por email
+    // Buscar ventas por email O userId (email insensible a mayúsculas)
     const sales = await prisma.sale.findMany({
       where: {
-        buyerEmail: user.email,
-        status: "COMPLETED", // Solo ventas completadas
+        status: "COMPLETED",
+        OR: [
+          { buyerEmail: { equals: user.email, mode: "insensitive" } },
+          { userId: user.id },
+        ],
       },
       include: {
         event: {

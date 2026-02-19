@@ -67,6 +67,22 @@ export default function EventBoletosPage() {
     if (eventId) loadEvent();
   }, [eventId, router]);
 
+  // Pre-llenar datos del comprador si está logueado (evita que no vea boletos en mis-boletos)
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.user?.email) {
+          setCheckoutData((prev) => ({
+            ...prev,
+            buyerEmail: data.user.email,
+            buyerName: prev.buyerName || data.user.name || prev.buyerName,
+          }));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const ticketTypes = (event?.ticketTypes || []).filter((tt: any) => !tt.isTable);
 
   const getAvailable = (tt: any) => tt.maxQuantity - (tt.soldQuantity || 0);

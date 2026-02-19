@@ -11,6 +11,7 @@ import { CartItem, Concert } from "@/components/eventos/types";
 import { EventCardZamna } from "@/components/eventos/EventCardZamna";
 import { GalleryEventCardZamna } from "@/components/eventos/GalleryEventCardZamna";
 import { UpcomingEventsCarousel } from "@/components/eventos/UpcomingEventsCarousel";
+import { BrandPresenceCarousel } from "@/components/BrandPresenceCarousel";
 import { GALLERY_EVENTS } from "@/lib/gallery-events";
 import { RevealSection } from "@/components/RevealSection";
 
@@ -544,6 +545,9 @@ export default function HomePage() {
           </div>
         </section>
       </RevealSection>
+
+      {/* 3. BRAND PRESENCE - Carrusel infinito de marcas */}
+      <BrandPresenceCarousel />
 
       {/* 4. MANIFIESTO - ¿Por qué Somnus? */}
       <RevealSection>

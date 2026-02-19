@@ -184,6 +184,16 @@ El mensaje detallado viene en `detail` de la respuesta. Los logs muestran `[Clip
 
 ---
 
+## Mis Boletos: no aparecen boletos tras pagar con Clip
+
+**Causa:** Los boletos se buscan por `buyerEmail` (o `userId` si estabas logueado). El email con el que inicias sesión debe coincidir exactamente con el que usaste al pagar.
+
+**Solución:** Inicia sesión con el mismo email que ingresaste en el checkout. La búsqueda es insensible a mayúsculas (User@mail.com = user@mail.com).
+
+Si el QR no aparece en un boleto, verifica que el evento tenga `showQR: true` (desde Admin → Editar evento).
+
+---
+
 ## Login: Rate limit exceeded / 400
 
 Supabase limita OTP (códigos por email): ~30/hora global, 60 segundos entre intentos al mismo email.

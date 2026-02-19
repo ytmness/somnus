@@ -249,6 +249,9 @@ export default function MisBoletosPage() {
               <p className="somnus-text-body mb-6">
                 Compra boletos para tus eventos favoritos
               </p>
+              <p className="somnus-text-body text-sm text-white/60 mb-6 max-w-md mx-auto">
+                ¿Acabas de pagar con Clip? Cierra sesión e inicia con el <strong>mismo email</strong> que usaste en el checkout. Los boletos se asocian a ese correo.
+              </p>
               <button
                 onClick={() => router.push("/")}
                 className="somnus-btn px-8 py-3.5"
@@ -344,7 +347,7 @@ export default function MisBoletosPage() {
                         )}
                       </div>
 
-                      {ticket.event.showQR !== false && (
+                      {(ticket.event.showQR !== false) && ticket.qrCode && ticket.qrCode !== "TEMP" && (
                         <div className="mt-6 pt-6 border-t border-white/10">
                           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                             <div className="flex-1">

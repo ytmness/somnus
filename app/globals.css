@@ -49,6 +49,15 @@ body::-webkit-scrollbar {
   to { opacity: 1; }
 }
 
+/* Carrusel infinito Brand Presence */
+@keyframes brand-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.brand-scroll-animate {
+  animation: brand-scroll 40s linear infinite;
+}
+
 .reveal-on-scroll {
   opacity: 0;
   transform: translateY(32px);
