@@ -18,14 +18,11 @@ function useIsMobile() {
 interface UpcomingEventsCarouselProps {
   children: React.ReactNode[];
   className?: string;
-  /** Título a la izquierda (ej: "Cerca de ti") */
   title?: string;
-  /** CTA a la derecha (ej: "Ver eventos →") */
   ctaLabel?: string;
   ctaHref?: string;
 }
 
-// Parámetros del coverflow
 const COVERFLOW = {
   perspective: 1200,
   centerScale: 1.18,
@@ -44,6 +41,16 @@ const COVERFLOW = {
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
+}
+
+/** Normaliza índice para loop: evita saltos al cruzar boundaries */
+function normalizeLoopDistance(index: number, selected: number, count: number): number {
+  if (count <= 1) return 0;
+  let dist = index - selected;
+  const half = count / 2;
+  if (dist > half) dist -= count;
+  else if (dist < -half) dist += count;
+  return dist;
 }
 
 export function UpcomingEventsCarousel({
@@ -76,15 +83,17 @@ export function UpcomingEventsCarousel({
 
   useEffect(() => {
     if (!emblaApi) return;
-    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
+    const onSelect = () => {
+      const raw = emblaApi.selectedScrollSnap();
+      setSelectedIndex(raw % children.length);
+    };
     onSelect();
     emblaApi.on("select", onSelect);
     return () => {
       emblaApi.off("select", onSelect);
     };
-  }, [emblaApi]);
+  }, [emblaApi, children.length]);
 
-  // Actualizar scrollProgress para transición suave durante drag
   useEffect(() => {
     if (!emblaApi) return;
     const updateProgress = () => {
@@ -100,12 +109,9 @@ export function UpcomingEventsCarousel({
     };
   }, [emblaApi]);
 
-  // Auto-play: pausa al hacer hover
   useEffect(() => {
     if (!emblaApi || isHovered || children.length <= 1) return;
-    const interval = setInterval(() => {
-      emblaApi.scrollNext();
-    }, 4000);
+    const interval = setInterval(() => emblaApi.scrollNext(), 4000);
     return () => clearInterval(interval);
   }, [emblaApi, isHovered, children.length]);
 
@@ -117,8 +123,8 @@ export function UpcomingEventsCarousel({
     snapList.length > 1 ? snapList[snapList.length - 1] - snapList[0] : 0;
   const slideWidth =
     count > 1 && snapList.length > 1
-      ? totalRange / (snapList.length - 1)
-      : 300;
+      ? totalRange / Math.max(snapList.length - 1, 1)
+      : 320;
   const currentScroll =
     totalRange > 0
       ? scrollProgress * totalRange + (snapList[0] ?? 0)
@@ -147,7 +153,6 @@ export function UpcomingEventsCarousel({
       role="region"
       aria-label="Event carousel"
     >
-      {/* Header: título izquierda + CTA derecha (si se pasan props) */}
       {(title || ctaLabel) && (
         <div className="flex items-center justify-between mb-6 px-2">
           {title && (
@@ -180,26 +185,24 @@ export function UpcomingEventsCarousel({
         </div>
       )}
 
-      {/* Stage con padding lateral para ver cards parcialmente cortadas */}
-      <div className="overflow-hidden pl-14 pr-14 md:pl-20 md:pr-20">
+      {/* Stage: overflow-visible para no recortar laterales/sombras. Solo viewport tiene overflow-hidden. */}
+      <div className="relative overflow-visible pl-14 pr-14 md:pl-20 md:pr-20">
         <div
-          className="overflow-hidden"
+          className="overflow-hidden min-w-0"
           ref={emblaRef}
           style={{ perspective: COVERFLOW.perspective }}
         >
           <div
-            className="flex"
-            style={{
-              backfaceVisibility: "hidden",
-            }}
+            className="flex touch-pan-y"
+            style={{ backfaceVisibility: "hidden" }}
           >
             {children.map((child, index) => {
               let distance: number;
               if (snapList.length > 0 && slideWidth > 0) {
-                const slideCenter = snapList[index] ?? index * slideWidth;
+                const slideCenter = snapList[Math.min(index, snapList.length - 1)] ?? index * slideWidth;
                 distance = (slideCenter - currentScroll) / slideWidth;
               } else {
-                distance = index - selectedIndex;
+                distance = normalizeLoopDistance(index, selectedIndex, count);
               }
               if (count > 2 && Math.abs(distance) > count / 2) {
                 distance -= distance > 0 ? count : -count;
@@ -233,7 +236,7 @@ export function UpcomingEventsCarousel({
                 translateZ = lerp(COVERFLOW.centerZ, COVERFLOW.side1Z, t);
                 rotateY = sign * lerp(0, rotY, t);
                 opacity = lerp(1, COVERFLOW.sideOpacity, t);
-                zIndex = 5;
+                zIndex = Math.max(1, 10 - Math.round(absDist * 4));
               } else {
                 const t = Math.min((absDist - 1.5) / 1, 1);
                 scale = lerp(side1Scl, side2Scl, t);
@@ -246,21 +249,19 @@ export function UpcomingEventsCarousel({
               return (
                 <div
                   key={index}
-                  className="flex-[0_0_85%] min-w-0 shrink-0 pl-3 pr-3 md:flex-[0_0_42%] md:pl-4 md:pr-4 lg:flex-[0_0_36%] lg:pl-5 lg:pr-5"
-                  style={{
-                    zIndex,
-                    transformStyle: "preserve-3d",
-                  }}
+                  className="embla__slide min-w-0 shrink-0 flex-[0_0_85%] px-2 md:flex-[0_0_38%] md:px-3 lg:flex-[0_0_32%] lg:px-4"
                 >
                   <div
-                    className="transition-transform duration-300 ease-out will-change-transform"
+                    className="embla__slide-inner min-h-[380px] md:min-h-[400px] transition-transform duration-200 ease-out"
                     style={{
-                      transform: `perspective(${COVERFLOW.perspective}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
+                      zIndex,
+                      transform: `translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
                       opacity,
                       transformStyle: "preserve-3d",
+                      transformOrigin: "center center",
                       boxShadow: isCenter
-                        ? "0 20px 40px -12px rgba(0,0,0,0.5)"
-                        : "0 8px 24px -8px rgba(0,0,0,0.3)",
+                        ? "0 24px 48px -12px rgba(0,0,0,0.55)"
+                        : "0 12px 28px -8px rgba(0,0,0,0.35)",
                     }}
                   >
                     {child}
@@ -272,14 +273,12 @@ export function UpcomingEventsCarousel({
         </div>
       </div>
 
-      {/* Indicador Pausado */}
       {isHovered && children.length > 1 && (
         <div className="absolute top-2 right-4 md:top-4 md:right-8 bg-black/60 text-white text-xs uppercase tracking-wider px-3 py-1.5 rounded-full backdrop-blur-sm z-20">
           Paused
         </div>
       )}
 
-      {/* Pagination dots */}
       <div className="flex justify-center gap-2 mt-8" role="tablist" aria-label="Carousel navigation">
         {children.map((_, index) => (
           <button
@@ -297,7 +296,6 @@ export function UpcomingEventsCarousel({
         ))}
       </div>
 
-      {/* Flechas - teclado + aria */}
       {children.length > 1 && (
         <>
           <button
@@ -314,11 +312,7 @@ export function UpcomingEventsCarousel({
               stroke="currentColor"
               className="w-6 h-6"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 19.5L8.25 12l7.5-7.5"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
           </button>
           <button
@@ -335,11 +329,7 @@ export function UpcomingEventsCarousel({
               stroke="currentColor"
               className="w-6 h-6"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M8.25 4.5l7.5 7.5-7.5 7.5"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
             </svg>
           </button>
         </>
