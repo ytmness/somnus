@@ -219,17 +219,6 @@ body::-webkit-scrollbar {
     z-index: 0;
     opacity: 0.6;
   }
-
-  /* Carrusel coverflow: slide = flex-item estable, slide-inner = transforms */
-  .embla__slide {
-    flex-shrink: 0;
-    /* Sin transform aquí: solo flex-basis fijo */
-  }
-
-  .embla__slide-inner {
-    transform-origin: center center;
-    backface-visibility: hidden;
-  }
   
   .regia-gradient {
     background: linear-gradient(135deg, #2a2c30 0%, #49484e 100%);
