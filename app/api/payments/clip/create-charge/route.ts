@@ -56,9 +56,10 @@ export async function POST(request: NextRequest) {
       description
     );
 
-    // Clip puede devolver paid: true o status: "captured"/"completed"
+    // Clip devuelve status: "approved" o "captured"/"completed"; paid/paid_amount
     const isPaid =
       clipRes?.paid === true ||
+      clipRes?.status === "approved" ||
       clipRes?.status === "captured" ||
       clipRes?.status === "completed" ||
       clipRes?.status === "paid";

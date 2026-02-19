@@ -7,13 +7,13 @@
 | **Node.js ≥20** | Next.js y @supabase/supabase-js ya no soportan Node 18. Actualizar con `nvm use 20` o `n 20`. |
 | **Variables de entorno** | PM2 **no** recarga `.env` automáticamente al reiniciar. Tras editar `.env` usa: `pm2 restart somnus --update-env` |
 
-## Clip: variables vs Boletera
+## Clip: variables y autenticación
 
-Somnus usa `CLIP_AUTH_TOKEN` (token secreto backend). Boletera podría usar `CLIP_API_KEY` u otro nombre. En ambos casos el flujo es:
+Clip usa **Basic auth**: `Authorization: Base64(ClaveAPI:ClaveSecreta)`.
 
-1. Frontend: SDK tokeniza la tarjeta con `NEXT_PUBLIC_CLIP_API_KEY`
-2. Backend: crea el cargo con `Authorization: Bearer <token_secreto>`
-3. El **token secreto** debe coincidir con el ambiente (sandbox vs producción) y la URL por defecto es `https://api.payclip.com`
+- `NEXT_PUBLIC_CLIP_API_KEY` = Clave API (para SDK frontend y Basic auth)
+- `CLIP_AUTH_TOKEN` = Clave secreta (solo backend, para Basic auth)
+- URL por defecto: `https://api.payclip.com`
 
 ## Supabase: getUser vs getSession
 

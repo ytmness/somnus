@@ -29,15 +29,19 @@ export async function createClipCharge(
   customer: { email: string; phone?: string },
   description: string
 ): Promise<ClipChargeResponse> {
-  const authToken = process.env.CLIP_AUTH_TOKEN;
-  if (!authToken) {
-    throw new Error("CLIP_AUTH_TOKEN no configurado");
+  const apiKey = process.env.NEXT_PUBLIC_CLIP_API_KEY || process.env.CLIP_API_KEY;
+  const secretKey = process.env.CLIP_AUTH_TOKEN;
+  if (!apiKey || !secretKey) {
+    throw new Error("NEXT_PUBLIC_CLIP_API_KEY y CLIP_AUTH_TOKEN deben estar configurados");
   }
 
-  // Clip espera el monto en centavos (ej: $10.45 → 1045)
-  const amountCentavos = Math.round(Number(totalAmount) * 100);
+  // Clip usa Basic auth: Base64(ClaveAPI:ClaveSecreta)
+  const basicAuth = Buffer.from(`${apiKey}:${secretKey}`).toString("base64");
+
+  // Clip espera el monto (puede ser decimal para pruebas, ej: 0.01)
+  const amount = Number(totalAmount);
   const body: ClipChargeRequest = {
-    amount: amountCentavos,
+    amount,
     currency: "MXN",
     description: description || `Venta Somnus - ${saleId.slice(0, 8)}`,
     payment_method: { token },
@@ -48,7 +52,7 @@ export async function createClipCharge(
   const res = await fetch(`${CLIP_API}/payments`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${authToken}`,
+      Authorization: `Basic ${basicAuth}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
