@@ -57,22 +57,19 @@ export function getSupabaseAdmin() {
 export async function getSession(): Promise<SessionUser | null> {
   try {
     const supabase = createServerClient();
+    // getUser() verifica con el servidor de Auth; getSession() lee de cookies (menos seguro)
     const {
-      data: { session },
+      data: { user: authUser },
       error,
-    } = await supabase.auth.getSession();
+    } = await supabase.auth.getUser();
 
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/0a40da1d-54df-4a70-9c53-c9c9e8cfa786',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/auth/supabase-auth.ts:42',message:'getSession - Supabase session check',data:{hasSession:!!session,hasError:!!error,hasUser:!!session?.user,userEmail:session?.user?.email},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-
-    if (error || !session?.user) {
+    if (error || !authUser?.email) {
       return null;
     }
 
     // Buscar usuario en nuestra tabla User por email
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email! },
+      where: { email: authUser.email },
     });
 
     if (!user || !user.isActive) {
@@ -84,7 +81,7 @@ export async function getSession(): Promise<SessionUser | null> {
       email: user.email,
       name: user.name,
       role: user.role as SessionUser["role"],
-      authUserId: session.user.id,
+      authUserId: authUser.id,
     };
   } catch (error) {
     console.error("Error getting session:", error);

@@ -1,8 +1,9 @@
 /**
  * Cliente Clip para cobros (Checkout Transparente)
- * API: https://api.payclip.com/payments
+ * API base configurable: api.payclip.com (producción) o api.sandbox.payclip.com (pruebas)
  */
-const CLIP_API = "https://api.payclip.com";
+const CLIP_API =
+  process.env.CLIP_API_URL || "https://api.payclip.com";
 
 export interface ClipChargeRequest {
   amount: number; // En CENTAVOS (Clip requiere enteros)
@@ -53,14 +54,15 @@ export async function createClipCharge(
     body: JSON.stringify(body),
   });
 
-  const data = await res.json();
+  const data = (await res.json().catch(() => ({}))) as Record<string, unknown>;
 
   if (!res.ok) {
     const msg =
-      data?.message ||
-      data?.error ||
+      (data?.message as string) ||
+      (data?.error as string) ||
       (typeof data?.errors === "string" ? data.errors : null) ||
-      "Error al procesar pago con Clip";
+      `Error al procesar pago con Clip (${res.status})`;
+    console.error("[Clip API]", res.status, data);
     throw new Error(String(msg));
   }
 

@@ -11,6 +11,14 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(request: NextRequest) {
   try {
+    if (!process.env.CLIP_AUTH_TOKEN) {
+      console.error("Clip create-charge: CLIP_AUTH_TOKEN no configurado en .env");
+      return NextResponse.json(
+        { error: "Los pagos con tarjeta no están disponibles temporalmente. Contacta al administrador." },
+        { status: 503 }
+      );
+    }
+
     const body = await request.json();
     const { saleId, token, customer } = body;
 
@@ -73,6 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear tickets desde saleItems
+    const eventPrefix = (sale.event?.name || "EVT").substring(0, 3).toUpperCase();
     for (const item of sale.saleItems) {
       const ticketType = await prisma.ticketType.findUnique({
         where: { id: item.ticketTypeId },
@@ -80,12 +89,13 @@ export async function POST(request: NextRequest) {
       if (!ticketType) continue;
 
       const qty = item.isTable ? (ticketType.seatsPerTable || 4) : item.quantity;
+      const typePrefix = (ticketType.name || "TKT").substring(0, 3).toUpperCase();
 
       for (let i = 0; i < qty; i++) {
         const ticketCount = await prisma.ticket.count({
           where: { ticketTypeId: item.ticketTypeId },
         });
-        const ticketNumber = `${(sale.event?.name || "EVT").substring(0, 3).toUpperCase()}-${ticketType.name.substring(0, 3).toUpperCase()}-${String(ticketCount + 1).padStart(6, "0")}`;
+        const ticketNumber = `${eventPrefix}-${typePrefix}-${String(ticketCount + 1).padStart(6, "0")}`;
 
         const ticket = await prisma.ticket.create({
           data: {
@@ -128,9 +138,20 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     const errMsg = error?.message || String(error);
     console.error("Clip create-charge error:", errMsg, error?.stack);
+    const isUnauthorized = /unauthorized/i.test(errMsg);
+    const isConfigError = errMsg.includes("CLIP_AUTH_TOKEN") || errMsg.includes("no configurado");
+    let status = 500;
+    let clientMsg = errMsg;
+    if (isConfigError) {
+      status = 503;
+      clientMsg = "Configuración de pagos incompleta. Contacta al administrador.";
+    } else if (isUnauthorized) {
+      status = 401;
+      clientMsg = "Error de autenticación con Clip. El administrador debe verificar CLIP_AUTH_TOKEN.";
+    }
     return NextResponse.json(
-      { error: errMsg || "Error al procesar pago" },
-      { status: 500 }
+      { error: clientMsg || "Error al procesar pago" },
+      { status }
     );
   }
 }

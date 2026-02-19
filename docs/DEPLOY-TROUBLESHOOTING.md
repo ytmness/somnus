@@ -87,11 +87,41 @@ Ahí verás el error real (ej. "column does not exist", "connection refused").
 
 ---
 
+## Error: Failed to find Server Action "x"
+
+Síntoma en logs:
+```
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+```
+
+**Causa:** El cliente (navegador) tiene código en caché que apunta a Server Actions que ya no existen en el build actual del servidor.
+
+**Solución:**
+1. **Build limpio en el servidor:**
+   ```bash
+   cd /var/www/somnus
+   rm -rf .next
+   git pull
+   npm install
+   npm run build
+   pm2 restart somnus
+   ```
+2. **Un solo proceso PM2** – Si usas `instances: 2` o más, asegúrate de que todos corran el mismo build.
+3. **Hard refresh en el navegador:** `Ctrl+Shift+R` (o `Cmd+Shift+R` en Mac) para limpiar caché.
+4. **Verificar reinicios** – Si la app se reinicia muchas veces, puede haber un crash loop. Revisa `pm2 logs` para la causa.
+
+---
+
 ## Clip create-charge: Error "Unauthorized" (401)
 
-La API de Clip rechaza la petición. Revisa:
+La API de Clip rechaza el Bearer token.
 
-1. **CLIP_AUTH_TOKEN en el servidor**: Debe estar en `.env` en `/var/www/somnus`:
+**Causas posibles:**
+- Token equivocado: `CLIP_AUTH_TOKEN` debe ser el **token secreto** del backend, NO `NEXT_PUBLIC_CLIP_API_KEY` (esa es para el frontend).
+- Token expirado o revocado.
+- URL incorrecta: por defecto usamos `api.payclip.com`. Si Clip te indica otra (ej. `api.clip.mx` o sandbox), añade `CLIP_API_URL=https://...` en `.env`.
+
+1. **CLIP_AUTH_TOKEN en el servidor** – Debe estar en `.env` en `/var/www/somnus`:
    ```bash
    grep CLIP_AUTH_TOKEN /var/www/somnus/.env
    ```
@@ -100,7 +130,7 @@ La API de Clip rechaza la petición. Revisa:
    CLIP_AUTH_TOKEN=tu_token_de_clip
    ```
 
-2. **Token válido**: El token puede haber expirado. Genera uno nuevo en el panel de Clip (developer.clip.mx o similar).
+2. **Token válido** – El token puede haber expirado. Entra a [Clip Developer](https://developer.clip.mx) o tu panel de Clip y genera uno nuevo. Copia el token completo (sin espacios).
 
 3. **Reiniciar tras cambiar .env**:
    ```bash

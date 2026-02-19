@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       type: "email",
     });
 
-    if (authError || !authData.user) {
+    if (authError || !authData?.user) {
       console.error("[OTP VERIFY] Error:", authError);
       return NextResponse.json(
         { error: authError?.message || "Invalid or expired OTP code" },
@@ -78,7 +78,8 @@ export async function POST(request: NextRequest) {
       user.emailVerified = true;
     }
 
-    const { data: { session } } = await supabase.auth.getSession();
+    // verifyOtp devuelve la sesión; evita getSession (warning de Supabase)
+    const session = authData?.session;
 
     const jsonResponse = NextResponse.json({
       success: true,
