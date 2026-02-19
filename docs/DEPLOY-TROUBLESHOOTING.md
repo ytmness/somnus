@@ -168,6 +168,20 @@ La API de Clip rechaza el Bearer token.
 
 4. **Token y ambiente** – Asegura que el token secreto corresponda al ambiente correcto (sandbox vs producción) y que la API URL sea la esperada.
 
+### Códigos de error Clip (error_code en respuesta)
+
+| Código | HTTP | Significado |
+|--------|------|-------------|
+| CL1501 | 401 | Unauthorized – credenciales inválidas |
+| CL1307 | 400 | card token not found – token de tarjeta no encontrado |
+| CL1607 | 400 | card token expired – token expirado |
+| CL1136 | 400 | transaction amount limit reached – límite de monto |
+| CL2200 | 400 | Input validation – datos inválidos |
+| CL1620 | 409 | Pago duplicado (ya recibido) |
+| AI1899 | 500 | Error interno de Clip |
+
+El mensaje detallado viene en `detail` de la respuesta. Los logs muestran `[Clip API] status error_code { ... }`.
+
 ---
 
 ## Login: Rate limit exceeded / 400

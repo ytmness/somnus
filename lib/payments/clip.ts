@@ -6,7 +6,7 @@ const CLIP_API =
   process.env.CLIP_API_URL || "https://api.payclip.com";
 
 export interface ClipChargeRequest {
-  amount: number; // En CENTAVOS (Clip requiere enteros)
+  amount: number; // En pesos (decimal, ej: 100.50)
   currency: string;
   description: string;
   payment_method: { token: string };
@@ -61,13 +61,18 @@ export async function createClipCharge(
   const data = (await res.json().catch(() => ({}))) as Record<string, unknown>;
 
   if (!res.ok) {
+    const errorCode = data?.error_code as string;
+    const detail = Array.isArray(data?.detail)
+      ? (data.detail as string[]).join(". ")
+      : (data?.detail as string);
     const msg =
+      detail ||
       (data?.message as string) ||
       (data?.error as string) ||
-      (typeof data?.errors === "string" ? data.errors : null) ||
       `Error al procesar pago con Clip (${res.status})`;
-    console.error("[Clip API]", res.status, data);
-    throw new Error(String(msg));
+    const fullMsg = errorCode ? `[${errorCode}] ${msg}` : msg;
+    console.error("[Clip API]", res.status, errorCode, data);
+    throw new Error(fullMsg);
   }
 
   return data as ClipChargeResponse;
