@@ -1,3 +1,32 @@
+# Diagnóstico general (Somnus vs Boletera)
+
+## Requisitos del servidor
+
+| Requisito | Detalle |
+|-----------|---------|
+| **Node.js ≥20** | Next.js y @supabase/supabase-js ya no soportan Node 18. Actualizar con `nvm use 20` o `n 20`. |
+| **Variables de entorno** | PM2 **no** recarga `.env` automáticamente al reiniciar. Tras editar `.env` usa: `pm2 restart somnus --update-env` |
+
+## Clip: variables vs Boletera
+
+Somnus usa `CLIP_AUTH_TOKEN` (token secreto backend). Boletera podría usar `CLIP_API_KEY` u otro nombre. En ambos casos el flujo es:
+
+1. Frontend: SDK tokeniza la tarjeta con `NEXT_PUBLIC_CLIP_API_KEY`
+2. Backend: crea el cargo con `Authorization: Bearer <token_secreto>`
+3. El **token secreto** debe coincidir con el ambiente (sandbox vs producción) y la URL por defecto es `https://api.payclip.com`
+
+## Supabase: getUser vs getSession
+
+Supabase recomienda usar `getUser()` en servidor (valida contra el Auth server) en lugar de `getSession()` (lee solo de cookies). Somnus ya usa `getUser()` en `lib/auth/supabase-auth.ts`.
+
+## Flujo de prueba de pagos Clip
+
+1. Probar localmente: `NEXT_PUBLIC_APP_URL=http://localhost:3000`
+2. Verificar en la consola de Clip que el pago se complete
+3. En producción: token correcto en `.env` + `pm2 restart somnus --update-env`
+
+---
+
 # Solución: ChunkLoadError / 400 en _next/static/chunks
 
 ## Síntoma
@@ -132,10 +161,12 @@ La API de Clip rechaza el Bearer token.
 
 2. **Token válido** – El token puede haber expirado. Entra a [Clip Developer](https://developer.clip.mx) o tu panel de Clip y genera uno nuevo. Copia el token completo (sin espacios).
 
-3. **Reiniciar tras cambiar .env**:
+3. **Reiniciar tras cambiar .env** – PM2 no recarga variables automáticamente; usa `--update-env`:
    ```bash
    pm2 restart somnus --update-env
    ```
+
+4. **Token y ambiente** – Asegura que el token secreto corresponda al ambiente correcto (sandbox vs producción) y que la API URL sea la esperada.
 
 ---
 
