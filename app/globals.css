@@ -792,6 +792,37 @@ video.hero-video-no-controls::-ms-media-controls {
   display: none !important;
 }
 
+/* ===== CARRUSEL SWIPER COVERFLOW (eventos) ===== */
+/* No recortar el efecto 3D: overflow-visible en el stage; sin overflow-hidden en padres */
+.events-carousel-swiper,
+.events-carousel-swiper.swiper {
+  overflow: visible !important;
+}
+.events-carousel-swiper .swiper-slide {
+  /* NO overflow-hidden ni transform aquí; Swiper coverflow los gestiona */
+}
+
+/* Paginación abajo con translate, estilo Bresh */
+.events-carousel-swiper .swiper-pagination {
+  position: relative !important;
+  margin-top: 0 !important;
+  transform: translateY(-3rem);
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.events-carousel-swiper .swiper-pagination-bullet {
+  width: 0.5rem !important;
+  height: 0.5rem !important;
+  background: rgba(255, 255, 255, 0.4) !important;
+  opacity: 1 !important;
+  transition: all 0.3s ease;
+}
+.events-carousel-swiper .swiper-pagination-bullet-active {
+  background: #fff !important;
+  transform: scale(1.25);
+}
+
 /* Asegurar que el video no tenga apariencia nativa */
 video,
 video.hero-video-no-controls,
