@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { CreditCard, ArrowLeft } from "lucide-react";
+import { CreditCard, ArrowLeft, Calendar, MapPin, Clock } from "lucide-react";
 
 export default function PagarInvitePage() {
   const router = useRouter();
@@ -129,6 +129,15 @@ export default function PagarInvitePage() {
     currency: "MXN",
   }).format(invite.pricePerSeat);
 
+  const eventDate = invite.event?.eventDate
+    ? new Date(invite.event.eventDate).toLocaleDateString("es-MX", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : "";
+
   return (
     <div className="min-h-screen somnus-bg-main">
       <header className="border-b border-white/10 py-6 px-4 sm:px-6">
@@ -144,15 +153,65 @@ export default function PagarInvitePage() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2 uppercase tracking-wider">
-          Pagar asiento VIP
-        </h1>
-        <p className="text-white/60 mb-2">
-          Mesa {invite.tableNumber} - Asiento {invite.seatNumber}
-        </p>
-        <p className="text-white/80 mb-8">
-          <strong>{invite.event?.name}</strong>
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
+        {/* Bloque evento: imagen + detalles */}
+        <div className="rounded-xl overflow-hidden border border-white/10 mb-8">
+          {invite.event?.imageUrl ? (
+            <div className="relative w-full aspect-[16/9] bg-white/5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={invite.event.imageUrl.startsWith("http") ? invite.event.imageUrl : invite.event.imageUrl.startsWith("/") ? invite.event.imageUrl : `/${invite.event.imageUrl}`}
+                alt={invite.event.name || "Evento"}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+                <h1 className="text-xl sm:text-2xl font-bold text-white drop-shadow-lg">
+                  {invite.event.name}
+                </h1>
+                {invite.event.artist && (
+                  <p className="text-white/90 text-sm sm:text-base mt-0.5">
+                    {invite.event.artist}
+                  </p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white/5 p-6">
+              <h1 className="text-xl sm:text-2xl font-bold text-white">
+                {invite.event?.name}
+              </h1>
+              {invite.event?.artist && (
+                <p className="text-white/80 mt-1">{invite.event.artist}</p>
+              )}
+            </div>
+          )}
+          <div className="p-4 sm:p-5 bg-white/5 border-t border-white/10 flex flex-wrap gap-4 text-sm text-white/80">
+            {eventDate && (
+              <span className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-white/60" />
+                {eventDate}
+              </span>
+            )}
+            {invite.event?.eventTime && (
+              <span className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-white/60" />
+                {invite.event.eventTime}
+              </span>
+            )}
+            {invite.event?.venue && (
+              <span className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-white/60" />
+                {invite.event.venue}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <p className="text-white/70 text-center mb-6">
+          Mesa <strong className="text-white">{invite.tableNumber}</strong>
+          {" · "}
+          Asiento <strong className="text-white">{invite.seatNumber}</strong>
         </p>
 
         <div className="somnus-card p-6 sm:p-8 mb-6">

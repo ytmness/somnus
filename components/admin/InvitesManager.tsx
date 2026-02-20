@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Copy, Check, Link2, ExternalLink, Users } from "lucide-react";
+import { Copy, Check, Link2, ExternalLink, Users, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+
+const TOTAL_TABLES = 162;
 
 interface EventOption {
   id: string;
@@ -34,6 +36,18 @@ export function InvitesManager() {
   const [isLoadingEvents, setIsLoadingEvents] = useState(true);
   const [isLoadingInvites, setIsLoadingInvites] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Generar nuevos invites desde admin
+  const [showGenerate, setShowGenerate] = useState(false);
+  const [generateEventId, setGenerateEventId] = useState("");
+  const [generateTableNumber, setGenerateTableNumber] = useState("");
+  const [generateInvites, setGenerateInvites] = useState<
+    Array<{ name: string; email: string; phone: string }>
+  >([{ name: "", email: "", phone: "" }]);
+  const [isSubmittingGenerate, setIsSubmittingGenerate] = useState(false);
+  const [generatedLinks, setGeneratedLinks] = useState<
+    Array<{ token: string; name: string; url: string; pricePerSeat: number; seatNumber: number }>
+  >([]);
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -98,6 +112,91 @@ export function InvitesManager() {
     }
   };
 
+  const addGenerateInvite = () => {
+    setGenerateInvites((p) => [...p, { name: "", email: "", phone: "" }]);
+  };
+
+  const removeGenerateInvite = (index: number) => {
+    if (generateInvites.length <= 1) return;
+    setGenerateInvites((p) => p.filter((_, i) => i !== index));
+  };
+
+  const updateGenerateInvite = (
+    index: number,
+    field: "name" | "email" | "phone",
+    value: string
+  ) => {
+    setGenerateInvites((p) =>
+      p.map((inv, i) => (i === index ? { ...inv, [field]: value } : inv))
+    );
+  };
+
+  const handleGenerateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const eventId = generateEventId || selectedEventId;
+    if (!eventId) {
+      toast.error("Elige un evento");
+      return;
+    }
+    const tableNum = parseInt(generateTableNumber, 10);
+    if (isNaN(tableNum) || tableNum < 1 || tableNum > TOTAL_TABLES) {
+      toast.error(`Mesa debe ser entre 1 y ${TOTAL_TABLES}`);
+      return;
+    }
+    const validInvites = generateInvites.filter((inv) => inv.name.trim());
+    if (validInvites.length === 0) {
+      toast.error("Agrega al menos un invitado con nombre");
+      return;
+    }
+
+    setIsSubmittingGenerate(true);
+    setGeneratedLinks([]);
+    try {
+      const res = await fetch(
+        `/api/events/${eventId}/tables/${tableNum}/invites`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            invites: validInvites.map((inv) => ({
+              name: inv.name.trim(),
+              email: inv.email.trim() || undefined,
+              phone: inv.phone.trim() || undefined,
+            })),
+          }),
+        }
+      );
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Error al generar invites");
+      }
+
+      if (data.success && data.data?.invites) {
+        setGeneratedLinks(data.data.invites);
+        setSelectedEventId(eventId);
+        setShowGenerate(false);
+        setGenerateInvites([{ name: "", email: "", phone: "" }]);
+        setGenerateTableNumber("");
+        toast.success("Links generados. Cópialos y compártelos.");
+        // Refrescar lista de invites
+        const invRes = await fetch(`/api/admin/events/${eventId}/invites`, {
+          credentials: "include",
+        });
+        const invData = await invRes.json();
+        if (invData.success && invData.data?.invites) {
+          setInvites(invData.data.invites);
+        }
+      } else {
+        throw new Error("No se recibieron los links");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Error al generar");
+    } finally {
+      setIsSubmittingGenerate(false);
+    }
+  };
+
   if (isLoadingEvents) {
     return (
       <div className="text-center py-12">
@@ -119,38 +218,210 @@ export function InvitesManager() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-4">
-        <label className="text-white/80 text-sm font-medium">
-          Evento:
-        </label>
-        <select
-          value={selectedEventId}
-          onChange={(e) => setSelectedEventId(e.target.value)}
-          className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30 min-w-[240px]"
-        >
-          {events.map((ev) => (
-            <option key={ev.id} value={ev.id}>
-              {ev.name}
-            </option>
-          ))}
-        </select>
-        <Link href={`/eventos/${selectedEventId}/mesas`} target="_blank">
+    <div className="space-y-8">
+      {/* Generar nuevos invites */}
+      <div className="rounded-xl border border-white/10 bg-white/5 p-6">
+        <h3 className="text-lg font-bold text-white mb-4">
+          Generar nuevos invites
+        </h3>
+        <p className="text-white/60 text-sm mb-4">
+          Elige evento, número de mesa e invitados. Cada uno recibirá un link
+          para pagar su asiento. La página del link mostrará la imagen y datos
+          del evento.
+        </p>
+        {!showGenerate ? (
           <Button
-            variant="outline"
-            className="border-white/30 text-white hover:bg-white/10"
+            onClick={() => {
+              setShowGenerate(true);
+              setGenerateEventId(selectedEventId);
+              setGenerateTableNumber("");
+              setGenerateInvites([{ name: "", email: "", phone: "" }]);
+              setGeneratedLinks([]);
+            }}
+            className="bg-white/20 text-white hover:bg-white/30"
           >
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Ir a mesas y generar invites
+            <Plus className="w-4 h-4 mr-2" />
+            Generar links
           </Button>
-        </Link>
+        ) : (
+          <form onSubmit={handleGenerateSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-white/80 text-sm font-medium mb-1">
+                  Evento *
+                </label>
+                <select
+                  value={generateEventId}
+                  onChange={(e) => setGenerateEventId(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                >
+                  {events.map((ev) => (
+                    <option key={ev.id} value={ev.id}>
+                      {ev.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-white/80 text-sm font-medium mb-1">
+                  Número de mesa (1–{TOTAL_TABLES}) *
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={TOTAL_TABLES}
+                  value={generateTableNumber}
+                  onChange={(e) => setGenerateTableNumber(e.target.value)}
+                  placeholder="Ej: 42"
+                  required
+                  className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-white/80 text-sm font-medium">
+                  Invitados (nombre, email, teléfono)
+                </label>
+                <button
+                  type="button"
+                  onClick={addGenerateInvite}
+                  className="text-white/70 hover:text-white text-sm flex items-center gap-1"
+                >
+                  <Plus className="w-4 h-4" /> Agregar
+                </button>
+              </div>
+              <div className="space-y-3">
+                {generateInvites.map((inv, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-wrap gap-2 items-start p-3 rounded-lg bg-white/5 border border-white/10"
+                  >
+                    <input
+                      type="text"
+                      placeholder="Nombre *"
+                      value={inv.name}
+                      onChange={(e) =>
+                        updateGenerateInvite(i, "name", e.target.value)
+                      }
+                      className="flex-1 min-w-[120px] px-3 py-2 rounded bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      value={inv.email}
+                      onChange={(e) =>
+                        updateGenerateInvite(i, "email", e.target.value)
+                      }
+                      className="flex-1 min-w-[120px] px-3 py-2 rounded bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm"
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Teléfono"
+                      value={inv.phone}
+                      onChange={(e) =>
+                        updateGenerateInvite(i, "phone", e.target.value)
+                      }
+                      className="flex-1 min-w-[100px] px-3 py-2 rounded bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeGenerateInvite(i)}
+                      className="text-red-400 hover:text-red-300 p-2"
+                      title="Quitar"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                type="submit"
+                disabled={isSubmittingGenerate}
+                className="bg-white text-black hover:bg-white/90"
+              >
+                {isSubmittingGenerate ? "Generando..." : "Generar links"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setShowGenerate(false);
+                  setGeneratedLinks([]);
+                }}
+                className="border-white/30 text-white hover:bg-white/10"
+              >
+                Cancelar
+              </Button>
+            </div>
+          </form>
+        )}
+
+        {generatedLinks.length > 0 && (
+          <div className="mt-6 pt-6 border-t border-white/10">
+            <p className="text-white/80 font-medium mb-3">Links generados:</p>
+            <div className="space-y-2">
+              {generatedLinks.map((link, i) => (
+                <div
+                  key={link.token}
+                  className="flex flex-wrap items-center gap-2 p-2 rounded bg-white/5"
+                >
+                  <span className="text-white/80 text-sm">
+                    {link.name || `Invitado ${i + 1}`} (Mesa, asiento {link.seatNumber}) ·
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => copyLink(link.url, link.token)}
+                    className="text-white/90 hover:text-white text-sm flex items-center gap-1"
+                  >
+                    {copiedId === link.token ? (
+                      <Check className="w-4 h-4 text-green-400" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                    {copiedId === link.token ? "Copiado" : "Copiar link"}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      <p className="text-white/60 text-sm">
-        Desde el mapa de mesas puedes elegir una mesa disponible y usar
-        &quot;Invitar grupo&quot; para generar links. Aquí ves todos los links
-        creados y puedes copiarlos.
-      </p>
+      {/* Ver invites existentes */}
+      <div>
+        <h3 className="text-lg font-bold text-white mb-4">
+          Ver y copiar links existentes
+        </h3>
+        <div className="flex flex-wrap items-center gap-4 mb-4">
+          <label className="text-white/80 text-sm font-medium">Evento:</label>
+          <select
+            value={selectedEventId}
+            onChange={(e) => setSelectedEventId(e.target.value)}
+            className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30 min-w-[240px]"
+          >
+            {events.map((ev) => (
+              <option key={ev.id} value={ev.id}>
+                {ev.name}
+              </option>
+            ))}
+          </select>
+          <Link href={`/eventos/${selectedEventId}/mesas`} target="_blank">
+            <Button
+              variant="outline"
+              className="border-white/30 text-white hover:bg-white/10"
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Ir a mapa de mesas
+            </Button>
+          </Link>
+        </div>
+      </div>
 
       {isLoadingInvites ? (
         <div className="text-center py-8">
