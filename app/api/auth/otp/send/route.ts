@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/auth/supabase-auth";
+import { isInOtpCooldown, markOtpSent } from "@/lib/auth/otp-cooldown";
 import { z } from "zod";
 
 const sendOtpSchema = z.object({
@@ -22,19 +23,39 @@ export async function POST(request: NextRequest) {
     }
 
     const { email } = result.data;
+    const emailTrim = email.trim();
+
+    if (isInOtpCooldown(emailTrim)) {
+      return NextResponse.json({
+        success: true,
+        message: "Código OTP enviado a tu email",
+        cooldown: true,
+      });
+    }
+
     const supabase = createServerClient();
 
     const { error } = await supabase.auth.signInWithOtp({
-      email,
+      email: emailTrim,
       options: { shouldCreateUser: true },
     });
 
     if (error) {
+      const isRateLimit =
+        error.message?.toLowerCase().includes("rate") ||
+        error.code === "rate_limit_exceeded" ||
+        error.status === 429;
       return NextResponse.json(
-        { error: error.message || "Error al enviar código OTP" },
-        { status: 400 }
+        {
+          error: isRateLimit
+            ? "Demasiados intentos. Espera 1 minuto y vuelve a intentar."
+            : error.message || "Error al enviar código OTP",
+        },
+        { status: isRateLimit ? 429 : 400 }
       );
     }
+
+    markOtpSent(emailTrim);
 
     return NextResponse.json({
       success: true,

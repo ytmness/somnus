@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/auth/supabase-auth";
+import { isInOtpCooldown, markOtpSent } from "@/lib/auth/otp-cooldown";
 import { loginSchema } from "@/lib/validations/schemas";
 
 /**
@@ -18,10 +19,20 @@ export async function POST(request: NextRequest) {
     }
 
     const { email } = result.data;
+    const emailTrim = email.trim();
+
+    if (isInOtpCooldown(emailTrim)) {
+      return NextResponse.json({
+        success: true,
+        message: "Verification code sent to your email",
+        cooldown: true,
+      });
+    }
+
     const supabase = createServerClient();
 
     const { error } = await supabase.auth.signInWithOtp({
-      email,
+      email: emailTrim,
       options: {
         shouldCreateUser: true,
       },
@@ -29,16 +40,17 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error("[LOGIN] Error:", error.message, error.code);
-      // Supabase rate limit: espera 60 segundos entre OTPs al mismo email
       const isRateLimit =
         error.message?.toLowerCase().includes("rate") ||
         error.code === "rate_limit_exceeded" ||
         error.status === 429;
       const msg = isRateLimit
-        ? "Too many attempts. Please wait 1 minute and try again."
+        ? "Demasiados intentos. Espera 1 minuto y vuelve a intentar."
         : error.message || "Error sending verification code";
       return NextResponse.json({ error: msg }, { status: isRateLimit ? 429 : 400 });
     }
+
+    markOtpSent(emailTrim);
 
     return NextResponse.json({
       success: true,
