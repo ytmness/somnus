@@ -30,12 +30,68 @@ export async function GET(
       return NextResponse.json({ error: "Evento no encontrado" }, { status: 404 });
     }
 
-    const invites = await prisma.tableSlotInvite.findMany({
-      where: { eventId },
-      orderBy: [{ tableNumber: "asc" }, { seatNumber: "asc" }],
-    });
-
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+    type InviteRow = {
+      id: string;
+      tableNumber: number;
+      seatNumber: number;
+      invitedName: string;
+      invitedEmail: string | null;
+      invitedPhone: string | null;
+      status: string;
+      pricePerSeat: unknown;
+      inviteToken: string;
+      expiresAt: Date | null;
+      createdAt: Date;
+      paidAt?: Date | null;
+    };
+
+    let invites: InviteRow[];
+
+    try {
+      invites = await prisma.tableSlotInvite.findMany({
+        where: { eventId },
+        orderBy: [{ tableNumber: "asc" }, { seatNumber: "asc" }],
+        select: {
+          id: true,
+          tableNumber: true,
+          seatNumber: true,
+          invitedName: true,
+          invitedEmail: true,
+          invitedPhone: true,
+          status: true,
+          pricePerSeat: true,
+          inviteToken: true,
+          expiresAt: true,
+          createdAt: true,
+          paidAt: true,
+        },
+      }) as InviteRow[];
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("paidAt") || msg.includes("column") || msg.includes("does not exist")) {
+        invites = await prisma.tableSlotInvite.findMany({
+          where: { eventId },
+          orderBy: [{ tableNumber: "asc" }, { seatNumber: "asc" }],
+          select: {
+            id: true,
+            tableNumber: true,
+            seatNumber: true,
+            invitedName: true,
+            invitedEmail: true,
+            invitedPhone: true,
+            status: true,
+            pricePerSeat: true,
+            inviteToken: true,
+            expiresAt: true,
+            createdAt: true,
+          },
+        }) as InviteRow[];
+      } else {
+        throw err;
+      }
+    }
 
     const data = invites.map((inv) => ({
       id: inv.id,

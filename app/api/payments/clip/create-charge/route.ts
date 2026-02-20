@@ -139,16 +139,33 @@ export async function POST(request: NextRequest) {
     });
 
     if (isInviteSale && invite) {
-      await prisma.tableSlotInvite.update({
-        where: { id: invite.id },
-        data: {
-          status: "PAID",
-          invitedName: sale.buyerName,
-          invitedEmail: sale.buyerEmail || null,
-          invitedPhone: sale.buyerPhone || null,
-          paidAt: new Date(),
-        },
-      });
+      try {
+        await prisma.tableSlotInvite.update({
+          where: { id: invite.id },
+          data: {
+            status: "PAID",
+            invitedName: sale.buyerName,
+            invitedEmail: sale.buyerEmail || null,
+            invitedPhone: sale.buyerPhone || null,
+            paidAt: new Date(),
+          },
+        });
+      } catch (inviteErr: any) {
+        const msg = inviteErr?.message || String(inviteErr);
+        if (msg.includes("paidAt") || msg.includes("column") || msg.includes("does not exist")) {
+          await prisma.tableSlotInvite.update({
+            where: { id: invite.id },
+            data: {
+              status: "PAID",
+              invitedName: sale.buyerName,
+              invitedEmail: sale.buyerEmail || null,
+              invitedPhone: sale.buyerPhone || null,
+            },
+          });
+        } else {
+          throw inviteErr;
+        }
+      }
     }
 
     return NextResponse.json({
