@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
 import { prisma } from "@/lib/db/prisma";
 import { createClipCharge } from "@/lib/payments/clip";
 import { generateQRHash } from "@/lib/services/qr-generator";
@@ -97,19 +98,24 @@ export async function POST(request: NextRequest) {
       const typePrefix = (ticketType.name || "TKT").substring(0, 3).toUpperCase();
 
       for (let i = 0; i < qty; i++) {
+        const seatNumber = isInviteSale && invite ? invite.seatNumber : item.isTable ? i + 1 : null;
+
+        // ticketNumber debe ser único: secuencia + sufijo corto para evitar colisión si dos pagos a la vez
         const ticketCount = await prisma.ticket.count({
           where: { ticketTypeId: item.ticketTypeId },
         });
-        const ticketNumber = `${eventPrefix}-${typePrefix}-${String(ticketCount + 1).padStart(6, "0")}`;
+        const seq = String(ticketCount + 1).padStart(6, "0");
+        const uniqueSuffix = crypto.randomBytes(3).toString("hex");
+        const ticketNumber = `${eventPrefix}-${typePrefix}-${seq}-${uniqueSuffix}`;
 
-        const seatNumber = isInviteSale && invite ? invite.seatNumber : item.isTable ? i + 1 : null;
-
+        // qrCode es @unique: valor temporal único, luego se actualiza al hash real
+        const tempQr = `tmp-${crypto.randomUUID()}`;
         const ticket = await prisma.ticket.create({
           data: {
             saleId,
             ticketTypeId: item.ticketTypeId,
             ticketNumber,
-            qrCode: "TEMP",
+            qrCode: tempQr,
             tableNumber: item.tableNumber || null,
             seatNumber,
           },
@@ -174,7 +180,8 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: any) {
     const errMsg = error?.message || String(error);
-    console.error("Clip create-charge error:", errMsg, error?.stack);
+    const errCode = error?.code ?? "";
+    console.error("[create-charge] Error:", errCode, errMsg, error?.stack);
     const isUnauthorized = /unauthorized/i.test(errMsg);
     const isConfigError = errMsg.includes("CLIP_AUTH_TOKEN") || errMsg.includes("no configurado");
     let status = 500;
