@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { X, ZoomIn, ZoomOut, Info, Move } from "lucide-react";
+import { X, ZoomIn, ZoomOut, Info, Move, Users } from "lucide-react";
 import Image from "next/image";
 import {
   VIP_TABLES_162,
@@ -30,6 +31,7 @@ interface Section {
 interface PatriotasTablesMapProps {
   eventName: string;
   eventDate: string;
+  eventId?: string; // Para link "Invitar grupo"
   tables?: IndividualTable[]; // Mesas con estado desde BD
   sections?: Section[]; // Secciones desde BD
   onSelectTable: (table: IndividualTable) => void;
@@ -39,11 +41,13 @@ interface PatriotasTablesMapProps {
 export function PatriotasTablesMap({
   eventName,
   eventDate,
+  eventId,
   tables = VIP_TABLES_162,
   sections = NON_VIP_SECTIONS_162 as Section[],
   onSelectTable,
   onSelectSection,
 }: PatriotasTablesMapProps) {
+  const router = useRouter();
   const [selectedTable, setSelectedTable] = useState<IndividualTable | null>(null);
   const [selectedSection, setSelectedSection] = useState<Section | null>(null);
   const [hoveredTable, setHoveredTable] = useState<number | null>(null);
@@ -424,6 +428,10 @@ export function PatriotasTablesMap({
               <span className="text-white/70 text-sm">Disponible (Trasera)</span>
             </div>
             <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full bg-[#ff9800]"></div>
+              <span className="text-white/70 text-sm">Reservada (invites pendientes)</span>
+            </div>
+            <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded-full bg-[#666]"></div>
               <span className="text-white/70 text-sm">Vendida</span>
             </div>
@@ -484,12 +492,27 @@ export function PatriotasTablesMap({
             </div>
           </div>
 
-          <Button
-            onClick={handleConfirm}
-            className="w-full bg-[#5B8DEF] text-white hover:bg-[#7BA3E8] h-12 text-lg"
-          >
-            Agregar al Carrito
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              onClick={handleConfirm}
+              className="flex-1 bg-[#5B8DEF] text-white hover:bg-[#7BA3E8] h-12 text-lg"
+            >
+              Comprar Mesa Completa
+            </Button>
+            {eventId && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  router.push(`/eventos/${eventId}/mesa/${selectedTable.number}/invitar`);
+                  setSelectedTable(null);
+                }}
+                className="flex-1 border-[#5B8DEF] text-[#5B8DEF] hover:bg-[#5B8DEF]/10 h-12 text-lg"
+              >
+                <Users className="w-5 h-5 mr-2" />
+                Invitar Grupo
+              </Button>
+            )}
+          </div>
         </div>
       )}
 

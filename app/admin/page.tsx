@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, Calendar, Ticket, Users, ImageIcon } from "lucide-react";
+import { Plus, Calendar, Ticket, Users, ImageIcon, Link2 } from "lucide-react";
 import { EventsTable } from "@/components/admin/EventsTable";
 import { CreateEventModal } from "@/components/admin/CreateEventModal";
 import { GalleryManager } from "@/components/admin/GalleryManager";
+import { InvitesManager } from "@/components/admin/InvitesManager";
 import { toast } from "sonner";
 
 interface SessionUser {
@@ -30,7 +31,7 @@ export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [activeTab, setActiveTab] = useState<"eventos" | "galeria">("eventos");
+  const [activeTab, setActiveTab] = useState<"eventos" | "galeria" | "invites">("eventos");
 
   useEffect(() => {
     checkAuth();
@@ -243,6 +244,18 @@ export default function AdminPage() {
             <ImageIcon className="w-4 h-4 inline mr-2" />
             Galería
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("invites")}
+            className={`px-4 py-2 rounded-xl font-medium transition-all ${
+              activeTab === "invites"
+                ? "liquid-glass bg-white text-black"
+                : "liquid-glass text-white/80 hover:text-white"
+            }`}
+          >
+            <Link2 className="w-4 h-4 inline mr-2" />
+            Invites Mesas
+          </button>
         </div>
 
         {activeTab === "eventos" && (
@@ -262,6 +275,16 @@ export default function AdminPage() {
               <code className="bg-white/10 px-1 rounded">/assets/</code> o en una URL pública.
             </p>
             <GalleryManager />
+          </div>
+        )}
+
+        {activeTab === "invites" && (
+          <div className="liquid-glass p-6">
+            <h2 className="text-xl font-bold text-white mb-6">Invites de mesas VIP</h2>
+            <p className="text-white/70 text-sm mb-6">
+              Consulta los links de pago por asiento y cópialos. Para generar nuevos invites, usa &quot;Ir a mesas y generar invites&quot; y en el mapa elige una mesa → Invitar grupo.
+            </p>
+            <InvitesManager />
           </div>
         )}
       </main>

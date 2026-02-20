@@ -533,6 +533,7 @@ export default function EventMesasPage() {
         <PatriotasTablesMap
           eventName={event.name}
           eventDate={formattedDate}
+          eventId={eventId}
           tables={tables}
           sections={sections}
           onSelectTable={handleSelectTable}

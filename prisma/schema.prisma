@@ -76,6 +76,7 @@ model Event {
   // Relaciones
   ticketTypes       TicketType[]
   sales             Sale[]
+  tableSlotInvites  TableSlotInvite[]
 
   @@index([eventDate])
   @@index([isActive])
@@ -110,8 +111,9 @@ model TicketType {
   updatedAt     DateTime       @updatedAt
 
   // Relaciones
-  event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  tickets       Ticket[]
+  event            Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  tickets          Ticket[]
+  tableSlotInvites TableSlotInvite[]
 
   @@index([eventId])
   @@index([category])
@@ -135,34 +137,38 @@ enum SaleStatus {
 }
 
 model Sale {
-  id            String      @id @default(uuid())
-  eventId       String
-  userId        String?     // Vendedor (null si es online sin vendedor asignado)
-  channel       SaleChannel
-  status        SaleStatus  @default(PENDING)
+  id                  String      @id @default(uuid())
+  eventId             String
+  userId              String?     // Vendedor (null si es online sin vendedor asignado)
+  channel             SaleChannel
+  status              SaleStatus  @default(PENDING)
   
-  subtotal      Decimal     @db.Decimal(10, 2)
-  tax           Decimal     @db.Decimal(10, 2) // IVA
-  total         Decimal     @db.Decimal(10, 2)
+  subtotal            Decimal     @db.Decimal(10, 2)
+  tax                 Decimal     @db.Decimal(10, 2) // IVA
+  total               Decimal     @db.Decimal(10, 2)
   
   // Info del comprador
-  buyerName     String
-  buyerEmail    String
-  buyerPhone    String?
+  buyerName           String
+  buyerEmail          String
+  buyerPhone          String?
+  
+  // Venta desde invite de mesa (trazabilidad)
+  tableSlotInviteId   String?     @unique
   
   // Pago
-  paymentMethod String?     // "efectivo", "tarjeta", "stripe", etc
-  paymentId     String?     // ID de pago externo (Stripe, MercadoPago)
-  paidAt        DateTime?
+  paymentMethod       String?     // "efectivo", "tarjeta", "stripe", etc
+  paymentId           String?     // ID de pago externo (Stripe, MercadoPago)
+  paidAt              DateTime?
   
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
 
   // Relaciones
-  event         Event       @relation(fields: [eventId], references: [id])
-  user          User?       @relation(fields: [userId], references: [id])
-  saleItems     SaleItem[]
-  tickets       Ticket[]
+  event             Event             @relation(fields: [eventId], references: [id])
+  user              User?             @relation(fields: [userId], references: [id])
+  saleItems         SaleItem[]
+  tickets           Ticket[]
+  tableSlotInvite   TableSlotInvite? @relation(fields: [tableSlotInviteId], references: [id])
 
   @@index([eventId])
   @@index([status])
@@ -230,6 +236,52 @@ model Ticket {
   @@index([ticketNumber])
   @@index([status])
   @@index([saleId])
+}
+
+// =====================================================
+// INVITES DE MESAS VIP (URL PERSONALIZADO POR ASIENTO)
+// =====================================================
+
+enum SlotInviteStatus {
+  PENDING    // Link creado, pendiente de pago
+  PAID       // Pagado exitosamente
+  EXPIRED    // Venció sin pagar
+  CANCELLED  // Cancelado por anfitrión
+}
+
+model TableSlotInvite {
+  id            String           @id @default(uuid())
+  eventId       String
+  ticketTypeId  String           // TicketType VIP de mesas
+  tableNumber   Int              // Ej: Mesa 42
+  seatNumber    Int              // 1, 2, 3... hasta seatsPerTable
+  
+  // Token único para la URL (8 chars)
+  inviteToken  String           @unique
+  
+  // Info del invitado (quien va a pagar)
+  invitedName  String           // "Juan Pérez"
+  invitedEmail String?
+  invitedPhone String?
+  
+  // Estado
+  status       SlotInviteStatus @default(PENDING)
+  
+  // Precio por asiento (precio mesa / seatsPerTable)
+  pricePerSeat Decimal         @db.Decimal(10, 2)
+  
+  expiresAt    DateTime?       // Vence en X días si no paga (default: createdAt + 7)
+  
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  event        Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ticketType   TicketType      @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
+  sale         Sale?           // Back-relation: Sale que pagó este invite (Sale.tableSlotInviteId)
+
+  @@index([eventId])
+  @@index([inviteToken])
+  @@index([eventId, tableNumber])
 }
 
 // =====================================================

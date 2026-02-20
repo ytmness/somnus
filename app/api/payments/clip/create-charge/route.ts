@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     const sale = await prisma.sale.findUnique({
       where: { id: saleId },
-      include: { event: true, saleItems: true },
+      include: { event: true, saleItems: true, tableSlotInvite: true },
     });
 
     if (!sale) {
@@ -82,6 +82,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear tickets desde saleItems
+    const isInviteSale = !!sale.tableSlotInviteId;
+    const invite = sale.tableSlotInvite;
+
     const eventPrefix = (sale.event?.name || "EVT").substring(0, 3).toUpperCase();
     for (const item of sale.saleItems) {
       const ticketType = await prisma.ticketType.findUnique({
@@ -89,7 +92,8 @@ export async function POST(request: NextRequest) {
       });
       if (!ticketType) continue;
 
-      const qty = item.isTable ? (ticketType.seatsPerTable || 4) : item.quantity;
+      // Venta desde invite: 1 solo ticket con seatNumber del invite
+      const qty = isInviteSale && invite ? 1 : item.isTable ? (ticketType.seatsPerTable || 4) : item.quantity;
       const typePrefix = (ticketType.name || "TKT").substring(0, 3).toUpperCase();
 
       for (let i = 0; i < qty; i++) {
@@ -98,6 +102,8 @@ export async function POST(request: NextRequest) {
         });
         const ticketNumber = `${eventPrefix}-${typePrefix}-${String(ticketCount + 1).padStart(6, "0")}`;
 
+        const seatNumber = isInviteSale && invite ? invite.seatNumber : item.isTable ? i + 1 : null;
+
         const ticket = await prisma.ticket.create({
           data: {
             saleId,
@@ -105,7 +111,7 @@ export async function POST(request: NextRequest) {
             ticketNumber,
             qrCode: "TEMP",
             tableNumber: item.tableNumber || null,
-            seatNumber: item.isTable ? i + 1 : null,
+            seatNumber,
           },
         });
 
@@ -131,6 +137,13 @@ export async function POST(request: NextRequest) {
         paidAt: new Date(),
       },
     });
+
+    if (isInviteSale && invite) {
+      await prisma.tableSlotInvite.update({
+        where: { id: invite.id },
+        data: { status: "PAID" },
+      });
+    }
 
     return NextResponse.json({
       success: true,

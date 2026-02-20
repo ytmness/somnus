@@ -103,6 +103,17 @@ export async function GET(
 
     console.log(`[Tables API] Evento ${params.id}: ${soldTableNumbers.size} mesas vendidas`, Array.from(soldTableNumbers));
 
+    // Mesas con invites PENDING (reservadas, pendientes de pago)
+    const pendingInvites = await prisma.tableSlotInvite.findMany({
+      where: {
+        eventId: params.id,
+        status: "PENDING",
+      },
+      select: { tableNumber: true },
+      distinct: ["tableNumber"],
+    });
+    const reservedTableNumbers = new Set(pendingInvites.map((i) => String(i.tableNumber)));
+
     // Generar las 162 mesas base (estructura fija del plano: 9 filas × 18 columnas)
     // Esto debería venir de la configuración del evento, pero por ahora usamos la estructura estándar
     const ROWS = 9;
@@ -124,6 +135,11 @@ export async function GET(
         const y = START_Y + row * (TABLE_HEIGHT + SPACING_Y);
 
         const isSold = soldTableNumbers.has(String(tableNumber));
+        const isReserved = reservedTableNumbers.has(String(tableNumber));
+
+        let status: "available" | "reserved" | "sold" = "available";
+        if (isSold) status = "sold";
+        else if (isReserved) status = "reserved";
 
         tables.push({
           id: `mesa-${tableNumber}`,
@@ -136,7 +152,7 @@ export async function GET(
           height: TABLE_HEIGHT,
           price: Number(tableTicketType.price),
           seatsPerTable: (tableTicketType.seatsPerTable || 4) as 4,
-          status: isSold ? "sold" : "available",
+          status,
         });
 
         tableNumber++;
