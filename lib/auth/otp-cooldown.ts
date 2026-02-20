@@ -7,9 +7,9 @@ const OTP_COOLDOWN_MS = 60_000; // 1 minuto
 
 function cleanupOldEntries() {
   const cutoff = Date.now() - OTP_COOLDOWN_MS;
-  for (const [email, at] of lastOtpSentAt) {
+  Array.from(lastOtpSentAt.entries()).forEach(([email, at]) => {
     if (at < cutoff) lastOtpSentAt.delete(email);
-  }
+  });
 }
 
 export function isInOtpCooldown(email: string): boolean {
