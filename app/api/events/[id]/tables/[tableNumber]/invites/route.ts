@@ -16,10 +16,11 @@ function generateInviteToken(): string {
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string; tableNumber: string } }
+  { params }: { params: Promise<{ id: string; tableNumber: string }> | { id: string; tableNumber: string } }
 ) {
   try {
-    const { id: eventId, tableNumber: tableNumberStr } = params;
+    const resolvedParams = typeof (params as any)?.then === "function" ? await (params as Promise<{ id: string; tableNumber: string }>) : (params as { id: string; tableNumber: string });
+    const { id: eventId, tableNumber: tableNumberStr } = resolvedParams;
     const tableNumber = parseInt(tableNumberStr, 10);
 
     if (isNaN(tableNumber) || tableNumber < 1 || tableNumber > TOTAL_TABLES) {
@@ -72,8 +73,8 @@ export async function POST(
     const tableTicketType = event.ticketTypes.find((tt) => tt.isTable === true);
     if (!tableTicketType) {
       return NextResponse.json(
-        { error: "Este evento no tiene mesas VIP configuradas" },
-        { status: 404 }
+        { error: "Este evento no tiene mesas VIP configuradas. Edita el evento y agrega un tipo de boleto con opción Mesa VIP." },
+        { status: 400 }
       );
     }
 
@@ -193,11 +194,12 @@ export async function POST(
  * Listar invites de una mesa (status, nombre, etc.)
  */
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string; tableNumber: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string; tableNumber: string }> | { id: string; tableNumber: string } }
 ) {
   try {
-    const { id: eventId, tableNumber: tableNumberStr } = params;
+    const resolvedParams = typeof (params as any)?.then === "function" ? await (params as Promise<{ id: string; tableNumber: string }>) : (params as { id: string; tableNumber: string });
+    const { id: eventId, tableNumber: tableNumberStr } = resolvedParams;
     const tableNumber = parseInt(tableNumberStr, 10);
 
     if (isNaN(tableNumber) || tableNumber < 1 || tableNumber > TOTAL_TABLES) {

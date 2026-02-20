@@ -10,16 +10,19 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
+    const resolvedParams = typeof (params as any)?.then === "function" ? await (params as Promise<{ id: string }>) : (params as { id: string });
+    const eventId = resolvedParams.id;
+
     const user = await getSession();
     if (!hasRole(user, ["ADMIN"])) {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
     const event = await prisma.event.findUnique({
-      where: { id: params.id },
+      where: { id: eventId },
       select: { id: true, name: true },
     });
 
@@ -28,7 +31,7 @@ export async function GET(
     }
 
     const invites = await prisma.tableSlotInvite.findMany({
-      where: { eventId: params.id },
+      where: { eventId },
       orderBy: [{ tableNumber: "asc" }, { seatNumber: "asc" }],
     });
 
@@ -42,11 +45,11 @@ export async function GET(
       invitedEmail: inv.invitedEmail,
       invitedPhone: inv.invitedPhone,
       status: inv.status,
-      paidAt: inv.paidAt?.toISOString() ?? null,
+      paidAt: inv.paidAt != null ? inv.paidAt.toISOString() : null,
       pricePerSeat: Number(inv.pricePerSeat),
-      url: `${baseUrl}/eventos/${params.id}/mesa/${inv.tableNumber}/pagar/${inv.inviteToken}`,
+      url: `${baseUrl}/eventos/${eventId}/mesa/${inv.tableNumber}/pagar/${inv.inviteToken}`,
       inviteToken: inv.inviteToken,
-      expiresAt: inv.expiresAt?.toISOString() ?? null,
+      expiresAt: inv.expiresAt != null ? inv.expiresAt.toISOString() : null,
       createdAt: inv.createdAt.toISOString(),
     }));
 
@@ -56,8 +59,12 @@ export async function GET(
     });
   } catch (error) {
     console.error("[Admin invites] Error:", error);
+    const message = error instanceof Error ? error.message : "Error al obtener invitaciones";
     return NextResponse.json(
-      { error: "Error al obtener invitaciones" },
+      {
+        error: "Error al obtener invitaciones",
+        ...(process.env.NODE_ENV === "development" && { details: message }),
+      },
       { status: 500 }
     );
   }
