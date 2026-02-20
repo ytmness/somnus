@@ -63,12 +63,23 @@ export async function POST(request: NextRequest) {
     }
 
     const subtotal = Number(invite.pricePerSeat);
+    if (subtotal <= 0 || !Number.isFinite(subtotal)) {
+      return NextResponse.json(
+        { error: "Precio del asiento inválido" },
+        { status: 400 }
+      );
+    }
     const { totalCommission } = calculateClipCommission(subtotal);
     const tax = Math.round(totalCommission * 100) / 100;
     const total = Math.round((subtotal + totalCommission) * 100) / 100;
 
-    const user = await getSession();
-    const userId = user?.id || null;
+    let userId: string | null = null;
+    try {
+      const user = await getSession();
+      userId = user?.id || null;
+    } catch {
+      // Sin sesión: venta como invitado (userId null)
+    }
 
     const sale = await prisma.sale.create({
       data: {
@@ -103,9 +114,13 @@ export async function POST(request: NextRequest) {
       data: { saleId: sale.id },
     });
   } catch (error) {
-    console.error("[Checkout invite] Error:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("[Checkout invite] Error:", msg, error instanceof Error ? error.stack : "");
     return NextResponse.json(
-      { error: "Error al procesar la orden" },
+      {
+        error: "Error al procesar la orden",
+        ...(process.env.NODE_ENV === "development" && { details: msg }),
+      },
       { status: 500 }
     );
   }
