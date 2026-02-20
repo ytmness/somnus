@@ -81,45 +81,65 @@ export async function POST(request: NextRequest) {
       // Sin sesión: venta como invitado (userId null)
     }
 
-    const sale = await prisma.sale.create({
-      data: {
-        eventId: invite.eventId,
-        userId,
-        channel: "ONLINE",
-        status: "PENDING",
-        subtotal,
-        tax,
-        total,
-        buyerName: buyerName.trim(),
-        buyerEmail: buyerEmail.trim(),
-        buyerPhone: buyerPhone?.trim() || null,
-        tableSlotInviteId: invite.id,
-        paymentMethod: null,
-      },
-    });
-
-    await prisma.saleItem.create({
-      data: {
-        saleId: sale.id,
-        ticketTypeId: invite.ticketTypeId,
-        quantity: 1,
-        isTable: true,
-        tableNumber: `Mesa ${invite.tableNumber}`,
-      },
-    });
+    let saleId: string;
+    try {
+      const result = await prisma.$transaction(async (tx) => {
+        const sale = await tx.sale.create({
+          data: {
+            eventId: invite.eventId,
+            userId,
+            channel: "ONLINE",
+            status: "PENDING",
+            subtotal,
+            tax,
+            total,
+            buyerName: buyerName.trim(),
+            buyerEmail: buyerEmail.trim(),
+            buyerPhone: buyerPhone?.trim() || null,
+            tableSlotInviteId: invite.id,
+            paymentMethod: null,
+          },
+        });
+        await tx.saleItem.create({
+          data: {
+            saleId: sale.id,
+            ticketTypeId: invite.ticketTypeId,
+            quantity: 1,
+            isTable: true,
+            tableNumber: `Mesa ${invite.tableNumber}`,
+          },
+        });
+        return sale.id;
+      });
+      saleId = result;
+    } catch (txError: any) {
+      const code = txError?.code || "";
+      const msg = txError?.message || String(txError);
+      if (code === "P2002" || msg.includes("Unique constraint") || msg.includes("tableSlotInviteId")) {
+        return NextResponse.json(
+          { error: "Esta invitación ya tiene una orden. Revisa tu correo o intenta de nuevo." },
+          { status: 400 }
+        );
+      }
+      throw txError;
+    }
 
     return NextResponse.json({
       success: true,
       message: "Redirigiendo a pago",
-      data: { saleId: sale.id },
+      data: { saleId },
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error("[Checkout invite] Error:", msg, error instanceof Error ? error.stack : "");
+    const safeDetails =
+      process.env.NODE_ENV === "development"
+        ? msg
+        : msg.slice(0, 200).replace(/\n/g, " ");
     return NextResponse.json(
       {
         error: "Error al procesar la orden",
-        ...(process.env.NODE_ENV === "development" && { details: msg }),
+        details: safeDetails,
       },
       { status: 500 }
     );
