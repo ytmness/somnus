@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Copy, Check, Link2, ExternalLink, Users, Plus, Trash2 } from "lucide-react";
+import { Copy, Check, Link2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 const TOTAL_TABLES = 162;
+const MAX_SLOTS = 100; // Límite al generar el link grupal (lo estableces tú)
 
 interface EventOption {
   id: string;
@@ -20,7 +21,9 @@ interface InviteRow {
   seatNumber: number;
   invitedName: string;
   invitedEmail: string | null;
+  invitedPhone: string | null;
   status: string;
+  paidAt: string | null;
   pricePerSeat: number;
   url: string;
   inviteToken: string;
@@ -41,9 +44,8 @@ export function InvitesManager() {
   const [showGenerate, setShowGenerate] = useState(false);
   const [generateEventId, setGenerateEventId] = useState("");
   const [generateTableNumber, setGenerateTableNumber] = useState("");
-  const [generateInvites, setGenerateInvites] = useState<
-    Array<{ name: string; email: string; phone: string }>
-  >([{ name: "", email: "", phone: "" }]);
+  const [generateSlots, setGenerateSlots] = useState(5);
+  const [generateTotalPrice, setGenerateTotalPrice] = useState("");
   const [isSubmittingGenerate, setIsSubmittingGenerate] = useState(false);
   const [generatedLinks, setGeneratedLinks] = useState<
     Array<{ token: string; name: string; url: string; pricePerSeat: number; seatNumber: number }>
@@ -114,25 +116,6 @@ export function InvitesManager() {
     }
   };
 
-  const addGenerateInvite = () => {
-    setGenerateInvites((p) => [...p, { name: "", email: "", phone: "" }]);
-  };
-
-  const removeGenerateInvite = (index: number) => {
-    if (generateInvites.length <= 1) return;
-    setGenerateInvites((p) => p.filter((_, i) => i !== index));
-  };
-
-  const updateGenerateInvite = (
-    index: number,
-    field: "name" | "email" | "phone",
-    value: string
-  ) => {
-    setGenerateInvites((p) =>
-      p.map((inv, i) => (i === index ? { ...inv, [field]: value } : inv))
-    );
-  };
-
   const handleGenerateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const eventId = generateEventId || selectedEventId;
@@ -145,9 +128,10 @@ export function InvitesManager() {
       toast.error(`Mesa debe ser entre 1 y ${TOTAL_TABLES}`);
       return;
     }
-    const validInvites = generateInvites.filter((inv) => inv.name.trim());
-    if (validInvites.length === 0) {
-      toast.error("Agrega al menos un invitado con nombre");
+    const slots = Math.min(MAX_SLOTS, Math.max(1, generateSlots));
+    const totalPrice = parseFloat(generateTotalPrice.replace(/,/g, "."));
+    if (isNaN(totalPrice) || totalPrice <= 0) {
+      toast.error("Precio total de la mesa debe ser mayor que 0");
       return;
     }
 
@@ -159,13 +143,7 @@ export function InvitesManager() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            invites: validInvites.map((inv) => ({
-              name: inv.name.trim(),
-              email: inv.email.trim() || undefined,
-              phone: inv.phone.trim() || undefined,
-            })),
-          }),
+          body: JSON.stringify({ slots, totalTablePrice: totalPrice }),
         }
       );
       const data = await res.json();
@@ -178,8 +156,8 @@ export function InvitesManager() {
         setGeneratedLinks(data.data.invites);
         setSelectedEventId(eventId);
         setShowGenerate(false);
-        setGenerateInvites([{ name: "", email: "", phone: "" }]);
         setGenerateTableNumber("");
+        setGenerateTotalPrice("");
         toast.success("Links generados. Cópialos y compártelos.");
         // Refrescar lista de invites
         const invRes = await fetch(`/api/admin/events/${eventId}/invites`, {
@@ -234,55 +212,18 @@ export function InvitesManager() {
           <p className="text-amber-200 text-sm">
             <strong>Ningún evento tiene mesas VIP configuradas.</strong> Edita un
             evento en la pestaña Eventos y agrega un tipo de boleto con
-            &quot;Mesa&quot; / VIP. Mientras tanto puedes abrir el mapa de
-            mesas del evento que elijas abajo (si luego le agregas mesas, funcionará).
+            &quot;Mesa&quot; / VIP.
           </p>
         </div>
       )}
 
-      {/* Ir a mesas - siempre visible cuando hay eventos */}
-      <div className="rounded-xl border border-white/10 bg-white/5 p-6">
-        <h3 className="text-lg font-bold text-white mb-4">
-          Ir a mesas y generar invites
-        </h3>
-        <p className="text-white/60 text-sm mb-4">
-          Abre el mapa de mesas del evento, elige una mesa disponible y usa
-          &quot;Invitar grupo&quot; para generar links. O genera links desde aquí abajo.
-        </p>
-        <div className="flex flex-wrap items-center gap-4">
-          <label className="text-white/80 text-sm font-medium">Evento:</label>
-          <select
-            value={selectedEventId}
-            onChange={(e) => setSelectedEventId(e.target.value)}
-            className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30 min-w-[240px]"
-          >
-            {events.map((ev) => (
-              <option key={ev.id} value={ev.id}>
-                {ev.name}
-                {!ev.hasTables ? " (sin mesas VIP)" : ""}
-              </option>
-            ))}
-          </select>
-          <Link href={`/eventos/${selectedEventId}/mesas`} target="_blank">
-            <Button
-              variant="outline"
-              className="border-white/30 text-white hover:bg-white/10"
-            >
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Ir a mapa de mesas
-            </Button>
-          </Link>
-        </div>
-      </div>
-
       {/* Generar nuevos invites */}
       <div className="rounded-xl border border-white/10 bg-white/5 p-6">
         <h3 className="text-lg font-bold text-white mb-4">
-          Generar nuevos invites (desde aquí)
+          Generar links de pago
         </h3>
         <p className="text-white/60 text-sm mb-4">
-          Elige evento, número de mesa e invitados. Cada uno recibirá un link
-          para pagar su asiento. Solo funciona para eventos que tengan mesas VIP configuradas.
+          Elige evento, número de mesa, precio total de la mesa y cuántas personas pueden pagar (1–{MAX_SLOTS}). El precio se divide entre ellos. Cada uno recibe un link; al pagar ingresan nombre, email y teléfono. Cuando paguen todos, la mesa pasa a reservada. Puedes crear varias mesas para el mismo evento.
         </p>
         {!showGenerate ? (
           <Button
@@ -290,7 +231,8 @@ export function InvitesManager() {
               setShowGenerate(true);
               setGenerateEventId(eventsWithTables.length > 0 ? eventsWithTables[0].id : selectedEventId);
               setGenerateTableNumber("");
-              setGenerateInvites([{ name: "", email: "", phone: "" }]);
+              setGenerateSlots(5);
+              setGenerateTotalPrice("");
               setGeneratedLinks([]);
             }}
             className="bg-white/20 text-white hover:bg-white/30"
@@ -337,62 +279,43 @@ export function InvitesManager() {
               </div>
             </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-white/80 text-sm font-medium">
-                  Invitados (nombre, email, teléfono)
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-white/80 text-sm font-medium mb-1">
+                  Precio total de la mesa (MXN) *
                 </label>
-                <button
-                  type="button"
-                  onClick={addGenerateInvite}
-                  className="text-white/70 hover:text-white text-sm flex items-center gap-1"
-                >
-                  <Plus className="w-4 h-4" /> Agregar
-                </button>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={generateTotalPrice}
+                  onChange={(e) => setGenerateTotalPrice(e.target.value.replace(/[^0-9.,]/g, ""))}
+                  placeholder="Ej: 5000"
+                  required
+                  className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
+                />
+                <p className="text-white/50 text-xs mt-1">
+                  Se dividirá entre el número de personas.
+                </p>
               </div>
-              <div className="space-y-3">
-                {generateInvites.map((inv, i) => (
-                  <div
-                    key={i}
-                    className="flex flex-wrap gap-2 items-start p-3 rounded-lg bg-white/5 border border-white/10"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Nombre *"
-                      value={inv.name}
-                      onChange={(e) =>
-                        updateGenerateInvite(i, "name", e.target.value)
-                      }
-                      className="flex-1 min-w-[120px] px-3 py-2 rounded bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm"
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      value={inv.email}
-                      onChange={(e) =>
-                        updateGenerateInvite(i, "email", e.target.value)
-                      }
-                      className="flex-1 min-w-[120px] px-3 py-2 rounded bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm"
-                    />
-                    <input
-                      type="tel"
-                      placeholder="Teléfono"
-                      value={inv.phone}
-                      onChange={(e) =>
-                        updateGenerateInvite(i, "phone", e.target.value)
-                      }
-                      className="flex-1 min-w-[100px] px-3 py-2 rounded bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeGenerateInvite(i)}
-                      className="text-red-400 hover:text-red-300 p-2"
-                      title="Quitar"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
+              <div>
+                <label className="block text-white/80 text-sm font-medium mb-1">
+                  Cuántas personas pueden pagar (1–{MAX_SLOTS}) *
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={MAX_SLOTS}
+                  value={generateSlots}
+                  onChange={(e) =>
+                    setGenerateSlots(
+                      Math.min(MAX_SLOTS, Math.max(1, parseInt(e.target.value, 10) || 1))
+                    )
+                  }
+                  className="w-full max-w-[120px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                />
+                <p className="text-white/50 text-xs mt-1">
+                  Cada uno recibe un link; ingresan nombre, email y teléfono al pagar.
+                </p>
               </div>
             </div>
 
@@ -429,7 +352,7 @@ export function InvitesManager() {
                   className="flex flex-wrap items-center gap-2 p-2 rounded bg-white/5"
                 >
                   <span className="text-white/80 text-sm">
-                    {link.name || `Invitado ${i + 1}`} (Mesa, asiento {link.seatNumber}) ·
+                    Asiento {link.seatNumber} ·
                   </span>
                   <button
                     type="button"
@@ -480,12 +403,7 @@ export function InvitesManager() {
         <div className="text-center py-8 rounded-lg bg-white/5 border border-white/10">
           <Link2 className="w-12 h-12 text-white/30 mx-auto mb-3" />
           <p className="text-white/70 mb-2">No hay invites para este evento</p>
-          <Link href={`/eventos/${selectedEventId}/mesas`} target="_blank">
-            <Button className="bg-white/20 text-white hover:bg-white/30">
-              <Users className="w-4 h-4 mr-2" />
-              Generar invites desde el mapa
-            </Button>
-          </Link>
+          <p className="text-white/50 text-sm">Genera links arriba.</p>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-white/10">
@@ -503,6 +421,9 @@ export function InvitesManager() {
                 </th>
                 <th className="text-left py-3 px-4 text-white/90 font-semibold text-sm">
                   Estado
+                </th>
+                <th className="text-left py-3 px-4 text-white/90 font-semibold text-sm">
+                  Timeline / Pagado
                 </th>
                 <th className="text-left py-3 px-4 text-white/90 font-semibold text-sm">
                   Precio
@@ -523,9 +444,14 @@ export function InvitesManager() {
                   </td>
                   <td className="py-3 px-4 text-white/80">{inv.seatNumber}</td>
                   <td className="py-3 px-4">
-                    <p className="text-white/90 font-medium">{inv.invitedName}</p>
-                    {inv.invitedEmail && (
+                    <p className="text-white/90 font-medium">
+                      {inv.invitedName === "Pendiente" ? "—" : inv.invitedName}
+                    </p>
+                    {inv.invitedEmail && inv.invitedEmail !== "" && (
                       <p className="text-xs text-white/60">{inv.invitedEmail}</p>
+                    )}
+                    {inv.invitedPhone && inv.invitedPhone !== "" && (
+                      <p className="text-xs text-white/50">{inv.invitedPhone}</p>
                     )}
                   </td>
                   <td className="py-3 px-4">
@@ -548,6 +474,17 @@ export function InvitesManager() {
                         ? "Expirado"
                         : inv.status}
                     </span>
+                  </td>
+                  <td className="py-3 px-4 text-white/70 text-sm">
+                    {inv.paidAt
+                      ? new Date(inv.paidAt).toLocaleString("es-MX", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "—"}
                   </td>
                   <td className="py-3 px-4 text-white/80">
                     ${inv.pricePerSeat.toLocaleString()}

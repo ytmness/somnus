@@ -267,6 +267,9 @@ model TableSlotInvite {
   // Estado
   status       SlotInviteStatus @default(PENDING)
   
+  // Cuándo pagó (para timeline)
+  paidAt       DateTime?
+  
   // Precio por asiento (precio mesa / seatsPerTable)
   pricePerSeat Decimal         @db.Decimal(10, 2)
   

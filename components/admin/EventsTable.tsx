@@ -194,13 +194,7 @@ export function EventsTable() {
                 </td>
                 <td className="py-4 px-4">
                   <div className="flex items-center justify-end gap-2">
-                    <Link
-                      href={
-                        event.ticketTypes.some((tt) => tt.isTable)
-                          ? `/eventos/${event.id}/mesas`
-                          : `/eventos/${event.id}/boletos`
-                      }
-                    >
+                    <Link href={`/eventos/${event.id}/boletos`}>
                       <Button
                         size="sm"
                         variant="ghost"

@@ -282,7 +282,7 @@ export default function AdminPage() {
           <div className="liquid-glass p-6">
             <h2 className="text-xl font-bold text-white mb-6">Invites de mesas VIP</h2>
             <p className="text-white/70 text-sm mb-6">
-              Consulta los links de pago por asiento y cópialos. Para generar nuevos invites, usa &quot;Ir a mesas y generar invites&quot; y en el mapa elige una mesa → Invitar grupo.
+              Genera links de pago por asiento desde el formulario de abajo (evento, mesa, precio total y número de personas). Cópialos y compártelos. Las mesas ya no usan mapa; todo se hace desde aquí.
             </p>
             <InvitesManager />
           </div>

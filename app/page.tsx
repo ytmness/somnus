@@ -261,11 +261,7 @@ export default function HomePage() {
           (tt: any) => tt.isTable === true
         );
 
-        if (hasTables) {
-          router.push(`/eventos/${concert.id}/mesas`);
-        } else {
-          router.push(`/eventos/${concert.id}/boletos`);
-        }
+        router.push(`/eventos/${concert.id}/boletos`);
       } else {
         toast.error("Error loading event information");
       }

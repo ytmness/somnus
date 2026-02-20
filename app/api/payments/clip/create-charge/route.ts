@@ -141,7 +141,13 @@ export async function POST(request: NextRequest) {
     if (isInviteSale && invite) {
       await prisma.tableSlotInvite.update({
         where: { id: invite.id },
-        data: { status: "PAID" },
+        data: {
+          status: "PAID",
+          invitedName: sale.buyerName,
+          invitedEmail: sale.buyerEmail || null,
+          invitedPhone: sale.buyerPhone || null,
+          paidAt: new Date(),
+        },
       });
     }
 

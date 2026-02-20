@@ -4,6 +4,7 @@ import crypto from "crypto";
 
 const TOTAL_TABLES = 162; // 9 filas × 18 columnas
 const INVITE_EXPIRY_DAYS = 7;
+const MAX_SLOTS_PER_TABLE = 100; // Límite al generar el link grupal (lo establece el admin)
 
 function generateInviteToken(): string {
   return crypto.randomBytes(6).toString("base64url").slice(0, 8);
@@ -29,11 +30,32 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { invites } = body as { invites?: Array<{ name: string; email?: string; phone?: string }> };
+    const { invites: invitesList, slots: slotsCount, totalTablePrice } = body as {
+      invites?: Array<{ name: string; email?: string; phone?: string }>;
+      slots?: number;
+      totalTablePrice?: number;
+    };
 
-    if (!invites || !Array.isArray(invites) || invites.length === 0) {
+    // Aceptar "slots" (1 a MAX): cada quien pone sus datos al pagar. O "invites" con nombres opcionales.
+    let invites: Array<{ name: string; email?: string; phone?: string }>;
+    if (typeof slotsCount === "number" && slotsCount >= 1 && slotsCount <= MAX_SLOTS_PER_TABLE) {
+      invites = Array.from({ length: slotsCount }, () => ({ name: "Pendiente" }));
+    } else if (invitesList && Array.isArray(invitesList) && invitesList.length > 0) {
+      invites = invitesList.map((inv) => ({
+        name: inv?.name?.trim() ? inv.name.trim() : "Pendiente",
+        email: inv?.email?.trim() || undefined,
+        phone: inv?.phone?.trim() || undefined,
+      }));
+    } else {
       return NextResponse.json(
-        { error: "Se requiere un arreglo de invites con al menos un invitado (name, email?, phone?)" },
+        { error: `Envía "slots" (número del 1 al ${MAX_SLOTS_PER_TABLE}) o "invites" (array con al menos un item)` },
+        { status: 400 }
+      );
+    }
+
+    if (invites.length > MAX_SLOTS_PER_TABLE) {
+      return NextResponse.json(
+        { error: `Máximo ${MAX_SLOTS_PER_TABLE} personas por mesa` },
         { status: 400 }
       );
     }
@@ -52,14 +74,6 @@ export async function POST(
       return NextResponse.json(
         { error: "Este evento no tiene mesas VIP configuradas" },
         { status: 404 }
-      );
-    }
-
-    const seatsPerTable = tableTicketType.seatsPerTable ?? 4;
-    if (invites.length > seatsPerTable) {
-      return NextResponse.json(
-        { error: `Esta mesa tiene ${seatsPerTable} asientos. Máximo ${seatsPerTable} invitados.` },
-        { status: 400 }
       );
     }
 
@@ -95,8 +109,21 @@ export async function POST(
       );
     }
 
-    const priceMesa = Number(tableTicketType.price);
-    const pricePerSeat = Math.round((priceMesa / seatsPerTable) * 100) / 100;
+    // Precio por asiento: si envían totalTablePrice se divide entre slots; si no, se usa el del tipo de boleto
+    let pricePerSeat: number;
+    if (typeof totalTablePrice === "number" && totalTablePrice > 0) {
+      pricePerSeat = Math.round((totalTablePrice / invites.length) * 100) / 100;
+      if (pricePerSeat <= 0) {
+        return NextResponse.json(
+          { error: "El precio total debe ser mayor que 0" },
+          { status: 400 }
+        );
+      }
+    } else {
+      const seatsPerTable = tableTicketType.seatsPerTable ?? 4;
+      const priceMesa = Number(tableTicketType.price);
+      pricePerSeat = Math.round((priceMesa / seatsPerTable) * 100) / 100;
+    }
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + INVITE_EXPIRY_DAYS);
@@ -107,12 +134,7 @@ export async function POST(
 
     for (let i = 0; i < invites.length; i++) {
       const inv = invites[i];
-      if (!inv || typeof inv.name !== "string" || !inv.name.trim()) {
-        return NextResponse.json(
-          { error: `Invitado ${i + 1}: el nombre es requerido` },
-          { status: 400 }
-        );
-      }
+      const name = (inv?.name?.trim() || "Pendiente").slice(0, 200);
 
       let token = generateInviteToken();
       let exists = await prisma.tableSlotInvite.findUnique({ where: { inviteToken: token } });
@@ -128,9 +150,9 @@ export async function POST(
           tableNumber,
           seatNumber: i + 1,
           inviteToken: token,
-          invitedName: inv.name.trim(),
-          invitedEmail: inv.email?.trim() || null,
-          invitedPhone: inv.phone?.trim() || null,
+          invitedName: name,
+          invitedEmail: inv?.email?.trim() || null,
+          invitedPhone: inv?.phone?.trim() || null,
           pricePerSeat,
           expiresAt,
         },

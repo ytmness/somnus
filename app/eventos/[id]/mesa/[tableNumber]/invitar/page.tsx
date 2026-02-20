@@ -163,11 +163,11 @@ export default function InvitarMesaPage() {
       <header className="border-b border-white/10 py-6 px-4 sm:px-6">
         <div className="max-w-2xl mx-auto flex justify-between items-center">
           <Link
-            href={`/eventos/${eventId}/mesas`}
+            href={`/eventos/${eventId}/boletos`}
             className="text-white/80 hover:text-white text-sm font-medium uppercase tracking-wider flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Volver
+            Volver al evento
           </Link>
           <span className="text-white/60 text-sm">Mesa {tableNumber}</span>
         </div>
@@ -230,10 +230,10 @@ export default function InvitarMesaPage() {
               ))}
             </div>
             <Link
-              href={`/eventos/${eventId}/mesas`}
+              href={`/eventos/${eventId}/boletos`}
               className="inline-block mt-6 px-6 py-3 rounded-lg bg-white text-black font-bold hover:bg-white/90"
             >
-              Volver al mapa
+              Volver al evento
             </Link>
           </div>
         ) : (

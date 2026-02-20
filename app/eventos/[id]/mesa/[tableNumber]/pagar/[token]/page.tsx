@@ -37,11 +37,13 @@ export default function PagarInvitePage() {
 
         if (data.success && data.data) {
           setInvite(data.data);
-          setFormData({
-            buyerName: data.data.invitedName || "",
-            buyerEmail: data.data.invitedEmail || "",
-            buyerPhone: data.data.invitedPhone || "",
-          });
+          if (data.data.status !== "PAID") {
+            setFormData({
+              buyerName: data.data.invitedName === "Pendiente" ? "" : (data.data.invitedName || ""),
+              buyerEmail: data.data.invitedEmail || "",
+              buyerPhone: data.data.invitedPhone || "",
+            });
+          }
         } else {
           setError("Invitación no encontrada");
         }
@@ -214,6 +216,28 @@ export default function PagarInvitePage() {
           Asiento <strong className="text-white">{invite.seatNumber}</strong>
         </p>
 
+        {invite.tableReserved || invite.status === "PAID" ? (
+          <div className="somnus-card p-8 text-center">
+            <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">✓</span>
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">Mesa reservada</h2>
+            <p className="text-white/70">
+              Esta mesa ya está completa. Todos los asientos han sido pagados.
+              {invite.paidCount != null && invite.totalSlots != null && (
+                <span className="block mt-1 text-white/60 text-sm">
+                  {invite.paidCount}/{invite.totalSlots} pagados
+                </span>
+              )}
+            </p>
+            <Link
+              href="/"
+              className="inline-block mt-6 px-6 py-3 rounded-lg bg-white text-black font-medium hover:bg-white/90"
+            >
+              Volver al inicio
+            </Link>
+          </div>
+        ) : (
         <div className="somnus-card p-6 sm:p-8 mb-6">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
@@ -280,11 +304,14 @@ export default function PagarInvitePage() {
             </button>
           </form>
         </div>
+        )}
 
-        <p className="text-white/50 text-xs text-center">
-          Serás redirigido a la pasarela de Clip para ingresar los datos de tu
-          tarjeta. Tu información está protegida.
-        </p>
+        {invite.tableReserved || invite.status === "PAID" ? null : (
+          <p className="text-white/50 text-xs text-center">
+            Serás redirigido a la pasarela de Clip para ingresar los datos de tu
+            tarjeta. Tu información está protegida.
+          </p>
+        )}
       </main>
     </div>
   );
