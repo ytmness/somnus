@@ -55,12 +55,14 @@ export function InvitesManager() {
         const res = await fetch("/api/events", { credentials: "include" });
         const data = await res.json();
         if (data.success && Array.isArray(data.data)) {
-          const withTables = data.data.filter((e: any) =>
-            e.ticketTypes?.some((tt: any) => tt.isTable)
-          );
-          setEvents(withTables);
-          if (withTables.length > 0 && !selectedEventId) {
-            setSelectedEventId(withTables[0].id);
+          const allEvents = data.data.map((e: any) => ({
+            id: e.id,
+            name: e.name,
+            hasTables: !!e.ticketTypes?.some((tt: any) => tt.isTable === true),
+          }));
+          setEvents(allEvents);
+          if (allEvents.length > 0 && !selectedEventId) {
+            setSelectedEventId(allEvents[0].id);
           }
         }
       } catch {
@@ -205,40 +207,94 @@ export function InvitesManager() {
     );
   }
 
+  const eventsWithTables = events.filter((e) => e.hasTables);
+
   if (events.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-white/70 mb-4">No hay eventos con mesas VIP</p>
-        <p className="text-white/50 text-sm">
-          Los invites de mesas solo aplican a eventos que tengan mesas
-          configuradas.
+      <div className="text-center py-12 rounded-lg bg-white/5 border border-white/10 p-6">
+        <p className="text-white/70 mb-4">No hay eventos</p>
+        <p className="text-white/50 text-sm mb-4">
+          Crea un evento desde la pestaña Eventos. Para usar invites de mesas,
+          al crearlo agrega un tipo de boleto con opción &quot;Mesa VIP&quot;.
         </p>
+        <Link href="/admin">
+          <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
+            Ir a Eventos
+          </Button>
+        </Link>
       </div>
     );
   }
 
   return (
     <div className="space-y-8">
+      {/* Aviso si ningún evento tiene mesas */}
+      {eventsWithTables.length === 0 && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 mb-6">
+          <p className="text-amber-200 text-sm">
+            <strong>Ningún evento tiene mesas VIP configuradas.</strong> Edita un
+            evento en la pestaña Eventos y agrega un tipo de boleto con
+            &quot;Mesa&quot; / VIP. Mientras tanto puedes abrir el mapa de
+            mesas del evento que elijas abajo (si luego le agregas mesas, funcionará).
+          </p>
+        </div>
+      )}
+
+      {/* Ir a mesas - siempre visible cuando hay eventos */}
+      <div className="rounded-xl border border-white/10 bg-white/5 p-6">
+        <h3 className="text-lg font-bold text-white mb-4">
+          Ir a mesas y generar invites
+        </h3>
+        <p className="text-white/60 text-sm mb-4">
+          Abre el mapa de mesas del evento, elige una mesa disponible y usa
+          &quot;Invitar grupo&quot; para generar links. O genera links desde aquí abajo.
+        </p>
+        <div className="flex flex-wrap items-center gap-4">
+          <label className="text-white/80 text-sm font-medium">Evento:</label>
+          <select
+            value={selectedEventId}
+            onChange={(e) => setSelectedEventId(e.target.value)}
+            className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30 min-w-[240px]"
+          >
+            {events.map((ev) => (
+              <option key={ev.id} value={ev.id}>
+                {ev.name}
+                {!ev.hasTables ? " (sin mesas VIP)" : ""}
+              </option>
+            ))}
+          </select>
+          <Link href={`/eventos/${selectedEventId}/mesas`} target="_blank">
+            <Button
+              variant="outline"
+              className="border-white/30 text-white hover:bg-white/10"
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Ir a mapa de mesas
+            </Button>
+          </Link>
+        </div>
+      </div>
+
       {/* Generar nuevos invites */}
       <div className="rounded-xl border border-white/10 bg-white/5 p-6">
         <h3 className="text-lg font-bold text-white mb-4">
-          Generar nuevos invites
+          Generar nuevos invites (desde aquí)
         </h3>
         <p className="text-white/60 text-sm mb-4">
           Elige evento, número de mesa e invitados. Cada uno recibirá un link
-          para pagar su asiento. La página del link mostrará la imagen y datos
-          del evento.
+          para pagar su asiento. Solo funciona para eventos que tengan mesas VIP configuradas.
         </p>
         {!showGenerate ? (
           <Button
             onClick={() => {
               setShowGenerate(true);
-              setGenerateEventId(selectedEventId);
+              setGenerateEventId(eventsWithTables.length > 0 ? eventsWithTables[0].id : selectedEventId);
               setGenerateTableNumber("");
               setGenerateInvites([{ name: "", email: "", phone: "" }]);
               setGeneratedLinks([]);
             }}
             className="bg-white/20 text-white hover:bg-white/30"
+            title={eventsWithTables.length === 0 ? "Necesitas un evento con mesas VIP" : ""}
           >
             <Plus className="w-4 h-4 mr-2" />
             Generar links
@@ -257,8 +313,9 @@ export function InvitesManager() {
                   className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
                 >
                   {events.map((ev) => (
-                    <option key={ev.id} value={ev.id}>
+                    <option key={ev.id} value={ev.id} disabled={!ev.hasTables}>
                       {ev.name}
+                      {!ev.hasTables ? " (sin mesas VIP)" : ""}
                     </option>
                   ))}
                 </select>
@@ -408,18 +465,10 @@ export function InvitesManager() {
             {events.map((ev) => (
               <option key={ev.id} value={ev.id}>
                 {ev.name}
+                {!ev.hasTables ? " (sin mesas VIP)" : ""}
               </option>
             ))}
           </select>
-          <Link href={`/eventos/${selectedEventId}/mesas`} target="_blank">
-            <Button
-              variant="outline"
-              className="border-white/30 text-white hover:bg-white/10"
-            >
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Ir a mapa de mesas
-            </Button>
-          </Link>
         </div>
       </div>
 
