@@ -77,6 +77,7 @@ model Event {
   ticketTypes       TicketType[]
   sales             Sale[]
   tableSlotInvites  TableSlotInvite[]
+  tableInvitePools  TableInvitePool[]
 
   @@index([eventDate])
   @@index([isActive])
@@ -114,6 +115,7 @@ model TicketType {
   event            Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
   tickets          Ticket[]
   tableSlotInvites TableSlotInvite[]
+  tableInvitePools TableInvitePool[]
 
   @@index([eventId])
   @@index([category])
@@ -249,14 +251,37 @@ enum SlotInviteStatus {
   CANCELLED  // Cancelado por anfitrión
 }
 
+// Pool tipo "money pool": un solo link para toda la mesa, cada quien paga y se registra
+model TableInvitePool {
+  id            String   @id @default(uuid())
+  eventId       String
+  ticketTypeId  String
+  tableNumber   Int      // Ej: Mesa 42
+  inviteToken   String   @unique // Un solo token para toda la mesa
+  maxSlots      Int      // Cuántas personas pueden pagar (ej: 10)
+  pricePerSeat  Decimal  @db.Decimal(10, 2)
+  expiresAt     DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  event         Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ticketType    TicketType    @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
+  slotInvites   TableSlotInvite[] // Slots creados al pagar (invitedName/email/phone al momento del pago)
+
+  @@index([eventId])
+  @@index([inviteToken])
+  @@index([eventId, tableNumber])
+}
+
 model TableSlotInvite {
   id            String           @id @default(uuid())
   eventId       String
   ticketTypeId  String           // TicketType VIP de mesas
   tableNumber   Int              // Ej: Mesa 42
   seatNumber    Int              // 1, 2, 3... hasta seatsPerTable
+  poolId        String?          // Si viene de TableInvitePool (money pool)
   
-  // Token único para la URL (8 chars)
+  // Token único para la URL (8 chars) - en modo pool se genera al crear el slot al pagar
   inviteToken  String           @unique
   
   // Info del invitado (quien va a pagar)
@@ -280,11 +305,13 @@ model TableSlotInvite {
 
   event        Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
   ticketType   TicketType      @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
+  pool         TableInvitePool? @relation(fields: [poolId], references: [id], onDelete: SetNull)
   sale         Sale?           // Back-relation: Sale que pagó este invite (Sale.tableSlotInviteId)
 
   @@index([eventId])
   @@index([inviteToken])
   @@index([eventId, tableNumber])
+  @@index([poolId])
 }
 
 // =====================================================

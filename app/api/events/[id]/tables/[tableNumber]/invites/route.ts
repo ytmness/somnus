@@ -31,34 +31,53 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { invites: invitesList, slots: slotsCount, totalTablePrice } = body as {
+    const {
+      invites: invitesList,
+      slots: slotsCount,
+      totalTablePrice,
+      mode, // "pool" = money pool: un solo link para toda la mesa, cada quien se registra al pagar
+    } = body as {
       invites?: Array<{ name: string; email?: string; phone?: string }>;
       slots?: number;
       totalTablePrice?: number;
+      mode?: "pool";
     };
 
-    // Aceptar "slots" (1 a MAX): cada quien pone sus datos al pagar. O "invites" con nombres opcionales.
-    let invites: Array<{ name: string; email?: string; phone?: string }>;
-    if (typeof slotsCount === "number" && slotsCount >= 1 && slotsCount <= MAX_SLOTS_PER_TABLE) {
-      invites = Array.from({ length: slotsCount }, () => ({ name: "Pendiente" }));
-    } else if (invitesList && Array.isArray(invitesList) && invitesList.length > 0) {
-      invites = invitesList.map((inv) => ({
-        name: inv?.name?.trim() ? inv.name.trim() : "Pendiente",
-        email: inv?.email?.trim() || undefined,
-        phone: inv?.phone?.trim() || undefined,
-      }));
-    } else {
-      return NextResponse.json(
-        { error: `Envía "slots" (número del 1 al ${MAX_SLOTS_PER_TABLE}) o "invites" (array con al menos un item)` },
-        { status: 400 }
-      );
-    }
+    const isPoolMode = mode === "pool";
 
-    if (invites.length > MAX_SLOTS_PER_TABLE) {
-      return NextResponse.json(
-        { error: `Máximo ${MAX_SLOTS_PER_TABLE} personas por mesa` },
-        { status: 400 }
-      );
+    // Para pool: slots y totalTablePrice requeridos
+    if (isPoolMode) {
+      const slots = typeof slotsCount === "number" ? slotsCount : 0;
+      const totalPrice = typeof totalTablePrice === "number" ? totalTablePrice : 0;
+      if (slots < 1 || slots > MAX_SLOTS_PER_TABLE || totalPrice <= 0) {
+        return NextResponse.json(
+          { error: `Modo pool requiere "slots" (1–${MAX_SLOTS_PER_TABLE}) y "totalTablePrice" mayor a 0` },
+          { status: 400 }
+        );
+      }
+    } else {
+      // Modo tradicional: slots o invites
+      let invites: Array<{ name: string; email?: string; phone?: string }>;
+      if (typeof slotsCount === "number" && slotsCount >= 1 && slotsCount <= MAX_SLOTS_PER_TABLE) {
+        invites = Array.from({ length: slotsCount }, () => ({ name: "Pendiente" }));
+      } else if (invitesList && Array.isArray(invitesList) && invitesList.length > 0) {
+        invites = invitesList.map((inv) => ({
+          name: inv?.name?.trim() ? inv.name.trim() : "Pendiente",
+          email: inv?.email?.trim() || undefined,
+          phone: inv?.phone?.trim() || undefined,
+        }));
+      } else {
+        return NextResponse.json(
+          { error: `Envía "slots" (número del 1 al ${MAX_SLOTS_PER_TABLE}), "invites" (array), o "mode":"pool" con slots y totalTablePrice` },
+          { status: 400 }
+        );
+      }
+      if (invites.length > MAX_SLOTS_PER_TABLE) {
+        return NextResponse.json(
+          { error: `Máximo ${MAX_SLOTS_PER_TABLE} personas por mesa` },
+          { status: 400 }
+        );
+      }
     }
 
     const event = await prisma.event.findUnique({
@@ -95,30 +114,123 @@ export async function POST(
       );
     }
 
-    const existingInvites = await prisma.tableSlotInvite.count({
-      where: {
-        eventId,
-        tableNumber,
-        status: { in: ["PENDING", "PAID"] },
-      },
-    });
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + INVITE_EXPIRY_DAYS);
 
-    if (existingInvites > 0) {
+    if (isPoolMode) {
+      // Money pool: un solo link para toda la mesa
+      const slots = Math.min(MAX_SLOTS_PER_TABLE, Math.max(1, slotsCount));
+      const totalPrice = parseFloat(String(totalTablePrice).replace(/,/g, "."));
+      if (!Number.isFinite(totalPrice) || totalPrice <= 0) {
+        return NextResponse.json({ error: "Precio total de la mesa debe ser mayor a 0" }, { status: 400 });
+      }
+      const pricePerSeat = Math.round((totalPrice / slots) * 100) / 100;
+
+      const existingPool = await prisma.tableInvitePool.findFirst({
+        where: { eventId, tableNumber },
+      });
+      if (existingPool) {
+        return NextResponse.json(
+          { error: `La mesa ${tableNumber} ya tiene un link compartido activo.` },
+          { status: 400 }
+        );
+      }
+      const existingInvites = await prisma.tableSlotInvite.count({
+        where: { eventId, tableNumber, status: { in: ["PENDING", "PAID"] } },
+      });
+      if (existingInvites > 0) {
+        return NextResponse.json(
+          { error: `La mesa ${tableNumber} ya tiene invitaciones. No se pueden crear más.` },
+          { status: 400 }
+        );
+      }
+
+      let token = generateInviteToken();
+      let exists = await prisma.tableSlotInvite.findUnique({ where: { inviteToken: token } })
+        || await prisma.tableInvitePool.findUnique({ where: { inviteToken: token } });
+      while (exists) {
+        token = generateInviteToken();
+        exists = await prisma.tableSlotInvite.findUnique({ where: { inviteToken: token } })
+          || await prisma.tableInvitePool.findUnique({ where: { inviteToken: token } });
+      }
+
+      const pool = await prisma.tableInvitePool.create({
+        data: {
+          eventId,
+          ticketTypeId: tableTicketType.id,
+          tableNumber,
+          inviteToken: token,
+          maxSlots: slots,
+          pricePerSeat,
+          expiresAt,
+        },
+      });
+
+      const url = `${baseUrl}/eventos/${eventId}/mesa/${tableNumber}/pagar/${token}`;
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          isPool: true,
+          invites: [{
+            id: pool.id,
+            token: pool.inviteToken,
+            name: "Mesa compartida",
+            seatNumber: null,
+            url,
+            pricePerSeat: Number(pool.pricePerSeat),
+            maxSlots: pool.maxSlots,
+            isPool: true,
+          }],
+          tableNumber,
+          eventName: event.name,
+          expiresAt: expiresAt.toISOString(),
+        },
+      });
+    }
+
+    // Modo tradicional: N links por asiento
+    let invites: Array<{ name: string; email?: string; phone?: string }>;
+    if (typeof slotsCount === "number" && slotsCount >= 1 && slotsCount <= MAX_SLOTS_PER_TABLE) {
+      invites = Array.from({ length: slotsCount }, () => ({ name: "Pendiente" }));
+    } else if (invitesList && Array.isArray(invitesList) && invitesList.length > 0) {
+      invites = invitesList.map((inv) => ({
+        name: inv?.name?.trim() ? inv.name.trim() : "Pendiente",
+        email: inv?.email?.trim() || undefined,
+        phone: inv?.phone?.trim() || undefined,
+      }));
+    } else {
       return NextResponse.json(
-        { error: `La mesa ${tableNumber} ya tiene invitaciones activas. No se pueden crear más.` },
+        { error: `Envía "slots" o "invites"` },
         { status: 400 }
       );
     }
 
-    // Precio por asiento: si envían totalTablePrice se divide entre slots; si no, se usa el del tipo de boleto
+    const existingInvitesCount = await prisma.tableSlotInvite.count({
+      where: { eventId, tableNumber, status: { in: ["PENDING", "PAID"] } },
+    });
+    if (existingInvitesCount > 0) {
+      return NextResponse.json(
+        { error: `La mesa ${tableNumber} ya tiene invitaciones activas.` },
+        { status: 400 }
+      );
+    }
+    const existingPoolCheck = await prisma.tableInvitePool.findFirst({
+      where: { eventId, tableNumber },
+    });
+    if (existingPoolCheck) {
+      return NextResponse.json(
+        { error: `La mesa ${tableNumber} ya tiene un link compartido. No se pueden crear links individuales.` },
+        { status: 400 }
+      );
+    }
+
     let pricePerSeat: number;
     if (typeof totalTablePrice === "number" && totalTablePrice > 0) {
       pricePerSeat = Math.round((totalTablePrice / invites.length) * 100) / 100;
       if (pricePerSeat <= 0) {
-        return NextResponse.json(
-          { error: "El precio total debe ser mayor que 0" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "El precio total debe ser mayor que 0" }, { status: 400 });
       }
     } else {
       const seatsPerTable = tableTicketType.seatsPerTable ?? 4;
@@ -126,22 +238,18 @@ export async function POST(
       pricePerSeat = Math.round((priceMesa / seatsPerTable) * 100) / 100;
     }
 
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + INVITE_EXPIRY_DAYS);
-
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-
     const createdInvites = [];
-
     for (let i = 0; i < invites.length; i++) {
       const inv = invites[i];
       const name = (inv?.name?.trim() || "Pendiente").slice(0, 200);
 
       let token = generateInviteToken();
-      let exists = await prisma.tableSlotInvite.findUnique({ where: { inviteToken: token } });
+      let exists = await prisma.tableSlotInvite.findUnique({ where: { inviteToken: token } })
+        || await prisma.tableInvitePool.findUnique({ where: { inviteToken: token } });
       while (exists) {
         token = generateInviteToken();
-        exists = await prisma.tableSlotInvite.findUnique({ where: { inviteToken: token } });
+        exists = await prisma.tableSlotInvite.findUnique({ where: { inviteToken: token } })
+          || await prisma.tableInvitePool.findUnique({ where: { inviteToken: token } });
       }
 
       const invite = await prisma.tableSlotInvite.create({
@@ -160,7 +268,6 @@ export async function POST(
       });
 
       const url = `${baseUrl}/eventos/${eventId}/mesa/${tableNumber}/pagar/${token}`;
-
       createdInvites.push({
         id: invite.id,
         token: invite.inviteToken,

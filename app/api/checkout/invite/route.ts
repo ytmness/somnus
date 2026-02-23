@@ -2,12 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { getSession } from "@/lib/auth/supabase-auth";
 import { calculateClipCommission } from "@/lib/utils";
+import crypto from "crypto";
 
 export const dynamic = "force-dynamic";
+
+function generateInviteToken(): string {
+  return crypto.randomBytes(6).toString("base64url").slice(0, 8);
+}
 
 /**
  * POST /api/checkout/invite
  * Crear una venta desde una invitación de mesa (pago por asiento)
+ * Soporta: TableSlotInvite (link individual) o TableInvitePool (money pool)
  */
 export async function POST(request: NextRequest) {
   try {
@@ -28,38 +34,92 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const invite = await prisma.tableSlotInvite.findUnique({
+    // 1. Buscar TableSlotInvite (link individual)
+    let invite = await prisma.tableSlotInvite.findUnique({
       where: { inviteToken },
       include: { event: true, ticketType: true },
     });
 
+    // 2. Si no existe, buscar TableInvitePool (money pool)
     if (!invite) {
-      return NextResponse.json({ error: "Invitación no encontrada" }, { status: 404 });
-    }
-
-    if (invite.status !== "PENDING") {
-      return NextResponse.json(
-        {
-          error:
-            invite.status === "PAID"
-              ? "Esta invitación ya fue pagada"
-              : invite.status === "EXPIRED"
-              ? "Esta invitación ha expirado"
-              : "Esta invitación no está disponible",
-        },
-        { status: 400 }
-      );
-    }
-
-    if (invite.expiresAt && new Date() > invite.expiresAt) {
-      await prisma.tableSlotInvite.update({
-        where: { id: invite.id },
-        data: { status: "EXPIRED" },
+      const pool = await prisma.tableInvitePool.findUnique({
+        where: { inviteToken },
+        include: { event: true, ticketType: true },
       });
-      return NextResponse.json(
-        { error: "Esta invitación ha expirado" },
-        { status: 400 }
-      );
+
+      if (!pool) {
+        return NextResponse.json({ error: "Invitación no encontrada" }, { status: 404 });
+      }
+
+      if (pool.expiresAt && new Date() > pool.expiresAt) {
+        return NextResponse.json(
+          { error: "Este link ha expirado" },
+          { status: 400 }
+        );
+      }
+
+      const paidCount = await prisma.tableSlotInvite.count({
+        where: { poolId: pool.id, status: "PAID" },
+      });
+      if (paidCount >= pool.maxSlots) {
+        return NextResponse.json(
+          { error: "Esta mesa ya está completa. Todos los espacios han sido pagados." },
+          { status: 400 }
+        );
+      }
+
+      const nextSeatNumber = paidCount + 1;
+      let slotToken = generateInviteToken();
+      let exists = await prisma.tableSlotInvite.findUnique({ where: { inviteToken: slotToken } })
+        || await prisma.tableInvitePool.findUnique({ where: { inviteToken: slotToken } });
+      while (exists) {
+        slotToken = generateInviteToken();
+        exists = await prisma.tableSlotInvite.findUnique({ where: { inviteToken: slotToken } })
+          || await prisma.tableInvitePool.findUnique({ where: { inviteToken: slotToken } });
+      }
+
+      invite = await prisma.tableSlotInvite.create({
+        data: {
+          eventId: pool.eventId,
+          ticketTypeId: pool.ticketTypeId,
+          tableNumber: pool.tableNumber,
+          seatNumber: nextSeatNumber,
+          poolId: pool.id,
+          inviteToken: slotToken,
+          invitedName: buyerName.trim(),
+          invitedEmail: buyerEmail.trim(),
+          invitedPhone: buyerPhone?.trim() || null,
+          pricePerSeat: pool.pricePerSeat,
+          expiresAt: pool.expiresAt,
+        },
+        include: { event: true, ticketType: true },
+      });
+    } else {
+      // Flujo TableSlotInvite existente
+      if (invite.status !== "PENDING") {
+        return NextResponse.json(
+          {
+            error:
+              invite.status === "PAID"
+                ? "Esta invitación ya fue pagada"
+                : invite.status === "EXPIRED"
+                ? "Esta invitación ha expirado"
+                : "Esta invitación no está disponible",
+          },
+          { status: 400 }
+        );
+      }
+
+      if (invite.expiresAt && new Date() > invite.expiresAt) {
+        await prisma.tableSlotInvite.update({
+          where: { id: invite.id },
+          data: { status: "EXPIRED" },
+        });
+        return NextResponse.json(
+          { error: "Esta invitación ha expirado" },
+          { status: 400 }
+        );
+      }
     }
 
     const subtotal = Number(invite.pricePerSeat);

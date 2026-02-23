@@ -39,7 +39,7 @@ export default function PagarInvitePage() {
           setInvite(data.data);
           if (data.data.status !== "PAID") {
             setFormData({
-              buyerName: data.data.invitedName === "Pendiente" ? "" : (data.data.invitedName || ""),
+              buyerName: data.data.isPool ? "" : (data.data.invitedName === "Pendiente" ? "" : (data.data.invitedName || "")),
               buyerEmail: data.data.invitedEmail || "",
               buyerPhone: data.data.invitedPhone || "",
             });
@@ -212,8 +212,22 @@ export default function PagarInvitePage() {
 
         <p className="text-white/70 text-center mb-6">
           Mesa <strong className="text-white">{invite.tableNumber}</strong>
-          {" · "}
-          Asiento <strong className="text-white">{invite.seatNumber}</strong>
+          {invite.isPool ? (
+            <>
+              {" · "}
+              <span className="text-white">Link compartido</span>
+              {invite.paidCount != null && invite.maxSlots != null && (
+                <span className="block mt-1 text-white/60 text-sm">
+                  {invite.paidCount} de {invite.maxSlots} ya pagaron
+                </span>
+              )}
+            </>
+          ) : (
+            <>
+              {" · "}
+              Asiento <strong className="text-white">{invite.seatNumber}</strong>
+            </>
+          )}
         </p>
 
         {invite.tableReserved || invite.status === "PAID" ? (

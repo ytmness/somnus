@@ -18,7 +18,7 @@ interface EventOption {
 interface InviteRow {
   id: string;
   tableNumber: number;
-  seatNumber: number;
+  seatNumber: number | null;
   invitedName: string;
   invitedEmail: string | null;
   invitedPhone: string | null;
@@ -29,6 +29,9 @@ interface InviteRow {
   inviteToken: string;
   expiresAt: string | null;
   createdAt: string;
+  isPool?: boolean;
+  maxSlots?: number;
+  paidCount?: number;
 }
 
 export function InvitesManager() {
@@ -48,8 +51,9 @@ export function InvitesManager() {
   const [generateTotalPrice, setGenerateTotalPrice] = useState("");
   const [isSubmittingGenerate, setIsSubmittingGenerate] = useState(false);
   const [generatedLinks, setGeneratedLinks] = useState<
-    Array<{ token: string; name: string; url: string; pricePerSeat: number; seatNumber: number }>
+    Array<{ token: string; name: string; url: string; pricePerSeat: number; seatNumber: number | null; maxSlots?: number; isPool?: boolean }>
   >([]);
+  const [usePoolMode, setUsePoolMode] = useState(true); // Money pool: un link para toda la mesa
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -138,12 +142,15 @@ export function InvitesManager() {
     setIsSubmittingGenerate(true);
     setGeneratedLinks([]);
     try {
+      const body: Record<string, unknown> = usePoolMode
+        ? { slots, totalTablePrice: totalPrice, mode: "pool" }
+        : { slots, totalTablePrice: totalPrice };
       const res = await fetch(
         `/api/events/${eventId}/tables/${tableNum}/invites`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ slots, totalTablePrice: totalPrice }),
+          body: JSON.stringify(body),
         }
       );
       const data = await res.json();
@@ -222,8 +229,28 @@ export function InvitesManager() {
         <h3 className="text-lg font-bold text-white mb-4">
           Generar links de pago
         </h3>
+        <div className="flex flex-wrap items-center gap-4 mb-4">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={usePoolMode}
+              onChange={(e) => setUsePoolMode(e.target.checked)}
+              className="rounded border-white/30 bg-white/10 text-white focus:ring-white/30"
+            />
+            <span className="text-white/80 text-sm font-medium">
+              Modo money pool
+            </span>
+          </label>
+          <span className="text-white/50 text-xs">
+            {usePoolMode
+              ? "Un solo link para toda la mesa. Cada persona ingresa su nombre al pagar."
+              : "Un link por asiento (cada uno con su link individual)."}
+          </span>
+        </div>
         <p className="text-white/60 text-sm mb-4">
-          Elige evento, número de mesa, precio total de la mesa y cuántas personas pueden pagar (1–{MAX_SLOTS}). El precio se divide entre ellos. Cada uno recibe un link; al pagar ingresan nombre, email y teléfono. Cuando paguen todos, la mesa pasa a reservada. Puedes crear varias mesas para el mismo evento.
+          {usePoolMode
+            ? "Un link compartido para toda la mesa. Compártelo en el grupo de WhatsApp y cada quien paga su parte ingresando nombre, email y teléfono al pagar. Los pagos se registran automáticamente."
+            : `Evento, mesa, precio total y cuántas personas (1–${MAX_SLOTS}). Cada uno recibe su link individual.`}
         </p>
         {!showGenerate ? (
           <Button
@@ -314,7 +341,9 @@ export function InvitesManager() {
                   className="w-full max-w-[120px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
                 />
                 <p className="text-white/50 text-xs mt-1">
-                  Cada uno recibe un link; ingresan nombre, email y teléfono al pagar.
+                  {usePoolMode
+                    ? "Máximo de pagos permitidos en este link."
+                    : "Cada uno recibe un link; ingresan nombre, email y teléfono al pagar."}
                 </p>
               </div>
             </div>
@@ -344,7 +373,9 @@ export function InvitesManager() {
 
         {generatedLinks.length > 0 && (
           <div className="mt-6 pt-6 border-t border-white/10">
-            <p className="text-white/80 font-medium mb-3">Links generados:</p>
+            <p className="text-white/80 font-medium mb-3">
+              {generatedLinks[0]?.isPool ? "Link compartido:" : "Links generados:"}
+            </p>
             <div className="space-y-2">
               {generatedLinks.map((link, i) => (
                 <div
@@ -352,7 +383,9 @@ export function InvitesManager() {
                   className="flex flex-wrap items-center gap-2 p-2 rounded bg-white/5"
                 >
                   <span className="text-white/80 text-sm">
-                    Asiento {link.seatNumber} ·
+                    {link.isPool
+                      ? `Mesa compartida (hasta ${link.maxSlots} pagos) ·`
+                      : `Asiento ${link.seatNumber} ·`}
                   </span>
                   <button
                     type="button"
@@ -442,7 +475,9 @@ export function InvitesManager() {
                   <td className="py-3 px-4 text-white/90">
                     Mesa {inv.tableNumber}
                   </td>
-                  <td className="py-3 px-4 text-white/80">{inv.seatNumber}</td>
+                  <td className="py-3 px-4 text-white/80">
+                    {inv.isPool ? "Link compartido" : inv.seatNumber}
+                  </td>
                   <td className="py-3 px-4">
                     <p className="text-white/90 font-medium">
                       {inv.invitedName === "Pendiente" ? "—" : inv.invitedName}
@@ -459,6 +494,8 @@ export function InvitesManager() {
                       className={`inline-block px-2 py-1 rounded text-xs font-medium ${
                         inv.status === "PAID"
                           ? "bg-green-500/20 text-green-400"
+                          : inv.status === "POOL"
+                          ? "bg-blue-500/20 text-blue-400"
                           : inv.status === "PENDING"
                           ? "bg-amber-500/20 text-amber-400"
                           : inv.status === "EXPIRED"
@@ -466,7 +503,9 @@ export function InvitesManager() {
                           : "bg-red-500/20 text-red-400"
                       }`}
                     >
-                      {inv.status === "PAID"
+                      {inv.status === "POOL" && inv.paidCount != null && inv.maxSlots != null
+                        ? `${inv.paidCount}/${inv.maxSlots} pagados`
+                        : inv.status === "PAID"
                         ? "Pagado"
                         : inv.status === "PENDING"
                         ? "Pendiente"
@@ -494,15 +533,15 @@ export function InvitesManager() {
                       size="sm"
                       variant="ghost"
                       className="text-white/70 hover:text-white"
-                      onClick={() => copyLink(inv.url, inv.id)}
+                      onClick={() => copyLink(inv.url, inv.inviteToken)}
                     >
-                      {copiedId === inv.id ? (
+                      {copiedId === inv.inviteToken ? (
                         <Check className="w-4 h-4 text-green-400" />
                       ) : (
                         <Copy className="w-4 h-4" />
                       )}
                       <span className="ml-1 text-xs">
-                        {copiedId === inv.id ? "Copiado" : "Copiar"}
+                        {copiedId === inv.inviteToken ? "Copiado" : "Copiar"}
                       </span>
                     </Button>
                   </td>
