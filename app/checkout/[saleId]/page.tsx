@@ -25,7 +25,8 @@ export default function CheckoutPage() {
         }
 
         if (data.data?.status === "COMPLETED") {
-          router.push("/mis-boletos");
+          const buyerEmail = data.data?.buyerEmail || "";
+          router.push(buyerEmail ? `/pago-exitoso?email=${encodeURIComponent(buyerEmail)}` : "/pago-exitoso");
           return;
         }
 

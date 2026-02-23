@@ -141,8 +141,8 @@ export function ClipCheckoutForm({
         throw new Error(data.error || "Error al procesar el pago");
       }
 
-      toast.success("Payment successful! Redirecting to your tickets...");
-      router.push("/mis-boletos");
+      toast.success("¡Pago exitoso! Redirigiendo...");
+      router.push(`/pago-exitoso?email=${encodeURIComponent(buyerEmail)}`);
     } catch (err: any) {
       toast.error(err.message || "Error al procesar el pago");
     } finally {

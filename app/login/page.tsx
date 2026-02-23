@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,9 @@ import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const searchParams = useSearchParams();
+  const emailParam = searchParams.get("email") || "";
+  const [email, setEmail] = useState(emailParam);
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -202,6 +204,11 @@ export default function LoginPage() {
                   </div>
 
                   <form onSubmit={handleLogin} className="space-y-6">
+                    {emailParam && (
+                      <p className="text-green-400/90 text-sm text-center bg-green-500/10 border border-green-500/20 rounded-lg py-2 px-3">
+                        Inicia sesión con el correo del checkout para ver tus boletos
+                      </p>
+                    )}
                     <div>
                       <label
                         htmlFor="email"

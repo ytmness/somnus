@@ -24,13 +24,6 @@ export async function GET(
       return NextResponse.json({ error: "Venta no encontrada" }, { status: 404 });
     }
 
-    if (sale.status === "COMPLETED") {
-      return NextResponse.json(
-        { error: "Esta venta ya fue pagada" },
-        { status: 400 }
-      );
-    }
-
     return NextResponse.json({ success: true, data: sale });
   } catch (error) {
     console.error("Get sale error:", error);
