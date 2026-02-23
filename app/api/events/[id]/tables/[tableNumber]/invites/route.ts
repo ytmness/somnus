@@ -120,7 +120,7 @@ export async function POST(
 
     if (isPoolMode) {
       // Money pool: un solo link para toda la mesa
-      const slots = Math.min(MAX_SLOTS_PER_TABLE, Math.max(1, slotsCount));
+      const slots = Math.min(MAX_SLOTS_PER_TABLE, Math.max(1, slotsCount ?? 1));
       const totalPrice = parseFloat(String(totalTablePrice).replace(/,/g, "."));
       if (!Number.isFinite(totalPrice) || totalPrice <= 0) {
         return NextResponse.json({ error: "Precio total de la mesa debe ser mayor a 0" }, { status: 400 });
