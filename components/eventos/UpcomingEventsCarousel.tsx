@@ -74,12 +74,13 @@ export function UpcomingEventsCarousel({
           slidesPerView="auto"
           watchSlidesProgress
           loop={children.length >= 3}
+          loopAdditionalSlides={3}
           initialSlide={Math.floor(children.length / 2)}
           speed={500}
           modules={[EffectCoverflow, Pagination, Autoplay]}
           coverflowEffect={{
             rotate: 0,
-            stretch: 0,
+            stretch: 20,
             depth: 200,
             modifier: 1,
             slideShadows: false,
@@ -95,7 +96,7 @@ export function UpcomingEventsCarousel({
           {children.map((child, index) => (
             <SwiperSlide key={index} className="!w-auto">
               <div
-                className={`!w-[92vw] !h-[496px] md:!w-[443px] md:!h-[650px] flex items-center justify-center [&>article]:w-full [&>article]:h-full`}
+                className={`!w-[min(92vw,443px)] !h-[496px] md:!w-[443px] md:!h-[650px] flex items-center justify-center [&>article]:w-full [&>article]:h-full`}
               >
                 {child}
               </div>
