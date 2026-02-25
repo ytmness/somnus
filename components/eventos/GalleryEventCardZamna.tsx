@@ -13,7 +13,7 @@ export function GalleryEventCardZamna({ event, onSelect }: GalleryEventCardZamna
   return (
     <article
       onClick={onSelect}
-      className="group relative overflow-hidden rounded-2xl bg-[#1a1a1a] flex flex-col cursor-pointer"
+      className="group relative overflow-hidden rounded-2xl bg-[#1a1a1a] flex flex-col cursor-pointer border border-white/15 hover:border-white/25 transition-colors"
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         <Image

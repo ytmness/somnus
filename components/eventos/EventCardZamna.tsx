@@ -42,7 +42,7 @@ export function EventCardZamna({
       onClick={() => {
         if (!isMystery) onSelect();
       }}
-      className={`group relative overflow-hidden rounded-2xl bg-[#1a1a1a] flex flex-col ${
+      className={`group relative overflow-hidden rounded-2xl bg-[#1a1a1a] flex flex-col border border-white/15 hover:border-white/25 transition-colors ${
         isPast || isMystery ? "cursor-default opacity-90" : "cursor-pointer"
       }`}
     >
