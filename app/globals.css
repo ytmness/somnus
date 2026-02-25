@@ -22,7 +22,7 @@
 
 html,
 body {
-  overflow-x: hidden;
+  /* overflow-x: visible para que el carrusel coverflow muestre slides a ambos lados */
   scrollbar-width: none;
   -ms-overflow-style: none;
 }

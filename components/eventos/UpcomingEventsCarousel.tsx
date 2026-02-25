@@ -54,24 +54,32 @@ export function UpcomingEventsCarousel({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Botones de navegación - posicionados en los costados */}
+      {/* Botones de navegación - posicionados en los costados, z-50 para que no los tape nada */}
       {children.length > 1 && swiper && (
         <>
           <button
             type="button"
-            onClick={() => swiper.slidePrev()}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              swiper.slidePrev();
+            }}
             aria-label="Anterior"
-            className="absolute -left-2 md:-left-6 lg:-left-8 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm transition-colors border border-white/15"
+            className="absolute -left-4 md:-left-12 lg:-left-16 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-black/70 hover:bg-black/90 text-white backdrop-blur-sm transition-colors border border-white/20 pointer-events-auto cursor-pointer"
           >
-            <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+            <ChevronLeft className="w-6 h-6 md:w-7 md:h-7" />
           </button>
           <button
             type="button"
-            onClick={() => swiper.slideNext()}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              swiper.slideNext();
+            }}
             aria-label="Siguiente"
-            className="absolute -right-2 md:-right-6 lg:-right-8 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm transition-colors border border-white/15"
+            className="absolute -right-4 md:-right-12 lg:-right-16 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-black/70 hover:bg-black/90 text-white backdrop-blur-sm transition-colors border border-white/20 pointer-events-auto cursor-pointer"
           >
-            <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+            <ChevronRight className="w-6 h-6 md:w-7 md:h-7" />
           </button>
         </>
       )}

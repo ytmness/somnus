@@ -304,7 +304,7 @@ export default function HomePage() {
   const isGalleryMode = concerts.length === 0;
 
   return (
-    <div className="min-h-screen somnus-bg-main overflow-x-hidden">
+    <div className="min-h-screen somnus-bg-main">
       {/* Loader entrada - una vez por sesión */}
       {showLoader && (
         <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center">
