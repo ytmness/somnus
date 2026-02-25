@@ -811,11 +811,11 @@ video.hero-video-no-controls::-ms-media-controls {
   /* NO overflow-hidden ni transform aquí; Swiper coverflow los gestiona */
 }
 
-/* Paginación abajo con translate, estilo Bresh */
+/* Paginación abajo del carrusel */
 .events-carousel-swiper .swiper-pagination {
   position: relative !important;
-  margin-top: 0 !important;
-  transform: translateY(-3rem);
+  margin-top: 1.5rem !important;
+  transform: none;
   display: flex;
   justify-content: center;
   gap: 0.5rem;

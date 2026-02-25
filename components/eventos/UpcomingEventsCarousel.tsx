@@ -80,13 +80,6 @@ export function UpcomingEventsCarousel({
         </Swiper>
       </div>
 
-      {/* Indicador "Pausado" al hacer hover (estilo Bresh) */}
-      {isHovered && children.length > 1 && (
-        <div className="absolute top-2 right-4 md:top-4 md:right-8 bg-black/60 text-white text-xs uppercase tracking-wider px-3 py-1.5 rounded-full backdrop-blur-sm z-20">
-          Paused
-        </div>
-      )}
-
     </div>
   );
 }
