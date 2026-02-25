@@ -42,14 +42,14 @@ export function UpcomingEventsCarousel({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Botones de navegación */}
+      {/* Botones de navegación - posicionados en los costados */}
       {children.length > 1 && swiper && (
         <>
           <button
             type="button"
             onClick={() => swiper.slidePrev()}
             aria-label="Anterior"
-            className="absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm transition-colors border border-white/15"
+            className="absolute -left-2 md:-left-6 lg:-left-8 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm transition-colors border border-white/15"
           >
             <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
           </button>
@@ -57,7 +57,7 @@ export function UpcomingEventsCarousel({
             type="button"
             onClick={() => swiper.slideNext()}
             aria-label="Siguiente"
-            className="absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm transition-colors border border-white/15"
+            className="absolute -right-2 md:-right-6 lg:-right-8 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm transition-colors border border-white/15"
           >
             <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
           </button>
@@ -74,7 +74,7 @@ export function UpcomingEventsCarousel({
           slidesPerView="auto"
           watchSlidesProgress
           loop={children.length >= 3}
-          loopAdditionalSlides={3}
+          loopAdditionalSlides={Math.max(5, children.length)}
           initialSlide={Math.floor(children.length / 2)}
           speed={500}
           modules={[EffectCoverflow, Pagination, Autoplay]}
