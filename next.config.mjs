@@ -11,6 +11,8 @@ const nextConfig = {
       { protocol: 'https', hostname: 'www.lifeder.com' },
       { protocol: 'https', hostname: 'lifeder.com' },
       { protocol: 'https', hostname: 'i.pinimg.com' },
+      { protocol: 'https', hostname: '**.canva.com' },
+      { protocol: 'https', hostname: 'marketplace.canva.com' },
     ],
   },
   // Aumentar límites para archivos grandes como videos 4K
