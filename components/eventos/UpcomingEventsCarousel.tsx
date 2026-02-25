@@ -74,6 +74,7 @@ export function UpcomingEventsCarousel({
           slidesPerView="auto"
           watchSlidesProgress
           loop={children.length >= 3}
+          initialSlide={Math.floor(children.length / 2)}
           speed={500}
           modules={[EffectCoverflow, Pagination, Autoplay]}
           coverflowEffect={{
