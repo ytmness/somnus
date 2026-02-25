@@ -34,6 +34,18 @@ export function UpcomingEventsCarousel({
     if (swiper && isHovered) swiper.autoplay?.stop();
   }, [swiper, isHovered]);
 
+  // Forzar posición centrada al cargar (evita desplazamiento a la izquierda en refresh)
+  useEffect(() => {
+    if (!swiper || children.length < 2) return;
+    const centerIndex = Math.floor(children.length / 2);
+    const fixPosition = () => {
+      swiper.slideTo(centerIndex, 0);
+      swiper.update();
+    };
+    const timer = setTimeout(fixPosition, 50);
+    return () => clearTimeout(timer);
+  }, [swiper, children.length]);
+
   if (!children || children.length === 0) return null;
 
   return (
@@ -77,6 +89,8 @@ export function UpcomingEventsCarousel({
           loopAdditionalSlides={Math.max(5, children.length)}
           initialSlide={Math.floor(children.length / 2)}
           speed={500}
+          observer
+          observeParents
           modules={[EffectCoverflow, Pagination, Autoplay]}
           coverflowEffect={{
             rotate: 0,
