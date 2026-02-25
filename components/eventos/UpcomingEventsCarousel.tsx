@@ -49,7 +49,7 @@ export function UpcomingEventsCarousel({
             type="button"
             onClick={() => swiper.slidePrev()}
             aria-label="Anterior"
-            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm transition-colors border border-white/15"
+            className="absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm transition-colors border border-white/15"
           >
             <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
           </button>
@@ -57,7 +57,7 @@ export function UpcomingEventsCarousel({
             type="button"
             onClick={() => swiper.slideNext()}
             aria-label="Siguiente"
-            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm transition-colors border border-white/15"
+            className="absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm transition-colors border border-white/15"
           >
             <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
           </button>
@@ -65,7 +65,7 @@ export function UpcomingEventsCarousel({
       )}
 
       {/* Stage: padding horizontal para que el coverflow 3D no se corte; SIN overflow-hidden aquí */}
-      <div className="w-full h-[600px] md:h-[700px] px-6 md:px-12">
+      <div className="w-full h-[600px] md:h-[700px] px-14 md:px-20 lg:px-28">
         <Swiper
           onSwiper={setSwiper}
           effect="coverflow"
