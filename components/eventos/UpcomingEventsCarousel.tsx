@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCoverflow, Pagination, Autoplay } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
@@ -21,6 +21,7 @@ export function UpcomingEventsCarousel({
 }: UpcomingEventsCarouselProps) {
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
     if (!swiper || isHovered || children.length <= 1) return;
@@ -34,15 +35,15 @@ export function UpcomingEventsCarousel({
     if (swiper && isHovered) swiper.autoplay?.stop();
   }, [swiper, isHovered]);
 
-  // Forzar posición centrada al cargar (evita desplazamiento a la izquierda en refresh)
+  // Forzar posición centrada SOLO al cargar una vez (evita que slidePrev reseteé)
   useEffect(() => {
-    if (!swiper || children.length < 2) return;
+    if (!swiper || children.length < 2 || hasInitialized.current) return;
+    hasInitialized.current = true;
     const centerIndex = Math.floor(children.length / 2);
-    const fixPosition = () => {
+    const timer = setTimeout(() => {
       swiper.slideTo(centerIndex, 0);
       swiper.update();
-    };
-    const timer = setTimeout(fixPosition, 50);
+    }, 50);
     return () => clearTimeout(timer);
   }, [swiper, children.length]);
 
@@ -93,12 +94,11 @@ export function UpcomingEventsCarousel({
           centeredSlides
           slidesPerView="auto"
           watchSlidesProgress
-          loop={children.length >= 3}
-          loopAdditionalSlides={Math.max(5, children.length)}
+          loop={children.length >= 2}
+          loopAdditionalSlides={Math.max(10, children.length * 3)}
+          loopPreventsSliding={false}
           initialSlide={Math.floor(children.length / 2)}
           speed={500}
-          observer
-          observeParents
           modules={[EffectCoverflow, Pagination, Autoplay]}
           coverflowEffect={{
             rotate: 0,
