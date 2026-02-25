@@ -21,6 +21,7 @@ export function UpcomingEventsCarousel({
 }: UpcomingEventsCarouselProps) {
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
   const hasInitialized = useRef(false);
 
   useEffect(() => {
@@ -39,15 +40,19 @@ export function UpcomingEventsCarousel({
   useEffect(() => {
     if (!swiper || children.length < 2 || hasInitialized.current) return;
     hasInitialized.current = true;
-    const centerIndex = Math.floor(children.length / 2);
+    const centerIndex = children.length + Math.floor(children.length / 2);
     const timer = setTimeout(() => {
       swiper.slideTo(centerIndex, 0);
       swiper.update();
+      setActiveIndex(Math.floor(children.length / 2));
     }, 50);
     return () => clearTimeout(timer);
   }, [swiper, children.length]);
 
   if (!children || children.length === 0) return null;
+
+  // Duplicar slides para que Swiper tenga suficientes en loop (requiere slides >= slidesPerView*2)
+  const slidesForLoop = [...children, ...children, ...children];
 
   return (
     <div
@@ -95,9 +100,8 @@ export function UpcomingEventsCarousel({
           slidesPerView="auto"
           watchSlidesProgress
           loop={children.length >= 2}
-          loopAdditionalSlides={Math.max(10, children.length * 3)}
-          loopPreventsSliding={false}
-          initialSlide={Math.floor(children.length / 2)}
+          loopAdditionalSlides={children.length}
+          initialSlide={children.length + Math.floor(children.length / 2)}
           speed={500}
           modules={[EffectCoverflow, Pagination, Autoplay]}
           coverflowEffect={{
@@ -107,7 +111,8 @@ export function UpcomingEventsCarousel({
             modifier: 1,
             slideShadows: false,
           }}
-          pagination={{ clickable: true }}
+          pagination={false}
+          onSlideChange={(s) => setActiveIndex(s.realIndex % children.length)}
           autoplay={
             children.length > 1
               ? { delay: 4000, disableOnInteraction: false }
@@ -115,8 +120,8 @@ export function UpcomingEventsCarousel({
           }
           className="!overflow-visible events-carousel-swiper"
         >
-          {children.map((child, index) => (
-            <SwiperSlide key={index} className="!w-auto">
+          {slidesForLoop.map((child, i) => (
+            <SwiperSlide key={i} className="!w-auto">
               <div
                 className={`!w-[min(92vw,443px)] !h-[496px] md:!w-[443px] md:!h-[650px] flex items-center justify-center [&>article]:w-full [&>article]:h-full`}
               >
@@ -127,6 +132,24 @@ export function UpcomingEventsCarousel({
         </Swiper>
       </div>
 
+      {/* Paginación custom: 5 bullets según eventos únicos */}
+      {children.length > 1 && (
+        <div className="flex justify-center gap-2 mt-6">
+          {children.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => swiper?.slideToLoop(i)}
+              aria-label={`Ir a slide ${i + 1}`}
+              className={`w-2 h-2 rounded-full transition-all ${
+                activeIndex === i
+                  ? "bg-white scale-125"
+                  : "bg-white/40 hover:bg-white/60"
+              }`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
