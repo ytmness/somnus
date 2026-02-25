@@ -45,7 +45,7 @@ export const createEventSchema = z.object({
   address: z.string().optional(),
   eventDate: z.string().or(z.date()),
   eventTime: z.string().min(1, "Time is required"),
-  imageUrl: z.string().url("Invalid image URL").optional(),
+  imageUrl: z.union([z.string().url("URL de imagen inválida"), z.literal("")]).optional(),
   maxCapacity: z.number().int().positive("Capacity must be greater than 0"),
   salesStartDate: z.string().or(z.date()),
   salesEndDate: z.string().or(z.date()),

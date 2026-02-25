@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import { X, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -281,19 +282,11 @@ export function CreateEventModal({ onClose, onSuccess }: CreateEventModalProps) 
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-white/90 mb-2">
-                  URL de Imagen (opcional)
-                </label>
-                <input
-                  type="url"
-                  name="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white placeholder-white/50 focus:outline-none focus:border-regia-gold"
-                  placeholder="https://..."
-                />
-              </div>
+              <ImageUploadField
+                value={formData.imageUrl}
+                onChange={(url) => setFormData((prev) => ({ ...prev, imageUrl: url }))}
+                placeholder="https://... o arrastra una imagen"
+              />
 
               <div>
                 <label className="block text-sm font-medium text-white/90 mb-2">

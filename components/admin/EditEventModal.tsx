@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -346,18 +347,11 @@ export function EditEventModal({
                   required
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-white/90 mb-2">
-                  URL de Imagen
-                </label>
-                <input
-                  type="url"
-                  name="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white"
-                />
-              </div>
+              <ImageUploadField
+                value={formData.imageUrl}
+                onChange={(url) => setFormData((prev) => ({ ...prev, imageUrl: url }))}
+                placeholder="https://... o arrastra una imagen"
+              />
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
