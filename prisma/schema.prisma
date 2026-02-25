@@ -434,6 +434,25 @@ model GalleryImage {
 }
 
 // =====================================================
+// CONTACTO / LEADS (formulario de la home)
+// =====================================================
+
+model ContactLead {
+  id        String   @id @default(uuid())
+  name      String
+  lastName  String
+  email     String
+  phone     String?
+  country   String?
+  city      String?
+  agreedToTerms Boolean @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+// =====================================================
 // CONFIGURACIÓN DEL SISTEMA
 // =====================================================
 

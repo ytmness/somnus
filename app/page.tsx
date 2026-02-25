@@ -12,6 +12,7 @@ import { EventCardZamna } from "@/components/eventos/EventCardZamna";
 import { GalleryEventCardZamna } from "@/components/eventos/GalleryEventCardZamna";
 import { UpcomingEventsCarousel } from "@/components/eventos/UpcomingEventsCarousel";
 import { BrandPresenceCarousel } from "@/components/BrandPresenceCarousel";
+import { ContactForm } from "@/components/ContactForm";
 import { GALLERY_EVENTS } from "@/lib/gallery-events";
 import { RevealSection } from "@/components/RevealSection";
 
@@ -545,45 +546,26 @@ export default function HomePage() {
       {/* 3. BRAND PRESENCE - Carrusel infinito de marcas */}
       <BrandPresenceCarousel />
 
-      {/* 4. MANIFIESTO - ¿Por qué Somnus? */}
+      {/* 4. FORMULARIO DE CONTACTO */}
       <RevealSection>
-        <section className="py-28 sm:py-36 lg:py-44 px-4 sm:px-6 lg:px-8 border-t border-white/10">
-          <div className="max-w-5xl mx-auto text-center">
-            <h2 className="somnus-title-secondary text-3xl md:text-4xl mb-8 uppercase tracking-wider">
-              ¿Por qué Somnus?
-            </h2>
-            <p className="somnus-text-body text-lg md:text-xl mb-20 text-white/70">
-              Tu plataforma de confianza para eventos en vivo exclusivos
-            </p>
+        <section className="py-20 sm:py-28 lg:py-36 px-4 sm:px-6 lg:px-8 border-t border-white/10">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Columna izquierda - Branding */}
+            <div className="text-center lg:text-left">
+              <p className="somnus-text-body text-white/70 mb-4 uppercase tracking-wider text-sm">
+                Accede a eventos exclusivos y promociones
+              </p>
+              <h2 className="somnus-title-secondary text-4xl md:text-5xl lg:text-6xl uppercase tracking-wider mb-6">
+                Sé parte de Somnus
+              </h2>
+              <p className="somnus-text-body text-lg text-white/60 max-w-md mx-auto lg:mx-0">
+                Únete a nuestra comunidad y recibe información de los mejores eventos en vivo.
+              </p>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-20">
-              <div className="liquid-glass p-6 md:p-8 rounded-2xl space-y-4">
-                <span className="text-4xl font-bold text-white">✓</span>
-                <h3 className="somnus-title-secondary text-lg uppercase">
-                  Boletos garantizados
-                </h3>
-                <p className="somnus-text-body text-sm text-white/60">
-                  100% auténticos y verificados
-                </p>
-              </div>
-              <div className="liquid-glass p-6 md:p-8 rounded-2xl space-y-4">
-                <span className="text-4xl font-bold text-white">★</span>
-                <h3 className="somnus-title-secondary text-lg uppercase">
-                  Mejor precio
-                </h3>
-                <p className="somnus-text-body text-sm text-white/60">
-                  Sin comisiones ocultas
-                </p>
-              </div>
-              <div className="liquid-glass p-6 md:p-8 rounded-2xl space-y-4">
-                <span className="text-4xl font-bold text-white">♥</span>
-                <h3 className="somnus-title-secondary text-lg uppercase">
-                  Soporte
-                </h3>
-                <p className="somnus-text-body text-sm text-white/60">
-                  Atención cuando la necesites
-                </p>
-              </div>
+            {/* Columna derecha - Formulario */}
+            <div className="liquid-glass p-8 sm:p-10 rounded-2xl">
+              <ContactForm />
             </div>
           </div>
         </section>

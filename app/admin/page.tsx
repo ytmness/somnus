@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, Calendar, Ticket, Users, ImageIcon, Link2 } from "lucide-react";
+import { Plus, Calendar, Ticket, Users, ImageIcon, Link2, Mail } from "lucide-react";
 import { EventsTable } from "@/components/admin/EventsTable";
 import { CreateEventModal } from "@/components/admin/CreateEventModal";
 import { GalleryManager } from "@/components/admin/GalleryManager";
 import { InvitesManager } from "@/components/admin/InvitesManager";
+import { ContactLeadsManager } from "@/components/admin/ContactLeadsManager";
 import { toast } from "sonner";
 
 interface SessionUser {
@@ -31,7 +32,7 @@ export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [activeTab, setActiveTab] = useState<"eventos" | "galeria" | "invites">("eventos");
+  const [activeTab, setActiveTab] = useState<"eventos" | "galeria" | "invites" | "contacto">("eventos");
 
   useEffect(() => {
     checkAuth();
@@ -256,6 +257,18 @@ export default function AdminPage() {
             <Link2 className="w-4 h-4 inline mr-2" />
             Invites Mesas
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("contacto")}
+            className={`px-4 py-2 rounded-xl font-medium transition-all ${
+              activeTab === "contacto"
+                ? "liquid-glass bg-white text-black"
+                : "liquid-glass text-white/80 hover:text-white"
+            }`}
+          >
+            <Mail className="w-4 h-4 inline mr-2" />
+            Contacto
+          </button>
         </div>
 
         {activeTab === "eventos" && (
@@ -285,6 +298,16 @@ export default function AdminPage() {
               Genera links de pago por asiento desde el formulario de abajo (evento, mesa, precio total y número de personas). Cópialos y compártelos. Las mesas ya no usan mapa; todo se hace desde aquí.
             </p>
             <InvitesManager />
+          </div>
+        )}
+
+        {activeTab === "contacto" && (
+          <div className="liquid-glass p-6">
+            <h2 className="text-xl font-bold text-white mb-6">Solicitudes de contacto</h2>
+            <p className="text-white/70 text-sm mb-6">
+              Personas que enviaron el formulario de contacto desde la página principal.
+            </p>
+            <ContactLeadsManager />
           </div>
         )}
       </main>
