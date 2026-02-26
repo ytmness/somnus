@@ -51,8 +51,11 @@ export function UpcomingEventsCarousel({
 
   if (!children || children.length === 0) return null;
 
-  // Duplicar slides para que Swiper tenga suficientes en loop (requiere slides >= slidesPerView*2)
-  const slidesForLoop = [...children, ...children, ...children];
+  // Solo duplicar si hay ≤5 eventos; con más, Swiper tiene suficientes slides para el loop
+  const slidesForLoop =
+    children.length <= 5
+      ? [...children, ...children, ...children]
+      : children;
 
   return (
     <div
