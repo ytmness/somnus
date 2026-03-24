@@ -27,7 +27,7 @@ export function GalleryEventCardZamna({
       <div
         className={
           carouselGlass
-            ? "relative flex-1 min-h-[220px] md:min-h-[300px] overflow-hidden bg-black/25"
+            ? "relative flex-1 min-h-[280px] md:min-h-[400px] overflow-hidden bg-black/20"
             : "relative aspect-[4/3] overflow-hidden"
         }
       >
@@ -36,10 +36,8 @@ export function GalleryEventCardZamna({
           alt={event.artist}
           fill
           className={`${
-            carouselGlass ? "object-contain p-2" : "object-cover"
-          } transition-transform duration-700 ${
-            carouselGlass ? "" : "group-hover:scale-105"
-          }`}
+            carouselGlass ? "object-cover object-center" : "object-cover"
+          } transition-transform duration-700 group-hover:scale-105`}
           sizes="(max-width: 768px) 100vw, 33vw"
           loading="lazy"
           quality={75}

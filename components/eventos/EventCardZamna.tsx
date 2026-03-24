@@ -9,7 +9,7 @@ interface EventCardZamnaProps {
   isPast: boolean;
   isFeatured?: boolean;
   onSelect: () => void;
-  /** Carrusel: vidrio líquido + poster completo sin recorte */
+  /** Carrusel: vidrio líquido + poster a pantalla ancha (cover) */
   carouselGlass?: boolean;
 }
 
@@ -55,7 +55,7 @@ export function EventCardZamna({
       <div
         className={
           carouselGlass
-            ? "relative flex-1 min-h-[220px] md:min-h-[300px] overflow-hidden bg-black/25"
+            ? "relative flex-1 min-h-[280px] md:min-h-[400px] overflow-hidden bg-black/20"
             : "relative aspect-[4/3] overflow-hidden"
         }
       >
@@ -70,9 +70,11 @@ export function EventCardZamna({
               alt={concert.artist}
               fill
               className={`${
-                carouselGlass ? "object-contain p-2" : "object-cover"
+                carouselGlass
+                  ? "object-cover object-center"
+                  : "object-cover"
               } transition-transform duration-700 ${
-                isPast || carouselGlass ? "" : "group-hover:scale-105"
+                isPast ? "" : "group-hover:scale-105"
               }`}
               sizes="(max-width: 768px) 100vw, 33vw"
               loading="lazy"
