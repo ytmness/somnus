@@ -7,28 +7,59 @@ import type { GalleryEvent } from "@/lib/gallery-events";
 interface GalleryEventCardZamnaProps {
   event: GalleryEvent;
   onSelect: () => void;
+  carouselGlass?: boolean;
 }
 
-export function GalleryEventCardZamna({ event, onSelect }: GalleryEventCardZamnaProps) {
+export function GalleryEventCardZamna({
+  event,
+  onSelect,
+  carouselGlass = false,
+}: GalleryEventCardZamnaProps) {
   return (
     <article
       onClick={onSelect}
-      className="group relative overflow-hidden rounded-2xl bg-[#1a1a1a] flex flex-col cursor-pointer border border-white/15 hover:border-white/25 transition-colors"
+      className={`group relative overflow-hidden rounded-2xl flex flex-col h-full cursor-pointer transition-colors ${
+        carouselGlass
+          ? "liquid-glass border-white/15 hover:border-white/20"
+          : "bg-[#1a1a1a] border border-white/15 hover:border-white/25"
+      }`}
     >
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div
+        className={
+          carouselGlass
+            ? "relative flex-1 min-h-[220px] md:min-h-[300px] overflow-hidden bg-black/25"
+            : "relative aspect-[4/3] overflow-hidden"
+        }
+      >
         <Image
           src={event.image}
           alt={event.artist}
           fill
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          className={`${
+            carouselGlass ? "object-contain p-2" : "object-cover"
+          } transition-transform duration-700 ${
+            carouselGlass ? "" : "group-hover:scale-105"
+          }`}
           sizes="(max-width: 768px) 100vw, 33vw"
           loading="lazy"
           quality={75}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        <div
+          className={
+            carouselGlass
+              ? "pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"
+              : "absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"
+          }
+        />
       </div>
 
-      <div className="flex flex-col flex-1 p-6 bg-[#141414]">
+      <div
+        className={
+          carouselGlass
+            ? "flex flex-col flex-1 p-5 md:p-6 border-t border-white/10 bg-black/20 backdrop-blur-md"
+            : "flex flex-col flex-1 p-6 bg-[#141414]"
+        }
+      >
         <span className="text-[10px] uppercase tracking-widest text-white/70 mb-1">
           {event.venue}
         </span>

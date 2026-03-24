@@ -109,8 +109,8 @@ export function UpcomingEventsCarousel({
           modules={[EffectCoverflow, Pagination, Autoplay]}
           coverflowEffect={{
             rotate: 0,
-            stretch: 20,
-            depth: 200,
+            stretch: 24,
+            depth: 0,
             modifier: 1,
             slideShadows: false,
           }}

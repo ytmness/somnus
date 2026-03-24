@@ -9,6 +9,8 @@ interface EventCardZamnaProps {
   isPast: boolean;
   isFeatured?: boolean;
   onSelect: () => void;
+  /** Carrusel: vidrio líquido + poster completo sin recorte */
+  carouselGlass?: boolean;
 }
 
 function getEventStatus(
@@ -31,6 +33,7 @@ export function EventCardZamna({
   isPast,
   isFeatured = false,
   onSelect,
+  carouselGlass = false,
 }: EventCardZamnaProps) {
   const status = getEventStatus(concert);
   const isMystery =
@@ -42,12 +45,20 @@ export function EventCardZamna({
       onClick={() => {
         if (!isMystery) onSelect();
       }}
-      className={`group relative overflow-hidden rounded-2xl bg-[#1a1a1a] flex flex-col border border-white/15 hover:border-white/25 transition-colors ${
-        isPast || isMystery ? "cursor-default opacity-90" : "cursor-pointer"
-      }`}
+      className={`group relative overflow-hidden rounded-2xl flex flex-col h-full transition-colors ${
+        carouselGlass
+          ? "liquid-glass border-white/15 hover:border-white/20"
+          : "bg-[#1a1a1a] border border-white/15 hover:border-white/25"
+      } ${isPast || isMystery ? "cursor-default opacity-90" : "cursor-pointer"}`}
     >
-      {/* Top: imagen impactante tipo Zamna */}
-      <div className="relative aspect-[4/3] overflow-hidden">
+      {/* Top: imagen (carrusel = poster completo; resto = crop tipo Zamna) */}
+      <div
+        className={
+          carouselGlass
+            ? "relative flex-1 min-h-[220px] md:min-h-[300px] overflow-hidden bg-black/25"
+            : "relative aspect-[4/3] overflow-hidden"
+        }
+      >
         {isMystery ? (
           <div className="absolute inset-0 flex items-center justify-center bg-black/70">
             <p className="text-5xl font-bold text-white/60">?</p>
@@ -58,14 +69,22 @@ export function EventCardZamna({
               src={concert.image}
               alt={concert.artist}
               fill
-              className={`object-cover transition-transform duration-700 ${
-                isPast ? "" : "group-hover:scale-105"
+              className={`${
+                carouselGlass ? "object-contain p-2" : "object-cover"
+              } transition-transform duration-700 ${
+                isPast || carouselGlass ? "" : "group-hover:scale-105"
               }`}
               sizes="(max-width: 768px) 100vw, 33vw"
               loading="lazy"
               quality={75}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            <div
+              className={
+                carouselGlass
+                  ? "pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"
+                  : "absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"
+              }
+            />
           </>
         )}
         {isFeatured && !isPast && (
@@ -86,8 +105,14 @@ export function EventCardZamna({
         )}
       </div>
 
-      {/* Bottom: bloque oscuro con detalles tipo Zamna */}
-      <div className="flex flex-col flex-1 p-6 bg-[#141414]">
+      {/* Bottom: detalles */}
+      <div
+        className={
+          carouselGlass
+            ? "flex flex-col flex-1 p-5 md:p-6 border-t border-white/10 bg-black/20 backdrop-blur-md"
+            : "flex flex-col flex-1 p-6 bg-[#141414]"
+        }
+      >
         <span className="text-[10px] uppercase tracking-widest text-white/70 mb-1">
           {concert.venue}
         </span>

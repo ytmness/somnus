@@ -498,6 +498,7 @@ export default function HomePage() {
                     concert={concert}
                     isPast={false}
                     isFeatured={index === 0}
+                    carouselGlass
                     onSelect={() => handleSelectConcert(concert)}
                   />
                 ))}
@@ -512,6 +513,7 @@ export default function HomePage() {
                   <GalleryEventCardZamna
                     key={item.id}
                     event={item}
+                    carouselGlass
                     onSelect={() => router.push(item.galleryUrl)}
                   />
                 ))}
@@ -533,6 +535,7 @@ export default function HomePage() {
                       key={concert.id}
                       concert={concert}
                       isPast
+                      carouselGlass
                       onSelect={() => toast.info("This event has already passed")}
                     />
                   ))}
