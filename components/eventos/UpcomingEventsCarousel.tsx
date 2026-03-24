@@ -28,18 +28,37 @@ function UpcomingEventsCarouselInner({
   showPosterTuner = true,
 }: UpcomingEventsCarouselProps) {
   const layout = useCarouselLayout();
+  const uniqueCount = children.length;
+
+  /** Bastantes repeticiones del set único: vecinos a ambos lados + loop continuo */
+  const loopRepeats =
+    uniqueCount <= 1 ? 1 : Math.max(5, Math.ceil(28 / uniqueCount));
+
+  const initialSlideIndex =
+    uniqueCount <= 1
+      ? 0
+      : Math.floor(loopRepeats / 2) * uniqueCount +
+        Math.floor(uniqueCount / 2);
+
+  const slideNodes =
+    uniqueCount <= 1
+      ? children
+      : Array.from({ length: loopRepeats }, () => children).flat();
+
+  const loopAdditionalSlides = Math.max(uniqueCount * 3, 16);
+
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const hasInitialized = useRef(false);
 
   useEffect(() => {
-    if (!swiper || isHovered || children.length <= 1) return;
+    if (!swiper || isHovered || uniqueCount <= 1) return;
     swiper.autoplay?.start();
     return () => {
       swiper.autoplay?.stop();
     };
-  }, [swiper, isHovered, children.length]);
+  }, [swiper, isHovered, uniqueCount]);
 
   useEffect(() => {
     if (swiper && isHovered) swiper.autoplay?.stop();
@@ -61,23 +80,21 @@ function UpcomingEventsCarouselInner({
   );
 
   useEffect(() => {
-    if (!swiper || children.length < 2 || hasInitialized.current) return;
+    hasInitialized.current = false;
+  }, [uniqueCount, loopRepeats]);
+
+  useEffect(() => {
+    if (!swiper || uniqueCount < 2 || hasInitialized.current) return;
     hasInitialized.current = true;
-    const centerIndex = children.length + Math.floor(children.length / 2);
     const timer = setTimeout(() => {
-      swiper.slideTo(centerIndex, 0);
+      swiper.slideTo(initialSlideIndex, 0);
       swiper.update();
-      setActiveIndex(Math.floor(children.length / 2));
+      setActiveIndex(Math.floor(uniqueCount / 2));
     }, 50);
     return () => clearTimeout(timer);
-  }, [swiper, children.length]);
+  }, [swiper, uniqueCount, initialSlideIndex]);
 
-  if (!children || children.length === 0) return null;
-
-  const slidesForLoop =
-    children.length <= 5
-      ? [...children, ...children, ...children]
-      : children;
+  if (!children || uniqueCount === 0) return null;
 
   const stageMinSm = Math.max(layout.slideHeightMobile + 72, 560);
   const stageMinMd = Math.max(layout.slideHeightDesktop + 72, 640);
@@ -90,7 +107,7 @@ function UpcomingEventsCarouselInner({
     >
       {showPosterTuner ? <CarouselPosterTuner /> : null}
 
-      {children.length > 1 && swiper && (
+      {uniqueCount > 1 && swiper && (
         <>
           <button
             type="button"
@@ -135,22 +152,22 @@ function UpcomingEventsCarouselInner({
           centeredSlides
           slidesPerView="auto"
           watchSlidesProgress
-          loop={children.length >= 2}
-          loopAdditionalSlides={children.length}
-          initialSlide={children.length + Math.floor(children.length / 2)}
+          loop={uniqueCount >= 2}
+          loopAdditionalSlides={loopAdditionalSlides}
+          initialSlide={initialSlideIndex}
           speed={500}
           modules={[EffectCoverflow, Pagination, Autoplay]}
           coverflowEffect={coverflowEffect}
           pagination={false}
-          onSlideChange={(s) => setActiveIndex(s.realIndex % children.length)}
+          onSlideChange={(s) => setActiveIndex(s.realIndex % uniqueCount)}
           autoplay={
-            children.length > 1
+            uniqueCount > 1
               ? { delay: 4000, disableOnInteraction: false }
               : false
           }
           className="!overflow-visible events-carousel-swiper"
         >
-          {slidesForLoop.map((child, i) => (
+          {slideNodes.map((child, i) => (
             <SwiperSlide key={i} className="!w-auto">
               <div
                 className="flex items-center justify-center [&>article]:w-full [&>article]:h-full w-[min(92vw,var(--carousel-sw))] h-[var(--carousel-sh)] md:h-[var(--carousel-sh-md)]"
@@ -169,7 +186,7 @@ function UpcomingEventsCarouselInner({
         </Swiper>
       </div>
 
-      {children.length > 1 && (
+      {uniqueCount > 1 && (
         <div className="flex justify-center gap-2 mt-6">
           {children.map((_, i) => (
             <button
