@@ -7,13 +7,18 @@ import { SomnusHeader } from "@/components/SomnusHeader";
 import { gallerySections as staticSections } from "@/lib/gallery-images";
 import { X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 
+/** Fallback estático: más reciente arriba (orden inverso al definido en gallery-images) */
+const staticSectionsNewestFirst = [...staticSections].reverse();
+
 type GallerySection = { id: string; title: string; images: string[] };
 
 function GaleriaContent() {
   const searchParams = useSearchParams();
   const sectionParam = searchParams.get("section");
-  const [sections, setSections] = useState<GallerySection[]>(staticSections);
-  const [activeSection, setActiveSection] = useState(staticSections[0]?.id ?? "panorama");
+  const [sections, setSections] = useState<GallerySection[]>(staticSectionsNewestFirst);
+  const [activeSection, setActiveSection] = useState(
+    staticSectionsNewestFirst[0]?.id ?? "panorama"
+  );
   const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -128,93 +133,93 @@ function GaleriaContent() {
           Gallery
         </h1>
         <p className="somnus-text-body text-center mb-4 max-w-xl mx-auto text-white/60">
-          Pick a set to open its photo grid. Each card is a preview of that
-          edition.
+          Newest editions first. Tap a row to scroll to its photos — every row
+          shows a cover preview.
         </p>
         <p className="text-center text-white/40 text-xs uppercase tracking-[0.25em] mb-12">
           {sections.map((s) => s.title).join(" · ")}
         </p>
 
-        {/* Repository-style preview cards (one per section) */}
+        {/* Vertical list: newest → oldest, one full-width row each */}
         <section
-          className="mb-16 max-w-5xl mx-auto"
+          className="mb-16 max-w-3xl mx-auto flex flex-col gap-5"
           aria-label="Gallery editions"
         >
           <h2 className="sr-only">Editions</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
-            {sections.map((section) => {
-              const cover = section.images[0];
-              const isActive = activeSection === section.id;
-              const count = section.images.length;
-              return (
-                <button
-                  key={section.id}
-                  type="button"
-                  onClick={() => handleSectionChange(section.id, { scroll: true })}
-                  className={`text-left rounded-2xl overflow-hidden transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] liquid-glass group ${
-                    isActive
-                      ? "ring-2 ring-white/50 shadow-[0_0_40px_-8px_rgba(255,255,255,0.15)]"
-                      : "ring-1 ring-white/10 hover:ring-white/25 hover:bg-white/[0.04]"
-                  }`}
-                >
-                  <div className="relative aspect-[16/10] bg-white/5">
-                    {cover ? (
-                      <>
-                        {!loadedImages[`preview:${cover}`] && (
-                          <div className="absolute inset-0 bg-white/5 animate-pulse" />
-                        )}
-                        <Image
-                          src={cover}
-                          alt={`${section.title} cover preview`}
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
-                          className={`object-cover transition-all duration-500 group-hover:scale-[1.03] ${
-                            loadedImages[`preview:${cover}`]
-                              ? "opacity-100"
-                              : "opacity-0"
-                          }`}
-                          loading="lazy"
-                          quality={75}
-                          onLoad={() =>
-                            setLoadedImages((p) => ({
-                              ...p,
-                              [`preview:${cover}`]: true,
-                            }))
-                          }
-                        />
-                      </>
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-white/[0.06]">
-                        <ImageIcon
-                          className="w-14 h-14 text-white/25"
-                          aria-hidden
-                        />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
-                      <p className="text-white font-semibold text-lg sm:text-xl tracking-tight drop-shadow-md">
-                        {section.title}
-                      </p>
-                      <p className="text-white/70 text-sm mt-1">
-                        {count === 0
-                          ? "No photos yet"
-                          : `${count} photo${count === 1 ? "" : "s"}`}
-                      </p>
+          {sections.map((section) => {
+            const cover = section.images[0];
+            const isActive = activeSection === section.id;
+            const count = section.images.length;
+            return (
+              <button
+                key={section.id}
+                type="button"
+                onClick={() => handleSectionChange(section.id, { scroll: true })}
+                className={`text-left w-full rounded-2xl overflow-hidden transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] liquid-glass group flex flex-col sm:flex-row sm:min-h-[200px] ${
+                  isActive
+                    ? "ring-2 ring-white/50 shadow-[0_0_40px_-8px_rgba(255,255,255,0.15)]"
+                    : "ring-1 ring-white/10 hover:ring-white/25 hover:bg-white/[0.04]"
+                }`}
+              >
+                <div className="relative w-full sm:w-[44%] min-h-[200px] sm:min-h-0 bg-white/5 shrink-0">
+                  {cover ? (
+                    <>
+                      {!loadedImages[`preview:${cover}`] && (
+                        <div className="absolute inset-0 bg-white/5 animate-pulse" />
+                      )}
+                      <Image
+                        src={cover}
+                        alt={`${section.title} cover preview`}
+                        fill
+                        sizes="(max-width: 640px) 100vw, 360px"
+                        className={`object-cover transition-all duration-500 group-hover:scale-[1.02] ${
+                          loadedImages[`preview:${cover}`]
+                            ? "opacity-100"
+                            : "opacity-0"
+                        }`}
+                        loading="lazy"
+                        quality={75}
+                        onLoad={() =>
+                          setLoadedImages((p) => ({
+                            ...p,
+                            [`preview:${cover}`]: true,
+                          }))
+                        }
+                      />
+                    </>
+                  ) : (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/[0.06]">
+                      <ImageIcon
+                        className="w-12 h-12 text-white/25"
+                        aria-hidden
+                      />
+                      <span className="text-white/35 text-xs uppercase tracking-wider">
+                        Preview
+                      </span>
                     </div>
-                  </div>
-                  <div className="px-4 py-3 sm:px-5 flex items-center justify-between border-t border-white/10">
+                  )}
+                </div>
+                <div className="flex flex-1 flex-col justify-center p-5 sm:p-6 border-t sm:border-t-0 sm:border-l border-white/10">
+                  <p className="text-white font-semibold text-xl sm:text-2xl tracking-tight">
+                    {section.title}
+                  </p>
+                  <p className="text-white/65 text-sm mt-2">
+                    {count === 0
+                      ? "No photos yet"
+                      : `${count} photo${count === 1 ? "" : "s"}`}
+                  </p>
+                  <div className="mt-4 flex items-center justify-between gap-4">
                     <span className="text-[10px] uppercase tracking-[0.2em] text-white/45">
-                      {isActive ? "Showing" : "View set"}
+                      {isActive ? "Showing" : "View photos"}
                     </span>
-                    <span className="text-white/50 text-xs group-hover:text-white/80 transition-colors">
+                    <span className="text-white/50 text-sm group-hover:text-white/90 transition-colors">
                       →
                     </span>
                   </div>
-                </button>
-              );
-            })}
-          </div>
+                </div>
+              </button>
+            );
+          })}
         </section>
 
         <div className="max-w-5xl mx-auto mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 border-b border-white/10 pb-4">

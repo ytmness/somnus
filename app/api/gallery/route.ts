@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const sections = await prisma.gallerySection.findMany({
-      orderBy: { sortOrder: "asc" },
+      orderBy: { createdAt: "desc" },
       include: {
         images: {
           orderBy: { sortOrder: "asc" },
@@ -24,6 +24,7 @@ export async function GET() {
       data: sections.map((s) => ({
         id: s.id,
         title: s.title,
+        createdAt: s.createdAt.toISOString(),
         images: s.images.map((i) => i.url),
       })),
     });
@@ -61,12 +62,21 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === "image" && sectionId) {
+      let sortOrder: number =
+        typeof body.sortOrder === "number" ? body.sortOrder : NaN;
+      if (Number.isNaN(sortOrder)) {
+        const agg = await prisma.galleryImage.aggregate({
+          where: { sectionId },
+          _max: { sortOrder: true },
+        });
+        sortOrder = (agg._max.sortOrder ?? -1) + 1;
+      }
       const image = await prisma.galleryImage.create({
         data: {
           sectionId,
           url: url || "",
           alt: alt || null,
-          sortOrder: body.sortOrder ?? 0,
+          sortOrder,
         },
       });
       return NextResponse.json({ success: true, data: image });

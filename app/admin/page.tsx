@@ -284,8 +284,10 @@ export default function AdminPage() {
           <div className="liquid-glass p-6">
             <h2 className="text-xl font-bold text-white mb-6">Gallery</h2>
             <p className="text-white/70 text-sm mb-6">
-              Create sections and add photos by URL. Images should live under{" "}
-              <code className="bg-white/10 px-1 rounded">/assets/</code> or at a public URL.
+              Sections sort with the newest on top on the public page. Upload
+              files (drag-and-drop or choose files) or add by URL. Files go to
+              Supabase Storage (same bucket as event posters,{" "}
+              <code className="bg-white/10 px-1 rounded">gallery/</code> folder).
             </p>
             <GalleryManager />
           </div>

@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const sections = await prisma.gallerySection.findMany({
-      orderBy: { sortOrder: "asc" },
+      orderBy: { createdAt: "desc" },
       include: {
         images: {
           orderBy: { sortOrder: "asc" },
