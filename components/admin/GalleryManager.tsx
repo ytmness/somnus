@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2, Image as ImageIcon, Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -30,8 +30,19 @@ async function postGalleryImage(sectionId: string, url: string) {
       url: url.trim(),
     }),
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Failed to add image");
+  let data: { success?: boolean; error?: string } = {};
+  try {
+    data = await res.json();
+  } catch {
+    throw new Error("Invalid server response when saving image");
+  }
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || "Failed to add image");
+  }
+}
+
+function uploadInputId(sectionId: string) {
+  return `gallery-upload-${sectionId}`;
 }
 
 export function GalleryManager() {
@@ -42,9 +53,6 @@ export function GalleryManager() {
   const [showUrl, setShowUrl] = useState<string | null>(null);
   const [uploadBusy, setUploadBusy] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState<string | null>(null);
-
-  const pickSectionRef = useRef<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadFullSections = async () => {
     try {
@@ -74,6 +82,7 @@ export function GalleryManager() {
     const list = Array.from(files);
     if (!list.length) return;
     setUploadBusy(sectionId);
+    let added = 0;
     try {
       for (const file of list) {
         const okType =
@@ -85,42 +94,60 @@ export function GalleryManager() {
           toast.error(`${file.name}: not a recognized image`);
           continue;
         }
-        const formData = new FormData();
-        formData.append("file", file);
-        const up = await fetch("/api/upload/gallery-image", {
-          method: "POST",
-          body: formData,
-          credentials: "include",
-        });
-        const json = await up.json();
-        if (!up.ok) throw new Error(json.error || "Upload failed");
-        const url = json.data?.url as string | undefined;
-        if (url) await postGalleryImage(sectionId, url);
+        try {
+          const formData = new FormData();
+          formData.append("file", file);
+          const up = await fetch("/api/upload/gallery-image", {
+            method: "POST",
+            body: formData,
+            credentials: "include",
+          });
+          let json: {
+            success?: boolean;
+            error?: string;
+            data?: { url?: string };
+          } = {};
+          try {
+            json = await up.json();
+          } catch {
+            throw new Error(
+              up.ok
+                ? "Upload response was not JSON"
+                : `Upload failed (${up.status})`
+            );
+          }
+          if (!up.ok || !json.success) {
+            throw new Error(json.error || `Upload failed (${up.status})`);
+          }
+          const url = json.data?.url?.trim();
+          if (!url) {
+            throw new Error(
+              "Server did not return an image URL after upload"
+            );
+          }
+          await postGalleryImage(sectionId, url);
+          added += 1;
+        } catch (e: unknown) {
+          const msg =
+            e instanceof Error ? e.message : "Upload failed";
+          toast.error(`${file.name}: ${msg}`);
+        }
       }
-      toast.success(
-        list.length > 1 ? `${list.length} photos added` : "Photo added"
-      );
-      await loadFullSections();
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Upload failed";
-      toast.error(msg);
+      if (added === 0) {
+        toast.error("No images were uploaded (check types or permissions)");
+      } else {
+        toast.success(
+          added > 1 ? `${added} photos added` : "Photo added"
+        );
+        await loadFullSections();
+      }
     } finally {
       setUploadBusy(null);
     }
   };
 
-  const onHiddenFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const sectionId = pickSectionRef.current;
-    const files = e.target.files;
-    e.target.value = "";
-    pickSectionRef.current = null;
-    if (!sectionId || !files?.length) return;
-    await uploadFilesToSection(sectionId, files);
-  };
-
-  const openFilePicker = (sectionId: string) => {
-    pickSectionRef.current = sectionId;
-    fileInputRef.current?.click();
+  const triggerFilePicker = (sectionId: string) => {
+    document.getElementById(uploadInputId(sectionId))?.click();
   };
 
   const createSection = async () => {
@@ -208,15 +235,6 @@ export function GalleryManager() {
 
   return (
     <div className="space-y-6">
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*,.heic,.heif"
-        multiple
-        className="hidden"
-        onChange={onHiddenFileChange}
-      />
-
       <div className="flex flex-wrap items-center gap-4">
         <input
           type="text"
@@ -246,6 +264,19 @@ export function GalleryManager() {
             key={section.id}
             className="bg-white/5 border border-regia-gold/20 rounded-lg p-6"
           >
+            <input
+              id={uploadInputId(section.id)}
+              type="file"
+              accept="image/*,.heic,.heif"
+              multiple
+              className="sr-only"
+              onChange={(e) => {
+                const files = e.target.files;
+                e.target.value = "";
+                if (files?.length) void uploadFilesToSection(section.id, files);
+              }}
+            />
+
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-white">{section.title}</h3>
               <Button
@@ -258,15 +289,8 @@ export function GalleryManager() {
               </Button>
             </div>
 
-            <div
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  openFilePicker(section.id);
-                }
-              }}
+            <label
+              htmlFor={uploadInputId(section.id)}
               onDragOver={(e) => {
                 e.preventDefault();
                 setDragOver(section.id);
@@ -278,12 +302,11 @@ export function GalleryManager() {
                 if (e.dataTransfer.files?.length)
                   void uploadFilesToSection(section.id, e.dataTransfer.files);
               }}
-              className={`mb-4 rounded-xl border-2 border-dashed px-4 py-8 text-center cursor-pointer transition-colors ${
+              className={`mb-4 block rounded-xl border-2 border-dashed px-4 py-8 text-center cursor-pointer transition-colors ${
                 dragOver === section.id
                   ? "border-regia-gold bg-regia-gold/10"
                   : "border-white/25 hover:border-white/40 hover:bg-white/5"
               } ${uploadBusy === section.id ? "opacity-60 pointer-events-none" : ""}`}
-              onClick={() => openFilePicker(section.id)}
             >
               <Upload className="w-10 h-10 text-white/45 mx-auto mb-2" />
               <p className="text-white/85 text-sm font-medium">
@@ -292,14 +315,17 @@ export function GalleryManager() {
               <p className="text-white/45 text-xs mt-1">
                 Multiple files · image/* · max 15 MB each
               </p>
-            </div>
+            </label>
 
             <div className="flex flex-wrap gap-2 mb-4">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => openFilePicker(section.id)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  triggerFilePicker(section.id);
+                }}
                 disabled={uploadBusy === section.id}
                 className="border-regia-gold/50 text-regia-gold hover:bg-regia-gold hover:text-regia-dark"
               >

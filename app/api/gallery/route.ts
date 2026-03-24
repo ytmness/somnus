@@ -19,20 +19,30 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      data: sections.map((s) => ({
-        id: s.id,
-        title: s.title,
-        createdAt: s.createdAt.toISOString(),
-        images: s.images.map((i) => i.url),
-      })),
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: sections.map((s) => ({
+          id: s.id,
+          title: s.title,
+          createdAt: s.createdAt.toISOString(),
+          images: s.images.map((i) => i.url),
+        })),
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+        },
+      }
+    );
   } catch (error) {
     console.error("Get gallery error:", error);
     return NextResponse.json(
       { error: "Failed to load gallery" },
-      { status: 500 }
+      {
+        status: 500,
+        headers: { "Cache-Control": "no-store" },
+      }
     );
   }
 }

@@ -18,12 +18,22 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json({ success: true, data: sections });
+    return NextResponse.json(
+      { success: true, data: sections },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+        },
+      }
+    );
   } catch (error) {
     console.error("Get gallery full error:", error);
     return NextResponse.json(
       { error: "Failed to load gallery" },
-      { status: 500 }
+      {
+        status: 500,
+        headers: { "Cache-Control": "no-store" },
+      }
     );
   }
 }

@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
     if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
       return NextResponse.json(
         {
+          success: false,
           error:
             "Missing SUPABASE_SERVICE_ROLE_KEY. Add it in server .env (Supabase → Settings → API).",
         },
@@ -59,7 +60,10 @@ export async function POST(request: NextRequest) {
 
     const user = await getSession();
     if (!hasRole(user, ["ADMIN"])) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 403 }
+      );
     }
 
     const formData = await request.formData();
@@ -74,7 +78,7 @@ export async function POST(request: NextRequest) {
 
     if (!isFileLike) {
       return NextResponse.json(
-        { error: "No file received" },
+        { success: false, error: "No file received" },
         { status: 400 }
       );
     }
@@ -88,14 +92,17 @@ export async function POST(request: NextRequest) {
 
     if (fileObj.size > MAX_SIZE) {
       return NextResponse.json(
-        { error: `Image must be under ${MAX_SIZE / 1024 / 1024} MB` },
+        {
+          success: false,
+          error: `Image must be under ${MAX_SIZE / 1024 / 1024} MB`,
+        },
         { status: 400 }
       );
     }
 
     if (!isProbablyImage(fileObj)) {
       return NextResponse.json(
-        { error: "File must be an image" },
+        { success: false, error: "File must be an image" },
         { status: 400 }
       );
     }
@@ -128,8 +135,22 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error("[Upload gallery-image]", error);
+      const msg = error.message || "Upload failed";
+      if (
+        msg.includes("Bucket not found") ||
+        msg.includes("does not exist")
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              "Storage bucket missing. Create a public bucket named 'event-images' in Supabase → Storage (same as event posters).",
+          },
+          { status: 500 }
+        );
+      }
       return NextResponse.json(
-        { error: error.message || "Upload failed" },
+        { success: false, error: msg },
         { status: 500 }
       );
     }
@@ -143,6 +164,9 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("[Upload gallery-image]", err);
-    return NextResponse.json({ error: msg || "Upload failed" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: msg || "Upload failed" },
+      { status: 500 }
+    );
   }
 }

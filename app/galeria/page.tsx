@@ -5,48 +5,63 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { SomnusHeader } from "@/components/SomnusHeader";
 import { gallerySections as staticSections } from "@/lib/gallery-images";
-import { X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, ImageIcon, Plus } from "lucide-react";
 
 /** Fallback estático: más reciente arriba (orden inverso al definido en gallery-images) */
 const staticSectionsNewestFirst = [...staticSections].reverse();
+
+/** Miniaturas visibles en la fila; la 6ª celda muestra +N si hay más */
+const PREVIEW_THUMB_COUNT = 5;
 
 type GallerySection = { id: string; title: string; images: string[] };
 
 function GaleriaContent() {
   const searchParams = useSearchParams();
   const sectionParam = searchParams.get("section");
-  const [sections, setSections] = useState<GallerySection[]>(staticSectionsNewestFirst);
-  const [activeSection, setActiveSection] = useState(
-    staticSectionsNewestFirst[0]?.id ?? "panorama"
-  );
+  const [sections, setSections] = useState<GallerySection[] | null>(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
   const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    const loadGallery = async () => {
+    let cancelled = false;
+    (async () => {
+      let next: GallerySection[];
       try {
-        const res = await fetch("/api/gallery");
+        const res = await fetch("/api/gallery", { cache: "no-store" });
         const data = await res.json();
+        if (cancelled) return;
         if (data.success && data.data?.length > 0) {
-          setSections(
-            data.data.map((s: { id: string; title: string; images: string[] }) => ({
+          next = data.data.map(
+            (s: { id: string; title: string; images: string[] }) => ({
               id: s.id,
               title: s.title,
               images: s.images || [],
-            }))
+            })
           );
-          setActiveSection((prev) => {
-            const exists = data.data.some((s: { id: string }) => s.id === prev);
-            return exists ? prev : data.data[0]?.id ?? prev;
-          });
+        } else {
+          next = staticSectionsNewestFirst;
         }
       } catch {
-        // Fall back to staticSections
+        if (cancelled) return;
+        next = staticSectionsNewestFirst;
       }
+      if (cancelled) return;
+      setSections(next);
+      const param =
+        typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search).get("section")
+          : null;
+      const initial =
+        param && next.some((s) => s.id === param) ? param : next[0]?.id ?? null;
+      setActiveSection(initial);
+    })();
+    return () => {
+      cancelled = true;
     };
-    loadGallery();
   }, []);
 
   useEffect(() => {
+    if (!sections?.length) return;
     if (sectionParam && sections.some((s) => s.id === sectionParam)) {
       setActiveSection(sectionParam);
     }
@@ -56,7 +71,7 @@ function GaleriaContent() {
   const [lightboxSection, setLightboxSection] = useState<string | null>(null);
 
   const currentImages =
-    sections.find((s) => s.id === activeSection)?.images ?? [];
+    sections?.find((s) => s.id === activeSection)?.images ?? [];
 
   const scrollToPhotoGrid = useCallback(() => {
     requestAnimationFrame(() => {
@@ -81,7 +96,7 @@ function GaleriaContent() {
   }, []);
   const lightboxImages =
     lightboxSection != null
-      ? sections.find((s) => s.id === lightboxSection)?.images ?? []
+      ? sections?.find((s) => s.id === lightboxSection)?.images ?? []
       : [];
 
   const openLightbox = useCallback((sectionId: string, index: number) => {
@@ -95,18 +110,18 @@ function GaleriaContent() {
   }, []);
 
   const goPrev = useCallback(() => {
-    if (lightboxIndex === null || lightboxSection === null) return;
+    if (lightboxIndex === null || lightboxSection === null || !sections) return;
     const imgs =
       sections.find((s) => s.id === lightboxSection)?.images ?? [];
     setLightboxIndex((lightboxIndex - 1 + imgs.length) % imgs.length);
-  }, [lightboxIndex, lightboxSection]);
+  }, [lightboxIndex, lightboxSection, sections]);
 
   const goNext = useCallback(() => {
-    if (lightboxIndex === null || lightboxSection === null) return;
+    if (lightboxIndex === null || lightboxSection === null || !sections) return;
     const imgs =
       sections.find((s) => s.id === lightboxSection)?.images ?? [];
     setLightboxIndex((lightboxIndex + 1) % imgs.length);
-  }, [lightboxIndex, lightboxSection]);
+  }, [lightboxIndex, lightboxSection, sections]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -121,7 +136,7 @@ function GaleriaContent() {
 
   const currentSrc =
     lightboxIndex != null && lightboxSection != null
-      ? sections.find((s) => s.id === lightboxSection)?.images[lightboxIndex]
+      ? sections?.find((s) => s.id === lightboxSection)?.images[lightboxIndex]
       : null;
 
   return (
@@ -133,11 +148,18 @@ function GaleriaContent() {
           Gallery
         </h1>
         <p className="somnus-text-body text-center mb-4 max-w-xl mx-auto text-white/60">
-          Newest editions first. Tap a row to scroll to its photos — every row
-          shows a cover preview.
+          Newest editions first. Tap a row to scroll to its photos — each row
+          shows a horizontal strip of previews (and +N if there are more).
         </p>
-        <p className="text-center text-white/40 text-xs uppercase tracking-[0.25em] mb-12">
-          {sections.map((s) => s.title).join(" · ")}
+        <p className="text-center text-white/40 text-xs uppercase tracking-[0.25em] mb-12 min-h-[1.25em]">
+          {sections ? (
+            sections.map((s) => s.title).join(" · ")
+          ) : (
+            <span
+              className="inline-block h-4 w-56 mx-auto rounded bg-white/10 animate-pulse"
+              aria-hidden
+            />
+          )}
         </p>
 
         {/* Vertical list: newest → oldest, one full-width row each */}
@@ -146,123 +168,177 @@ function GaleriaContent() {
           aria-label="Gallery editions"
         >
           <h2 className="sr-only">Editions</h2>
-          {sections.map((section) => {
-            const cover = section.images[0];
-            const isActive = activeSection === section.id;
-            const count = section.images.length;
-            return (
-              <button
-                key={section.id}
-                type="button"
-                onClick={() => handleSectionChange(section.id, { scroll: true })}
-                className={`text-left w-full rounded-2xl overflow-hidden transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] liquid-glass group flex flex-col sm:flex-row sm:min-h-[200px] ${
-                  isActive
-                    ? "ring-2 ring-white/50 shadow-[0_0_40px_-8px_rgba(255,255,255,0.15)]"
-                    : "ring-1 ring-white/10 hover:ring-white/25 hover:bg-white/[0.04]"
-                }`}
-              >
-                <div className="relative w-full sm:w-[44%] min-h-[200px] sm:min-h-0 bg-white/5 shrink-0">
-                  {cover ? (
-                    <>
-                      {!loadedImages[`preview:${cover}`] && (
-                        <div className="absolute inset-0 bg-white/5 animate-pulse" />
-                      )}
-                      <Image
-                        src={cover}
-                        alt={`${section.title} cover preview`}
-                        fill
-                        sizes="(max-width: 640px) 100vw, 360px"
-                        className={`object-cover transition-all duration-500 group-hover:scale-[1.02] ${
-                          loadedImages[`preview:${cover}`]
-                            ? "opacity-100"
-                            : "opacity-0"
-                        }`}
-                        loading="lazy"
-                        quality={75}
-                        onLoad={() =>
-                          setLoadedImages((p) => ({
-                            ...p,
-                            [`preview:${cover}`]: true,
-                          }))
-                        }
-                      />
-                    </>
-                  ) : (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/[0.06]">
-                      <ImageIcon
-                        className="w-12 h-12 text-white/25"
-                        aria-hidden
-                      />
-                      <span className="text-white/35 text-xs uppercase tracking-wider">
-                        Preview
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-1 flex-col justify-center p-5 sm:p-6 border-t sm:border-t-0 sm:border-l border-white/10">
-                  <p className="text-white font-semibold text-xl sm:text-2xl tracking-tight">
-                    {section.title}
-                  </p>
-                  <p className="text-white/65 text-sm mt-2">
-                    {count === 0
-                      ? "No photos yet"
-                      : `${count} photo${count === 1 ? "" : "s"}`}
-                  </p>
-                  <div className="mt-4 flex items-center justify-between gap-4">
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-white/45">
-                      {isActive ? "Showing" : "View photos"}
-                    </span>
-                    <span className="text-white/50 text-sm group-hover:text-white/90 transition-colors">
-                      →
-                    </span>
+          {sections === null
+            ? [0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="w-full rounded-2xl liquid-glass ring-1 ring-white/10 flex flex-col sm:flex-row sm:min-h-[200px] overflow-hidden animate-pulse"
+                >
+                  <div className="w-full sm:w-[44%] min-h-[140px] sm:min-h-[200px] bg-white/[0.06]" />
+                  <div className="flex-1 p-6 space-y-3 border-t sm:border-t-0 sm:border-l border-white/10">
+                    <div className="h-7 bg-white/10 rounded-md w-3/4 max-w-xs" />
+                    <div className="h-4 bg-white/10 rounded-md w-24" />
                   </div>
                 </div>
-              </button>
-            );
-          })}
+              ))
+            : sections.map((section) => {
+                const isActive = activeSection === section.id;
+                const count = section.images.length;
+                const thumbs = section.images.slice(0, PREVIEW_THUMB_COUNT);
+                const moreCount = count - PREVIEW_THUMB_COUNT;
+                return (
+                  <button
+                    key={section.id}
+                    type="button"
+                    onClick={() =>
+                      handleSectionChange(section.id, { scroll: true })
+                    }
+                    className={`text-left w-full rounded-2xl overflow-hidden transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] liquid-glass group flex flex-col sm:flex-row sm:min-h-[200px] ${
+                      isActive
+                        ? "ring-2 ring-white/50 shadow-[0_0_40px_-8px_rgba(255,255,255,0.15)]"
+                        : "ring-1 ring-white/10 hover:ring-white/25 hover:bg-white/[0.04]"
+                    }`}
+                  >
+                    <div className="relative w-full sm:w-[44%] min-h-[132px] sm:min-h-0 sm:min-h-[200px] bg-white/5 shrink-0 flex items-stretch">
+                      {count === 0 ? (
+                        <div className="flex flex-1 flex-col items-center justify-center gap-2 bg-white/[0.06] m-3 rounded-xl">
+                          <ImageIcon
+                            className="w-12 h-12 text-white/25"
+                            aria-hidden
+                          />
+                          <span className="text-white/35 text-xs uppercase tracking-wider">
+                            Preview
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2 overflow-x-auto p-3 sm:p-4 w-full items-center [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/20">
+                          {thumbs.map((src, idx) => {
+                            const loadKey = `preview:${section.id}:${idx}:${src}`;
+                            return (
+                              <div
+                                key={loadKey}
+                                className="relative shrink-0 w-[72px] h-[96px] sm:w-20 sm:h-[110px] rounded-lg overflow-hidden bg-white/5 ring-1 ring-white/10"
+                              >
+                                {!loadedImages[loadKey] && (
+                                  <div className="absolute inset-0 bg-white/5 animate-pulse z-[1]" />
+                                )}
+                                <Image
+                                  src={src}
+                                  alt=""
+                                  fill
+                                  sizes="80px"
+                                  className={`object-cover transition-opacity duration-500 group-hover:scale-[1.03] ${
+                                    loadedImages[loadKey]
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  }`}
+                                  loading="lazy"
+                                  quality={70}
+                                  onLoad={() =>
+                                    setLoadedImages((p) => ({
+                                      ...p,
+                                      [loadKey]: true,
+                                    }))
+                                  }
+                                />
+                              </div>
+                            );
+                          })}
+                          {moreCount > 0 && (
+                            <div
+                              className="shrink-0 w-[72px] h-[96px] sm:w-20 sm:h-[110px] rounded-lg overflow-hidden bg-white/[0.08] ring-1 ring-white/15 flex flex-col items-center justify-center gap-0.5 text-white/90"
+                              aria-label={`${moreCount} more photos`}
+                            >
+                              <Plus
+                                className="w-6 h-6 sm:w-7 sm:h-7"
+                                strokeWidth={2.5}
+                                aria-hidden
+                              />
+                              <span className="text-sm font-semibold tabular-nums leading-none">
+                                +{moreCount}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-1 flex-col justify-center p-5 sm:p-6 border-t sm:border-t-0 sm:border-l border-white/10">
+                      <p className="text-white font-semibold text-xl sm:text-2xl tracking-tight">
+                        {section.title}
+                      </p>
+                      <p className="text-white/65 text-sm mt-2">
+                        {count === 0
+                          ? "No photos yet"
+                          : `${count} photo${count === 1 ? "" : "s"}`}
+                      </p>
+                      <div className="mt-4 flex items-center justify-between gap-4">
+                        <span className="text-[10px] uppercase tracking-[0.2em] text-white/45">
+                          {isActive ? "Showing" : "View photos"}
+                        </span>
+                        <span className="text-white/50 text-sm group-hover:text-white/90 transition-colors">
+                          →
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
         </section>
 
         <div className="max-w-5xl mx-auto mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 border-b border-white/10 pb-4">
           <h2 className="somnus-title-secondary text-xl sm:text-2xl uppercase tracking-wider text-white/90">
             Photos
           </h2>
-          <p className="text-white/50 text-sm">
-            {sections.find((s) => s.id === activeSection)?.title ?? ""}
+          <p className="text-white/50 text-sm min-h-[1.25rem]">
+            {sections && activeSection
+              ? sections.find((s) => s.id === activeSection)?.title ?? ""
+              : ""}
           </p>
         </div>
 
         {/* 3-column grid — first 3 eager, rest lazy */}
-        <div
-          id="gallery-photos"
-          className="scroll-mt-28 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto"
-        >
-          {currentImages.map((src, index) => (
-            <button
-              key={`${activeSection}-${index}`}
-              type="button"
-              onClick={() => openLightbox(activeSection, index)}
-              className="relative aspect-[4/5] overflow-hidden group focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]"
-            >
-              {/* Skeleton while loading */}
-              {!loadedImages[src] && (
-                <div className="absolute inset-0 bg-white/5 animate-pulse" />
-              )}
-              <Image
-                src={src}
-                alt={`${sections.find((s) => s.id === activeSection)?.title ?? "Photo"} - ${index + 1}`}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
-                className={`object-cover transition-opacity duration-500 ${
-                  loadedImages[src] ? "opacity-100" : "opacity-0"
-                } group-hover:scale-105`}
-                loading={index < 3 ? "eager" : "lazy"}
-                fetchPriority={index < 2 ? "high" : "low"}
-                quality={72}
-                onLoad={() => handleImageLoad(src)}
+        {sections === null ? (
+          <div className="scroll-mt-28 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
+            {Array.from({ length: 6 }, (_, i) => (
+              <div
+                key={i}
+                className="aspect-[4/5] rounded-lg bg-white/5 animate-pulse"
               />
-            </button>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div
+            id="gallery-photos"
+            className="scroll-mt-28 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto"
+          >
+            {activeSection &&
+              currentImages.map((src, index) => (
+                <button
+                  key={`${activeSection}-${index}`}
+                  type="button"
+                  onClick={() => openLightbox(activeSection, index)}
+                  className="relative aspect-[4/5] overflow-hidden group focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]"
+                >
+                  {!loadedImages[src] && (
+                    <div className="absolute inset-0 bg-white/5 animate-pulse" />
+                  )}
+                  <Image
+                    src={src}
+                    alt={`${sections.find((s) => s.id === activeSection)?.title ?? "Photo"} - ${index + 1}`}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
+                    className={`object-cover transition-opacity duration-500 ${
+                      loadedImages[src] ? "opacity-100" : "opacity-0"
+                    } group-hover:scale-105`}
+                    loading={index < 3 ? "eager" : "lazy"}
+                    fetchPriority={index < 2 ? "high" : "low"}
+                    quality={72}
+                    onLoad={() => handleImageLoad(src)}
+                  />
+                </button>
+              ))}
+          </div>
+        )}
       </main>
 
       {/* Lightbox */}
