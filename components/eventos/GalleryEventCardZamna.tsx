@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { useRef } from "react";
 import { Calendar, MapPin } from "lucide-react";
 import type { GalleryEvent } from "@/lib/gallery-events";
-import { useCarouselPosterSettingsOptional } from "./carousel-poster-settings";
+import { useCarouselPosterOptional } from "./carousel-poster-settings";
+import { CarouselPosterImage } from "./CarouselPosterImage";
 
 interface GalleryEventCardZamnaProps {
   event: GalleryEvent;
@@ -16,10 +18,18 @@ export function GalleryEventCardZamna({
   onSelect,
   carouselGlass = false,
 }: GalleryEventCardZamnaProps) {
-  const tune = useCarouselPosterSettingsOptional();
+  const posterCtx = useCarouselPosterOptional();
+  const skipOpenAfterDrag = useRef(false);
+
   return (
     <article
-      onClick={onSelect}
+      onClick={() => {
+        if (skipOpenAfterDrag.current) {
+          skipOpenAfterDrag.current = false;
+          return;
+        }
+        onSelect();
+      }}
       className={`group relative overflow-hidden rounded-2xl flex flex-col h-full cursor-pointer transition-colors ${
         carouselGlass
           ? "liquid-glass border-white/15 hover:border-white/20"
@@ -33,41 +43,47 @@ export function GalleryEventCardZamna({
             : "relative aspect-[4/3] overflow-hidden"
         }
         style={
-          carouselGlass && tune
+          carouselGlass && posterCtx
             ? ({
-                "--evt-pmin-sm": `${tune.posterMinHeightSm}px`,
-                "--evt-pmin-md": `${tune.posterMinHeightMd}px`,
+                "--evt-pmin-sm": `${posterCtx.settings.posterMinHeightSm}px`,
+                "--evt-pmin-md": `${posterCtx.settings.posterMinHeightMd}px`,
               } as React.CSSProperties)
             : carouselGlass
               ? ({
-                  "--evt-pmin-sm": "280px",
-                  "--evt-pmin-md": "400px",
+                  "--evt-pmin-sm": "264px",
+                  "--evt-pmin-md": "496px",
                 } as React.CSSProperties)
               : undefined
         }
       >
-        <Image
-          src={event.image}
-          alt={event.artist}
-          fill
-          className={`${
-            carouselGlass
-              ? tune?.imageObjectFit === "contain"
-                ? "object-contain object-center"
-                : "object-cover object-center"
-              : "object-cover"
-          } transition-transform duration-700 group-hover:scale-105`}
-          sizes="(max-width: 768px) 100vw, 33vw"
-          loading="lazy"
-          quality={75}
-        />
-        <div
-          className={
-            carouselGlass
-              ? "pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"
-              : "absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"
-          }
-        />
+        {carouselGlass && posterCtx ? (
+          <>
+            <CarouselPosterImage
+              src={event.image}
+              alt={event.artist}
+              sizes="(max-width: 768px) 100vw, 33vw"
+              quality={75}
+              disableHoverScale={posterCtx.settings.imageDragMode}
+              settings={posterCtx.settings}
+              setSettings={posterCtx.setSettings}
+              onDragEndRef={skipOpenAfterDrag}
+            />
+            <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          </>
+        ) : (
+          <>
+            <Image
+              src={event.image}
+              alt={event.artist}
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 33vw"
+              loading="lazy"
+              quality={75}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          </>
+        )}
       </div>
 
       <div

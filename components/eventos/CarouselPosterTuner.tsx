@@ -143,6 +143,39 @@ export function CarouselPosterTuner() {
               </select>
             </label>
 
+            <label className="flex items-center gap-2 text-xs text-white/90 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={settings.imageDragMode}
+                onChange={(e) =>
+                  setSettings({ imageDragMode: e.target.checked })
+                }
+                className="rounded border-white/30"
+              />
+              <span>
+                Arrastrar imagen en el póster (mover encuadre con el dedo/ratón)
+              </span>
+            </label>
+
+            <Row
+              label="Posición horizontal (imagen)"
+              value={settings.imagePosX}
+              min={0}
+              max={100}
+              step={1}
+              suffix="%"
+              onChange={(imagePosX) => setSettings({ imagePosX })}
+            />
+            <Row
+              label="Posición vertical (imagen)"
+              value={settings.imagePosY}
+              min={0}
+              max={100}
+              step={1}
+              suffix="%"
+              onChange={(imagePosY) => setSettings({ imagePosY })}
+            />
+
             <Row
               label="Profundidad 3D (coverflow)"
               value={settings.coverflowDepth}

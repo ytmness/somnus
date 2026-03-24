@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 
-const STORAGE_KEY = "somnus-carousel-poster-v1";
+const STORAGE_KEY = "somnus-carousel-poster-v2";
 
 export type CarouselPosterSettings = {
   slideWidth: number;
@@ -18,21 +18,30 @@ export type CarouselPosterSettings = {
   posterMinHeightSm: number;
   posterMinHeightMd: number;
   imageObjectFit: "cover" | "contain";
+  /** object-position horizontal 0–100 */
+  imagePosX: number;
+  /** object-position vertical 0–100 */
+  imagePosY: number;
+  /** Si true: arrastra sobre el póster para mover el encuadre */
+  imageDragMode: boolean;
   coverflowDepth: number;
   coverflowStretch: number;
   coverflowModifier: number;
 };
 
 export const CAROUSEL_POSTER_DEFAULTS: CarouselPosterSettings = {
-  slideWidth: 480,
-  slideHeightMobile: 520,
-  slideHeightDesktop: 680,
-  posterMinHeightSm: 280,
-  posterMinHeightMd: 400,
-  imageObjectFit: "cover",
-  coverflowDepth: 120,
+  slideWidth: 400,
+  slideHeightMobile: 460,
+  slideHeightDesktop: 744,
+  posterMinHeightSm: 264,
+  posterMinHeightMd: 496,
+  imageObjectFit: "contain",
+  imagePosX: 50,
+  imagePosY: 50,
+  imageDragMode: false,
+  coverflowDepth: 180,
   coverflowStretch: 52,
-  coverflowModifier: 0.85,
+  coverflowModifier: 0.9,
 };
 
 function loadStored(): CarouselPosterSettings {
@@ -125,4 +134,14 @@ export function useCarouselPosterSettings() {
 export function useCarouselPosterSettingsOptional(): CarouselPosterSettings | null {
   const ctx = useContext(CarouselPosterContext);
   return ctx?.settings ?? null;
+}
+
+/** Settings + setSettings para arrastre en tarjetas; null fuera del provider. */
+export function useCarouselPosterOptional(): {
+  settings: CarouselPosterSettings;
+  setSettings: (u: Partial<CarouselPosterSettings>) => void;
+} | null {
+  const ctx = useContext(CarouselPosterContext);
+  if (!ctx) return null;
+  return { settings: ctx.settings, setSettings: ctx.setSettings };
 }

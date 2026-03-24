@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { useRef } from "react";
 import { Calendar, MapPin } from "lucide-react";
 import { Concert } from "./types";
-import { useCarouselPosterSettingsOptional } from "./carousel-poster-settings";
+import { useCarouselPosterOptional } from "./carousel-poster-settings";
+import { CarouselPosterImage } from "./CarouselPosterImage";
 
 interface EventCardZamnaProps {
   concert: Concert & { eventDate?: string };
@@ -36,7 +38,8 @@ export function EventCardZamna({
   onSelect,
   carouselGlass = false,
 }: EventCardZamnaProps) {
-  const tune = useCarouselPosterSettingsOptional();
+  const posterCtx = useCarouselPosterOptional();
+  const skipOpenAfterDrag = useRef(false);
   const status = getEventStatus(concert);
   const isMystery =
     concert.artist === "Artista por Confirmar" ||
@@ -45,6 +48,10 @@ export function EventCardZamna({
   return (
     <article
       onClick={() => {
+        if (skipOpenAfterDrag.current) {
+          skipOpenAfterDrag.current = false;
+          return;
+        }
         if (!isMystery) onSelect();
       }}
       className={`group relative overflow-hidden rounded-2xl flex flex-col h-full transition-colors ${
@@ -61,15 +68,15 @@ export function EventCardZamna({
             : "relative aspect-[4/3] overflow-hidden"
         }
         style={
-          carouselGlass && tune
+          carouselGlass && posterCtx
             ? ({
-                "--evt-pmin-sm": `${tune.posterMinHeightSm}px`,
-                "--evt-pmin-md": `${tune.posterMinHeightMd}px`,
+                "--evt-pmin-sm": `${posterCtx.settings.posterMinHeightSm}px`,
+                "--evt-pmin-md": `${posterCtx.settings.posterMinHeightMd}px`,
               } as React.CSSProperties)
             : carouselGlass
               ? ({
-                  "--evt-pmin-sm": "280px",
-                  "--evt-pmin-md": "400px",
+                  "--evt-pmin-sm": "264px",
+                  "--evt-pmin-md": "496px",
                 } as React.CSSProperties)
               : undefined
         }
@@ -78,42 +85,44 @@ export function EventCardZamna({
           <div className="absolute inset-0 flex items-center justify-center bg-black/70">
             <p className="text-5xl font-bold text-white/60">?</p>
           </div>
+        ) : carouselGlass && posterCtx ? (
+          <>
+            <CarouselPosterImage
+              src={concert.image}
+              alt={concert.artist}
+              sizes="(max-width: 768px) 100vw, 33vw"
+              quality={75}
+              disableHoverScale={isPast || posterCtx.settings.imageDragMode}
+              settings={posterCtx.settings}
+              setSettings={posterCtx.setSettings}
+              onDragEndRef={skipOpenAfterDrag}
+            />
+            <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          </>
         ) : (
           <>
             <Image
               src={concert.image}
               alt={concert.artist}
               fill
-              className={`${
-                carouselGlass
-                  ? tune?.imageObjectFit === "contain"
-                    ? "object-contain object-center"
-                    : "object-cover object-center"
-                  : "object-cover"
-              } transition-transform duration-700 ${
+              className={`object-cover transition-transform duration-700 ${
                 isPast ? "" : "group-hover:scale-105"
               }`}
               sizes="(max-width: 768px) 100vw, 33vw"
               loading="lazy"
               quality={75}
             />
-            <div
-              className={
-                carouselGlass
-                  ? "pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"
-                  : "absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"
-              }
-            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           </>
         )}
         {isFeatured && !isPast && (
-          <span className="absolute top-4 right-4 bg-[#7B4BB5] text-white text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+          <span className="absolute top-4 right-4 z-[2] bg-[#7B4BB5] text-white text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
             Featured
           </span>
         )}
         {status && !isFeatured && (
           <span
-            className={`absolute top-4 right-4 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${
+            className={`absolute top-4 right-4 z-[2] text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${
               status === "Past event" || status === "Sold out"
                 ? "bg-white/20 text-white"
                 : "bg-white/90 text-black"
