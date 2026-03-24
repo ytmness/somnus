@@ -1,7 +1,7 @@
 "use client";
 
 import Image, { type ImageProps } from "next/image";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { CarouselPosterSettings } from "./carousel-poster-settings";
 
 function clamp(n: number, min: number, max: number) {
@@ -34,6 +34,11 @@ export function CarouselPosterImage({
   setSettings,
   onDragEndRef,
 }: Props) {
+  /** Durante arrastre: vista local; evita setSettings en cada pointermove (rompía Swiper). */
+  const [dragPreview, setDragPreview] = useState<{ x: number; y: number } | null>(
+    null
+  );
+  const lastPreviewRef = useRef<{ x: number; y: number } | null>(null);
   const drag = useRef({
     active: false,
     startX: 0,
@@ -48,13 +53,17 @@ export function CarouselPosterImage({
       ? "object-contain"
       : "object-cover";
 
-  const objectPosition = `${settings.imagePosX}% ${settings.imagePosY}%`;
+  const objectPosition = dragPreview
+    ? `${dragPreview.x}% ${dragPreview.y}%`
+    : `${settings.imagePosX}% ${settings.imagePosY}%`;
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
       if (!settings.imageDragMode) return;
       e.preventDefault();
       onDragEndRef.current = false;
+      lastPreviewRef.current = null;
+      setDragPreview(null);
       drag.current = {
         active: true,
         startX: e.clientX,
@@ -77,9 +86,11 @@ export function CarouselPosterImage({
       const nx = clamp(drag.current.origX - dx * sens, 0, 100);
       const ny = clamp(drag.current.origY - dy * sens, 0, 100);
       if (Math.abs(dx) > 4 || Math.abs(dy) > 4) onDragEndRef.current = true;
-      setSettings({ imagePosX: nx, imagePosY: ny });
+      const next = { x: nx, y: ny };
+      lastPreviewRef.current = next;
+      setDragPreview(next);
     },
-    [setSettings, onDragEndRef]
+    [onDragEndRef]
   );
 
   const endDrag = useCallback(
@@ -91,8 +102,12 @@ export function CarouselPosterImage({
       } catch {
         /* ignore */
       }
+      const p = lastPreviewRef.current;
+      lastPreviewRef.current = null;
+      if (p) setSettings({ imagePosX: p.x, imagePosY: p.y });
+      setDragPreview(null);
     },
-    []
+    [setSettings]
   );
 
   const wrapperClass = settings.imageDragMode

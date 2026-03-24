@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCoverflow, Pagination, Autoplay } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   CarouselPosterSettingsProvider,
-  useCarouselPosterSettings,
+  useCarouselLayout,
 } from "./carousel-poster-settings";
 import { CarouselPosterTuner } from "./CarouselPosterTuner";
 
@@ -24,7 +24,7 @@ function UpcomingEventsCarouselInner({
   children,
   className = "",
 }: UpcomingEventsCarouselProps) {
-  const { settings } = useCarouselPosterSettings();
+  const layout = useCarouselLayout();
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -42,22 +42,20 @@ function UpcomingEventsCarouselInner({
     if (swiper && isHovered) swiper.autoplay?.stop();
   }, [swiper, isHovered]);
 
-  useEffect(() => {
-    if (!swiper) return;
-    swiper.params.coverflowEffect = {
+  const coverflowEffect = useMemo(
+    () => ({
       rotate: 0,
-      stretch: settings.coverflowStretch,
-      depth: settings.coverflowDepth,
-      modifier: settings.coverflowModifier,
+      stretch: layout.coverflowStretch,
+      depth: layout.coverflowDepth,
+      modifier: layout.coverflowModifier,
       slideShadows: false,
-    };
-    swiper.update();
-  }, [
-    swiper,
-    settings.coverflowStretch,
-    settings.coverflowDepth,
-    settings.coverflowModifier,
-  ]);
+    }),
+    [
+      layout.coverflowStretch,
+      layout.coverflowDepth,
+      layout.coverflowModifier,
+    ]
+  );
 
   useEffect(() => {
     if (!swiper || children.length < 2 || hasInitialized.current) return;
@@ -78,8 +76,8 @@ function UpcomingEventsCarouselInner({
       ? [...children, ...children, ...children]
       : children;
 
-  const stageMinSm = Math.max(settings.slideHeightMobile + 72, 560);
-  const stageMinMd = Math.max(settings.slideHeightDesktop + 72, 640);
+  const stageMinSm = Math.max(layout.slideHeightMobile + 72, 560);
+  const stageMinMd = Math.max(layout.slideHeightDesktop + 72, 640);
 
   return (
     <div
@@ -139,13 +137,7 @@ function UpcomingEventsCarouselInner({
           initialSlide={children.length + Math.floor(children.length / 2)}
           speed={500}
           modules={[EffectCoverflow, Pagination, Autoplay]}
-          coverflowEffect={{
-            rotate: 0,
-            stretch: settings.coverflowStretch,
-            depth: settings.coverflowDepth,
-            modifier: settings.coverflowModifier,
-            slideShadows: false,
-          }}
+          coverflowEffect={coverflowEffect}
           pagination={false}
           onSlideChange={(s) => setActiveIndex(s.realIndex % children.length)}
           autoplay={
@@ -161,9 +153,9 @@ function UpcomingEventsCarouselInner({
                 className="flex items-center justify-center [&>article]:w-full [&>article]:h-full w-[min(92vw,var(--carousel-sw))] h-[var(--carousel-sh)] md:h-[var(--carousel-sh-md)]"
                 style={
                   {
-                    "--carousel-sw": `${settings.slideWidth}px`,
-                    "--carousel-sh": `${settings.slideHeightMobile}px`,
-                    "--carousel-sh-md": `${settings.slideHeightDesktop}px`,
+                    "--carousel-sw": `${layout.slideWidth}px`,
+                    "--carousel-sh": `${layout.slideHeightMobile}px`,
+                    "--carousel-sh-md": `${layout.slideHeightDesktop}px`,
                   } as React.CSSProperties
                 }
               >
