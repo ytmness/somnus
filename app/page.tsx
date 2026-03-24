@@ -11,6 +11,7 @@ import { CartItem, Concert } from "@/components/eventos/types";
 import { EventCardZamna } from "@/components/eventos/EventCardZamna";
 import { GalleryEventCardZamna } from "@/components/eventos/GalleryEventCardZamna";
 import { UpcomingEventsCarousel } from "@/components/eventos/UpcomingEventsCarousel";
+import { CarouselPosterSettingsProvider } from "@/components/eventos/carousel-poster-settings";
 import { BrandPresenceCarousel } from "@/components/BrandPresenceCarousel";
 import { ContactForm } from "@/components/ContactForm";
 import { GALLERY_EVENTS } from "@/lib/gallery-events";
@@ -490,58 +491,72 @@ export default function HomePage() {
               Get in the dream with us.
             </p>
 
-            {activeConcerts.length > 0 ? (
-              <UpcomingEventsCarousel>
-                {activeConcerts.map((concert, index) => (
-                  <EventCardZamna
-                    key={concert.id}
-                    concert={concert}
-                    isPast={false}
-                    isFeatured={index === 0}
-                    carouselGlass
-                    onSelect={() => handleSelectConcert(concert)}
-                  />
-                ))}
-              </UpcomingEventsCarousel>
-            ) : !isGalleryMode ? (
-              <p className="text-center text-white/50 py-12">
-                No upcoming events at the moment
-              </p>
-            ) : (
-              <UpcomingEventsCarousel>
-                {GALLERY_EVENTS.map((item) => (
-                  <GalleryEventCardZamna
-                    key={item.id}
-                    event={item}
-                    carouselGlass
-                    onSelect={() => router.push(item.galleryUrl)}
-                  />
-                ))}
-              </UpcomingEventsCarousel>
-            )}
-
-            {/* EVENTOS PASADOS */}
-            {pastConcerts.length > 0 && (
-              <div className="mt-24 pt-24 border-t border-white/10">
-                <h2 className="somnus-title-secondary text-center text-3xl md:text-4xl mb-4 uppercase tracking-wider">
-                  Past events
-                </h2>
-                <p className="somnus-text-body text-center mb-12 max-w-xl mx-auto text-white/60">
-                  Events that have already taken place
-                </p>
-                <UpcomingEventsCarousel>
-                  {pastConcerts.map((concert) => (
+            <CarouselPosterSettingsProvider>
+              {activeConcerts.length > 0 ? (
+                <UpcomingEventsCarousel
+                  standaloneSettingsProvider={false}
+                  showPosterTuner
+                >
+                  {activeConcerts.map((concert, index) => (
                     <EventCardZamna
                       key={concert.id}
                       concert={concert}
-                      isPast
+                      isPast={false}
+                      isFeatured={index === 0}
                       carouselGlass
-                      onSelect={() => toast.info("This event has already passed")}
+                      onSelect={() => handleSelectConcert(concert)}
                     />
                   ))}
                 </UpcomingEventsCarousel>
-              </div>
-            )}
+              ) : !isGalleryMode ? (
+                <p className="text-center text-white/50 py-12">
+                  No upcoming events at the moment
+                </p>
+              ) : (
+                <UpcomingEventsCarousel
+                  standaloneSettingsProvider={false}
+                  showPosterTuner
+                >
+                  {GALLERY_EVENTS.map((item) => (
+                    <GalleryEventCardZamna
+                      key={item.id}
+                      event={item}
+                      carouselGlass
+                      onSelect={() => router.push(item.galleryUrl)}
+                    />
+                  ))}
+                </UpcomingEventsCarousel>
+              )}
+
+              {/* EVENTOS PASADOS — mismo carrusel y tipografía que Upcoming */}
+              {pastConcerts.length > 0 && (
+                <div className="mt-24">
+                  <h2 className="somnus-title-secondary text-center text-4xl md:text-5xl lg:text-6xl mb-4 uppercase tracking-wider font-bold">
+                    Past events
+                  </h2>
+                  <p className="somnus-text-body text-center mb-16 max-w-2xl mx-auto text-lg">
+                    Events that have already taken place
+                  </p>
+                  <UpcomingEventsCarousel
+                    standaloneSettingsProvider={false}
+                    showPosterTuner={false}
+                  >
+                    {pastConcerts.map((concert, index) => (
+                      <EventCardZamna
+                        key={concert.id}
+                        concert={concert}
+                        isPast
+                        isFeatured={index === 0}
+                        carouselGlass
+                        onSelect={() =>
+                          toast.info("This event has already passed")
+                        }
+                      />
+                    ))}
+                  </UpcomingEventsCarousel>
+                </div>
+              )}
+            </CarouselPosterSettingsProvider>
           </div>
         </section>
       </RevealSection>

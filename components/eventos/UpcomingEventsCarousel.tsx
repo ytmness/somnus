@@ -15,14 +15,17 @@ import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/pagination";
 
-interface UpcomingEventsCarouselProps {
+export interface UpcomingEventsCarouselProps {
   children: React.ReactNode[];
   className?: string;
+  /** Panel de ajustes del póster (solo hace falta una vez por página) */
+  showPosterTuner?: boolean;
 }
 
 function UpcomingEventsCarouselInner({
   children,
   className = "",
+  showPosterTuner = true,
 }: UpcomingEventsCarouselProps) {
   const layout = useCarouselLayout();
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
@@ -85,7 +88,7 @@ function UpcomingEventsCarouselInner({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <CarouselPosterTuner />
+      {showPosterTuner ? <CarouselPosterTuner /> : null}
 
       {children.length > 1 && swiper && (
         <>
@@ -187,10 +190,21 @@ function UpcomingEventsCarouselInner({
   );
 }
 
-export function UpcomingEventsCarousel(props: UpcomingEventsCarouselProps) {
+type StandaloneCarouselProps = UpcomingEventsCarouselProps & {
+  /**
+   * Si es false, el carrusel debe ir dentro de un `CarouselPosterSettingsProvider`
+   * (p. ej. varios carruseles comparten tamaños/coverflow).
+   */
+  standaloneSettingsProvider?: boolean;
+};
+
+export function UpcomingEventsCarousel({
+  standaloneSettingsProvider = true,
+  ...props
+}: StandaloneCarouselProps) {
+  const inner = <UpcomingEventsCarouselInner {...props} />;
+  if (!standaloneSettingsProvider) return inner;
   return (
-    <CarouselPosterSettingsProvider>
-      <UpcomingEventsCarouselInner {...props} />
-    </CarouselPosterSettingsProvider>
+    <CarouselPosterSettingsProvider>{inner}</CarouselPosterSettingsProvider>
   );
 }
