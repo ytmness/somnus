@@ -122,7 +122,7 @@ export default function AdminPage() {
             onClick={() => router.push("/galeria")}
             className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
           >
-            Galería
+            Gallery
           </button>
           <Link
             href="/admin"
@@ -243,7 +243,7 @@ export default function AdminPage() {
             }`}
           >
             <ImageIcon className="w-4 h-4 inline mr-2" />
-            Galería
+            Gallery
           </button>
           <button
             type="button"
@@ -282,10 +282,10 @@ export default function AdminPage() {
 
         {activeTab === "galeria" && (
           <div className="liquid-glass p-6">
-            <h2 className="text-xl font-bold text-white mb-6">Galería</h2>
+            <h2 className="text-xl font-bold text-white mb-6">Gallery</h2>
             <p className="text-white/70 text-sm mb-6">
-              Crea secciones y agrega fotos por URL. Las imágenes deben estar en{" "}
-              <code className="bg-white/10 px-1 rounded">/assets/</code> o en una URL pública.
+              Create sections and add photos by URL. Images should live under{" "}
+              <code className="bg-white/10 px-1 rounded">/assets/</code> or at a public URL.
             </p>
             <GalleryManager />
           </div>

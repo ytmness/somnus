@@ -126,7 +126,7 @@ export default function MisBoletosPage() {
               onClick={() => router.push("/galeria")}
               className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
             >
-              Galería
+              Gallery
             </button>
             <button
               onClick={() => router.push("/mis-boletos")}
@@ -172,7 +172,7 @@ export default function MisBoletosPage() {
             onClick={() => router.push("/galeria")}
             className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
           >
-            Galería
+            Gallery
           </button>
           {userRole === "ADMIN" && (
             <Link

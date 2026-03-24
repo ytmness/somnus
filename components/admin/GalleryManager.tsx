@@ -37,7 +37,7 @@ export function GalleryManager() {
       }
     } catch {
       setSections([]);
-      toast.error("Error al cargar galería");
+      toast.error("Failed to load gallery");
     } finally {
       setIsLoading(false);
     }
@@ -49,7 +49,7 @@ export function GalleryManager() {
 
   const createSection = async () => {
     if (!newSectionTitle.trim()) {
-      toast.error("Escribe el nombre de la sección");
+      toast.error("Enter a section name");
       return;
     }
     try {
@@ -66,29 +66,29 @@ export function GalleryManager() {
       if (!res.ok) throw new Error(data.error || "Error");
       setNewSectionTitle("");
       loadFullSections();
-      toast.success("Sección creada");
+      toast.success("Section created");
     } catch (e: any) {
-      toast.error(e.message || "Error al crear sección");
+      toast.error(e.message || "Failed to create section");
     }
   };
 
   const deleteSection = async (id: string) => {
-    if (!confirm("¿Eliminar esta sección y todas sus imágenes?")) return;
+    if (!confirm("Delete this section and all its images?")) return;
     try {
       const res = await fetch(`/api/gallery/sections/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Error");
       loadFullSections();
-      toast.success("Sección eliminada");
+      toast.success("Section deleted");
     } catch {
-      toast.error("Error al eliminar");
+      toast.error("Failed to delete");
     }
   };
 
   const addImage = async (sectionId: string) => {
     if (!newImageUrl.trim()) {
-      toast.error("Ingresa la URL de la imagen");
+      toast.error("Enter the image URL");
       return;
     }
     try {
@@ -107,30 +107,30 @@ export function GalleryManager() {
       setNewImageUrl("");
       setAddingImage(null);
       loadFullSections();
-      toast.success("Imagen agregada");
+      toast.success("Image added");
     } catch (e: any) {
-      toast.error(e.message || "Error al agregar imagen");
+      toast.error(e.message || "Failed to add image");
     }
   };
 
   const deleteImage = async (id: string) => {
-    if (!confirm("¿Eliminar esta imagen?")) return;
+    if (!confirm("Delete this image?")) return;
     try {
       const res = await fetch(`/api/gallery/images/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Error");
       loadFullSections();
-      toast.success("Imagen eliminada");
+      toast.success("Image deleted");
     } catch {
-      toast.error("Error al eliminar");
+      toast.error("Failed to delete");
     }
   };
 
   if (isLoading) {
     return (
       <div className="text-center py-12">
-        <p className="text-white/70">Cargando galería...</p>
+        <p className="text-white/70">Loading gallery...</p>
       </div>
     );
   }
@@ -142,7 +142,7 @@ export function GalleryManager() {
           type="text"
           value={newSectionTitle}
           onChange={(e) => setNewSectionTitle(e.target.value)}
-          placeholder="Nombre de nueva sección"
+          placeholder="New section name"
           className="px-4 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white placeholder-white/50 w-64 focus:outline-none focus:border-regia-gold"
         />
         <Button
@@ -150,7 +150,7 @@ export function GalleryManager() {
           className="bg-regia-gold hover:bg-regia-gold/90 text-white"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Crear sección
+          Create section
         </Button>
       </div>
 
@@ -200,7 +200,7 @@ export function GalleryManager() {
                   type="url"
                   value={newImageUrl}
                   onChange={(e) => setNewImageUrl(e.target.value)}
-                  placeholder="URL de la imagen (ej: /assets/foto.jpg)"
+                  placeholder="Image URL (e.g. /assets/photo.jpg)"
                   className="flex-1 px-4 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white placeholder-white/50 focus:outline-none focus:border-regia-gold"
                 />
                 <Button
@@ -208,7 +208,7 @@ export function GalleryManager() {
                   onClick={() => addImage(section.id)}
                   className="bg-regia-gold hover:bg-regia-gold/90"
                 >
-                  Agregar
+                  Add
                 </Button>
                 <Button
                   size="sm"
@@ -219,7 +219,7 @@ export function GalleryManager() {
                   }}
                   className="border-white/30 text-white"
                 >
-                  Cancelar
+                  Cancel
                 </Button>
               </div>
             ) : (
@@ -230,7 +230,7 @@ export function GalleryManager() {
                 className="border-regia-gold/50 text-regia-gold hover:bg-regia-gold hover:text-regia-dark"
               >
                 <ImageIcon className="w-4 h-4 mr-2" />
-                Agregar imagen
+                Add image
               </Button>
             )}
           </div>
@@ -239,7 +239,7 @@ export function GalleryManager() {
 
       {sections.length === 0 && (
         <p className="text-white/60 text-center py-8">
-          No hay secciones. Crea una para empezar a agregar fotos.
+          No sections yet. Create one to start adding photos.
         </p>
       )}
     </div>

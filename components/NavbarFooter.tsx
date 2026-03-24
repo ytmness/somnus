@@ -169,7 +169,7 @@ export function FooterMockup({
       { label: "Eventos", href: "/#eventos" },
       { label: "Nosotros", href: "/#nosotros" },
       { label: "Contacto", href: "/#contacto" },
-      { label: "Galería", href: "/galeria" },
+      { label: "Gallery", href: "/galeria" },
       { label: "Términos y Condiciones", href: "/#terminos" },
       { label: "Política de Privacidad", href: "/#privacidad" },
     ],

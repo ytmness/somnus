@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { SomnusHeader } from "@/components/SomnusHeader";
 import { gallerySections as staticSections } from "@/lib/gallery-images";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 
 type GallerySection = { id: string; title: string; images: string[] };
 
@@ -35,7 +35,7 @@ function GaleriaContent() {
           });
         }
       } catch {
-        // Usar staticSections por defecto
+        // Fall back to staticSections
       }
     };
     loadGallery();
@@ -53,11 +53,23 @@ function GaleriaContent() {
   const currentImages =
     sections.find((s) => s.id === activeSection)?.images ?? [];
 
-  const handleSectionChange = useCallback((sectionId: string) => {
-    setActiveSection(sectionId);
-    setLightboxIndex(null);
-    setLightboxSection(null);
+  const scrollToPhotoGrid = useCallback(() => {
+    requestAnimationFrame(() => {
+      document
+        .getElementById("gallery-photos")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }, []);
+
+  const handleSectionChange = useCallback(
+    (sectionId: string, options?: { scroll?: boolean }) => {
+      setActiveSection(sectionId);
+      setLightboxIndex(null);
+      setLightboxSection(null);
+      if (options?.scroll) scrollToPhotoGrid();
+    },
+    [scrollToPhotoGrid]
+  );
 
   const handleImageLoad = useCallback((src: string) => {
     setLoadedImages((prev) => ({ ...prev, [src]: true }));
@@ -113,34 +125,112 @@ function GaleriaContent() {
 
       <main className="pt-24 sm:pt-32 pb-24 px-4 sm:px-6 lg:px-8">
         <h1 className="somnus-title-secondary text-center text-4xl md:text-5xl mb-3 uppercase tracking-wider">
-          Galería
+          Gallery
         </h1>
-        <p className="somnus-text-body text-center mb-16 max-w-xl mx-auto text-white/60">
-          {sections.map((s) => s.title).join(" · ") || "Galería"}
+        <p className="somnus-text-body text-center mb-4 max-w-xl mx-auto text-white/60">
+          Pick a set to open its photo grid. Each card is a preview of that
+          edition.
+        </p>
+        <p className="text-center text-white/40 text-xs uppercase tracking-[0.25em] mb-12">
+          {sections.map((s) => s.title).join(" · ")}
         </p>
 
-        {/* Selector de sección */}
-        <nav className="relative flex flex-wrap justify-center gap-6 sm:gap-8 mb-16 max-w-lg mx-auto" aria-label="Secciones">
-          {sections.map((section) => (
-            <button
-              key={section.id}
-              onClick={() => handleSectionChange(section.id)}
-              className={`relative pb-2 text-sm font-medium uppercase tracking-[0.2em] transition-colors ${
-                activeSection === section.id
-                  ? "text-white"
-                  : "text-white/50 hover:text-white/80"
-              }`}
-            >
-              {section.title}
-              {activeSection === section.id && (
-                <span className="absolute bottom-0 left-0 right-0 h-px bg-white" />
-              )}
-            </button>
-          ))}
-        </nav>
+        {/* Repository-style preview cards (one per section) */}
+        <section
+          className="mb-16 max-w-5xl mx-auto"
+          aria-label="Gallery editions"
+        >
+          <h2 className="sr-only">Editions</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+            {sections.map((section) => {
+              const cover = section.images[0];
+              const isActive = activeSection === section.id;
+              const count = section.images.length;
+              return (
+                <button
+                  key={section.id}
+                  type="button"
+                  onClick={() => handleSectionChange(section.id, { scroll: true })}
+                  className={`text-left rounded-2xl overflow-hidden transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] liquid-glass group ${
+                    isActive
+                      ? "ring-2 ring-white/50 shadow-[0_0_40px_-8px_rgba(255,255,255,0.15)]"
+                      : "ring-1 ring-white/10 hover:ring-white/25 hover:bg-white/[0.04]"
+                  }`}
+                >
+                  <div className="relative aspect-[16/10] bg-white/5">
+                    {cover ? (
+                      <>
+                        {!loadedImages[`preview:${cover}`] && (
+                          <div className="absolute inset-0 bg-white/5 animate-pulse" />
+                        )}
+                        <Image
+                          src={cover}
+                          alt={`${section.title} cover preview`}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
+                          className={`object-cover transition-all duration-500 group-hover:scale-[1.03] ${
+                            loadedImages[`preview:${cover}`]
+                              ? "opacity-100"
+                              : "opacity-0"
+                          }`}
+                          loading="lazy"
+                          quality={75}
+                          onLoad={() =>
+                            setLoadedImages((p) => ({
+                              ...p,
+                              [`preview:${cover}`]: true,
+                            }))
+                          }
+                        />
+                      </>
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center bg-white/[0.06]">
+                        <ImageIcon
+                          className="w-14 h-14 text-white/25"
+                          aria-hidden
+                        />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
+                      <p className="text-white font-semibold text-lg sm:text-xl tracking-tight drop-shadow-md">
+                        {section.title}
+                      </p>
+                      <p className="text-white/70 text-sm mt-1">
+                        {count === 0
+                          ? "No photos yet"
+                          : `${count} photo${count === 1 ? "" : "s"}`}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="px-4 py-3 sm:px-5 flex items-center justify-between border-t border-white/10">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-white/45">
+                      {isActive ? "Showing" : "View set"}
+                    </span>
+                    <span className="text-white/50 text-xs group-hover:text-white/80 transition-colors">
+                      →
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </section>
 
-        {/* Grid 3 columnas - primeras 3 eager, resto lazy */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
+        <div className="max-w-5xl mx-auto mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 border-b border-white/10 pb-4">
+          <h2 className="somnus-title-secondary text-xl sm:text-2xl uppercase tracking-wider text-white/90">
+            Photos
+          </h2>
+          <p className="text-white/50 text-sm">
+            {sections.find((s) => s.id === activeSection)?.title ?? ""}
+          </p>
+        </div>
+
+        {/* 3-column grid — first 3 eager, rest lazy */}
+        <div
+          id="gallery-photos"
+          className="scroll-mt-28 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto"
+        >
           {currentImages.map((src, index) => (
             <button
               key={`${activeSection}-${index}`}
@@ -148,13 +238,13 @@ function GaleriaContent() {
               onClick={() => openLightbox(activeSection, index)}
               className="relative aspect-[4/5] overflow-hidden group focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]"
             >
-              {/* Skeleton mientras carga */}
+              {/* Skeleton while loading */}
               {!loadedImages[src] && (
                 <div className="absolute inset-0 bg-white/5 animate-pulse" />
               )}
               <Image
                 src={src}
-                alt={`${sections.find((s) => s.id === activeSection)?.title ?? "Foto"} - ${index + 1}`}
+                alt={`${sections.find((s) => s.id === activeSection)?.title ?? "Photo"} - ${index + 1}`}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
                 className={`object-cover transition-opacity duration-500 ${
@@ -177,13 +267,13 @@ function GaleriaContent() {
           onClick={closeLightbox}
           role="dialog"
           aria-modal="true"
-          aria-label="Vista ampliada"
+          aria-label="Expanded image"
         >
           <button
             type="button"
             onClick={closeLightbox}
             className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-            aria-label="Cerrar"
+            aria-label="Close"
           >
             <X className="w-6 h-6" />
           </button>
@@ -195,7 +285,7 @@ function GaleriaContent() {
               goPrev();
             }}
             className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-            aria-label="Anterior"
+            aria-label="Previous"
           >
             <ChevronLeft className="w-8 h-8" />
           </button>
@@ -206,7 +296,7 @@ function GaleriaContent() {
           >
             <Image
               src={currentSrc}
-              alt={`Foto ${lightboxIndex + 1}`}
+              alt={`Photo ${lightboxIndex + 1}`}
               width={1400}
               height={933}
               sizes="(max-width: 1400px) 100vw, 1400px"
@@ -223,7 +313,7 @@ function GaleriaContent() {
               goNext();
             }}
             className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-            aria-label="Siguiente"
+            aria-label="Next"
           >
             <ChevronRight className="w-8 h-8" />
           </button>
@@ -240,7 +330,7 @@ function GaleriaContent() {
 function GaleriaFallback() {
   return (
     <div className="min-h-screen somnus-bg-main flex items-center justify-center">
-      <p className="text-white/70">Cargando galería...</p>
+      <p className="text-white/70">Loading gallery...</p>
     </div>
   );
 }

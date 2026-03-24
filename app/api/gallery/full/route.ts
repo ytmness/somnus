@@ -22,7 +22,7 @@ export async function GET() {
   } catch (error) {
     console.error("Get gallery full error:", error);
     return NextResponse.json(
-      { error: "Error al obtener galería" },
+      { error: "Failed to load gallery" },
       { status: 500 }
     );
   }

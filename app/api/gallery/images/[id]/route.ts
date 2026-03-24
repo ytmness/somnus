@@ -30,7 +30,7 @@ export async function PATCH(
   } catch (error) {
     console.error("Gallery image update error:", error);
     return NextResponse.json(
-      { error: "Error al actualizar imagen" },
+      { error: "Failed to update image" },
       { status: 500 }
     );
   }
@@ -56,7 +56,7 @@ export async function DELETE(
   } catch (error) {
     console.error("Gallery image delete error:", error);
     return NextResponse.json(
-      { error: "Error al eliminar imagen" },
+      { error: "Failed to delete image" },
       { status: 500 }
     );
   }

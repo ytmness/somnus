@@ -595,7 +595,7 @@ export default function HomePage() {
               href="/galeria"
               className="text-white/60 hover:text-white transition-colors uppercase tracking-wider"
             >
-              Galería
+              Gallery
             </a>
             <a
               href="/mis-boletos"

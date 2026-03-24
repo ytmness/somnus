@@ -30,7 +30,7 @@ export async function GET() {
   } catch (error) {
     console.error("Get gallery error:", error);
     return NextResponse.json(
-      { error: "Error al obtener galería" },
+      { error: "Failed to load gallery" },
       { status: 500 }
     );
   }
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     if (action === "section") {
       const section = await prisma.gallerySection.create({
         data: {
-          title: title || "Nueva sección",
+          title: title || "New section",
           sortOrder: body.sortOrder ?? 0,
         },
       });
@@ -72,11 +72,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, data: image });
     }
 
-    return NextResponse.json({ error: "Acción inválida" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
     console.error("Gallery POST error:", error);
     return NextResponse.json(
-      { error: "Error al actualizar galería" },
+      { error: "Failed to update gallery" },
       { status: 500 }
     );
   }

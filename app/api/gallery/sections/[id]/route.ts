@@ -30,7 +30,7 @@ export async function PATCH(
   } catch (error) {
     console.error("Gallery section update error:", error);
     return NextResponse.json(
-      { error: "Error al actualizar sección" },
+      { error: "Failed to update section" },
       { status: 500 }
     );
   }
@@ -57,7 +57,7 @@ export async function DELETE(
   } catch (error) {
     console.error("Gallery section delete error:", error);
     return NextResponse.json(
-      { error: "Error al eliminar sección" },
+      { error: "Failed to delete section" },
       { status: 500 }
     );
   }
