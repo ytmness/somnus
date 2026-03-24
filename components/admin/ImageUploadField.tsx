@@ -99,9 +99,10 @@ export function ImageUploadField({
 
   const handleFileInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
+      const input = e.target;
+      const file = input.files?.[0];
+      input.value = "";
       if (file) uploadFile(file);
-      e.target.value = "";
     },
     [uploadFile]
   );

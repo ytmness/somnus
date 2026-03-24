@@ -271,9 +271,16 @@ export function GalleryManager() {
               multiple
               className="sr-only"
               onChange={(e) => {
-                const files = e.target.files;
-                e.target.value = "";
-                if (files?.length) void uploadFilesToSection(section.id, files);
+                const input = e.target;
+                // Copiar antes de vaciar: FileList es vivo y .value = "" lo vacía (Chrome, Safari, etc.)
+                const picked =
+                  input.files && input.files.length > 0
+                    ? Array.from(input.files)
+                    : [];
+                input.value = "";
+                if (picked.length > 0) {
+                  void uploadFilesToSection(section.id, picked);
+                }
               }}
             />
 
@@ -299,8 +306,13 @@ export function GalleryManager() {
               onDrop={(e) => {
                 e.preventDefault();
                 setDragOver(null);
-                if (e.dataTransfer.files?.length)
-                  void uploadFilesToSection(section.id, e.dataTransfer.files);
+                const dropped =
+                  e.dataTransfer.files?.length > 0
+                    ? Array.from(e.dataTransfer.files)
+                    : [];
+                if (dropped.length > 0) {
+                  void uploadFilesToSection(section.id, dropped);
+                }
               }}
               className={`mb-4 block rounded-xl border-2 border-dashed px-4 py-8 text-center cursor-pointer transition-colors ${
                 dragOver === section.id

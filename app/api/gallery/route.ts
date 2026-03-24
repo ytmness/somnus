@@ -55,7 +55,10 @@ export async function POST(request: NextRequest) {
   try {
     const user = await getSession();
     if (!hasRole(user, ["ADMIN"])) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+      return NextResponse.json(
+        { success: false, error: "No autorizado" },
+        { status: 403 }
+      );
     }
 
     const body = await request.json();
@@ -92,11 +95,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, data: image });
     }
 
-    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+    return NextResponse.json(
+      { success: false, error: "Invalid action" },
+      { status: 400 }
+    );
   } catch (error) {
     console.error("Gallery POST error:", error);
     return NextResponse.json(
-      { error: "Failed to update gallery" },
+      { success: false, error: "Failed to update gallery" },
       { status: 500 }
     );
   }
