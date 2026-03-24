@@ -16,16 +16,16 @@ import { BrandPresenceCarousel } from "@/components/BrandPresenceCarousel";
 import { ContactForm } from "@/components/ContactForm";
 import { GALLERY_EVENTS } from "@/lib/gallery-events";
 import { RevealSection } from "@/components/RevealSection";
+import {
+  formatEventCalendarDate,
+  eventCalendarKey,
+  localTodayCalendarKey,
+} from "@/lib/utils";
 
 const HERO_VIDEO = "/assets/Adobe Express 2026-02-17 16.05.01.mp4";
 
 function convertEventToConcert(event: any): Concert & { eventDate?: string } {
-  const eventDate = new Date(event.eventDate);
-  const formattedDate = eventDate.toLocaleDateString("en-US", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  const formattedDate = formatEventCalendarDate(event.eventDate);
 
   const heroImage =
     event.imageUrl && !event.imageUrl.includes("unsplash")
@@ -140,19 +140,6 @@ function convertEventToConcert(event: any): Concert & { eventDate?: string } {
   };
 }
 
-function getEventStatus(concert: Concert & { eventDate?: string }): string | null {
-  if (concert.eventDate && new Date(concert.eventDate) < new Date()) {
-    return "Past event";
-  }
-  const totalAvailable = concert.sections?.reduce(
-    (sum, s) => sum + (s.available || 0),
-    0
-  );
-  if (!totalAvailable) return "Sold out";
-  if (totalAvailable <= 20) return "Last tickets";
-  return null;
-}
-
 export default function HomePage() {
   const router = useRouter();
   const [concerts, setConcerts] = useState<Concert[]>([]);
@@ -215,18 +202,16 @@ export default function HomePage() {
         const data = await response.json();
 
         if (data.success && data.data) {
-          const now = new Date();
           const withTickets = data.data.filter(
             (e: any) => e.ticketTypes && e.ticketTypes.length > 0
           );
-          // Futuros = fecha futura o hoy (mostrar todos, activos o no)
-          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          // Mismo criterio que el admin (día calendario del evento en UTC vs hoy local)
+          const todayKey = localTodayCalendarKey();
           const futureEvents = withTickets.filter(
-            (e: any) => new Date(e.eventDate) >= today
+            (e: any) => eventCalendarKey(e.eventDate) >= todayKey
           );
-          // Pasados = ya pasó la fecha
           const pastEvents = withTickets.filter(
-            (e: any) => new Date(e.eventDate) < today
+            (e: any) => eventCalendarKey(e.eventDate) < todayKey
           );
           // Ordenar: primero los activos (para hero), luego por fecha. Pasados por fecha desc.
           const futureConverted = futureEvents

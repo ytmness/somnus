@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRef } from "react";
 import { Calendar, MapPin } from "lucide-react";
 import { Concert } from "./types";
+import { isEventPastByCalendar } from "@/lib/utils";
 import { useCarouselPosterOptional } from "./carousel-poster-settings";
 import { CarouselPosterImage } from "./CarouselPosterImage";
 
@@ -19,7 +20,7 @@ interface EventCardZamnaProps {
 function getEventStatus(
   concert: Concert & { eventDate?: string }
 ): string | null {
-  if (concert.eventDate && new Date(concert.eventDate) < new Date()) {
+  if (concert.eventDate && isEventPastByCalendar(concert.eventDate)) {
     return "Past event";
   }
   const totalAvailable = concert.sections?.reduce(

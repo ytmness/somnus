@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Ticket, Calendar, MapPin, User, ArrowLeft, Download, QrCode, Shield, Scan, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
+import { formatEventCalendarDate } from "@/lib/utils";
 
 interface TicketData {
   id: string;
@@ -89,15 +90,6 @@ export default function MisBoletosPage() {
 
     loadTickets();
   }, [router]);
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  };
 
   const getStatusText = (status: string) => {
     switch (status) {
@@ -304,7 +296,7 @@ export default function MisBoletosPage() {
                         <div className="flex items-center gap-2 somnus-text-body">
                           <Calendar className="w-5 h-5 text-white/80" />
                           <span>
-                            {formatDate(ticket.event.eventDate)} •{" "}
+                            {formatEventCalendarDate(ticket.event.eventDate)} •{" "}
                             {ticket.event.eventTime}
                           </span>
                         </div>

@@ -11,6 +11,7 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:update-quantities": "tsx scripts/update-ticket-quantities.ts",
+    "db:delete-somnus-panorama": "tsx scripts/delete-somnus-panorama-events.ts",
     "compress-gallery": "tsx scripts/compress-gallery.ts"
   },
   "dependencies": {

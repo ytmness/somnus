@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Eye } from "lucide-react";
 import { toast } from "sonner";
-import { formatDate, formatCurrency } from "@/lib/utils";
+import { formatEventCalendarDate } from "@/lib/utils";
 import { EditEventModal } from "./EditEventModal";
 
 interface Event {
@@ -169,7 +169,7 @@ export function EventsTable() {
                 </td>
                 <td className="py-4 px-4">
                   <p className="text-white/80">
-                    {formatDate(new Date(event.eventDate))}
+                    {formatEventCalendarDate(event.eventDate)}
                   </p>
                 </td>
                 <td className="py-4 px-4">

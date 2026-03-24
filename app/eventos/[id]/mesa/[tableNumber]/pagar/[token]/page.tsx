@@ -132,12 +132,13 @@ export default function PagarInvitePage() {
   }).format(invite.pricePerSeat);
 
   const eventDate = invite.event?.eventDate
-    ? new Date(invite.event.eventDate).toLocaleDateString("es-MX", {
+    ? new Intl.DateTimeFormat("es-MX", {
+        timeZone: "UTC",
         weekday: "long",
         day: "numeric",
         month: "long",
         year: "numeric",
-      })
+      }).format(new Date(invite.event.eventDate))
     : "";
 
   return (

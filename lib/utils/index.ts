@@ -31,6 +31,44 @@ export function formatDate(date: Date | string): string {
 }
 
 /**
+ * Fecha del **evento** tal como se guardó (día calendario en UTC).
+ * Evita mostrar un día menos en MX/LATAM: `eventDate` viene como medianoche UTC
+ * del día elegido en el admin (`type="date"`), y `formatDate` local lo corría a "ayer".
+ */
+export function formatEventCalendarDate(
+  date: Date | string,
+  locale = "en-US"
+): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+  return new Intl.DateTimeFormat(locale, {
+    timeZone: "UTC",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(d);
+}
+
+/** YYYY-MM-DD del día de evento según UTC (coincide con el date picker del admin). */
+export function eventCalendarKey(iso: string | Date): string {
+  const d = typeof iso === "string" ? new Date(iso) : iso;
+  return d.toISOString().slice(0, 10);
+}
+
+/** YYYY-MM-DD de "hoy" en la zona local del usuario. */
+export function localTodayCalendarKey(): string {
+  const n = new Date();
+  const y = n.getFullYear();
+  const m = String(n.getMonth() + 1).padStart(2, "0");
+  const day = String(n.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+/** El evento ya pasó comparando solo días (calendario evento UTC vs hoy local). */
+export function isEventPastByCalendar(iso: string | Date): boolean {
+  return eventCalendarKey(iso) < localTodayCalendarKey();
+}
+
+/**
  * Formatea fecha y hora
  */
 export function formatDateTime(date: Date | string): string {

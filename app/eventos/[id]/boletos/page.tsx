@@ -216,12 +216,13 @@ export default function EventBoletosPage() {
   if (!event) return null;
 
   const eventDate = event.eventDate
-    ? new Date(event.eventDate).toLocaleDateString("en-US", {
+    ? new Intl.DateTimeFormat("en-US", {
+        timeZone: "UTC",
         weekday: "short",
         day: "numeric",
         month: "short",
         year: "numeric",
-      })
+      }).format(new Date(event.eventDate))
     : "";
 
   const eventImage =
