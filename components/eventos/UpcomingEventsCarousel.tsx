@@ -5,6 +5,11 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCoverflow, Pagination, Autoplay } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  CarouselPosterSettingsProvider,
+  useCarouselPosterSettings,
+} from "./carousel-poster-settings";
+import { CarouselPosterTuner } from "./CarouselPosterTuner";
 
 import "swiper/css";
 import "swiper/css/effect-coverflow";
@@ -15,10 +20,11 @@ interface UpcomingEventsCarouselProps {
   className?: string;
 }
 
-export function UpcomingEventsCarousel({
+function UpcomingEventsCarouselInner({
   children,
   className = "",
 }: UpcomingEventsCarouselProps) {
+  const { settings } = useCarouselPosterSettings();
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -36,7 +42,23 @@ export function UpcomingEventsCarousel({
     if (swiper && isHovered) swiper.autoplay?.stop();
   }, [swiper, isHovered]);
 
-  // Forzar posición centrada SOLO al cargar una vez (evita que slidePrev reseteé)
+  useEffect(() => {
+    if (!swiper) return;
+    swiper.params.coverflowEffect = {
+      rotate: 0,
+      stretch: settings.coverflowStretch,
+      depth: settings.coverflowDepth,
+      modifier: settings.coverflowModifier,
+      slideShadows: false,
+    };
+    swiper.update();
+  }, [
+    swiper,
+    settings.coverflowStretch,
+    settings.coverflowDepth,
+    settings.coverflowModifier,
+  ]);
+
   useEffect(() => {
     if (!swiper || children.length < 2 || hasInitialized.current) return;
     hasInitialized.current = true;
@@ -51,11 +73,13 @@ export function UpcomingEventsCarousel({
 
   if (!children || children.length === 0) return null;
 
-  // Solo duplicar si hay ≤5 eventos; con más, Swiper tiene suficientes slides para el loop
   const slidesForLoop =
     children.length <= 5
       ? [...children, ...children, ...children]
       : children;
+
+  const stageMinSm = Math.max(settings.slideHeightMobile + 72, 560);
+  const stageMinMd = Math.max(settings.slideHeightDesktop + 72, 640);
 
   return (
     <div
@@ -63,7 +87,8 @@ export function UpcomingEventsCarousel({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Botones de navegación - posicionados en los costados, z-50 para que no los tape nada */}
+      <CarouselPosterTuner />
+
       {children.length > 1 && swiper && (
         <>
           <button
@@ -93,8 +118,15 @@ export function UpcomingEventsCarousel({
         </>
       )}
 
-      {/* Stage: padding horizontal para que el coverflow 3D no se corte; SIN overflow-hidden aquí */}
-      <div className="w-full h-[600px] md:h-[700px] px-14 md:px-20 lg:px-28">
+      <div
+        className="w-full px-14 md:px-20 lg:px-28 min-h-[var(--carousel-stage-sm)] md:min-h-[var(--carousel-stage-md)]"
+        style={
+          {
+            "--carousel-stage-sm": `${stageMinSm}px`,
+            "--carousel-stage-md": `${stageMinMd}px`,
+          } as React.CSSProperties
+        }
+      >
         <Swiper
           onSwiper={setSwiper}
           effect="coverflow"
@@ -109,9 +141,9 @@ export function UpcomingEventsCarousel({
           modules={[EffectCoverflow, Pagination, Autoplay]}
           coverflowEffect={{
             rotate: 0,
-            stretch: 52,
-            depth: 120,
-            modifier: 0.85,
+            stretch: settings.coverflowStretch,
+            depth: settings.coverflowDepth,
+            modifier: settings.coverflowModifier,
             slideShadows: false,
           }}
           pagination={false}
@@ -126,7 +158,14 @@ export function UpcomingEventsCarousel({
           {slidesForLoop.map((child, i) => (
             <SwiperSlide key={i} className="!w-auto">
               <div
-                className={`!w-[min(92vw,480px)] !h-[520px] md:!w-[480px] md:!h-[680px] flex items-center justify-center [&>article]:w-full [&>article]:h-full`}
+                className="flex items-center justify-center [&>article]:w-full [&>article]:h-full w-[min(92vw,var(--carousel-sw))] h-[var(--carousel-sh)] md:h-[var(--carousel-sh-md)]"
+                style={
+                  {
+                    "--carousel-sw": `${settings.slideWidth}px`,
+                    "--carousel-sh": `${settings.slideHeightMobile}px`,
+                    "--carousel-sh-md": `${settings.slideHeightDesktop}px`,
+                  } as React.CSSProperties
+                }
               >
                 {child}
               </div>
@@ -135,7 +174,6 @@ export function UpcomingEventsCarousel({
         </Swiper>
       </div>
 
-      {/* Paginación custom: 5 bullets según eventos únicos */}
       {children.length > 1 && (
         <div className="flex justify-center gap-2 mt-6">
           {children.map((_, i) => (
@@ -154,5 +192,13 @@ export function UpcomingEventsCarousel({
         </div>
       )}
     </div>
+  );
+}
+
+export function UpcomingEventsCarousel(props: UpcomingEventsCarouselProps) {
+  return (
+    <CarouselPosterSettingsProvider>
+      <UpcomingEventsCarouselInner {...props} />
+    </CarouselPosterSettingsProvider>
   );
 }

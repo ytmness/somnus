@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Calendar, MapPin } from "lucide-react";
 import { Concert } from "./types";
+import { useCarouselPosterSettingsOptional } from "./carousel-poster-settings";
 
 interface EventCardZamnaProps {
   concert: Concert & { eventDate?: string };
@@ -35,6 +36,7 @@ export function EventCardZamna({
   onSelect,
   carouselGlass = false,
 }: EventCardZamnaProps) {
+  const tune = useCarouselPosterSettingsOptional();
   const status = getEventStatus(concert);
   const isMystery =
     concert.artist === "Artista por Confirmar" ||
@@ -55,8 +57,21 @@ export function EventCardZamna({
       <div
         className={
           carouselGlass
-            ? "relative flex-1 min-h-[280px] md:min-h-[400px] overflow-hidden bg-black/20"
+            ? "relative flex-1 overflow-hidden bg-black/20 min-h-[var(--evt-pmin-sm)] md:min-h-[var(--evt-pmin-md)]"
             : "relative aspect-[4/3] overflow-hidden"
+        }
+        style={
+          carouselGlass && tune
+            ? ({
+                "--evt-pmin-sm": `${tune.posterMinHeightSm}px`,
+                "--evt-pmin-md": `${tune.posterMinHeightMd}px`,
+              } as React.CSSProperties)
+            : carouselGlass
+              ? ({
+                  "--evt-pmin-sm": "280px",
+                  "--evt-pmin-md": "400px",
+                } as React.CSSProperties)
+              : undefined
         }
       >
         {isMystery ? (
@@ -71,7 +86,9 @@ export function EventCardZamna({
               fill
               className={`${
                 carouselGlass
-                  ? "object-cover object-center"
+                  ? tune?.imageObjectFit === "contain"
+                    ? "object-contain object-center"
+                    : "object-cover object-center"
                   : "object-cover"
               } transition-transform duration-700 ${
                 isPast ? "" : "group-hover:scale-105"

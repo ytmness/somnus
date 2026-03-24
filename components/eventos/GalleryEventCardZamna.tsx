@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Calendar, MapPin } from "lucide-react";
 import type { GalleryEvent } from "@/lib/gallery-events";
+import { useCarouselPosterSettingsOptional } from "./carousel-poster-settings";
 
 interface GalleryEventCardZamnaProps {
   event: GalleryEvent;
@@ -15,6 +16,7 @@ export function GalleryEventCardZamna({
   onSelect,
   carouselGlass = false,
 }: GalleryEventCardZamnaProps) {
+  const tune = useCarouselPosterSettingsOptional();
   return (
     <article
       onClick={onSelect}
@@ -27,8 +29,21 @@ export function GalleryEventCardZamna({
       <div
         className={
           carouselGlass
-            ? "relative flex-1 min-h-[280px] md:min-h-[400px] overflow-hidden bg-black/20"
+            ? "relative flex-1 overflow-hidden bg-black/20 min-h-[var(--evt-pmin-sm)] md:min-h-[var(--evt-pmin-md)]"
             : "relative aspect-[4/3] overflow-hidden"
+        }
+        style={
+          carouselGlass && tune
+            ? ({
+                "--evt-pmin-sm": `${tune.posterMinHeightSm}px`,
+                "--evt-pmin-md": `${tune.posterMinHeightMd}px`,
+              } as React.CSSProperties)
+            : carouselGlass
+              ? ({
+                  "--evt-pmin-sm": "280px",
+                  "--evt-pmin-md": "400px",
+                } as React.CSSProperties)
+              : undefined
         }
       >
         <Image
@@ -36,7 +51,11 @@ export function GalleryEventCardZamna({
           alt={event.artist}
           fill
           className={`${
-            carouselGlass ? "object-cover object-center" : "object-cover"
+            carouselGlass
+              ? tune?.imageObjectFit === "contain"
+                ? "object-contain object-center"
+                : "object-cover object-center"
+              : "object-cover"
           } transition-transform duration-700 group-hover:scale-105`}
           sizes="(max-width: 768px) 100vw, 33vw"
           loading="lazy"
