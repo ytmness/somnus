@@ -1,12 +1,20 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, ArrowLeft } from "lucide-react";
 
 export default function PagoExitosoPage() {
-  const params = useSearchParams();
-  const email = params.get("email");
+  const [email, setEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      setEmail(params.get("email"));
+    } catch {
+      setEmail(null);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen somnus-bg-main text-white">
