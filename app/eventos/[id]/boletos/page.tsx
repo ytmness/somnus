@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, ArrowLeft, Plus, Minus, X, Ticket, Calendar, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { calculateClipCommission } from "@/lib/utils";
+import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
 import { EventMap } from "@/components/eventos/EventMap";
 
 interface CartItem {
@@ -87,6 +88,9 @@ export default function EventBoletosPage() {
 
   const getAvailable = (tt: any) => tt.maxQuantity - (tt.soldQuantity || 0);
 
+  const unitPrice = (tt: any) =>
+    effectiveTicketPriceAt(Number(tt.price), tt.pricePhases, new Date());
+
   const handleQuantityChange = (ttId: string, delta: number) => {
     const tt = ticketTypes.find((t: any) => t.id === ttId);
     if (!tt) return;
@@ -104,7 +108,7 @@ export default function EventBoletosPage() {
       .map((tt: any) => ({
         ticketTypeId: tt.id,
         name: tt.name,
-        price: Number(tt.price),
+        price: unitPrice(tt),
         quantity: quantities[tt.id],
       }));
 
@@ -384,7 +388,7 @@ export default function EventBoletosPage() {
                                 </p>
                               )}
                               <p className="text-white/80 mt-2 font-medium">
-                                ${Number(tt.price).toLocaleString("en-US")} MXN
+                                ${unitPrice(tt).toLocaleString("en-US")} MXN
                               </p>
                             </div>
                             <div className="flex items-center gap-3">

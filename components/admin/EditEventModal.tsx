@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import { X } from "lucide-react";
 import { toast } from "sonner";
+import {
+  TicketPricePhasesFields,
+  type PricePhaseFormRow,
+} from "@/components/admin/TicketPricePhasesFields";
 
 interface TicketTypeData {
   id: string;
@@ -16,6 +20,7 @@ interface TicketTypeData {
   soldQuantity: number;
   isTable: boolean;
   seatsPerTable: number | null;
+  pricePhases: PricePhaseFormRow[];
 }
 
 interface EventData {
@@ -115,6 +120,12 @@ export function EditEventModal({
             soldQuantity: tt.soldQuantity ?? 0,
             isTable: tt.isTable ?? false,
             seatsPerTable: tt.seatsPerTable ?? null,
+            pricePhases: (tt.pricePhases || []).map((p: any) => ({
+              price: Number(p.price),
+              startsAt: toDateTimeLocalStr(p.startsAt),
+              endsAt: toDateTimeLocalStr(p.endsAt),
+              label: p.label || "",
+            })),
           }))
         );
       } catch (err: any) {
@@ -147,7 +158,7 @@ export function EditEventModal({
   const handleTicketTypeChange = (
     index: number,
     field: keyof TicketTypeData,
-    value: string | number | boolean | null
+    value: string | number | boolean | null | PricePhaseFormRow[]
   ) => {
     setTicketTypes((prev) => {
       const updated = [...prev];
@@ -198,6 +209,13 @@ export function EditEventModal({
             maxQuantity: tt.maxQuantity,
             isTable: tt.isTable,
             seatsPerTable: tt.seatsPerTable ?? undefined,
+            pricePhases: tt.pricePhases.map((p, i) => ({
+              price: p.price,
+              startsAt: new Date(p.startsAt).toISOString(),
+              endsAt: new Date(p.endsAt).toISOString(),
+              label: p.label || undefined,
+              sortOrder: i,
+            })),
           })),
         }),
       });
@@ -502,6 +520,15 @@ export function EditEventModal({
                         </p>
                       )}
                     </div>
+
+                    <TicketPricePhasesFields
+                      phases={ticketType.pricePhases}
+                      onChange={(next) =>
+                        handleTicketTypeChange(index, "pricePhases", next)
+                      }
+                      defaultPriceHint={ticketType.price}
+                    />
+
                     <div className="md:col-span-3 rounded-lg border border-regia-gold/25 bg-white/[0.04] p-4">
                       <label className="flex items-start gap-3 cursor-pointer">
                         <input
@@ -518,21 +545,19 @@ export function EditEventModal({
                         />
                         <span>
                           <span className="block text-sm font-medium text-white">
-                            Boleto tipo mesa VIP (precio por mesa completa)
+                            Mesa VIP
                           </span>
-                          <span className="block text-xs text-white/55 mt-1 leading-relaxed">
-                            El precio es por mesa. En el link compartido cada pago equivale a precio de mesa ÷
-                            &quot;asientos por mesa&quot; (referencia, como el costo por persona). Eso no limita
-                            cuánta gente puede pagar; en admin defines cuántos pagos hacen falta para marcar la mesa
-                            confirmada.
+                          <span className="block text-xs text-white/50 mt-1">
+                            El precio de esta fila es por mesa completa (venta directa / mapa). Los links compartidos
+                            de cobro cobran el boleto General; el cupo para confirmar la mesa se configura en Invites.
                           </span>
                         </span>
                       </label>
                       {ticketType.isTable && (
                         <div className="mt-3 pl-7 flex flex-wrap items-end gap-4">
-                          <div>
+                          <div className="max-w-md">
                             <label className="block text-xs font-medium text-white/80 mb-1">
-                              Asientos por mesa (referencia)
+                              Personas por mesa
                             </label>
                             <input
                               type="number"
@@ -547,6 +572,9 @@ export function EditEventModal({
                               className="w-24 px-3 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white focus:outline-none focus:border-regia-gold text-sm"
                               min="2"
                             />
+                            <p className="text-[11px] text-white/45 mt-2 leading-relaxed">
+                              Referencia para mapa e inventario; no fija el precio de cada pago en el link.
+                            </p>
                           </div>
                         </div>
                       )}

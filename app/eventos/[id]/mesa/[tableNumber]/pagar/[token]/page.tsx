@@ -310,14 +310,14 @@ export default function PagarInvitePage() {
             </p>
             <p className="text-white/45 text-xs uppercase tracking-wide mb-1">Recaudado</p>
             <p className="text-4xl font-bold text-white tabular-nums mb-4">{mxn.format(totalCollected)}</p>
-            <p className="text-white/45 text-xs mb-1">Cada pago (mismo importe por persona)</p>
+            <p className="text-white/45 text-xs mb-1">Cada pago (precio General del evento)</p>
             <p className="text-lg font-semibold text-[#7BA3E8] tabular-nums">{priceFormatted}</p>
             {invite.minPaidToConfirm != null &&
               invite.pricePerSeat != null &&
               !invite.tableConfirmed && (
                 <p className="mt-2 text-[11px] text-white/40">
-                  Referencia para confirmar con {invite.minPaidToConfirm} pagos:{" "}
-                  {mxn.format(invite.minPaidToConfirm * invite.pricePerSeat)} (pueden seguir sumando pagos después).
+                  Con {invite.minPaidToConfirm} pagos a este precio se considera la mesa confirmada (total aprox.{" "}
+                  {mxn.format(invite.minPaidToConfirm * invite.pricePerSeat)}); pueden seguir entrando más pagos.
                 </p>
               )}
             {invite.minPaidToConfirm != null && (

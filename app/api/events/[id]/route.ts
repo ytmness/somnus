@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { prisma } from "@/lib/db/prisma";
 import { getSession, hasRole } from "@/lib/auth/supabase-auth";
 import { updateEventSchema } from "@/lib/validations/schemas";
@@ -20,6 +21,7 @@ export async function GET(
       include: {
         ticketTypes: {
           orderBy: { price: "asc" },
+          include: { pricePhases: { orderBy: { sortOrder: "asc" } } },
         },
       },
     });
@@ -69,7 +71,9 @@ export async function PATCH(
       const event = await prisma.event.update({
         where: { id: params.id },
         data: { isActive: body.isActive },
-        include: { ticketTypes: true },
+        include: {
+          ticketTypes: { include: { pricePhases: { orderBy: { sortOrder: "asc" } } } },
+        },
       });
       return NextResponse.json({ success: true, data: event });
     }
@@ -110,7 +114,7 @@ export async function PATCH(
       where: { id: params.id },
       data: updateData,
       include: {
-        ticketTypes: true,
+        ticketTypes: { include: { pricePhases: { orderBy: { sortOrder: "asc" } } } },
       },
     });
 
@@ -145,10 +149,27 @@ export async function PATCH(
             data: ttData,
           });
         }
+
+        if (tt.pricePhases !== undefined) {
+          await prisma.ticketPricePhase.deleteMany({ where: { ticketTypeId: tt.id } });
+          if (tt.pricePhases.length > 0) {
+            await prisma.ticketPricePhase.createMany({
+              data: tt.pricePhases.map((p, i) => ({
+                id: randomUUID(),
+                ticketTypeId: tt.id,
+                price: p.price,
+                startsAt: new Date(p.startsAt),
+                endsAt: new Date(p.endsAt),
+                label: p.label ?? null,
+                sortOrder: p.sortOrder ?? i,
+              })),
+            });
+          }
+        }
       }
       event = await prisma.event.findUniqueOrThrow({
         where: { id: params.id },
-        include: { ticketTypes: true },
+        include: { ticketTypes: { include: { pricePhases: { orderBy: { sortOrder: "asc" } } } } },
       });
     }
 

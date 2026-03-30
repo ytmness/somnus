@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import crypto from "crypto";
 import { parseTableKeyFromPath, ticketTableLabel } from "@/lib/table-invite";
+import { generalAdmissionUnitPrice } from "@/lib/ticket-pricing";
 
 const INVITE_EXPIRY_DAYS = 7;
 const MAX_TRADITIONAL_SLOTS = 500;
@@ -95,7 +96,11 @@ export async function POST(
 
     const event = await prisma.event.findUnique({
       where: { id: eventId },
-      include: { ticketTypes: true },
+      include: {
+        ticketTypes: {
+          include: { pricePhases: { orderBy: { sortOrder: "asc" } } },
+        },
+      },
     });
 
     if (!event) {
@@ -140,14 +145,12 @@ export async function POST(
         minPaidRaw === undefined || minPaidRaw === null
           ? DEFAULT_MIN_PAID_TO_CONFIRM
           : Math.floor(Number(minPaidRaw));
-      const seatsPerTable = Math.max(1, tableTicketType.seatsPerTable ?? 4);
-      const priceMesa = Number(tableTicketType.price);
-      const pricePerSeat = Math.round((priceMesa / seatsPerTable) * 100) / 100;
-      if (!Number.isFinite(pricePerSeat) || pricePerSeat <= 0) {
+      const pricePerSeat = generalAdmissionUnitPrice(event.ticketTypes);
+      if (pricePerSeat == null || pricePerSeat <= 0) {
         return NextResponse.json(
           {
             error:
-              "El tipo de boleto mesa tiene precio inválido. Revisa precio y asientos por mesa en el evento.",
+              "Agrega un tipo de boleto General (no mesa) con precio válido. Cada pago del link usa ese precio.",
           },
           { status: 400 }
         );
@@ -190,7 +193,7 @@ export async function POST(
           tableNumber,
           inviteToken: token,
           maxSlots: null,
-          splitAmong: seatsPerTable,
+          splitAmong: 1,
           minPaidToConfirm,
           pricePerSeat,
           expiresAt,
@@ -213,7 +216,6 @@ export async function POST(
               pricePerSeat: Number(pool.pricePerSeat),
               maxSlots: pool.maxSlots,
               splitAmong: pool.splitAmong,
-              seatsPerTable,
               minPaidToConfirm: pool.minPaidToConfirm,
               isPool: true,
             },
@@ -266,9 +268,17 @@ export async function POST(
         return NextResponse.json({ error: "El precio total debe ser mayor que 0" }, { status: 400 });
       }
     } else {
-      const seatsPerTable = tableTicketType.seatsPerTable ?? 4;
-      const priceMesa = Number(tableTicketType.price);
-      pricePerSeat = Math.round((priceMesa / seatsPerTable) * 100) / 100;
+      const unit = generalAdmissionUnitPrice(event.ticketTypes);
+      if (unit == null || unit <= 0) {
+        return NextResponse.json(
+          {
+            error:
+              "Sin precio de boleto General (no mesa). Agrégalo o indica precio total de mesa al generar links.",
+          },
+          { status: 400 }
+        );
+      }
+      pricePerSeat = unit;
     }
 
     const createdInvites = [];

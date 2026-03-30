@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import { X, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  TicketPricePhasesFields,
+  type PricePhaseFormRow,
+} from "@/components/admin/TicketPricePhasesFields";
 
 interface TicketType {
   name: string;
@@ -14,6 +18,7 @@ interface TicketType {
   maxQuantity: number;
   isTable: boolean;
   seatsPerTable?: number;
+  pricePhases: PricePhaseFormRow[];
 }
 
 interface CreateEventModalProps {
@@ -49,6 +54,7 @@ export function CreateEventModal({ onClose, onSuccess }: CreateEventModalProps) 
       price: 0,
       maxQuantity: 0,
       isTable: false,
+      pricePhases: [],
     },
   ]);
 
@@ -71,7 +77,7 @@ export function CreateEventModal({ onClose, onSuccess }: CreateEventModalProps) 
   const handleTicketTypeChange = (
     index: number,
     field: keyof TicketType,
-    value: any
+    value: unknown
   ) => {
     setTicketTypes((prev) => {
       const updated = [...prev];
@@ -90,6 +96,7 @@ export function CreateEventModal({ onClose, onSuccess }: CreateEventModalProps) 
         price: 0,
         maxQuantity: 0,
         isTable: false,
+        pricePhases: [],
       },
     ]);
   };
@@ -126,7 +133,26 @@ export function CreateEventModal({ onClose, onSuccess }: CreateEventModalProps) 
         body: JSON.stringify({
           ...formData,
           maxCapacity: parseInt(formData.maxCapacity.toString()),
-          ticketTypes,
+          ticketTypes: ticketTypes.map((tt) => ({
+            name: tt.name,
+            description: tt.description,
+            category: tt.category,
+            price: tt.price,
+            maxQuantity: tt.maxQuantity,
+            isTable: tt.isTable,
+            seatsPerTable: tt.seatsPerTable,
+            ...(tt.pricePhases.length > 0
+              ? {
+                  pricePhases: tt.pricePhases.map((p, i) => ({
+                    price: p.price,
+                    startsAt: new Date(p.startsAt).toISOString(),
+                    endsAt: new Date(p.endsAt).toISOString(),
+                    label: p.label || undefined,
+                    sortOrder: i,
+                  })),
+                }
+              : {}),
+          })),
         }),
       });
 
@@ -453,6 +479,14 @@ export function CreateEventModal({ onClose, onSuccess }: CreateEventModalProps) 
                       />
                     </div>
 
+                    <TicketPricePhasesFields
+                      phases={ticketType.pricePhases}
+                      onChange={(next) =>
+                        handleTicketTypeChange(index, "pricePhases", next)
+                      }
+                      defaultPriceHint={ticketType.price}
+                    />
+
                     <div className="md:col-span-3 rounded-lg border border-regia-gold/25 bg-white/[0.04] p-4">
                       <label className="flex items-start gap-3 cursor-pointer">
                         <input
@@ -469,21 +503,19 @@ export function CreateEventModal({ onClose, onSuccess }: CreateEventModalProps) 
                         />
                         <span>
                           <span className="block text-sm font-medium text-white">
-                            Boleto tipo mesa VIP (precio por mesa completa)
+                            Mesa VIP
                           </span>
-                          <span className="block text-xs text-white/55 mt-1 leading-relaxed">
-                            El precio es por mesa. En el link compartido cada pago equivale a precio de mesa ÷
-                            &quot;asientos por mesa&quot; (referencia, como el costo por persona). Eso no limita
-                            cuánta gente puede pagar; en admin defines cuántos pagos hacen falta para marcar la mesa
-                            confirmada.
+                          <span className="block text-xs text-white/50 mt-1">
+                            El precio de esta fila es por mesa completa (venta directa / mapa). Los links compartidos
+                            de cobro cobran el boleto General; el cupo para confirmar la mesa se configura en Invites.
                           </span>
                         </span>
                       </label>
                       {ticketType.isTable && (
                         <div className="mt-3 pl-7 flex flex-wrap items-end gap-4">
-                          <div>
+                          <div className="max-w-md">
                             <label className="block text-xs font-medium text-white/80 mb-1">
-                              Asientos por mesa (referencia)
+                              Personas por mesa
                             </label>
                             <input
                               type="number"
@@ -499,6 +531,9 @@ export function CreateEventModal({ onClose, onSuccess }: CreateEventModalProps) 
                               placeholder="4"
                               min="2"
                             />
+                            <p className="text-[11px] text-white/45 mt-2 leading-relaxed">
+                              Referencia para mapa e inventario; no fija el precio de cada pago en el link.
+                            </p>
                           </div>
                         </div>
                       )}

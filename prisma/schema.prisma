@@ -116,10 +116,30 @@ model TicketType {
   tickets          Ticket[]
   tableSlotInvites TableSlotInvite[]
   tableInvitePools TableInvitePool[]
+  pricePhases      TicketPricePhase[]
 
   @@index([eventId])
   @@index([category])
   @@index([isActive])
+}
+
+/// Precio vigente por ventana de fechas (preventa, regular, etc.). Si no hay fase activa, aplica `TicketType.price`.
+model TicketPricePhase {
+  id           String   @id @default(uuid())
+  ticketTypeId String
+  price        Decimal  @db.Decimal(10, 2)
+  startsAt     DateTime
+  endsAt       DateTime
+  label        String?  // ej. "Preventa", "Fase 1"
+  sortOrder    Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ticketType TicketType @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
+
+  @@index([ticketTypeId])
+  @@index([ticketTypeId, startsAt, endsAt])
 }
 
 // =====================================================

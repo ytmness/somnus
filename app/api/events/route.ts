@@ -23,6 +23,9 @@ export async function GET(request: NextRequest) {
         ticketTypes: {
           where: { isActive: true },
           orderBy: { price: "asc" },
+          include: {
+            pricePhases: { orderBy: { sortOrder: "asc" } },
+          },
         },
       },
       orderBy: { eventDate: "asc" },
@@ -94,11 +97,24 @@ export async function POST(request: NextRequest) {
             maxQuantity: tt.maxQuantity,
             isTable: tt.isTable || false,
             seatsPerTable: tt.seatsPerTable,
+            ...(tt.pricePhases && tt.pricePhases.length > 0
+              ? {
+                  pricePhases: {
+                    create: tt.pricePhases.map((p, i) => ({
+                      price: p.price,
+                      startsAt: new Date(p.startsAt),
+                      endsAt: new Date(p.endsAt),
+                      label: p.label ?? null,
+                      sortOrder: p.sortOrder ?? i,
+                    })),
+                  },
+                }
+              : {}),
           })),
         },
       },
       include: {
-        ticketTypes: true,
+        ticketTypes: { include: { pricePhases: { orderBy: { sortOrder: "asc" } } } },
       },
     });
 

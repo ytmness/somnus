@@ -21,6 +21,7 @@ import {
   eventCalendarKey,
   localTodayCalendarKey,
 } from "@/lib/utils";
+import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
 
 const HERO_VIDEO = "/assets/Adobe Express 2026-02-17 16.05.01.mp4";
 
@@ -46,9 +47,13 @@ function convertEventToConcert(event: any): Concert & { eventDate?: string } {
     };
   }
 
+  const at = new Date();
+  const eff = (tt: any) =>
+    effectiveTicketPriceAt(Number(tt.price), tt.pricePhases, at);
+
   const minPrice =
     event.ticketTypes.length > 0
-      ? Math.min(...event.ticketTypes.map((tt: any) => Number(tt.price)))
+      ? Math.min(...event.ticketTypes.map((tt: any) => eff(tt)))
       : 0;
 
   const generalTypes = event.ticketTypes.filter(
@@ -81,7 +86,7 @@ function convertEventToConcert(event: any): Concert & { eventDate?: string } {
       id: tt.id,
       name: tt.name,
       description: tt.description || "",
-      price: Number(tt.price),
+      price: eff(tt),
       available: Math.max(0, tt.maxQuantity - (tt.soldQuantity || 0)),
     });
   });
@@ -92,7 +97,7 @@ function convertEventToConcert(event: any): Concert & { eventDate?: string } {
         sum + Math.max(0, tt.maxQuantity - (tt.soldQuantity || 0)),
       0
     );
-    const preferentePrice = preferenteTypes[0]?.price || 0;
+    const preferentePrice = preferenteTypes[0] ? eff(preferenteTypes[0]) : 0;
     const preferenteDescription =
       preferenteTypes[0]?.description ||
       "Asientos numerados, excelente vista";
@@ -111,7 +116,7 @@ function convertEventToConcert(event: any): Concert & { eventDate?: string } {
       id: tt.id,
       name: tt.name,
       description: tt.description || "",
-      price: Number(tt.price),
+      price: eff(tt),
       available: Math.max(0, tt.maxQuantity - (tt.soldQuantity || 0)),
     });
   });
@@ -121,7 +126,7 @@ function convertEventToConcert(event: any): Concert & { eventDate?: string } {
       id: tt.id,
       name: tt.name,
       description: tt.description || "",
-      price: Number(tt.price),
+      price: eff(tt),
       available: Math.max(0, tt.maxQuantity - (tt.soldQuantity || 0)),
     });
   });

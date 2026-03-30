@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Copy, Check, Link2, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
 
 const MAX_TRADITIONAL_SLOTS = 500;
 const DEFAULT_MIN_CONFIRM = 20;
@@ -15,7 +16,7 @@ interface EventOption {
   hasTables: boolean;
   /** Asientos del tipo mesa (referencia) */
   defaultSeatsForPool: number;
-  /** Precio por persona = precio mesa ÷ asientos (mismo criterio que venta general) */
+  /** Precio por cupo en link compartido = boleto General del evento */
   pricePerPersonHint: number;
 }
 
@@ -84,9 +85,17 @@ export function InvitesManager() {
             const raw = tableTt?.seatsPerTable;
             const seats =
               typeof raw === "number" && raw >= 1 ? Math.min(10000, Math.floor(raw)) : 4;
-            const priceMesa = Number(tableTt?.price ?? 0);
+            const nonTable = (e.ticketTypes || []).filter((tt: any) => !tt.isTable);
+            const generalRows = nonTable.filter((tt: any) => tt.category === "GENERAL");
+            const pricePool = generalRows.length > 0 ? generalRows : nonTable;
+            const at = new Date();
+            const prices = pricePool
+              .map((tt: any) =>
+                effectiveTicketPriceAt(Number(tt.price), tt.pricePhases, at)
+              )
+              .filter((p: number) => p > 0);
             const pricePerPerson =
-              seats > 0 && priceMesa > 0 ? Math.round((priceMesa / seats) * 100) / 100 : 0;
+              prices.length > 0 ? Math.round(Math.min(...prices) * 100) / 100 : 0;
             return {
               id: e.id,
               name: e.name,
@@ -183,7 +192,7 @@ export function InvitesManager() {
         return;
       }
       if (pricePerPersonForEventId(eventId) <= 0) {
-        toast.error("El evento no tiene tipo mesa con precio válido.");
+        toast.error("El evento necesita un tipo General (no mesa) con precio para el link.");
         return;
       }
     }
@@ -383,13 +392,13 @@ export function InvitesManager() {
             {usePoolMode ? (
               <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4 space-y-4">
                 <p className="text-white/55 text-xs leading-relaxed">
-                  <strong className="text-white/75">Cada pago</strong> usa el mismo importe que un boleto “equivalente”:
-                  precio del tipo mesa ÷ asientos de referencia del evento (ahora{" "}
+                  <strong className="text-white/75">Cada pago</strong> es el precio del boleto{" "}
+                  <strong className="text-white/80">General</strong> del evento (ahora{" "}
                   <strong className="text-white/90">
                     ${pricePerPersonForEventId(generateEventId).toLocaleString("es-MX")}
-                  </strong>{" "}
-                  con {seatsDefaultForEventId(generateEventId)} asientos). El link no tiene tope: pueden seguir pagando
-                  más personas después de confirmar.
+                  </strong>
+                  ). No usa el precio de la fila “mesa”. Abajo defines cuántos pagos confirman la mesa; pueden seguir
+                  pagando más después.
                 </p>
                 <div>
                   <label className="block text-white/80 text-sm font-medium mb-1">
@@ -490,7 +499,7 @@ export function InvitesManager() {
                 >
                   <span className="text-white/80 text-sm">
                     {link.isPool
-                      ? `Mesa compartida ($${link.pricePerSeat?.toLocaleString("es-MX") ?? "—"} por pago${
+                      ? `Mesa compartida (General $${link.pricePerSeat?.toLocaleString("es-MX") ?? "—"} / pago${
                           link.minPaidToConfirm != null
                             ? ` · confirmar con ${link.minPaidToConfirm} pagos`
                             : ""

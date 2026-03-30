@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
+import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
 import { IndividualTable } from "@/lib/patriotas-individual-tables";
 
 /**
@@ -15,7 +16,9 @@ export async function GET(
     const event = await prisma.event.findUnique({
       where: { id: params.id },
       include: {
-        ticketTypes: true, // Obtener todos los tipos de boletos
+        ticketTypes: {
+          include: { pricePhases: { orderBy: { sortOrder: "asc" } } },
+        },
       },
     });
 
@@ -52,12 +55,16 @@ export async function GET(
       );
     }
 
+    const now = new Date();
+    const effPrice = (tt: (typeof event.ticketTypes)[0]) =>
+      effectiveTicketPriceAt(Number(tt.price), tt.pricePhases, now);
+
     console.log(`[Tables API] TicketType de mesas encontrado:`, {
       id: tableTicketType.id,
       name: tableTicketType.name,
       price: tableTicketType.price,
       maxQuantity: tableTicketType.maxQuantity,
-      soldQuantity: tableTicketType.soldQuantity
+      soldQuantity: tableTicketType.soldQuantity,
     });
 
     // Obtener todos los tickets vendidos para este tipo de boleto
@@ -150,7 +157,7 @@ export async function GET(
           y,
           width: TABLE_WIDTH,
           height: TABLE_HEIGHT,
-          price: Number(tableTicketType.price),
+          price: effPrice(tableTicketType),
           seatsPerTable: (tableTicketType.seatsPerTable || 4) as 4,
           status,
         });
@@ -187,7 +194,7 @@ export async function GET(
         id: generalTicketType.id,
         name: "GENERAL",
         type: "GENERAL",
-        price: Number(generalTicketType.price),
+        price: effPrice(generalTicketType),
         capacity: generalTicketType.maxQuantity,
         sold: generalTicketType.soldQuantity,
         color: "#8B7355",
@@ -210,7 +217,7 @@ export async function GET(
         id: preferenteA.id,
         name: "PREFERENTE A",
         type: "PREFERENTE",
-        price: Number(preferenteA.price),
+        price: effPrice(preferenteA),
         capacity: preferenteA.maxQuantity,
         sold: preferenteA.soldQuantity,
         color: "#C5A059",
@@ -225,7 +232,7 @@ export async function GET(
         id: preferenteB.id,
         name: "PREFERENTE B",
         type: "PREFERENTE",
-        price: Number(preferenteB.price),
+        price: effPrice(preferenteB),
         capacity: preferenteB.maxQuantity,
         sold: preferenteB.soldQuantity,
         color: "#C5A059",
@@ -242,7 +249,7 @@ export async function GET(
         id: `${preferenteGeneric.id}-a`,
         name: "PREFERENTE A",
         type: "PREFERENTE",
-        price: Number(preferenteGeneric.price),
+        price: effPrice(preferenteGeneric),
         capacity: Math.floor(preferenteGeneric.maxQuantity / 2),
         sold: Math.floor(preferenteGeneric.soldQuantity / 2),
         color: "#C5A059",
@@ -257,7 +264,7 @@ export async function GET(
         id: `${preferenteGeneric.id}-b`,
         name: "PREFERENTE B",
         type: "PREFERENTE",
-        price: Number(preferenteGeneric.price),
+        price: effPrice(preferenteGeneric),
         capacity: Math.ceil(preferenteGeneric.maxQuantity / 2),
         sold: Math.ceil(preferenteGeneric.soldQuantity / 2),
         color: "#C5A059",
@@ -277,7 +284,7 @@ export async function GET(
         ticketType: {
           id: tableTicketType.id,
           name: tableTicketType.name,
-          price: Number(tableTicketType.price),
+          price: effPrice(tableTicketType),
           maxQuantity: tableTicketType.maxQuantity,
           soldQuantity: tableTicketType.soldQuantity,
           seatsPerTable: tableTicketType.seatsPerTable,

@@ -26,6 +26,14 @@ export type RegisterInput = z.infer<typeof registerSchema>;
 // EVENTOS
 // =====================================================
 
+export const ticketPricePhaseSchema = z.object({
+  price: z.number().positive("Price must be greater than 0"),
+  startsAt: z.string().or(z.date()),
+  endsAt: z.string().or(z.date()),
+  label: z.string().optional(),
+  sortOrder: z.number().int().optional(),
+});
+
 export const ticketTypeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
@@ -34,6 +42,7 @@ export const ticketTypeSchema = z.object({
   maxQuantity: z.number().int().positive("Quantity must be greater than 0"),
   isTable: z.boolean().optional().default(false),
   seatsPerTable: z.number().int().positive().optional(),
+  pricePhases: z.array(ticketPricePhaseSchema).optional(),
 });
 
 export const createEventSchema = z.object({
@@ -54,7 +63,10 @@ export const createEventSchema = z.object({
 
 export const updateTicketTypeSchema = ticketTypeSchema
   .partial()
-  .extend({ id: z.string().uuid("Invalid ticket type ID") });
+  .extend({
+    id: z.string().uuid("Invalid ticket type ID"),
+    pricePhases: z.array(ticketPricePhaseSchema).optional(),
+  });
 
 export const updateEventSchema = createEventSchema.partial().extend({
   isActive: z.boolean().optional(),

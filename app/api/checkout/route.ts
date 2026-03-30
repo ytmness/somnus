@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db/prisma";
 import { getSession } from "@/lib/auth/supabase-auth";
 import { generateQRHash, generateQRPayload } from "@/lib/services/qr-generator";
 import { calculateClipCommission } from "@/lib/utils";
+import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
 
 // Marcar como dinámica porque usa cookies
 export const dynamic = 'force-dynamic';
@@ -34,7 +35,11 @@ export async function POST(request: NextRequest) {
     // Verificar que el evento existe
     const event = await prisma.event.findUnique({
       where: { id: eventId },
-      include: { ticketTypes: true },
+      include: {
+        ticketTypes: {
+          include: { pricePhases: { orderBy: { sortOrder: "asc" } } },
+        },
+      },
     });
 
     if (!event) {
@@ -43,6 +48,8 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    const now = new Date();
 
     // Calcular totales
     let subtotal = 0;
@@ -55,10 +62,13 @@ export async function POST(request: NextRequest) {
 
     for (const item of items) {
       if (item.table) {
-        // Es una mesa VIP
-        const ticketType = event.ticketTypes.find(
-          (tt) => tt.isTable === true && Number(tt.price) === item.table.price
-        );
+        // Es una mesa VIP (precio vigente por fases o base)
+        const want = Number(item.table.price);
+        const ticketType = event.ticketTypes.find((tt) => {
+          if (!tt.isTable) return false;
+          const unit = effectiveTicketPriceAt(Number(tt.price), tt.pricePhases, now);
+          return Math.abs(unit - want) < 0.02;
+        });
 
         if (!ticketType) {
           return NextResponse.json(
@@ -75,7 +85,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        subtotal += Number(ticketType.price);
+        subtotal += effectiveTicketPriceAt(Number(ticketType.price), ticketType.pricePhases, now);
         ticketDetails.push({
           ticketTypeId: ticketType.id,
           quantity: 1,
@@ -104,7 +114,8 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        subtotal += Number(ticketType.price) * item.quantity;
+        const unit = effectiveTicketPriceAt(Number(ticketType.price), ticketType.pricePhases, now);
+        subtotal += unit * item.quantity;
         ticketDetails.push({
           ticketTypeId: ticketType.id,
           quantity: item.quantity,
