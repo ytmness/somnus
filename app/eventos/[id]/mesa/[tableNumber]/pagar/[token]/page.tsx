@@ -68,6 +68,13 @@ function formatPaidAt(iso: string | null) {
   }
 }
 
+function eventFlyerSrc(imageUrl: string | undefined) {
+  if (!imageUrl) return "";
+  if (imageUrl.startsWith("http")) return imageUrl;
+  if (imageUrl.startsWith("/")) return imageUrl;
+  return `/${imageUrl}`;
+}
+
 export default function PagarInvitePage() {
   const router = useRouter();
   const params = useParams();
@@ -176,10 +183,10 @@ export default function PagarInvitePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0c1016] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-14 h-14 border-2 border-sky-500/30 border-t-sky-400 rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-400 text-sm">Cargando…</p>
+      <div className="min-h-screen somnus-bg-main flex items-center justify-center relative z-0">
+        <div className="text-center relative z-10">
+          <div className="w-14 h-14 border-2 border-white/20 border-t-[#5B8DEF] rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-white/60 text-sm">Cargando…</p>
         </div>
       </div>
     );
@@ -187,12 +194,12 @@ export default function PagarInvitePage() {
 
   if (error || !invite) {
     return (
-      <div className="min-h-screen bg-[#0c1016] flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
+      <div className="min-h-screen somnus-bg-main flex items-center justify-center p-4 relative z-0">
+        <div className="text-center max-w-md relative z-10">
           <h1 className="text-xl font-semibold text-white mb-4">{error || "Invitación no encontrada"}</h1>
           <Link
             href="/"
-            className="inline-block px-6 py-3 rounded-xl bg-sky-500 text-white font-medium hover:bg-sky-400 transition-colors"
+            className="inline-block px-6 py-3 rounded-lg bg-white text-black font-medium hover:bg-white/90 transition-colors"
           >
             Volver al inicio
           </Link>
@@ -227,121 +234,66 @@ export default function PagarInvitePage() {
       }).format(new Date(invite.expiresAt));
 
     return (
-      <div className="min-h-screen bg-[#0c1016] text-white pb-32">
-        {/* Barra superior */}
-        <header className="sticky top-0 z-40 flex items-center justify-between gap-3 px-4 h-14 border-b border-white/[0.06] bg-[#0c1016]/95 backdrop-blur-md">
+      <div className="min-h-screen somnus-bg-main text-white pb-32 relative z-0">
+        <header className="sticky top-0 z-40 flex items-center justify-between gap-3 px-4 h-14 border-b border-white/10 bg-[#0A0A0A]/90 backdrop-blur-md">
           <Link
             href="/"
-            className="p-2 -ml-2 rounded-full text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+            className="p-2 -ml-2 rounded-full text-white/70 hover:bg-white/10 hover:text-white transition-colors"
             aria-label="Volver"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="flex-1 text-center text-sm font-bold tracking-[0.2em] text-white truncate uppercase">
+          <h1 className="flex-1 text-center text-sm font-bold tracking-[0.15em] text-white truncate uppercase">
             {invite.tableNumber || "Mesa"}
           </h1>
           <Link
             href="/"
-            className="p-2 -mr-2 rounded-full text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
+            className="p-2 -mr-2 rounded-full text-white/50 hover:bg-white/10 hover:text-white transition-colors"
             aria-label="Ayuda"
           >
             <HelpCircle className="w-5 h-5" />
           </Link>
         </header>
 
-        {/* Franja decorativa */}
-        <div className="relative h-36 bg-gradient-to-br from-sky-500/25 via-sky-600/10 to-transparent overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-400/20 via-transparent to-transparent" />
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-4xl opacity-40 select-none" aria-hidden>
-            💸
-          </div>
-        </div>
-
-        <main className="max-w-lg mx-auto px-4 -mt-10 relative z-10 space-y-6">
-          {/* Tarjeta resumen estilo pool */}
-          <section className="rounded-2xl bg-[#161b24] border border-white/[0.08] shadow-xl shadow-black/40 p-6">
-            <p className="text-[11px] font-semibold tracking-widest text-sky-400/90 uppercase mb-1">Money pool</p>
-            <h2 className="text-2xl font-bold text-white leading-tight mb-1">{invite.tableNumber}</h2>
-            <p className="text-slate-400 text-sm flex items-center gap-1.5 mb-5">
-              <Users className="w-4 h-4 opacity-70" />
-              {paidCount === 1 ? "1 participante" : `${paidCount} participantes`}
-            </p>
-            <p className="text-slate-500 text-xs uppercase tracking-wide mb-1">Recaudado</p>
-            <p className="text-4xl font-bold text-white tabular-nums mb-4">{mxn.format(totalCollected)}</p>
-            <p className="text-slate-500 text-xs mb-1">Tu aportación sugerida</p>
-            <p className="text-lg font-semibold text-sky-300 tabular-nums">{priceFormatted}</p>
-            {invite.minPaidToConfirm != null && (
-              <p className="mt-4 text-xs text-slate-500 border-t border-white/[0.06] pt-4">
-                {invite.tableConfirmed ? (
-                  <span className="text-emerald-400 font-medium">Mesa confirmada</span>
-                ) : (
-                  <>
-                    Confirmación al completar{" "}
-                    <span className="text-slate-300 font-medium">{invite.minPaidToConfirm}</span> pagos:{" "}
-                    <span className="text-slate-300">
-                      {paidCount}/{invite.minPaidToConfirm}
-                    </span>
-                  </>
-                )}
-              </p>
-            )}
-            <div className="mt-5 flex items-center gap-2 text-xs text-slate-500">
-              <span className="w-7 h-7 rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-[10px] font-bold text-white">
-                S
-              </span>
-              <span>
-                Creado por <span className="text-slate-300 font-medium">Somnus</span>
-              </span>
+        {/* Flyer / imagen del evento completa (sin recorte) */}
+        {invite.event?.imageUrl ? (
+          <div className="relative z-10 px-4 pt-4">
+            <div className="max-w-lg mx-auto rounded-xl overflow-hidden border border-white/10 bg-black/40">
+              <div className="flex justify-center items-start w-full">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={eventFlyerSrc(invite.event.imageUrl)}
+                  alt={invite.event.name || "Evento"}
+                  className="w-full h-auto max-h-[min(88vh,960px)] object-contain object-top"
+                />
+              </div>
             </div>
-          </section>
+          </div>
+        ) : null}
 
-          {/* Evento compacto */}
+        <main className="max-w-lg mx-auto px-4 pt-6 relative z-10 space-y-6">
           {invite.event?.name && (
-            <section className="rounded-xl overflow-hidden border border-white/[0.06] bg-[#121820]">
-              {invite.event.imageUrl ? (
-                <div className="relative h-28 bg-slate-800">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={
-                      invite.event.imageUrl.startsWith("http")
-                        ? invite.event.imageUrl
-                        : invite.event.imageUrl.startsWith("/")
-                          ? invite.event.imageUrl
-                          : `/${invite.event.imageUrl}`
-                    }
-                    alt=""
-                    className="absolute inset-0 w-full h-full object-cover opacity-80"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#121820] to-transparent" />
-                  <div className="absolute bottom-2 left-3 right-3">
-                    <p className="font-semibold text-white text-sm line-clamp-2">{invite.event.name}</p>
-                    {invite.event.artist && (
-                      <p className="text-xs text-slate-400 truncate">{invite.event.artist}</p>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="p-4">
-                  <p className="font-semibold text-white">{invite.event.name}</p>
-                  {invite.event.artist && <p className="text-xs text-slate-400 mt-0.5">{invite.event.artist}</p>}
-                </div>
+            <section className="rounded-xl border border-white/10 bg-white/5 px-4 py-4">
+              <p className="font-bold text-white text-lg leading-snug">{invite.event.name}</p>
+              {invite.event.artist && (
+                <p className="text-white/70 text-sm mt-1">{invite.event.artist}</p>
               )}
-              <div className="px-4 py-3 flex flex-wrap gap-3 text-xs text-slate-400 border-t border-white/[0.06]">
+              <div className="mt-3 flex flex-wrap gap-3 text-xs text-white/55">
                 {eventDate && (
                   <span className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5" />
+                    <Calendar className="w-3.5 h-3.5 text-[#5B8DEF]/80" />
                     {eventDate}
                   </span>
                 )}
                 {invite.event.eventTime && (
                   <span className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5" />
+                    <Clock className="w-3.5 h-3.5 text-[#5B8DEF]/80" />
                     {invite.event.eventTime}
                   </span>
                 )}
                 {invite.event.venue && (
                   <span className="flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5" />
+                    <MapPin className="w-3.5 h-3.5 text-[#5B8DEF]/80" />
                     {invite.event.venue}
                   </span>
                 )}
@@ -349,27 +301,61 @@ export default function PagarInvitePage() {
             </section>
           )}
 
-          {/* Actividad — timeline vertical */}
+          <section className="rounded-xl bg-white/5 border border-white/10 p-6">
+            <p className="text-[10px] font-semibold tracking-[0.2em] text-[#7BA3E8] uppercase mb-2">Mesa compartida</p>
+            <h2 className="text-2xl font-bold text-white leading-tight mb-1">{invite.tableNumber}</h2>
+            <p className="text-white/60 text-sm flex items-center gap-1.5 mb-5">
+              <Users className="w-4 h-4 opacity-80" />
+              {paidCount === 1 ? "1 participante" : `${paidCount} participantes`}
+            </p>
+            <p className="text-white/45 text-xs uppercase tracking-wide mb-1">Recaudado</p>
+            <p className="text-4xl font-bold text-white tabular-nums mb-4">{mxn.format(totalCollected)}</p>
+            <p className="text-white/45 text-xs mb-1">Tu aportación sugerida</p>
+            <p className="text-lg font-semibold text-[#7BA3E8] tabular-nums">{priceFormatted}</p>
+            {invite.minPaidToConfirm != null && (
+              <p className="mt-4 text-xs text-white/50 border-t border-white/10 pt-4">
+                {invite.tableConfirmed ? (
+                  <span className="text-emerald-400/90 font-medium">Mesa confirmada</span>
+                ) : (
+                  <>
+                    Confirmación al completar{" "}
+                    <span className="text-white/80 font-medium">{invite.minPaidToConfirm}</span> pagos:{" "}
+                    <span className="text-white/80">
+                      {paidCount}/{invite.minPaidToConfirm}
+                    </span>
+                  </>
+                )}
+              </p>
+            )}
+            <div className="mt-5 flex items-center gap-2 text-xs text-white/50">
+              <span className="w-7 h-7 rounded-full bg-gradient-to-br from-[#5B8DEF] to-[#7BA3E8] flex items-center justify-center text-[10px] font-bold text-white">
+                S
+              </span>
+              <span>
+                Creado por <span className="text-white/75 font-medium">Somnus</span>
+              </span>
+            </div>
+          </section>
+
           <section>
-            <h3 className="text-sm font-semibold text-slate-300 mb-3 px-0.5">Actividad</h3>
+            <h3 className="text-sm font-semibold text-white/80 mb-3 px-0.5">Actividad</h3>
             {timeline.length === 0 ? (
-              <div className="rounded-2xl bg-[#161b24] border border-dashed border-white/[0.1] py-10 px-4 text-center">
-                <p className="text-slate-500 text-sm leading-relaxed">
+              <div className="rounded-xl bg-white/5 border border-dashed border-white/15 py-10 px-4 text-center">
+                <p className="text-white/50 text-sm leading-relaxed">
                   Anímate a ser el primero en pagar
                 </p>
               </div>
             ) : (
-              <div className="rounded-2xl bg-[#161b24] border border-white/[0.08] p-4 pr-2">
+              <div className="rounded-xl bg-white/5 border border-white/10 p-4 pr-2">
                 <ul className="relative">
-                  {/* línea vertical del timeline */}
                   <span
-                    className="absolute left-[15px] top-3 bottom-3 w-px bg-gradient-to-b from-sky-500/50 via-sky-500/20 to-transparent"
+                    className="absolute left-[15px] top-3 bottom-3 w-px bg-gradient-to-b from-[#5B8DEF]/60 via-[#5B8DEF]/25 to-transparent"
                     aria-hidden
                   />
                   {timeline.map((entry, i) => (
                     <li key={`${entry.seatNumber}-${entry.order}-${i}`} className="relative flex gap-4 pb-6 last:pb-0">
                       <div className="relative z-10 flex-shrink-0 w-8 flex flex-col items-center">
-                        <span className="w-8 h-8 rounded-full bg-[#0c1016] border-2 border-sky-500/80 flex items-center justify-center text-[11px] font-bold text-sky-300">
+                        <span className="w-8 h-8 rounded-full bg-[#0A0A0A] border-2 border-[#5B8DEF]/70 flex items-center justify-center text-[11px] font-bold text-[#7BA3E8]">
                           {entry.order}
                         </span>
                       </div>
@@ -379,12 +365,12 @@ export default function PagarInvitePage() {
                             <p className="font-semibold text-white text-[15px] leading-snug break-words">
                               {entry.name}
                             </p>
-                            <p className="text-xs text-slate-500 mt-0.5">
+                            <p className="text-xs text-white/45 mt-0.5">
                               {entry.order === 1 ? "Primero en pagar" : `Pago #${entry.order}`}
                               {entry.paidAt ? ` · ${formatPaidAt(entry.paidAt)}` : ""}
                             </p>
                           </div>
-                          <p className="text-sky-300 font-bold tabular-nums text-base sm:text-right flex-shrink-0">
+                          <p className="text-[#7BA3E8] font-bold tabular-nums text-base sm:text-right flex-shrink-0">
                             {mxn.format(entry.amount)}
                           </p>
                         </div>
@@ -397,68 +383,67 @@ export default function PagarInvitePage() {
           </section>
 
           {!poolFull && invite.status !== "PAID" ? (
-            <section className="rounded-2xl bg-[#161b24] border border-white/[0.08] p-5">
+            <section className="rounded-xl bg-white/5 border border-white/10 p-5">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-11 h-11 rounded-full bg-sky-500/15 flex items-center justify-center">
-                  <CreditCard className="w-5 h-5 text-sky-400" />
+                <div className="w-11 h-11 rounded-full bg-[#5B8DEF]/15 flex items-center justify-center border border-[#5B8DEF]/25">
+                  <CreditCard className="w-5 h-5 text-[#7BA3E8]" />
                 </div>
                 <div>
-                  <p className="text-slate-500 text-xs">Siguiente pago</p>
+                  <p className="text-white/50 text-xs">Siguiente pago</p>
                   <p className="text-lg font-bold text-white tabular-nums">{priceFormatted}</p>
                 </div>
               </div>
               <form id="pool-pay-form" onSubmit={handleSubmit} className="space-y-3">
                 <div>
-                  <label className="block text-slate-400 text-xs font-medium mb-1.5">Nombre completo *</label>
+                  <label className="block text-white/60 text-xs font-medium mb-1.5">Nombre completo *</label>
                   <input
                     type="text"
                     value={formData.buyerName}
                     onChange={(e) => setFormData((p) => ({ ...p, buyerName: e.target.value }))}
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-[#0c1016] border border-white/[0.08] text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500/40"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/15 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-[#5B8DEF]/40"
                     placeholder="Tu nombre"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 text-xs font-medium mb-1.5">Email *</label>
+                  <label className="block text-white/60 text-xs font-medium mb-1.5">Email *</label>
                   <input
                     type="email"
                     value={formData.buyerEmail}
                     onChange={(e) => setFormData((p) => ({ ...p, buyerEmail: e.target.value }))}
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-[#0c1016] border border-white/[0.08] text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500/40"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/15 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-[#5B8DEF]/40"
                     placeholder="tu@email.com"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 text-xs font-medium mb-1.5">Teléfono (opcional)</label>
+                  <label className="block text-white/60 text-xs font-medium mb-1.5">Teléfono (opcional)</label>
                   <input
                     type="tel"
                     value={formData.buyerPhone}
                     onChange={(e) => setFormData((p) => ({ ...p, buyerPhone: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl bg-[#0c1016] border border-white/[0.08] text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500/40"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/15 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-[#5B8DEF]/40"
                     placeholder="55 1234 5678"
                   />
                 </div>
               </form>
             </section>
           ) : (
-            <section className="rounded-2xl bg-emerald-500/10 border border-emerald-500/25 p-6 text-center">
+            <section className="rounded-xl bg-emerald-500/10 border border-emerald-500/25 p-6 text-center">
               <div className="w-14 h-14 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-3">
                 <span className="text-2xl">✓</span>
               </div>
               <h2 className="text-lg font-bold text-white mb-1">Mesa completa</h2>
-              <p className="text-slate-400 text-sm">Todos los lugares de este link ya fueron pagados.</p>
+              <p className="text-white/55 text-sm">Todos los lugares de este link ya fueron pagados.</p>
             </section>
           )}
         </main>
 
-        {/* Barra inferior fija */}
         {!poolFull && invite.status !== "PAID" && (
-          <div className="fixed bottom-0 left-0 right-0 z-50 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] bg-gradient-to-t from-[#0c1016] via-[#0c1016] to-transparent">
+          <div className="fixed bottom-0 left-0 right-0 z-50 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/98 to-transparent">
             <div className="max-w-lg mx-auto space-y-3">
               {expiresLine && (
-                <p className="text-center text-[11px] text-slate-500">
+                <p className="text-center text-[11px] text-white/45">
                   Se aceptan pagos hasta el {expiresLine}
                 </p>
               )}
@@ -466,11 +451,11 @@ export default function PagarInvitePage() {
                 type="submit"
                 form="pool-pay-form"
                 disabled={isProcessing}
-                className="w-full py-4 rounded-2xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-base shadow-lg shadow-sky-500/25 transition-colors"
+                className="w-full py-4 rounded-xl bg-white text-black font-bold uppercase tracking-wider text-sm hover:bg-white/95 disabled:opacity-50 disabled:cursor-not-allowed border border-white/30 transition-colors"
               >
                 {isProcessing ? "Procesando…" : "Pagar"}
               </button>
-              <p className="text-center text-[10px] text-slate-600">Pago seguro con Clip</p>
+              <p className="text-center text-[10px] text-white/40">Pago seguro con Clip</p>
             </div>
           </div>
         )}
