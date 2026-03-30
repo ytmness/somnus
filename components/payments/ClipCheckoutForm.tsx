@@ -144,6 +144,19 @@ export function ClipCheckoutForm({
       toast.success("¡Pago exitoso! Redirigiendo...");
       router.push(`/pago-exitoso?email=${encodeURIComponent(buyerEmail)}`);
     } catch (err: any) {
+      // Defensa por timing: a veces el backend puede fallar el response
+      // pero el pago ya quedó COMPLETED; en ese caso, igual redirigimos.
+      try {
+        const res = await fetch(`/api/sales/${saleId}`, { cache: "no-store" });
+        const data = await res.json();
+        if (res.ok && data?.data?.status === "COMPLETED") {
+          toast.success("¡Pago exitoso!");
+          router.push(`/pago-exitoso?email=${encodeURIComponent(buyerEmail)}`);
+          return;
+        }
+      } catch {
+        // ignore
+      }
       toast.error(err.message || "Error al procesar el pago");
     } finally {
       setIsPaying(false);

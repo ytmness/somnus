@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { ClipCheckoutForm } from "@/components/payments/ClipCheckoutForm";
@@ -12,6 +12,7 @@ export default function CheckoutPage() {
   const [sale, setSale] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const pollTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const loadSale = async () => {
@@ -26,7 +27,11 @@ export default function CheckoutPage() {
 
         if (data.data?.status === "COMPLETED") {
           const buyerEmail = data.data?.buyerEmail || "";
-          router.push(buyerEmail ? `/pago-exitoso?email=${encodeURIComponent(buyerEmail)}` : "/pago-exitoso");
+          router.push(
+            buyerEmail
+              ? `/pago-exitoso?email=${encodeURIComponent(buyerEmail)}`
+              : "/pago-exitoso"
+          );
           return;
         }
 
@@ -39,6 +44,35 @@ export default function CheckoutPage() {
     };
 
     loadSale();
+  }, [saleId, router]);
+
+  // Polling defensivo: evita quedarte en pantalla de tarjeta si Clip procesa
+  // pero el redirect falla por timing/network.
+  useEffect(() => {
+    if (!saleId) return;
+    if (pollTimerRef.current) window.clearInterval(pollTimerRef.current);
+
+    pollTimerRef.current = window.setInterval(async () => {
+      try {
+        const res = await fetch(`/api/sales/${saleId}`, { cache: "no-store" });
+        const data = await res.json();
+        if (res.ok && data?.data?.status === "COMPLETED") {
+          const buyerEmail = data.data?.buyerEmail || "";
+          router.push(
+            buyerEmail
+              ? `/pago-exitoso?email=${encodeURIComponent(buyerEmail)}`
+              : "/pago-exitoso"
+          );
+        }
+      } catch {
+        // ignore polling errors
+      }
+    }, 4000);
+
+    return () => {
+      if (pollTimerRef.current) window.clearInterval(pollTimerRef.current);
+      pollTimerRef.current = null;
+    };
   }, [saleId, router]);
 
   if (isLoading) {
