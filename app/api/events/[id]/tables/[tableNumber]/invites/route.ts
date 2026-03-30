@@ -6,7 +6,7 @@ import { parseTableKeyFromPath, ticketTableLabel } from "@/lib/table-invite";
 const INVITE_EXPIRY_DAYS = 7;
 const MAX_TRADITIONAL_SLOTS = 500;
 const DEFAULT_MIN_PAID_TO_CONFIRM = 20;
-const MAX_SPLIT_AMONG = 10_000;
+const MAX_MIN_PAID_CONFIRM = 10_000;
 
 function generateInviteToken(): string {
   return crypto.randomBytes(6).toString("base64url").slice(0, 8);
@@ -45,43 +45,25 @@ export async function POST(
       slots: slotsCount,
       totalTablePrice,
       mode,
-      splitAmong: splitAmongRaw,
       minPaidToConfirm: minPaidRaw,
     } = body as {
       invites?: Array<{ name: string; email?: string; phone?: string }>;
       slots?: number;
       totalTablePrice?: number;
       mode?: "pool";
-      splitAmong?: number;
       minPaidToConfirm?: number;
     };
 
     const isPoolMode = mode === "pool";
 
     if (isPoolMode) {
-      const splitAmong = Math.floor(Number(splitAmongRaw));
-      const totalPrice = parseFloat(String(totalTablePrice ?? "").replace(/,/g, "."));
-      if (
-        !Number.isFinite(splitAmong) ||
-        splitAmong < 1 ||
-        splitAmong > MAX_SPLIT_AMONG ||
-        !Number.isFinite(totalPrice) ||
-        totalPrice <= 0
-      ) {
-        return NextResponse.json(
-          {
-            error: `Modo pool requiere "totalTablePrice" mayor a 0 y "splitAmong" (entre cuántas personas se divide el precio, 1–${MAX_SPLIT_AMONG}).`,
-          },
-          { status: 400 }
-        );
-      }
       const minPaid =
         minPaidRaw === undefined || minPaidRaw === null
           ? DEFAULT_MIN_PAID_TO_CONFIRM
           : Math.floor(Number(minPaidRaw));
-      if (!Number.isFinite(minPaid) || minPaid < 1 || minPaid > MAX_SPLIT_AMONG) {
+      if (!Number.isFinite(minPaid) || minPaid < 1 || minPaid > MAX_MIN_PAID_CONFIRM) {
         return NextResponse.json(
-          { error: `"minPaidToConfirm" debe ser un entero entre 1 y ${MAX_SPLIT_AMONG}.` },
+          { error: `"minPaidToConfirm" debe ser un entero entre 1 y ${MAX_MIN_PAID_CONFIRM}.` },
           { status: 400 }
         );
       }
@@ -98,7 +80,7 @@ export async function POST(
       } else {
         return NextResponse.json(
           {
-            error: `Envía "slots" (número del 1 al ${MAX_TRADITIONAL_SLOTS}), "invites" (array), o "mode":"pool" con totalTablePrice y splitAmong`,
+            error: `Envía "slots" (número del 1 al ${MAX_TRADITIONAL_SLOTS}), "invites" (array), o "mode":"pool" con minPaidToConfirm`,
           },
           { status: 400 }
         );
@@ -154,16 +136,22 @@ export async function POST(
     expiresAt.setDate(expiresAt.getDate() + INVITE_EXPIRY_DAYS);
 
     if (isPoolMode) {
-      const splitAmong = Math.floor(Number(splitAmongRaw));
       const minPaidToConfirm =
         minPaidRaw === undefined || minPaidRaw === null
           ? DEFAULT_MIN_PAID_TO_CONFIRM
           : Math.floor(Number(minPaidRaw));
-      const totalPrice = parseFloat(String(totalTablePrice).replace(/,/g, "."));
-      if (!Number.isFinite(totalPrice) || totalPrice <= 0) {
-        return NextResponse.json({ error: "Precio total de la mesa debe ser mayor a 0" }, { status: 400 });
+      const seatsPerTable = Math.max(1, tableTicketType.seatsPerTable ?? 4);
+      const priceMesa = Number(tableTicketType.price);
+      const pricePerSeat = Math.round((priceMesa / seatsPerTable) * 100) / 100;
+      if (!Number.isFinite(pricePerSeat) || pricePerSeat <= 0) {
+        return NextResponse.json(
+          {
+            error:
+              "El tipo de boleto mesa tiene precio inválido. Revisa precio y asientos por mesa en el evento.",
+          },
+          { status: 400 }
+        );
       }
-      const pricePerSeat = Math.round((totalPrice / splitAmong) * 100) / 100;
 
       const existingPool = await prisma.tableInvitePool.findFirst({
         where: { eventId, tableNumber },
@@ -202,7 +190,7 @@ export async function POST(
           tableNumber,
           inviteToken: token,
           maxSlots: null,
-          splitAmong,
+          splitAmong: seatsPerTable,
           minPaidToConfirm,
           pricePerSeat,
           expiresAt,
@@ -225,6 +213,7 @@ export async function POST(
               pricePerSeat: Number(pool.pricePerSeat),
               maxSlots: pool.maxSlots,
               splitAmong: pool.splitAmong,
+              seatsPerTable,
               minPaidToConfirm: pool.minPaidToConfirm,
               isPool: true,
             },

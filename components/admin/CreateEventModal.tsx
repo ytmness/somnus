@@ -472,9 +472,10 @@ export function CreateEventModal({ onClose, onSuccess }: CreateEventModalProps) 
                             Boleto tipo mesa VIP (precio por mesa completa)
                           </span>
                           <span className="block text-xs text-white/55 mt-1 leading-relaxed">
-                            Actívalo si esta fila vende la mesa entera. El precio y la cantidad máxima son por mesas, no
-                            por persona. Los &quot;asientos por mesa&quot; solo definen cuántas partes se usan al
-                            generar links de cobro compartido en admin (puedes cambiarlo por mesa al crear el link).
+                            El precio es por mesa. En el link compartido cada pago equivale a precio de mesa ÷
+                            &quot;asientos por mesa&quot; (referencia, como el costo por persona). Eso no limita
+                            cuánta gente puede pagar; en admin defines cuántos pagos hacen falta para marcar la mesa
+                            confirmada.
                           </span>
                         </span>
                       </label>
