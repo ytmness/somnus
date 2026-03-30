@@ -40,10 +40,13 @@ export async function POST(request: NextRequest) {
     }
 
     if (sale.status === "COMPLETED") {
-      return NextResponse.json(
-        { error: "Esta venta ya fue pagada" },
-        { status: 400 }
-      );
+      // Idempotencia: si el frontend reintenta (doble click / retry),
+      // no regresemos 400; respondemos success para que no se quede
+      // el usuario en pantalla de tarjeta.
+      return NextResponse.json({
+        success: true,
+        data: { saleId, paid: true, alreadyCompleted: true },
+      });
     }
 
     const totalAmount = Number(sale.total);
