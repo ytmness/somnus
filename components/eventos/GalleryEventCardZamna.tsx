@@ -32,14 +32,14 @@ export function GalleryEventCardZamna({
       }}
       className={`group relative overflow-hidden rounded-2xl flex flex-col h-full cursor-pointer transition-colors ${
         carouselGlass
-          ? "liquid-glass border-white/15 hover:border-white/20"
+          ? "border border-white/12 bg-[#08080c]/88 backdrop-blur-xl hover:border-white/18 shadow-[0_8px_40px_rgba(0,0,0,0.45)]"
           : "bg-[#1a1a1a] border border-white/15 hover:border-white/25"
       }`}
     >
       <div
         className={
           carouselGlass
-            ? "relative flex-1 overflow-hidden bg-black/20 min-h-[var(--evt-pmin-sm)] md:min-h-[var(--evt-pmin-md)]"
+            ? "relative flex-1 overflow-hidden bg-[#08080c] min-h-[var(--evt-pmin-sm)] md:min-h-[var(--evt-pmin-md)]"
             : "relative aspect-[4/3] overflow-hidden"
         }
         style={
@@ -89,7 +89,7 @@ export function GalleryEventCardZamna({
       <div
         className={
           carouselGlass
-            ? "flex flex-col flex-1 p-5 md:p-6 border-t border-white/10 bg-black/20 backdrop-blur-md"
+            ? "relative z-[2] flex flex-col flex-1 p-5 md:p-6 border-t border-white/10 bg-[#08080c]"
             : "flex flex-col flex-1 p-6 bg-[#141414]"
         }
       >
