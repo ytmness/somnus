@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Copy, Check, Link2, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
+import { effectiveTicketPriceAt, generalAdmissionUnitPrice } from "@/lib/ticket-pricing";
 
 const MAX_TRADITIONAL_SLOTS = 500;
 const DEFAULT_MIN_CONFIRM = 20;
@@ -74,49 +74,61 @@ export function InvitesManager() {
   >([]);
   const [usePoolMode, setUsePoolMode] = useState(true); // Money pool: un link para toda la mesa
 
-  useEffect(() => {
-    const loadEvents = async () => {
+  const mapApiEventToOption = useCallback((e: any): EventOption => {
+    const tableTt = e.ticketTypes?.find((tt: any) => tt.isTable === true);
+    const raw = tableTt?.seatsPerTable;
+    const seats =
+      typeof raw === "number" && raw >= 1 ? Math.min(10000, Math.floor(raw)) : 4;
+    const nonTable = (e.ticketTypes || []).filter((tt: any) => !tt.isTable);
+    const generalRows = nonTable.filter((tt: any) => tt.category === "GENERAL");
+    const pricePool = generalRows.length > 0 ? generalRows : nonTable;
+    const at = new Date();
+    const prices = pricePool
+      .map((tt: any) =>
+        effectiveTicketPriceAt(Number(tt.price), tt.pricePhases, at)
+      )
+      .filter((p: number) => p > 0);
+    const pricePerPerson =
+      prices.length > 0 ? Math.round(Math.min(...prices) * 100) / 100 : 0;
+    return {
+      id: e.id,
+      name: e.name,
+      hasTables: !!tableTt,
+      defaultSeatsForPool: seats,
+      pricePerPersonHint: pricePerPerson,
+    };
+  }, []);
+
+  const loadEvents = useCallback(
+    async (opts?: { silent?: boolean }): Promise<EventOption[] | null> => {
+      if (!opts?.silent) setIsLoadingEvents(true);
       try {
         const res = await fetch("/api/events", { credentials: "include" });
         const data = await res.json();
         if (data.success && Array.isArray(data.data)) {
-          const allEvents: EventOption[] = data.data.map((e: any) => {
-            const tableTt = e.ticketTypes?.find((tt: any) => tt.isTable === true);
-            const raw = tableTt?.seatsPerTable;
-            const seats =
-              typeof raw === "number" && raw >= 1 ? Math.min(10000, Math.floor(raw)) : 4;
-            const nonTable = (e.ticketTypes || []).filter((tt: any) => !tt.isTable);
-            const generalRows = nonTable.filter((tt: any) => tt.category === "GENERAL");
-            const pricePool = generalRows.length > 0 ? generalRows : nonTable;
-            const at = new Date();
-            const prices = pricePool
-              .map((tt: any) =>
-                effectiveTicketPriceAt(Number(tt.price), tt.pricePhases, at)
-              )
-              .filter((p: number) => p > 0);
-            const pricePerPerson =
-              prices.length > 0 ? Math.round(Math.min(...prices) * 100) / 100 : 0;
-            return {
-              id: e.id,
-              name: e.name,
-              hasTables: !!tableTt,
-              defaultSeatsForPool: seats,
-              pricePerPersonHint: pricePerPerson,
-            };
-          });
+          const allEvents: EventOption[] = data.data.map(mapApiEventToOption);
           setEvents(allEvents);
-          if (allEvents.length > 0 && !selectedEventId) {
-            setSelectedEventId(allEvents[0].id);
-          }
+          setSelectedEventId((prev) => {
+            if (allEvents.length === 0) return "";
+            if (prev && allEvents.some((x) => x.id === prev)) return prev;
+            return allEvents[0].id;
+          });
+          return allEvents;
         }
+        return null;
       } catch {
         toast.error("Error al cargar eventos");
+        return null;
       } finally {
-        setIsLoadingEvents(false);
+        if (!opts?.silent) setIsLoadingEvents(false);
       }
-    };
-    loadEvents();
-  }, []);
+    },
+    [mapApiEventToOption]
+  );
+
+  useEffect(() => {
+    void loadEvents();
+  }, [loadEvents]);
 
   useEffect(() => {
     if (!selectedEventId) {
@@ -191,10 +203,26 @@ export function InvitesManager() {
         toast.error('"Pagos para confirmar" debe ser entre 1 y 10000.');
         return;
       }
-      if (pricePerPersonForEventId(eventId) <= 0) {
-        toast.error("El evento necesita un tipo General (no mesa) con precio para el link.");
+      const freshRes = await fetch(`/api/events/${eventId}`, {
+        credentials: "include",
+      });
+      const freshJson = await freshRes.json();
+      const ticketTypes = freshJson?.data?.ticketTypes;
+      const unit =
+        Array.isArray(ticketTypes) && ticketTypes.length > 0
+          ? generalAdmissionUnitPrice(ticketTypes)
+          : null;
+      if (unit == null || unit <= 0) {
+        toast.error(
+          "No hay precio válido para el link (se usa el boleto General del evento). Edita el evento: un tipo sin «Mesa VIP», precio mayor a 0 y guarda; luego vuelve a intentar o recarga esta página."
+        );
         return;
       }
+      setEvents((prev) =>
+        prev.map((ev) =>
+          ev.id === eventId ? { ...ev, pricePerPersonHint: unit } : ev
+        )
+      );
     }
 
     setIsSubmittingGenerate(true);
@@ -321,10 +349,12 @@ export function InvitesManager() {
         </div>
         {!showGenerate ? (
           <Button
-            onClick={() => {
+            onClick={async () => {
+              const fresh = (await loadEvents({ silent: true })) ?? events;
+              const withTables = fresh.filter((e) => e.hasTables);
               const pick =
-                eventsWithTables.find((e) => e.id === selectedEventId) ||
-                eventsWithTables[0];
+                withTables.find((e) => e.id === selectedEventId) ||
+                withTables[0];
               const eid = pick?.id || selectedEventId;
               setShowGenerate(true);
               setGenerateEventId(eid);
