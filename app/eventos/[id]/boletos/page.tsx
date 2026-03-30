@@ -130,6 +130,7 @@ export default function EventBoletosPage() {
       toAdd.forEach((item: CartItem) => (next[item.ticketTypeId] = 0));
       return next;
     });
+    setShowCart(true);
     toast.success("Added to cart");
   };
 
@@ -384,9 +385,6 @@ export default function EventBoletosPage() {
                               )}
                               <p className="text-white/80 mt-2 font-medium">
                                 ${Number(tt.price).toLocaleString("en-US")} MXN
-                              </p>
-                              <p className="text-white/50 text-xs mt-1">
-                                {available} available
                               </p>
                             </div>
                             <div className="flex items-center gap-3">
