@@ -139,8 +139,7 @@ export function CreateEventModal({ onClose, onSuccess }: CreateEventModalProps) 
             category: tt.category,
             price: tt.price,
             maxQuantity: tt.maxQuantity,
-            isTable: tt.isTable,
-            seatsPerTable: tt.seatsPerTable,
+            isTable: false,
             ...(tt.pricePhases.length > 0
               ? {
                   pricePhases: tt.pricePhases.map((p, i) => ({
@@ -486,58 +485,6 @@ export function CreateEventModal({ onClose, onSuccess }: CreateEventModalProps) 
                       }
                       defaultPriceHint={ticketType.price}
                     />
-
-                    <div className="md:col-span-3 rounded-lg border border-regia-gold/25 bg-white/[0.04] p-4">
-                      <label className="flex items-start gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={ticketType.isTable}
-                          onChange={(e) => {
-                            const on = e.target.checked;
-                            handleTicketTypeChange(index, "isTable", on);
-                            if (on && (ticketType.seatsPerTable == null || ticketType.seatsPerTable < 2)) {
-                              handleTicketTypeChange(index, "seatsPerTable", 4);
-                            }
-                          }}
-                          className="w-4 h-4 mt-0.5 rounded border-regia-gold/30 bg-white/10 text-regia-gold focus:ring-regia-gold shrink-0"
-                        />
-                        <span>
-                          <span className="block text-sm font-medium text-white">
-                            Mesa VIP
-                          </span>
-                          <span className="block text-xs text-white/50 mt-1">
-                            El precio de esta fila es por mesa completa (venta directa / mapa). Los links compartidos
-                            de cobro cobran el boleto General; el cupo para confirmar la mesa se configura en Invites.
-                          </span>
-                        </span>
-                      </label>
-                      {ticketType.isTable && (
-                        <div className="mt-3 pl-7 flex flex-wrap items-end gap-4">
-                          <div className="max-w-md">
-                            <label className="block text-xs font-medium text-white/80 mb-1">
-                              Personas por mesa
-                            </label>
-                            <input
-                              type="number"
-                              value={ticketType.seatsPerTable || 4}
-                              onChange={(e) =>
-                                handleTicketTypeChange(
-                                  index,
-                                  "seatsPerTable",
-                                  parseInt(e.target.value, 10) || 4
-                                )
-                              }
-                              className="w-24 px-3 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white focus:outline-none focus:border-regia-gold text-sm"
-                              placeholder="4"
-                              min="2"
-                            />
-                            <p className="text-[11px] text-white/45 mt-2 leading-relaxed">
-                              Referencia para mapa e inventario; no fija el precio de cada pago en el link.
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
 
                     <div className="md:col-span-3">
                       <label className="block text-sm font-medium text-white/90 mb-2">

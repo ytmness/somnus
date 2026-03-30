@@ -75,10 +75,6 @@ export function InvitesManager() {
   const [usePoolMode, setUsePoolMode] = useState(true); // Money pool: un link para toda la mesa
 
   const mapApiEventToOption = useCallback((e: any): EventOption => {
-    const tableTt = e.ticketTypes?.find((tt: any) => tt.isTable === true);
-    const raw = tableTt?.seatsPerTable;
-    const seats =
-      typeof raw === "number" && raw >= 1 ? Math.min(10000, Math.floor(raw)) : 4;
     const nonTable = (e.ticketTypes || []).filter((tt: any) => !tt.isTable);
     const generalRows = nonTable.filter((tt: any) => tt.category === "GENERAL");
     const pricePool = generalRows.length > 0 ? generalRows : nonTable;
@@ -93,8 +89,10 @@ export function InvitesManager() {
     return {
       id: e.id,
       name: e.name,
-      hasTables: !!tableTt,
-      defaultSeatsForPool: seats,
+      // Ya no dependemos de `isTable=true` para generar links:
+      // si hay precio válido de un boleto no-mesa, habilitamos generación.
+      hasTables: pricePerPerson > 0,
+      defaultSeatsForPool: 4,
       pricePerPersonHint: pricePerPerson,
     };
   }, []);

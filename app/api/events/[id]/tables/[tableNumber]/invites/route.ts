@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import crypto from "crypto";
 import { parseTableKeyFromPath, ticketTableLabel } from "@/lib/table-invite";
-import { generalAdmissionUnitPrice } from "@/lib/ticket-pricing";
+import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
 
 const INVITE_EXPIRY_DAYS = 7;
 const MAX_TRADITIONAL_SLOTS = 500;
@@ -107,12 +107,37 @@ export async function POST(
       return NextResponse.json({ error: "Evento no encontrado" }, { status: 404 });
     }
 
-    const tableTicketType = event.ticketTypes.find((tt) => tt.isTable === true);
-    if (!tableTicketType) {
+    const now = new Date();
+    const activeNonTable = event.ticketTypes.filter((tt) => !tt.isTable && tt.isActive !== false);
+    if (!activeNonTable.length) {
       return NextResponse.json(
         {
           error:
-            "Este evento no tiene mesas VIP configuradas. Edita el evento y agrega un tipo de boleto con opción Mesa VIP.",
+            "Agrega al menos un tipo de boleto no-mesa (por ejemplo General) con precio mayor a 0.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const candidates = activeNonTable.filter((tt) => tt.category === "GENERAL");
+    const poolCandidates = candidates.length > 0 ? candidates : activeNonTable;
+
+    let generalTicketType: (typeof poolCandidates)[number] | null = null;
+    let pricePerSeat: number | null = null;
+    for (const tt of poolCandidates) {
+      const unit = effectiveTicketPriceAt(Number(tt.price), tt.pricePhases ?? null, now);
+      if (!Number.isFinite(unit) || unit <= 0) continue;
+      if (pricePerSeat == null || unit < pricePerSeat) {
+        pricePerSeat = unit;
+        generalTicketType = tt;
+      }
+    }
+
+    if (!generalTicketType || pricePerSeat == null || pricePerSeat <= 0) {
+      return NextResponse.json(
+        {
+          error:
+            "No hay un precio vigente de boleto General para calcular el link (considera fases).",
         },
         { status: 400 }
       );
@@ -122,7 +147,6 @@ export async function POST(
 
     const existingTickets = await prisma.ticket.count({
       where: {
-        ticketTypeId: tableTicketType.id,
         tableNumber: mesaTicketLabel,
         status: { in: ["VALID", "USED"] },
         sale: { status: "COMPLETED" },
@@ -145,16 +169,6 @@ export async function POST(
         minPaidRaw === undefined || minPaidRaw === null
           ? DEFAULT_MIN_PAID_TO_CONFIRM
           : Math.floor(Number(minPaidRaw));
-      const pricePerSeat = generalAdmissionUnitPrice(event.ticketTypes);
-      if (pricePerSeat == null || pricePerSeat <= 0) {
-        return NextResponse.json(
-          {
-            error:
-              "Agrega un tipo de boleto General (no mesa) con precio válido. Cada pago del link usa ese precio.",
-          },
-          { status: 400 }
-        );
-      }
 
       const existingPool = await prisma.tableInvitePool.findFirst({
         where: { eventId, tableNumber },
@@ -189,7 +203,7 @@ export async function POST(
       const pool = await prisma.tableInvitePool.create({
         data: {
           eventId,
-          ticketTypeId: tableTicketType.id,
+          ticketTypeId: generalTicketType.id,
           tableNumber,
           inviteToken: token,
           maxSlots: null,
@@ -261,26 +275,6 @@ export async function POST(
       );
     }
 
-    let pricePerSeat: number;
-    if (typeof totalTablePrice === "number" && totalTablePrice > 0) {
-      pricePerSeat = Math.round((totalTablePrice / invites.length) * 100) / 100;
-      if (pricePerSeat <= 0) {
-        return NextResponse.json({ error: "El precio total debe ser mayor que 0" }, { status: 400 });
-      }
-    } else {
-      const unit = generalAdmissionUnitPrice(event.ticketTypes);
-      if (unit == null || unit <= 0) {
-        return NextResponse.json(
-          {
-            error:
-              "Sin precio de boleto General (no mesa). Agrégalo o indica precio total de mesa al generar links.",
-          },
-          { status: 400 }
-        );
-      }
-      pricePerSeat = unit;
-    }
-
     const createdInvites = [];
     for (let i = 0; i < invites.length; i++) {
       const inv = invites[i];
@@ -300,7 +294,7 @@ export async function POST(
       const invite = await prisma.tableSlotInvite.create({
         data: {
           eventId,
-          ticketTypeId: tableTicketType.id,
+          ticketTypeId: generalTicketType.id,
           tableNumber,
           seatNumber: i + 1,
           inviteToken: token,
