@@ -13,6 +13,8 @@ interface EventOption {
   id: string;
   name: string;
   hasTables: boolean;
+  /** Asientos del tipo boleto "mesa" del evento → valor inicial al generar link compartido */
+  defaultSeatsForPool: number;
 }
 
 interface InviteRow {
@@ -51,7 +53,7 @@ export function InvitesManager() {
   const [generateEventId, setGenerateEventId] = useState("");
   const [generateTableNumber, setGenerateTableNumber] = useState("");
   const [generateSlots, setGenerateSlots] = useState(5);
-  const [generateSplitAmong, setGenerateSplitAmong] = useState(34);
+  const [generateSplitAmong, setGenerateSplitAmong] = useState(4);
   const [generateMinConfirm, setGenerateMinConfirm] = useState(DEFAULT_MIN_CONFIRM);
   const [generateTotalPrice, setGenerateTotalPrice] = useState("");
   const [isSubmittingGenerate, setIsSubmittingGenerate] = useState(false);
@@ -76,11 +78,18 @@ export function InvitesManager() {
         const res = await fetch("/api/events", { credentials: "include" });
         const data = await res.json();
         if (data.success && Array.isArray(data.data)) {
-          const allEvents = data.data.map((e: any) => ({
-            id: e.id,
-            name: e.name,
-            hasTables: !!e.ticketTypes?.some((tt: any) => tt.isTable === true),
-          }));
+          const allEvents: EventOption[] = data.data.map((e: any) => {
+            const tableTt = e.ticketTypes?.find((tt: any) => tt.isTable === true);
+            const raw = tableTt?.seatsPerTable;
+            const seats =
+              typeof raw === "number" && raw >= 1 ? Math.min(10000, Math.floor(raw)) : 4;
+            return {
+              id: e.id,
+              name: e.name,
+              hasTables: !!tableTt,
+              defaultSeatsForPool: seats,
+            };
+          });
           setEvents(allEvents);
           if (allEvents.length > 0 && !selectedEventId) {
             setSelectedEventId(allEvents[0].id);
@@ -123,6 +132,9 @@ export function InvitesManager() {
     };
     loadInvites();
   }, [selectedEventId]);
+
+  const seatsDefaultForEventId = (eventId: string) =>
+    events.find((e) => e.id === eventId)?.defaultSeatsForPool ?? 4;
 
   const copyLink = async (url: string, id: string) => {
     try {
@@ -260,40 +272,52 @@ export function InvitesManager() {
 
       {/* Generar nuevos invites */}
       <div className="rounded-xl border border-white/10 bg-white/5 p-6">
-        <h3 className="text-lg font-bold text-white mb-4">
-          Generar links de pago
-        </h3>
-        <div className="flex flex-wrap items-center gap-4 mb-4">
+        <h3 className="text-lg font-bold text-white mb-2">Generar links de pago</h3>
+        <p className="text-white/50 text-sm mb-4">
+          Links para cobrar mesas VIP del evento. Elige si quieres una sola URL para el grupo o un link por asiento.
+        </p>
+        <div className="flex flex-wrap items-center gap-3 mb-4">
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
               checked={usePoolMode}
-              onChange={(e) => setUsePoolMode(e.target.checked)}
+              onChange={(e) => {
+                const v = e.target.checked;
+                setUsePoolMode(v);
+                const ev = events.find((x) => x.id === (generateEventId || selectedEventId));
+                if (ev?.hasTables) {
+                  if (v) setGenerateSplitAmong(ev.defaultSeatsForPool);
+                  else
+                    setGenerateSlots(
+                      Math.min(
+                        MAX_TRADITIONAL_SLOTS,
+                        Math.max(1, ev.defaultSeatsForPool)
+                      )
+                    );
+                }
+              }}
               className="rounded border-white/30 bg-white/10 text-white focus:ring-white/30"
             />
-            <span className="text-white/80 text-sm font-medium">
-              Modo money pool
-            </span>
+            <span className="text-white/85 text-sm font-medium">Link compartido (recomendado)</span>
           </label>
-          <span className="text-white/50 text-xs">
+          <span className="text-white/45 text-xs">
             {usePoolMode
-              ? "Un solo link para toda la mesa. Cada persona ingresa su nombre al pagar."
-              : "Un link por asiento (cada uno con su link individual)."}
+              ? "Una URL; cada quien paga y deja su nombre."
+              : `Una URL por persona (hasta ${MAX_TRADITIONAL_SLOTS}).`}
           </span>
         </div>
-        <p className="text-white/60 text-sm mb-4">
-          {usePoolMode
-            ? "Un link compartido para toda la mesa. Compártelo en el grupo de WhatsApp y cada quien paga su parte ingresando nombre, email y teléfono al pagar. Los pagos se registran automáticamente."
-            : `Evento, mesa, precio total y cuántas personas (1–${MAX_TRADITIONAL_SLOTS}). Cada uno recibe su link individual.`}
-        </p>
         {!showGenerate ? (
           <Button
             onClick={() => {
+              const pick =
+                eventsWithTables.find((e) => e.id === selectedEventId) ||
+                eventsWithTables[0];
+              const eid = pick?.id || selectedEventId;
               setShowGenerate(true);
-              setGenerateEventId(eventsWithTables.length > 0 ? eventsWithTables[0].id : selectedEventId);
+              setGenerateEventId(eid);
               setGenerateTableNumber("");
-              setGenerateSlots(5);
-              setGenerateSplitAmong(34);
+              setGenerateSlots(Math.min(MAX_TRADITIONAL_SLOTS, Math.max(1, pick?.defaultSeatsForPool ?? 5)));
+              setGenerateSplitAmong(pick?.defaultSeatsForPool ?? 4);
               setGenerateMinConfirm(DEFAULT_MIN_CONFIRM);
               setGenerateTotalPrice("");
               setGeneratedLinks([]);
@@ -313,7 +337,22 @@ export function InvitesManager() {
                 </label>
                 <select
                   value={generateEventId}
-                  onChange={(e) => setGenerateEventId(e.target.value)}
+                  onChange={(e) => {
+                    const id = e.target.value;
+                    setGenerateEventId(id);
+                    const ev = events.find((x) => x.id === id);
+                    if (ev?.hasTables) {
+                      setGenerateSplitAmong(ev.defaultSeatsForPool);
+                      if (!usePoolMode) {
+                        setGenerateSlots(
+                          Math.min(
+                            MAX_TRADITIONAL_SLOTS,
+                            Math.max(1, ev.defaultSeatsForPool)
+                          )
+                        );
+                      }
+                    }
+                  }}
                   required
                   className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
                 >
@@ -341,31 +380,33 @@ export function InvitesManager() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-white/80 text-sm font-medium mb-1">
-                  Precio total de la mesa (MXN) *
-                </label>
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  value={generateTotalPrice}
-                  onChange={(e) => setGenerateTotalPrice(e.target.value.replace(/[^0-9.,]/g, ""))}
-                  placeholder="Ej: 5000"
-                  required
-                  className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
-                />
-                <p className="text-white/50 text-xs mt-1">
-                  {usePoolMode
-                    ? "El total se divide entre la cantidad que indiques abajo (ej. mesa para 34 personas)."
-                    : "Se dividirá entre el número de personas (modo links individuales)."}
+            {usePoolMode ? (
+              <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4 space-y-4">
+                <p className="text-white/55 text-xs leading-relaxed">
+                  <strong className="text-white/75">Cómo se calcula cada pago:</strong> precio total de la mesa ÷ número de
+                  partes. Ese número suele coincidir con los asientos por mesa del evento (ahora{" "}
+                  <strong className="text-white/90">{seatsDefaultForEventId(generateEventId)}</strong>), pero puedes
+                  cambiarlo si esta mesa es más grande. El link puede recibir más pagos de los que indiques aquí; no hay
+                  tope.
                 </p>
-              </div>
-              {usePoolMode ? (
-                <>
+                <div>
+                  <label className="block text-white/80 text-sm font-medium mb-1">
+                    Precio total de la mesa (MXN) *
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={generateTotalPrice}
+                    onChange={(e) => setGenerateTotalPrice(e.target.value.replace(/[^0-9.,]/g, ""))}
+                    placeholder="Ej: 5000"
+                    required
+                    className="w-full max-w-xs px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                   <div>
                     <label className="block text-white/80 text-sm font-medium mb-1">
-                      Dividir precio total entre (personas) *
+                      Partes para dividir el precio *
                     </label>
                     <input
                       type="number"
@@ -379,13 +420,19 @@ export function InvitesManager() {
                       }
                       className="w-full max-w-[140px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
                     />
-                    <p className="text-white/50 text-xs mt-1">
-                      Ej.: 34 → cada pago es total ÷ 34. El link sigue aceptando más pagos sin tope.
-                    </p>
+                    <button
+                      type="button"
+                      className="mt-2 text-xs text-[#7BA3E8] hover:underline"
+                      onClick={() =>
+                        setGenerateSplitAmong(seatsDefaultForEventId(generateEventId))
+                      }
+                    >
+                      Usar asientos del evento ({seatsDefaultForEventId(generateEventId)})
+                    </button>
                   </div>
                   <div>
                     <label className="block text-white/80 text-sm font-medium mb-1">
-                      Pagos mínimos para confirmar mesa *
+                      Pagos para marcar mesa confirmada *
                     </label>
                     <input
                       type="number"
@@ -399,15 +446,30 @@ export function InvitesManager() {
                       }
                       className="w-full max-w-[140px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
                     />
-                    <p className="text-white/50 text-xs mt-1">
-                      Por defecto 20. En la lista verás &quot;confirmada&quot; al llegar a este número de pagos completados.
-                    </p>
+                    <p className="text-white/45 text-xs mt-1">En la tabla verás &quot;confirmada&quot; al llegar aquí.</p>
                   </div>
-                </>
-              ) : (
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-white/80 text-sm font-medium mb-1">
-                    Cuántas personas (1–{MAX_TRADITIONAL_SLOTS}) *
+                    Precio total de la mesa (MXN) *
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={generateTotalPrice}
+                    onChange={(e) => setGenerateTotalPrice(e.target.value.replace(/[^0-9.,]/g, ""))}
+                    placeholder="Ej: 5000"
+                    required
+                    className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
+                  />
+                  <p className="text-white/50 text-xs mt-1">Se reparte entre los links que generes abajo.</p>
+                </div>
+                <div>
+                  <label className="block text-white/80 text-sm font-medium mb-1">
+                    Número de links (asientos) *
                   </label>
                   <input
                     type="number"
@@ -424,12 +486,10 @@ export function InvitesManager() {
                     }
                     className="w-full max-w-[120px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
                   />
-                  <p className="text-white/50 text-xs mt-1">
-                    Cada uno recibe un link; ingresan nombre, email y teléfono al pagar.
-                  </p>
+                  <p className="text-white/50 text-xs mt-1">Un link por persona; cada quien completa sus datos al pagar.</p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             <div className="flex gap-3">
               <Button

@@ -502,36 +502,52 @@ export function EditEventModal({
                         </p>
                       )}
                     </div>
-                    <div className="flex items-center gap-4">
-                      <label className="flex items-center gap-2 text-white/90 text-sm cursor-pointer">
+                    <div className="md:col-span-3 rounded-lg border border-regia-gold/25 bg-white/[0.04] p-4">
+                      <label className="flex items-start gap-3 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={ticketType.isTable}
-                          onChange={(e) =>
-                            handleTicketTypeChange(
-                              index,
-                              "isTable",
-                              e.target.checked
-                            )
-                          }
-                          className="w-4 h-4 rounded border-regia-gold/30 bg-white/10 text-regia-gold focus:ring-regia-gold"
+                          onChange={(e) => {
+                            const on = e.target.checked;
+                            handleTicketTypeChange(index, "isTable", on);
+                            if (on && (ticketType.seatsPerTable == null || ticketType.seatsPerTable < 2)) {
+                              handleTicketTypeChange(index, "seatsPerTable", 4);
+                            }
+                          }}
+                          className="w-4 h-4 mt-0.5 rounded border-regia-gold/30 bg-white/10 text-regia-gold focus:ring-regia-gold shrink-0"
                         />
-                        ¿Es Mesa VIP?
+                        <span>
+                          <span className="block text-sm font-medium text-white">
+                            Boleto tipo mesa VIP (precio por mesa completa)
+                          </span>
+                          <span className="block text-xs text-white/55 mt-1 leading-relaxed">
+                            Actívalo si esta fila vende la mesa entera. El precio y la cantidad máxima son por mesas, no
+                            por persona. Los &quot;asientos por mesa&quot; solo definen cuántas partes se usan al
+                            generar links de cobro compartido en admin (puedes cambiarlo por mesa al crear el link).
+                          </span>
+                        </span>
                       </label>
                       {ticketType.isTable && (
-                        <input
-                          type="number"
-                          value={ticketType.seatsPerTable ?? 4}
-                          onChange={(e) =>
-                            handleTicketTypeChange(
-                              index,
-                              "seatsPerTable",
-                              parseInt(e.target.value) || 4
-                            )
-                          }
-                          className="w-20 px-3 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white focus:outline-none focus:border-regia-gold text-sm"
-                          min="2"
-                        />
+                        <div className="mt-3 pl-7 flex flex-wrap items-end gap-4">
+                          <div>
+                            <label className="block text-xs font-medium text-white/80 mb-1">
+                              Asientos por mesa (referencia)
+                            </label>
+                            <input
+                              type="number"
+                              value={ticketType.seatsPerTable ?? 4}
+                              onChange={(e) =>
+                                handleTicketTypeChange(
+                                  index,
+                                  "seatsPerTable",
+                                  parseInt(e.target.value, 10) || 4
+                                )
+                              }
+                              className="w-24 px-3 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white focus:outline-none focus:border-regia-gold text-sm"
+                              min="2"
+                            />
+                          </div>
+                        </div>
                       )}
                     </div>
                     <div className="md:col-span-3">
