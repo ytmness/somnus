@@ -46,6 +46,9 @@ export function EventCardZamna({
     concert.artist === "Artista por Confirmar" ||
     concert.artist.toLowerCase().includes("por confirmar");
 
+  /** En carrusel, eventos pasados se ven igual que upcoming (sin opacidad ni CTA apagado). */
+  const pastCarouselMatch = carouselGlass && isPast;
+
   return (
     <article
       onClick={() => {
@@ -59,7 +62,13 @@ export function EventCardZamna({
         carouselGlass
           ? "border border-white/12 bg-[#08080c]/88 backdrop-blur-xl hover:border-white/18 shadow-[0_8px_40px_rgba(0,0,0,0.45)]"
           : "bg-[#1a1a1a] border border-white/15 hover:border-white/25"
-      } ${isPast || isMystery ? "cursor-default opacity-90" : "cursor-pointer"}`}
+      } ${
+        pastCarouselMatch
+          ? "cursor-pointer"
+          : isPast || isMystery
+            ? "cursor-default opacity-90"
+            : "cursor-pointer"
+      }`}
     >
       {/* Top: imagen (carrusel = poster completo; resto = crop tipo Zamna) */}
       <div
@@ -93,7 +102,9 @@ export function EventCardZamna({
               alt={concert.artist}
               sizes="(max-width: 768px) 100vw, 33vw"
               quality={75}
-              disableHoverScale={isPast || posterCtx.settings.imageDragMode}
+              disableHoverScale={
+                (isPast && !pastCarouselMatch) || posterCtx.settings.imageDragMode
+              }
               settings={posterCtx.settings}
               setSettings={posterCtx.setSettings}
               onDragEndRef={skipOpenAfterDrag}
@@ -121,7 +132,7 @@ export function EventCardZamna({
             Featured
           </span>
         )}
-        {status && !isFeatured && (
+        {status && !isFeatured && !pastCarouselMatch && (
           <span
             className={`absolute top-4 right-4 z-[2] text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${
               status === "Past event" || status === "Sold out"
@@ -166,9 +177,11 @@ export function EventCardZamna({
         <div className="mt-auto">
           <span
             className={`inline-block w-full text-center font-bold uppercase tracking-wider py-3 px-6 rounded-lg transition-all ${
-              isPast || isMystery
+              isMystery
                 ? "bg-white/20 text-white/60 cursor-default"
-                : "bg-black text-white border border-white/20 hover:bg-white hover:text-black"
+                : pastCarouselMatch || !isPast
+                  ? "bg-black text-white border border-white/20 hover:bg-white hover:text-black"
+                  : "bg-white/20 text-white/60 cursor-default"
             }`}
           >
             {isPast ? "Past event" : isMystery ? "Coming soon" : "Get Tickets"}

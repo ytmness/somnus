@@ -524,7 +524,7 @@ export default function HomePage() {
                   </p>
                   <UpcomingEventsCarousel
                     standaloneSettingsProvider={false}
-                    showPosterTuner={false}
+                    showPosterTuner
                   >
                     {pastConcerts.map((concert, index) => (
                       <EventCardZamna
