@@ -26,7 +26,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { inviteToken, buyerName, buyerEmail, buyerPhone } = body;
+    const { inviteToken, buyerName, buyerEmail, buyerPhone, extraPeople } = body as {
+      inviteToken?: string;
+      buyerName?: string;
+      buyerEmail?: string;
+      buyerPhone?: string;
+      extraPeople?: Array<{ name?: string; email?: string; phone?: string }>;
+    };
 
     if (!inviteToken || !buyerName || !buyerEmail) {
       return NextResponse.json(
@@ -40,6 +46,19 @@ export async function POST(request: NextRequest) {
       where: { inviteToken },
       include: { event: true, ticketType: true },
     });
+
+    // Se asume 1 asiento (el del comprador). En modo pool podemos agregar extraPeople para pagar varios asientos en un solo checkout.
+    let seatsToCharge = 1;
+    const extras =
+      Array.isArray(extraPeople) && extraPeople.length > 0
+        ? extraPeople
+            .map((p) => ({
+              name: (p?.name ?? "").trim(),
+              email: (p?.email ?? "").trim() || undefined,
+              phone: (p?.phone ?? "").trim() || undefined,
+            }))
+            .filter((p) => p.name.length > 0)
+        : [];
 
     // 2. Si no existe, buscar TableInvitePool (money pool)
     if (!invite) {
@@ -62,39 +81,72 @@ export async function POST(request: NextRequest) {
       const paidCount = await prisma.tableSlotInvite.count({
         where: { poolId: pool.id, status: "PAID" },
       });
-      if (pool.maxSlots != null && paidCount >= pool.maxSlots) {
+      // En pool, el comprador siempre toma 1 asiento + (extras.length) adicionales
+      seatsToCharge = 1 + extras.length;
+
+      if (pool.maxSlots != null && paidCount + seatsToCharge > pool.maxSlots) {
         return NextResponse.json(
           { error: "Esta mesa ya está completa. Todos los espacios han sido pagados." },
           { status: 400 }
         );
       }
 
-      const nextSeatNumber = paidCount + 1;
-      let slotToken = generateInviteToken();
-      let exists = await prisma.tableSlotInvite.findUnique({ where: { inviteToken: slotToken } })
-        || await prisma.tableInvitePool.findUnique({ where: { inviteToken: slotToken } });
-      while (exists) {
-        slotToken = generateInviteToken();
-        exists = await prisma.tableSlotInvite.findUnique({ where: { inviteToken: slotToken } })
-          || await prisma.tableInvitePool.findUnique({ where: { inviteToken: slotToken } });
-      }
-
-      invite = await prisma.tableSlotInvite.create({
-        data: {
-          eventId: pool.eventId,
-          ticketTypeId: pool.ticketTypeId,
-          tableNumber: pool.tableNumber,
-          seatNumber: nextSeatNumber,
-          poolId: pool.id,
-          inviteToken: slotToken,
+      // Crear los seats pendientes en el mismo checkout
+      const peopleForSeats = [
+        {
           invitedName: buyerName.trim(),
           invitedEmail: buyerEmail.trim(),
           invitedPhone: buyerPhone?.trim() || null,
-          pricePerSeat: pool.pricePerSeat,
-          expiresAt: pool.expiresAt,
         },
-        include: { event: true, ticketType: true },
-      });
+        ...extras.map((p) => ({
+          invitedName: p.name,
+          invitedEmail: p.email ?? null,
+          invitedPhone: p.phone ?? null,
+        })),
+      ];
+
+      let firstCreated: any = null;
+      const startSeatNumber = paidCount + 1;
+
+      for (let offset = 0; offset < peopleForSeats.length; offset++) {
+        const nextSeatNumber = startSeatNumber + offset;
+
+        let slotToken = generateInviteToken();
+        let exists =
+          (await prisma.tableSlotInvite.findUnique({ where: { inviteToken: slotToken } })) ||
+          (await prisma.tableInvitePool.findUnique({ where: { inviteToken: slotToken } }));
+        while (exists) {
+          slotToken = generateInviteToken();
+          exists =
+            (await prisma.tableSlotInvite.findUnique({ where: { inviteToken: slotToken } })) ||
+            (await prisma.tableInvitePool.findUnique({ where: { inviteToken: slotToken } }));
+        }
+
+        const created = await prisma.tableSlotInvite.create({
+          data: {
+            eventId: pool.eventId,
+            ticketTypeId: pool.ticketTypeId,
+            tableNumber: pool.tableNumber,
+            seatNumber: nextSeatNumber,
+            poolId: pool.id,
+            inviteToken: slotToken,
+            invitedName: peopleForSeats[offset].invitedName,
+            invitedEmail: peopleForSeats[offset].invitedEmail,
+            invitedPhone: peopleForSeats[offset].invitedPhone,
+            pricePerSeat: pool.pricePerSeat,
+            expiresAt: pool.expiresAt,
+          },
+          include: { event: true, ticketType: true },
+        });
+
+        if (!firstCreated) firstCreated = created;
+      }
+
+      if (!firstCreated) {
+        return NextResponse.json({ error: "Error al crear asientos" }, { status: 500 });
+      }
+
+      invite = firstCreated;
     } else {
       // Flujo TableSlotInvite existente
       if (invite.status !== "PENDING") {
@@ -123,7 +175,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const subtotal = Number(invite.pricePerSeat);
+    if (!invite) {
+      return NextResponse.json({ error: "Invitación no encontrada" }, { status: 404 });
+    }
+
+    const subtotal = Number(invite.pricePerSeat) * seatsToCharge;
     if (subtotal <= 0 || !Number.isFinite(subtotal)) {
       return NextResponse.json(
         { error: "Precio del asiento inválido" },
@@ -165,7 +221,7 @@ export async function POST(request: NextRequest) {
           data: {
             saleId: sale.id,
             ticketTypeId: invite.ticketTypeId,
-            quantity: 1,
+            quantity: seatsToCharge,
             isTable: true,
             tableNumber: ticketTableLabel(String(invite.tableNumber)),
           },

@@ -88,6 +88,9 @@ export default function PagarInvitePage() {
     buyerEmail: "",
     buyerPhone: "",
   });
+  const [extraPeople, setExtraPeople] = useState<
+    Array<{ name: string; email: string; phone: string }>
+  >([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const loadInvite = useCallback(async () => {
@@ -150,6 +153,19 @@ export default function PagarInvitePage() {
 
     setIsProcessing(true);
     try {
+      for (const p of extraPeople) {
+        if (!p.name.trim()) {
+          toast.error("Para agregar una persona extra, el nombre es requerido");
+          return;
+        }
+      }
+
+      const extraPayload = extraPeople.map((p) => ({
+        name: p.name.trim(),
+        email: p.email.trim() || undefined,
+        phone: p.phone.trim() || undefined,
+      }));
+
       const res = await fetch("/api/checkout/invite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -158,6 +174,7 @@ export default function PagarInvitePage() {
           buyerName: formData.buyerName.trim(),
           buyerEmail: formData.buyerEmail.trim(),
           buyerPhone: formData.buyerPhone?.trim() || undefined,
+          extraPeople: extraPayload,
         }),
       });
 
@@ -308,8 +325,6 @@ export default function PagarInvitePage() {
               <Users className="w-4 h-4 opacity-80" />
               {paidCount === 1 ? "1 participante" : `${paidCount} participantes`}
             </p>
-            <p className="text-white/45 text-xs uppercase tracking-wide mb-1">Recaudado</p>
-            <p className="text-4xl font-bold text-white tabular-nums mb-4">{mxn.format(totalCollected)}</p>
             <p className="text-white/45 text-xs mb-1">Cada pago (precio General del evento)</p>
             <p className="text-lg font-semibold text-[#7BA3E8] tabular-nums">{priceFormatted}</p>
             {invite.minPaidToConfirm != null &&
@@ -399,6 +414,10 @@ export default function PagarInvitePage() {
                 <div>
                   <p className="text-white/50 text-xs">Siguiente pago</p>
                   <p className="text-lg font-bold text-white tabular-nums">{priceFormatted}</p>
+                  <p className="text-[11px] text-white/40 mt-1">
+                    Total este checkout:{" "}
+                    {mxn.format((invite.pricePerSeat ?? 0) * (1 + extraPeople.length))}
+                  </p>
                 </div>
               </div>
               <form id="pool-pay-form" onSubmit={handleSubmit} className="space-y-3">
@@ -433,6 +452,89 @@ export default function PagarInvitePage() {
                     className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/15 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-[#5B8DEF]/40"
                     placeholder="55 1234 5678"
                   />
+                </div>
+
+                <div className="pt-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-white/50 text-xs">Agregar personas extra (opcional)</p>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setExtraPeople((prev) => [
+                          ...prev,
+                          { name: "", email: "", phone: "" },
+                        ])
+                      }
+                      className="text-xs text-[#7BA3E8] hover:underline"
+                    >
+                      + Agregar
+                    </button>
+                  </div>
+
+                  {extraPeople.length > 0 && (
+                    <div className="space-y-3">
+                      {extraPeople.map((p, idx) => (
+                        <div
+                          key={idx}
+                          className="rounded-lg bg-white/5 border border-white/10 p-3"
+                        >
+                          <p className="text-white/70 text-[11px] mb-2">
+                            Persona extra #{idx + 1}
+                          </p>
+                          <div className="space-y-2">
+                            <input
+                              type="text"
+                              value={p.name}
+                              onChange={(e) =>
+                                setExtraPeople((prev) =>
+                                  prev.map((x, i) =>
+                                    i === idx ? { ...x, name: e.target.value } : x
+                                  )
+                                )
+                              }
+                              placeholder="Nombre *"
+                              className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/15 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-[#5B8DEF]/40"
+                            />
+                            <input
+                              type="email"
+                              value={p.email}
+                              onChange={(e) =>
+                                setExtraPeople((prev) =>
+                                  prev.map((x, i) =>
+                                    i === idx ? { ...x, email: e.target.value } : x
+                                  )
+                                )
+                              }
+                              placeholder="Email (opcional)"
+                              className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/15 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-[#5B8DEF]/40"
+                            />
+                            <input
+                              type="tel"
+                              value={p.phone}
+                              onChange={(e) =>
+                                setExtraPeople((prev) =>
+                                  prev.map((x, i) =>
+                                    i === idx ? { ...x, phone: e.target.value } : x
+                                  )
+                                )
+                              }
+                              placeholder="Teléfono (opcional)"
+                              className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/15 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-[#5B8DEF]/40"
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setExtraPeople((prev) => prev.filter((_, i) => i !== idx))
+                              }
+                              className="text-[11px] text-white/40 hover:text-white/70"
+                            >
+                              Quitar
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </form>
             </section>

@@ -43,6 +43,7 @@ export async function GET(
         const paidCount = await prisma.tableSlotInvite.count({
           where: { poolId: p.id, status: "PAID" },
         });
+        const totalCollected = paidCount * Number(p.pricePerSeat);
         const tableConfirmed = paidCount >= p.minPaidToConfirm;
         return {
           id: p.id,
@@ -63,6 +64,7 @@ export async function GET(
           splitAmong: p.splitAmong,
           minPaidToConfirm: p.minPaidToConfirm,
           paidCount,
+          totalCollected,
           tableConfirmed,
         };
       })
@@ -82,6 +84,7 @@ export async function GET(
       createdAt: Date;
       paidAt?: Date | null;
       poolId?: string | null;
+      totalCollected?: number;
     };
 
     let invites: InviteRow[];
@@ -148,6 +151,7 @@ export async function GET(
         status: inv.status,
         paidAt: inv.paidAt != null ? inv.paidAt.toISOString() : null,
         pricePerSeat: Number(inv.pricePerSeat),
+        totalCollected: inv.status === "PAID" ? Number(inv.pricePerSeat) : 0,
         url,
         inviteToken: inv.inviteToken,
         expiresAt: inv.expiresAt != null ? inv.expiresAt.toISOString() : null,

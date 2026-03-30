@@ -30,6 +30,8 @@ interface InviteRow {
   status: string;
   paidAt: string | null;
   pricePerSeat: number;
+  /** Solo para mostrar en el panel */
+  totalCollected?: number;
   url: string;
   inviteToken: string;
   expiresAt: string | null;
@@ -608,6 +610,9 @@ export function InvitesManager() {
                 <th className="text-left py-3 px-4 text-white/90 font-semibold text-sm">
                   Precio
                 </th>
+                <th className="text-left py-3 px-4 text-white/90 font-semibold text-sm">
+                  Recaudado
+                </th>
                 <th className="text-right py-3 px-4 text-white/90 font-semibold text-sm">
                   Link
                 </th>
@@ -678,6 +683,11 @@ export function InvitesManager() {
                   </td>
                   <td className="py-3 px-4 text-white/80">
                     ${inv.pricePerSeat.toLocaleString()}
+                  </td>
+                  <td className="py-3 px-4 text-white/80">
+                    {inv.isPool && typeof inv.totalCollected === "number"
+                      ? `$${inv.totalCollected.toLocaleString()}`
+                      : "—"}
                   </td>
                   <td className="py-3 px-4 text-right">
                     <Button

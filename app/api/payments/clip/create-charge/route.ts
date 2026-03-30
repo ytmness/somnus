@@ -97,11 +97,21 @@ export async function POST(request: NextRequest) {
       if (!ticketType) continue;
 
       // Venta desde invite: 1 solo ticket con seatNumber del invite
-      const qty = isInviteSale && invite ? 1 : item.isTable ? (ticketType.seatsPerTable || 4) : item.quantity;
+      const qty =
+        isInviteSale && invite
+          ? Math.max(1, item.quantity)
+          : item.isTable
+            ? (ticketType.seatsPerTable || 4)
+            : item.quantity;
       const typePrefix = (ticketType.name || "TKT").substring(0, 3).toUpperCase();
 
       for (let i = 0; i < qty; i++) {
-        const seatNumber = isInviteSale && invite ? invite.seatNumber : item.isTable ? i + 1 : null;
+        const seatNumber =
+          isInviteSale && invite
+            ? (invite.seatNumber ?? 0) + i
+            : item.isTable
+              ? i + 1
+              : null;
 
         // ticketNumber debe ser único: secuencia + sufijo corto para evitar colisión si dos pagos a la vez
         const ticketCount = await prisma.ticket.count({
@@ -148,20 +158,23 @@ export async function POST(request: NextRequest) {
     });
 
     if (isInviteSale && invite) {
+      // Para money pool: cuando el usuario paga N asientos en un solo checkout,
+      // los seatNumber consecutivos corresponden al rango [invite.seatNumber, invite.seatNumber + N - 1]
+      // y se marcan como PAID sin sobrescribir invitedName/invitedEmail/invitedPhone.
+      const totalQty = sale.saleItems.reduce((sum, si) => sum + (si.quantity || 0), 0);
+      const start = invite.seatNumber ?? 0;
+      const end = start + Math.max(0, totalQty - 1);
+
       try {
-        await prisma.tableSlotInvite.update({
-          where: { id: invite.id },
-          data: {
-            status: "PAID",
-            invitedName: sale.buyerName,
-            invitedEmail: sale.buyerEmail || null,
-            invitedPhone: sale.buyerPhone || null,
-            paidAt: new Date(),
-          },
-        });
-      } catch (inviteErr: any) {
-        const msg = inviteErr?.message || String(inviteErr);
-        if (msg.includes("paidAt") || msg.includes("column") || msg.includes("does not exist")) {
+        if (invite.poolId) {
+          await prisma.tableSlotInvite.updateMany({
+            where: {
+              poolId: invite.poolId,
+              seatNumber: { gte: start, lte: end },
+            },
+            data: { status: "PAID", paidAt: new Date() },
+          });
+        } else {
           await prisma.tableSlotInvite.update({
             where: { id: invite.id },
             data: {
@@ -169,8 +182,36 @@ export async function POST(request: NextRequest) {
               invitedName: sale.buyerName,
               invitedEmail: sale.buyerEmail || null,
               invitedPhone: sale.buyerPhone || null,
+              paidAt: new Date(),
             },
           });
+        }
+      } catch (inviteErr: any) {
+        const msg = inviteErr?.message || String(inviteErr);
+        if (
+          msg.includes("paidAt") ||
+          msg.includes("column") ||
+          msg.includes("does not exist")
+        ) {
+          if (invite.poolId) {
+            await prisma.tableSlotInvite.updateMany({
+              where: {
+                poolId: invite.poolId,
+                seatNumber: { gte: start, lte: end },
+              },
+              data: { status: "PAID" },
+            });
+          } else {
+            await prisma.tableSlotInvite.update({
+              where: { id: invite.id },
+              data: {
+                status: "PAID",
+                invitedName: sale.buyerName,
+                invitedEmail: sale.buyerEmail || null,
+                invitedPhone: sale.buyerPhone || null,
+              },
+            });
+          }
         } else {
           throw inviteErr;
         }
