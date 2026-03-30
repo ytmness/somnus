@@ -82,6 +82,26 @@ export async function GET(
     const poolFull = pool.maxSlots != null && paidCount >= pool.maxSlots;
     const tableConfirmed = paidCount >= pool.minPaidToConfirm;
 
+    const paidSlots = await prisma.tableSlotInvite.findMany({
+      where: { poolId: pool.id, status: "PAID" },
+      orderBy: [{ paidAt: "asc" }, { createdAt: "asc" }],
+      select: {
+        invitedName: true,
+        pricePerSeat: true,
+        paidAt: true,
+        seatNumber: true,
+      },
+    });
+
+    const totalCollected = paidSlots.reduce((sum, s) => sum + Number(s.pricePerSeat), 0);
+    const paymentTimeline = paidSlots.map((s, index) => ({
+      order: index + 1,
+      name: s.invitedName,
+      amount: Number(s.pricePerSeat),
+      paidAt: s.paidAt?.toISOString() ?? null,
+      seatNumber: s.seatNumber,
+    }));
+
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const payUrl = mesaPagarUrl(baseUrl, pool.eventId, pool.tableNumber, token);
 
@@ -98,7 +118,10 @@ export async function GET(
         splitAmong: pool.splitAmong,
         minPaidToConfirm: pool.minPaidToConfirm,
         paidCount,
+        totalCollected,
+        paymentTimeline,
         tableConfirmed,
+        expiresAt: pool.expiresAt?.toISOString() ?? null,
         eventId: pool.eventId,
         event: pool.event,
         payUrl,
