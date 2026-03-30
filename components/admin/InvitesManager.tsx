@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Copy, Check, Link2, Plus } from "lucide-react";
+import { Copy, Check, Link2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { effectiveTicketPriceAt, generalAdmissionUnitPrice } from "@/lib/ticket-pricing";
 
@@ -173,6 +173,51 @@ export function InvitesManager() {
       setTimeout(() => setCopiedId(null), 2000);
     } catch {
       toast.error("No se pudo copiar");
+    }
+  };
+
+  const cancelInvite = async (inviteToken: string, isPool: boolean, status: string) => {
+    try {
+      // No tocar pagos ya realizados
+      if (status === "PAID") {
+        toast.error("No se puede cancelar una invitación ya pagada");
+        return;
+      }
+
+      const ok = window.confirm(
+        isPool ? "¿Cancelar esta mesa? El link compartido ya no será usable." : "¿Cancelar este link?"
+      );
+      if (!ok) return;
+
+      const res = await fetch(
+        `/api/admin/events/${selectedEventId}/invites/cancel`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ inviteToken, isPool }),
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Error al cancelar");
+      }
+
+      toast.success(data.message || "Cancelado");
+
+      // Refrescar lista de invites
+      const invRes = await fetch(`/api/admin/events/${selectedEventId}/invites`, {
+        credentials: "include",
+      });
+      const invData = await invRes.json();
+      if (invData.success && invData.data?.invites) {
+        setInvites(invData.data.invites);
+      } else {
+        setInvites([]);
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Error al cancelar");
     }
   };
 
@@ -690,21 +735,36 @@ export function InvitesManager() {
                       : "—"}
                   </td>
                   <td className="py-3 px-4 text-right">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-white/70 hover:text-white"
-                      onClick={() => copyLink(inv.url, inv.inviteToken)}
-                    >
-                      {copiedId === inv.inviteToken ? (
-                        <Check className="w-4 h-4 text-green-400" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
-                      <span className="ml-1 text-xs">
-                        {copiedId === inv.inviteToken ? "Copiado" : "Copiar"}
-                      </span>
-                    </Button>
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-white/70 hover:text-white"
+                        onClick={() => copyLink(inv.url, inv.inviteToken)}
+                      >
+                        {copiedId === inv.inviteToken ? (
+                          <Check className="w-4 h-4 text-green-400" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                        <span className="ml-1 text-xs">
+                          {copiedId === inv.inviteToken ? "Copiado" : "Copiar"}
+                        </span>
+                      </Button>
+
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className={`${
+                          inv.status === "PAID" ? "pointer-events-none opacity-50" : "text-red-400 hover:text-red-300"
+                        }`}
+                        onClick={() => cancelInvite(inv.inviteToken, !!inv.isPool, inv.status)}
+                        aria-label="Cancelar mesa o link"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span className="ml-1 text-xs">Eliminar</span>
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}

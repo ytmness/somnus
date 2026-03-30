@@ -91,7 +91,7 @@ export async function GET(
 
     try {
       invites = await prisma.tableSlotInvite.findMany({
-        where: { eventId },
+        where: { eventId, status: { not: "CANCELLED" } },
         orderBy: [{ tableNumber: "asc" }, { seatNumber: "asc" }],
         select: {
           id: true,
@@ -113,7 +113,7 @@ export async function GET(
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes("paidAt") || msg.includes("column") || msg.includes("does not exist")) {
         invites = await prisma.tableSlotInvite.findMany({
-          where: { eventId },
+          where: { eventId, status: { not: "CANCELLED" } },
           orderBy: [{ tableNumber: "asc" }, { seatNumber: "asc" }],
           select: {
             id: true,
