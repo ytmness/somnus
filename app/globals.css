@@ -228,6 +228,29 @@ body::-webkit-scrollbar {
     z-index: 0;
     opacity: 0.6;
   }
+
+  /* Upcoming events: flyer de fondo (public/assets/fondoupcomingevents.jpg) */
+  .somnus-events-bg--flyer {
+    background-color: #06040c;
+    background-image:
+      linear-gradient(
+        180deg,
+        rgba(6, 4, 14, 0.88) 0%,
+        rgba(8, 6, 18, 0.72) 35%,
+        rgba(6, 4, 12, 0.82) 70%,
+        rgba(4, 3, 10, 0.92) 100%
+      ),
+      radial-gradient(ellipse 100% 80% at 50% 0%, rgba(40, 20, 60, 0.35) 0%, transparent 55%),
+      url("/assets/fondoupcomingevents.jpg");
+    background-size: cover, cover, cover;
+    background-position: center, center, center top;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+  }
+
+  .somnus-events-bg--flyer::before {
+    opacity: 0.22;
+  }
   
   .regia-gradient {
     background: linear-gradient(135deg, #2a2c30 0%, #49484e 100%);

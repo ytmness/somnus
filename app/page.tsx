@@ -466,7 +466,7 @@ export default function HomePage() {
       <RevealSection>
         <section
           id="eventos"
-          className="py-28 sm:py-36 lg:py-44 px-4 sm:px-6 lg:px-8 somnus-events-bg relative"
+          className="py-28 sm:py-36 lg:py-44 px-4 sm:px-6 lg:px-8 somnus-events-bg somnus-events-bg--flyer relative overflow-hidden"
         >
           <div className="max-w-7xl mx-auto relative z-10">
             <h2 className="somnus-title-secondary text-center text-4xl md:text-5xl lg:text-6xl mb-4 uppercase tracking-wider font-bold">
