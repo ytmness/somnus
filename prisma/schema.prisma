@@ -173,6 +173,11 @@ model Sale {
   buyerName           String
   buyerEmail          String
   buyerPhone          String?
+
+  // Email de recibo con QR (anti-doble envío)
+  emailReceiptStatus String   @default("NOT_SENT") // NOT_SENT | SENDING | SENT | FAILED
+  emailReceiptSentAt DateTime?
+  emailReceiptError  String?
   
   // Venta desde invite de mesa (trazabilidad)
   tableSlotInviteId   String?     @unique

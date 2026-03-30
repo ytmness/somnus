@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { prisma } from "@/lib/db/prisma";
 import { createClipCharge } from "@/lib/payments/clip";
 import { generateQRHash } from "@/lib/services/qr-generator";
+import { sendTicketsReceiptEmail } from "@/lib/services/tickets-email";
 
 export const dynamic = "force-dynamic";
 
@@ -39,10 +40,79 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Venta no encontrada" }, { status: 404 });
     }
 
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+    const attemptSendReceiptEmailIfNeeded = async () => {
+      // Candado anti-doble envío:
+      // - Solo enviamos si el Sale está en NOT_SENT.
+      // - Marcamos SENDING primero para que reintentos/concurrencia no reenvíen.
+      const locked = await prisma.sale.updateMany({
+        where: { id: saleId, emailReceiptStatus: "NOT_SENT" },
+        data: { emailReceiptStatus: "SENDING" },
+      });
+      if (locked.count === 0) return;
+
+      try {
+        const tickets = await prisma.ticket.findMany({
+          where: { saleId },
+          include: {
+            ticketType: {
+              include: {
+                event: true,
+              },
+            },
+          },
+          orderBy: { createdAt: "asc" },
+        });
+
+        if (!tickets.length) {
+          throw new Error("No se encontraron tickets para enviar el recibo");
+        }
+
+        await sendTicketsReceiptEmail({
+          saleId,
+          buyerEmail: sale.buyerEmail,
+          buyerName: sale.buyerName,
+          buyerPhone: sale.buyerPhone,
+          eventName: sale.event?.name || "Evento",
+          appUrl,
+          total: Number(sale.total),
+          subtotal: Number(sale.subtotal),
+          tax: Number(sale.tax),
+          tickets: tickets as any,
+        });
+
+        await prisma.sale.update({
+          where: { id: saleId },
+          data: {
+            emailReceiptStatus: "SENT",
+            emailReceiptSentAt: new Date(),
+            emailReceiptError: null,
+          },
+        });
+      } catch (err: any) {
+        const msg = err?.message || String(err);
+        console.error("[create-charge] Error enviando recibo:", msg);
+
+        await prisma.sale
+          .update({
+            where: { id: saleId },
+            data: {
+              emailReceiptStatus: "FAILED",
+              emailReceiptError: msg,
+            },
+          })
+          .catch(() => {
+            // No bloqueamos el endpoint si falló el update de estado
+          });
+      }
+    };
+
     if (sale.status === "COMPLETED") {
       // Idempotencia: si el frontend reintenta (doble click / retry),
       // no regresemos 400; respondemos success para que no se quede
       // el usuario en pantalla de tarjeta.
+      await attemptSendReceiptEmailIfNeeded();
       return NextResponse.json({
         success: true,
         data: { saleId, paid: true, alreadyCompleted: true },
@@ -156,6 +226,8 @@ export async function POST(request: NextRequest) {
         paidAt: new Date(),
       },
     });
+
+    await attemptSendReceiptEmailIfNeeded();
 
     if (isInviteSale && invite) {
       // Para money pool: cuando el usuario paga N asientos en un solo checkout,
