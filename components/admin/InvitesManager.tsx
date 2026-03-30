@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Copy, Check, Link2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
-const TOTAL_TABLES = 162;
-const MAX_SLOTS = 100; // Límite al generar el link grupal (lo estableces tú)
+const MAX_TRADITIONAL_SLOTS = 500;
+const DEFAULT_MIN_CONFIRM = 20;
 
 interface EventOption {
   id: string;
@@ -17,7 +17,7 @@ interface EventOption {
 
 interface InviteRow {
   id: string;
-  tableNumber: number;
+  tableNumber: string;
   seatNumber: number | null;
   invitedName: string;
   invitedEmail: string | null;
@@ -30,8 +30,11 @@ interface InviteRow {
   expiresAt: string | null;
   createdAt: string;
   isPool?: boolean;
-  maxSlots?: number;
+  maxSlots?: number | null;
+  splitAmong?: number;
+  minPaidToConfirm?: number;
   paidCount?: number;
+  tableConfirmed?: boolean;
 }
 
 export function InvitesManager() {
@@ -48,10 +51,22 @@ export function InvitesManager() {
   const [generateEventId, setGenerateEventId] = useState("");
   const [generateTableNumber, setGenerateTableNumber] = useState("");
   const [generateSlots, setGenerateSlots] = useState(5);
+  const [generateSplitAmong, setGenerateSplitAmong] = useState(34);
+  const [generateMinConfirm, setGenerateMinConfirm] = useState(DEFAULT_MIN_CONFIRM);
   const [generateTotalPrice, setGenerateTotalPrice] = useState("");
   const [isSubmittingGenerate, setIsSubmittingGenerate] = useState(false);
   const [generatedLinks, setGeneratedLinks] = useState<
-    Array<{ token: string; name: string; url: string; pricePerSeat: number; seatNumber: number | null; maxSlots?: number; isPool?: boolean }>
+    Array<{
+      token: string;
+      name: string;
+      url: string;
+      pricePerSeat: number;
+      seatNumber: number | null;
+      maxSlots?: number | null;
+      splitAmong?: number;
+      minPaidToConfirm?: number;
+      isPool?: boolean;
+    }>
   >([]);
   const [usePoolMode, setUsePoolMode] = useState(true); // Money pool: un link para toda la mesa
 
@@ -127,26 +142,45 @@ export function InvitesManager() {
       toast.error("Elige un evento");
       return;
     }
-    const tableNum = parseInt(generateTableNumber, 10);
-    if (isNaN(tableNum) || tableNum < 1 || tableNum > TOTAL_TABLES) {
-      toast.error(`Mesa debe ser entre 1 y ${TOTAL_TABLES}`);
+    const tableKey = generateTableNumber.trim();
+    if (tableKey.length < 1 || tableKey.length > 120) {
+      toast.error("Indica un nombre o número de mesa (1–120 caracteres).");
       return;
     }
-    const slots = Math.min(MAX_SLOTS, Math.max(1, generateSlots));
+    const tableSegment = encodeURIComponent(tableKey);
+    const slots = Math.min(MAX_TRADITIONAL_SLOTS, Math.max(1, generateSlots));
     const totalPrice = parseFloat(generateTotalPrice.replace(/,/g, "."));
     if (isNaN(totalPrice) || totalPrice <= 0) {
       toast.error("Precio total de la mesa debe ser mayor que 0");
       return;
     }
 
+    if (usePoolMode) {
+      const splitAmong = Math.floor(Number(generateSplitAmong));
+      const minC = Math.floor(Number(generateMinConfirm));
+      if (!Number.isFinite(splitAmong) || splitAmong < 1 || splitAmong > 10000) {
+        toast.error('"Dividir precio entre" debe ser un número entre 1 y 10000.');
+        return;
+      }
+      if (!Number.isFinite(minC) || minC < 1 || minC > 10000) {
+        toast.error('"Pagos para confirmar" debe ser entre 1 y 10000.');
+        return;
+      }
+    }
+
     setIsSubmittingGenerate(true);
     setGeneratedLinks([]);
     try {
       const body: Record<string, unknown> = usePoolMode
-        ? { slots, totalTablePrice: totalPrice, mode: "pool" }
+        ? {
+            totalTablePrice: totalPrice,
+            mode: "pool",
+            splitAmong: Math.floor(Number(generateSplitAmong)),
+            minPaidToConfirm: Math.floor(Number(generateMinConfirm)),
+          }
         : { slots, totalTablePrice: totalPrice };
       const res = await fetch(
-        `/api/events/${eventId}/tables/${tableNum}/invites`,
+        `/api/events/${eventId}/tables/${tableSegment}/invites`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -250,7 +284,7 @@ export function InvitesManager() {
         <p className="text-white/60 text-sm mb-4">
           {usePoolMode
             ? "Un link compartido para toda la mesa. Compártelo en el grupo de WhatsApp y cada quien paga su parte ingresando nombre, email y teléfono al pagar. Los pagos se registran automáticamente."
-            : `Evento, mesa, precio total y cuántas personas (1–${MAX_SLOTS}). Cada uno recibe su link individual.`}
+            : `Evento, mesa, precio total y cuántas personas (1–${MAX_TRADITIONAL_SLOTS}). Cada uno recibe su link individual.`}
         </p>
         {!showGenerate ? (
           <Button
@@ -259,6 +293,8 @@ export function InvitesManager() {
               setGenerateEventId(eventsWithTables.length > 0 ? eventsWithTables[0].id : selectedEventId);
               setGenerateTableNumber("");
               setGenerateSlots(5);
+              setGenerateSplitAmong(34);
+              setGenerateMinConfirm(DEFAULT_MIN_CONFIRM);
               setGenerateTotalPrice("");
               setGeneratedLinks([]);
             }}
@@ -291,16 +327,15 @@ export function InvitesManager() {
               </div>
               <div>
                 <label className="block text-white/80 text-sm font-medium mb-1">
-                  Número de mesa (1–{TOTAL_TABLES}) *
+                  Nombre o número de mesa *
                 </label>
                 <input
-                  type="number"
-                  min={1}
-                  max={TOTAL_TABLES}
+                  type="text"
                   value={generateTableNumber}
                   onChange={(e) => setGenerateTableNumber(e.target.value)}
-                  placeholder="Ej: 42"
+                  placeholder="Ej: 42, Terraza A, VIP Norte…"
                   required
+                  maxLength={120}
                   className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
                 />
               </div>
@@ -321,31 +356,79 @@ export function InvitesManager() {
                   className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
                 />
                 <p className="text-white/50 text-xs mt-1">
-                  Se dividirá entre el número de personas.
-                </p>
-              </div>
-              <div>
-                <label className="block text-white/80 text-sm font-medium mb-1">
-                  Cuántas personas pueden pagar (1–{MAX_SLOTS}) *
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  max={MAX_SLOTS}
-                  value={generateSlots}
-                  onChange={(e) =>
-                    setGenerateSlots(
-                      Math.min(MAX_SLOTS, Math.max(1, parseInt(e.target.value, 10) || 1))
-                    )
-                  }
-                  className="w-full max-w-[120px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
-                />
-                <p className="text-white/50 text-xs mt-1">
                   {usePoolMode
-                    ? "Máximo de pagos permitidos en este link."
-                    : "Cada uno recibe un link; ingresan nombre, email y teléfono al pagar."}
+                    ? "El total se divide entre la cantidad que indiques abajo (ej. mesa para 34 personas)."
+                    : "Se dividirá entre el número de personas (modo links individuales)."}
                 </p>
               </div>
+              {usePoolMode ? (
+                <>
+                  <div>
+                    <label className="block text-white/80 text-sm font-medium mb-1">
+                      Dividir precio total entre (personas) *
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={10000}
+                      value={generateSplitAmong}
+                      onChange={(e) =>
+                        setGenerateSplitAmong(
+                          Math.min(10000, Math.max(1, parseInt(e.target.value, 10) || 1))
+                        )
+                      }
+                      className="w-full max-w-[140px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                    />
+                    <p className="text-white/50 text-xs mt-1">
+                      Ej.: 34 → cada pago es total ÷ 34. El link sigue aceptando más pagos sin tope.
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-white/80 text-sm font-medium mb-1">
+                      Pagos mínimos para confirmar mesa *
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={10000}
+                      value={generateMinConfirm}
+                      onChange={(e) =>
+                        setGenerateMinConfirm(
+                          Math.min(10000, Math.max(1, parseInt(e.target.value, 10) || 1))
+                        )
+                      }
+                      className="w-full max-w-[140px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                    />
+                    <p className="text-white/50 text-xs mt-1">
+                      Por defecto 20. En la lista verás &quot;confirmada&quot; al llegar a este número de pagos completados.
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <div>
+                  <label className="block text-white/80 text-sm font-medium mb-1">
+                    Cuántas personas (1–{MAX_TRADITIONAL_SLOTS}) *
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={MAX_TRADITIONAL_SLOTS}
+                    value={generateSlots}
+                    onChange={(e) =>
+                      setGenerateSlots(
+                        Math.min(
+                          MAX_TRADITIONAL_SLOTS,
+                          Math.max(1, parseInt(e.target.value, 10) || 1)
+                        )
+                      )
+                    }
+                    className="w-full max-w-[120px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                  />
+                  <p className="text-white/50 text-xs mt-1">
+                    Cada uno recibe un link; ingresan nombre, email y teléfono al pagar.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3">
@@ -384,7 +467,11 @@ export function InvitesManager() {
                 >
                   <span className="text-white/80 text-sm">
                     {link.isPool
-                      ? `Mesa compartida (hasta ${link.maxSlots} pagos) ·`
+                      ? `Mesa compartida (precio ÷ ${link.splitAmong ?? "—"}${
+                          link.minPaidToConfirm != null
+                            ? ` · confirmar con ${link.minPaidToConfirm} pagos`
+                            : ""
+                        }) ·`
                       : `Asiento ${link.seatNumber} ·`}
                   </span>
                   <button
@@ -473,7 +560,7 @@ export function InvitesManager() {
                   className="border-b border-white/5 hover:bg-white/5"
                 >
                   <td className="py-3 px-4 text-white/90">
-                    Mesa {inv.tableNumber}
+                    {inv.tableNumber}
                   </td>
                   <td className="py-3 px-4 text-white/80">
                     {inv.isPool ? "Link compartido" : inv.seatNumber}
@@ -503,8 +590,12 @@ export function InvitesManager() {
                           : "bg-red-500/20 text-red-400"
                       }`}
                     >
-                      {inv.status === "POOL" && inv.paidCount != null && inv.maxSlots != null
-                        ? `${inv.paidCount}/${inv.maxSlots} pagados`
+                      {inv.status === "POOL" && inv.paidCount != null
+                        ? inv.tableConfirmed
+                          ? `Confirmada · ${inv.paidCount} pagos`
+                          : inv.minPaidToConfirm != null
+                          ? `${inv.paidCount}/${inv.minPaidToConfirm} para confirmar`
+                          : `${inv.paidCount} pagos`
                         : inv.status === "PAID"
                         ? "Pagado"
                         : inv.status === "PENDING"

@@ -43,6 +43,7 @@ export async function GET(
         const paidCount = await prisma.tableSlotInvite.count({
           where: { poolId: p.id, status: "PAID" },
         });
+        const tableConfirmed = paidCount >= p.minPaidToConfirm;
         return {
           id: p.id,
           tableNumber: p.tableNumber,
@@ -54,19 +55,22 @@ export async function GET(
           paidAt: null as string | null,
           pricePerSeat: Number(p.pricePerSeat),
           inviteToken: p.inviteToken,
-          url: `${baseUrl}/eventos/${eventId}/mesa/${p.tableNumber}/pagar/${p.inviteToken}`,
+          url: `${baseUrl}/eventos/${eventId}/mesa/${encodeURIComponent(p.tableNumber)}/pagar/${p.inviteToken}`,
           expiresAt: p.expiresAt != null ? p.expiresAt.toISOString() : null,
           createdAt: p.createdAt.toISOString(),
           isPool: true,
           maxSlots: p.maxSlots,
+          splitAmong: p.splitAmong,
+          minPaidToConfirm: p.minPaidToConfirm,
           paidCount,
+          tableConfirmed,
         };
       })
     );
 
     type InviteRow = {
       id: string;
-      tableNumber: number;
+      tableNumber: string;
       seatNumber: number;
       invitedName: string;
       invitedEmail: string | null;
@@ -132,8 +136,8 @@ export async function GET(
     const data = invites.map((inv) => {
       const url =
         inv.poolId && poolById.has(inv.poolId)
-          ? `${baseUrl}/eventos/${eventId}/mesa/${inv.tableNumber}/pagar/${poolById.get(inv.poolId)!.inviteToken}`
-          : `${baseUrl}/eventos/${eventId}/mesa/${inv.tableNumber}/pagar/${inv.inviteToken}`;
+          ? `${baseUrl}/eventos/${eventId}/mesa/${encodeURIComponent(inv.tableNumber)}/pagar/${poolById.get(inv.poolId)!.inviteToken}`
+          : `${baseUrl}/eventos/${eventId}/mesa/${encodeURIComponent(inv.tableNumber)}/pagar/${inv.inviteToken}`;
       return {
         id: inv.id,
         tableNumber: inv.tableNumber,
@@ -152,9 +156,14 @@ export async function GET(
       };
     });
 
-    const combinedInvites = [...poolRows, ...data].sort(
-      (a, b) => a.tableNumber - b.tableNumber || (a.seatNumber ?? 0) - (b.seatNumber ?? 0)
-    );
+    const combinedInvites = [...poolRows, ...data].sort((a, b) => {
+      const cmp = String(a.tableNumber).localeCompare(String(b.tableNumber), "es", {
+        numeric: true,
+        sensitivity: "base",
+      });
+      if (cmp !== 0) return cmp;
+      return (a.seatNumber ?? 0) - (b.seatNumber ?? 0);
+    });
 
     return NextResponse.json({
       success: true,

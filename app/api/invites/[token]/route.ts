@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 
+function mesaPagarUrl(baseUrl: string, eventId: string, tableKey: string, token: string) {
+  return `${baseUrl}/eventos/${eventId}/mesa/${encodeURIComponent(tableKey)}/pagar/${token}`;
+}
+
 /**
  * GET /api/invites/[token]
  * Obtener datos de una invitación por token (para página de pago)
@@ -75,10 +79,11 @@ export async function GET(
     const paidCount = await prisma.tableSlotInvite.count({
       where: { poolId: pool.id, status: "PAID" },
     });
-    const tableReserved = paidCount >= pool.maxSlots;
+    const poolFull = pool.maxSlots != null && paidCount >= pool.maxSlots;
+    const tableConfirmed = paidCount >= pool.minPaidToConfirm;
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const payUrl = `${baseUrl}/eventos/${pool.eventId}/mesa/${pool.tableNumber}/pagar/${token}`;
+    const payUrl = mesaPagarUrl(baseUrl, pool.eventId, pool.tableNumber, token);
 
     return NextResponse.json({
       success: true,
@@ -90,12 +95,15 @@ export async function GET(
         seatNumber: null,
         pricePerSeat: Number(pool.pricePerSeat),
         maxSlots: pool.maxSlots,
+        splitAmong: pool.splitAmong,
+        minPaidToConfirm: pool.minPaidToConfirm,
         paidCount,
+        tableConfirmed,
         eventId: pool.eventId,
         event: pool.event,
         payUrl,
-        status: tableReserved ? "PAID" : "PENDING",
-        tableReserved,
+        status: poolFull ? "PAID" : "PENDING",
+        tableReserved: poolFull,
       },
     });
   } catch (error) {
@@ -109,7 +117,7 @@ export async function GET(
 
 async function handleSlotInvite(invite: any) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const payUrl = `${baseUrl}/eventos/${invite.eventId}/mesa/${invite.tableNumber}/pagar/${invite.inviteToken}`;
+  const payUrl = mesaPagarUrl(baseUrl, invite.eventId, invite.tableNumber, invite.inviteToken);
 
   if (invite.expiresAt && new Date() > invite.expiresAt && invite.status === "PENDING") {
       await prisma.tableSlotInvite.update({

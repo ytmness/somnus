@@ -217,9 +217,22 @@ export default function PagarInvitePage() {
             <>
               {" · "}
               <span className="text-white">Link compartido</span>
-              {invite.paidCount != null && invite.maxSlots != null && (
+              {invite.paidCount != null && (
                 <span className="block mt-1 text-white/60 text-sm">
-                  {invite.paidCount} de {invite.maxSlots} ya pagaron
+                  {invite.maxSlots != null
+                    ? `${invite.paidCount} de ${invite.maxSlots} pagos`
+                    : `${invite.paidCount} pago(s) registrado(s)`}
+                  {invite.minPaidToConfirm != null && (
+                    <span className="block mt-1">
+                      {invite.tableConfirmed ? (
+                        <span className="text-green-400/90">Mesa confirmada</span>
+                      ) : (
+                        <span>
+                          Para confirmar la mesa: {invite.paidCount}/{invite.minPaidToConfirm} pagos
+                        </span>
+                      )}
+                    </span>
+                  )}
                 </span>
               )}
             </>

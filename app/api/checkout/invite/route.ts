@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { getSession } from "@/lib/auth/supabase-auth";
 import { calculateClipCommission } from "@/lib/utils";
+import { ticketTableLabel } from "@/lib/table-invite";
 import crypto from "crypto";
 
 export const dynamic = "force-dynamic";
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
       const paidCount = await prisma.tableSlotInvite.count({
         where: { poolId: pool.id, status: "PAID" },
       });
-      if (paidCount >= pool.maxSlots) {
+      if (pool.maxSlots != null && paidCount >= pool.maxSlots) {
         return NextResponse.json(
           { error: "Esta mesa ya está completa. Todos los espacios han sido pagados." },
           { status: 400 }
@@ -166,7 +167,7 @@ export async function POST(request: NextRequest) {
             ticketTypeId: invite.ticketTypeId,
             quantity: 1,
             isTable: true,
-            tableNumber: `Mesa ${invite.tableNumber}`,
+            tableNumber: ticketTableLabel(String(invite.tableNumber)),
           },
         });
         return sale.id;

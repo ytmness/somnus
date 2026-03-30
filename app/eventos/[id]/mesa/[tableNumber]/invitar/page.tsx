@@ -7,14 +7,18 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { ArrowLeft, Users, Copy, Check, Plus, Trash2 } from "lucide-react";
 
-const TOTAL_TABLES = 162;
-
 export default function InvitarMesaPage() {
   const router = useRouter();
   const params = useParams();
   const eventId = params.id as string;
   const tableNumberStr = params.tableNumber as string;
-  const tableNumber = parseInt(tableNumberStr, 10);
+  const tableKey = (() => {
+    try {
+      return decodeURIComponent(tableNumberStr).trim();
+    } catch {
+      return tableNumberStr.trim();
+    }
+  })();
 
   const [event, setEvent] = useState<any>(null);
   const [seatsPerTable, setSeatsPerTable] = useState(4);
@@ -31,7 +35,7 @@ export default function InvitarMesaPage() {
 
   useEffect(() => {
     const loadEvent = async () => {
-      if (!eventId || isNaN(tableNumber) || tableNumber < 1 || tableNumber > TOTAL_TABLES) {
+      if (!eventId || !tableKey || tableKey.length < 1 || tableKey.length > 120) {
         toast.error("Mesa o evento inválido");
         router.push("/");
         return;
@@ -70,7 +74,7 @@ export default function InvitarMesaPage() {
     };
 
     loadEvent();
-  }, [eventId, tableNumber, router]);
+  }, [eventId, tableKey, router]);
 
   const addInvite = () => {
     if (invites.length >= seatsPerTable) return;
@@ -99,7 +103,7 @@ export default function InvitarMesaPage() {
     setIsSubmitting(true);
     try {
       const res = await fetch(
-        `/api/events/${eventId}/tables/${tableNumber}/invites`,
+        `/api/events/${eventId}/tables/${encodeURIComponent(tableKey)}/invites`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -169,13 +173,13 @@ export default function InvitarMesaPage() {
             <ArrowLeft className="w-4 h-4" />
             Volver al evento
           </Link>
-          <span className="text-white/60 text-sm">Mesa {tableNumber}</span>
+          <span className="text-white/60 text-sm">Mesa {tableKey}</span>
         </div>
       </header>
 
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
         <h1 className="text-2xl md:text-3xl font-bold text-white mb-2 uppercase tracking-wider">
-          Invitar grupo - Mesa {tableNumber}
+          Invitar grupo - Mesa {tableKey}
         </h1>
         <p className="text-white/60 mb-2">{event.name}</p>
         <p className="text-white/80 mb-8">

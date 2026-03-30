@@ -256,9 +256,11 @@ model TableInvitePool {
   id            String   @id @default(uuid())
   eventId       String
   ticketTypeId  String
-  tableNumber   Int      // Ej: Mesa 42
+  tableNumber   String   // Nombre o número de mesa (ej: "42", "Terraza A")
   inviteToken   String   @unique // Un solo token para toda la mesa
-  maxSlots      Int      // Cuántas personas pueden pagar (ej: 10)
+  maxSlots      Int?     // Tope de pagos en el link; null = sin límite
+  splitAmong    Int      // Entre cuántas personas se divide el precio total (ej: 34)
+  minPaidToConfirm Int @default(20) // Pagos necesarios para considerar la mesa "confirmada"
   pricePerSeat  Decimal  @db.Decimal(10, 2)
   expiresAt     DateTime?
   createdAt     DateTime @default(now())
@@ -277,7 +279,7 @@ model TableSlotInvite {
   id            String           @id @default(uuid())
   eventId       String
   ticketTypeId  String           // TicketType VIP de mesas
-  tableNumber   Int              // Ej: Mesa 42
+  tableNumber   String           // Nombre o número de mesa (ej: "42", "Terraza A")
   seatNumber    Int              // 1, 2, 3... hasta seatsPerTable
   poolId        String?          // Si viene de TableInvitePool (money pool)
   
