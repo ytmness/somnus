@@ -23,8 +23,19 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { saleId, token, customer } = body;
+    console.info("[create-charge] request", {
+      saleId: saleId || null,
+      hasToken: Boolean(token),
+      customerEmail: customer?.email || null,
+      hasCustomerPhone: Boolean(customer?.phone),
+    });
 
     if (!saleId || !token || !customer?.email) {
+      console.warn("[create-charge] 400 campos faltantes", {
+        saleId: saleId || null,
+        hasToken: Boolean(token),
+        customerEmail: customer?.email || null,
+      });
       return NextResponse.json(
         { error: "Faltan saleId, token o customer.email" },
         { status: 400 }
@@ -112,6 +123,7 @@ export async function POST(request: NextRequest) {
       // Idempotencia: si el frontend reintenta (doble click / retry),
       // no regresemos 400; respondemos success para que no se quede
       // el usuario en pantalla de tarjeta.
+      console.info("[create-charge] sale ya COMPLETED, devolviendo idempotente", { saleId });
       await attemptSendReceiptEmailIfNeeded();
       return NextResponse.json({
         success: true,
