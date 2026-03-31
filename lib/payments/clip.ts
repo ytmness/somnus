@@ -22,18 +22,6 @@ export interface ClipChargeResponse {
   [key: string]: unknown;
 }
 
-function normalizeClipPhone(phone?: string): string | undefined {
-  if (!phone) return undefined;
-
-  const digitsOnly = phone.replace(/\D/g, "");
-  // Permitimos formatos numéricos comunes (MX 10 dígitos, o internacional 10-15)
-  if (digitsOnly.length >= 10 && digitsOnly.length <= 15) {
-    return digitsOnly;
-  }
-
-  return undefined;
-}
-
 export async function createClipCharge(
   saleId: string,
   totalAmount: number,
@@ -52,13 +40,13 @@ export async function createClipCharge(
 
   // Clip espera el monto (puede ser decimal para pruebas, ej: 0.01)
   const amount = Number(totalAmount);
-  const normalizedPhone = normalizeClipPhone(customer.phone);
   const body: ClipChargeRequest = {
     amount,
     currency: "MXN",
     description: description || `Venta Somnus - ${saleId.slice(0, 8)}`,
     payment_method: { token },
-    customer: { email: customer.email, ...(normalizedPhone && { phone: normalizedPhone }) },
+    // Evita rechazos CL2200: phone es opcional en Clip, enviamos solo email.
+    customer: { email: customer.email },
     external_reference: saleId,
   };
 
