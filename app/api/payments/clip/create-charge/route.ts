@@ -138,6 +138,13 @@ export async function POST(request: NextRequest) {
       clipRes?.status === "completed" ||
       clipRes?.status === "paid";
     if (!isPaid) {
+      console.warn("[create-charge] Pago no completado por Clip:", {
+        saleId,
+        clipId: clipRes?.id,
+        status: clipRes?.status,
+        paid: clipRes?.paid,
+        paidAmount: (clipRes as any)?.paid_amount,
+      });
       return NextResponse.json(
         {
           error: "El pago no se completó",
