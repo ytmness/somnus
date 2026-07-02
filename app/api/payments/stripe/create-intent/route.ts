@@ -7,6 +7,7 @@ import { isStripeEnabled } from "@/lib/payments/config";
 import {
   cancelPaymentIntentForSale,
   canReusePaymentIntent,
+  isApplicationFeeBlockedForConnectedAccount,
   retrievePaymentIntentForSale,
 } from "@/lib/payments/stripe-connect-charge";
 
@@ -63,6 +64,9 @@ export async function POST(request: NextRequest) {
 
     const connectedAccountId = organizerInfo?.stripeAccountId || null;
     const stripe = getStripe();
+    const blockApplicationFee = connectedAccountId
+      ? await isApplicationFeeBlockedForConnectedAccount(stripe, connectedAccountId)
+      : false;
 
     if (sale.paymentIntentId) {
       const existing = await retrievePaymentIntentForSale(
@@ -71,7 +75,7 @@ export async function POST(request: NextRequest) {
         connectedAccountId || sale.stripeConnectedAccountId
       );
 
-      if (canReusePaymentIntent(existing)) {
+      if (canReusePaymentIntent(existing, { blockApplicationFee })) {
         return NextResponse.json({
           clientSecret: existing.client_secret,
           paymentIntentId: existing.id,
@@ -98,20 +102,25 @@ export async function POST(request: NextRequest) {
         eventId: sale.eventId,
         organizerId: organizerInfo?.organizerId || "",
         platformFeeAmount: String(amounts.platformFeeCents),
+        serviceFeeAmount: String(amounts.serviceFeeCents),
+        platformKeepsCents: String(
+          amounts.platformFeeCents + amounts.serviceFeeCents
+        ),
         connectedAccountId: connectedAccountId || "",
         chargeType: connectedAccountId ? "direct" : "platform",
+        applicationFeeBlocked: blockApplicationFee ? "true" : "false",
         source: "somnus.live",
       },
     };
 
     const requestOptions: Parameters<typeof stripe.paymentIntents.create>[1] = {
-      idempotencyKey: `sale:${sale.id}:create_intent:v4-direct`,
+      idempotencyKey: `sale:${sale.id}:create_intent:v5-no-app-fee`,
     };
 
     if (connectedAccountId) {
       const platformKeepsCents =
         amounts.platformFeeCents + amounts.serviceFeeCents;
-      if (platformKeepsCents > 0) {
+      if (platformKeepsCents > 0 && !blockApplicationFee) {
         intentParams.application_fee_amount = platformKeepsCents;
       }
       requestOptions.stripeAccount = connectedAccountId;

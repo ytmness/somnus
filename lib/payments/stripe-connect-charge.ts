@@ -1,8 +1,42 @@
 import type Stripe from "stripe";
 
+const US_PLATFORM_BLOCKED_CONNECTED = new Set([
+  "MX",
+  "BR",
+  "IN",
+  "MY",
+  "SG",
+  "TH",
+]);
+
 /** Destination/on_behalf_of charges fail confirm for US platform + MX connected. */
 export function isLegacyDestinationCharge(pi: Stripe.PaymentIntent): boolean {
   return Boolean(pi.transfer_data?.destination || pi.on_behalf_of);
+}
+
+/**
+ * Stripe blocks application_fee_amount on confirm for US platforms paying out
+ * to connected accounts in several countries (including MX).
+ */
+export async function isApplicationFeeBlockedForConnectedAccount(
+  stripe: Stripe,
+  connectedAccountId: string
+): Promise<boolean> {
+  const [platform, connected] = await Promise.all([
+    stripe.accounts.retrieve(),
+    stripe.accounts.retrieve(connectedAccountId),
+  ]);
+
+  const platformCountry = platform.country?.toUpperCase();
+  const connectedCountry = connected.country?.toUpperCase();
+
+  if (!platformCountry || !connectedCountry || platformCountry === connectedCountry) {
+    return false;
+  }
+
+  return (
+    platformCountry === "US" && US_PLATFORM_BLOCKED_CONNECTED.has(connectedCountry)
+  );
 }
 
 export async function retrievePaymentIntentForSale(
@@ -43,9 +77,14 @@ export async function cancelPaymentIntentForSale(
   }
 }
 
-export function canReusePaymentIntent(pi: Stripe.PaymentIntent): boolean {
+export function canReusePaymentIntent(
+  pi: Stripe.PaymentIntent,
+  options?: { blockApplicationFee?: boolean }
+): boolean {
   if (!pi.client_secret) return false;
   if (pi.status === "canceled" || pi.status === "succeeded") return false;
   if (pi.last_payment_error) return false;
-  return !isLegacyDestinationCharge(pi);
+  if (isLegacyDestinationCharge(pi)) return false;
+  if (options?.blockApplicationFee && pi.application_fee_amount) return false;
+  return true;
 }
