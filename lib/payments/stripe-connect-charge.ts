@@ -22,15 +22,13 @@ export async function isApplicationFeeBlockedForConnectedAccount(
   stripe: Stripe,
   connectedAccountId: string
 ): Promise<boolean> {
-  const [platform, connected] = await Promise.all([
-    stripe.accounts.retrieve(),
-    stripe.accounts.retrieve(connectedAccountId),
-  ]);
-
-  const platformCountry = platform.country?.toUpperCase();
+  const connected = await stripe.accounts.retrieve(connectedAccountId);
   const connectedCountry = connected.country?.toUpperCase();
+  const platformCountry = (
+    process.env.STRIPE_PLATFORM_COUNTRY || "US"
+  ).toUpperCase();
 
-  if (!platformCountry || !connectedCountry || platformCountry === connectedCountry) {
+  if (!connectedCountry || platformCountry === connectedCountry) {
     return false;
   }
 
