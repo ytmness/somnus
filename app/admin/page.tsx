@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, Calendar, Ticket, Users, ImageIcon, Link2, Mail, Percent, Building2 } from "lucide-react";
+import { Plus, Calendar, Ticket, Users, ImageIcon, Link2, Mail, Percent, Building2, TrendingUp } from "lucide-react";
 import { EventsTable } from "@/components/admin/EventsTable";
 import { CreateEventModal } from "@/components/admin/CreateEventModal";
 import { GalleryManager } from "@/components/admin/GalleryManager";
@@ -12,6 +12,7 @@ import { InvitesManager } from "@/components/admin/InvitesManager";
 import { ContactLeadsManager } from "@/components/admin/ContactLeadsManager";
 import { CommissionsManager } from "@/components/admin/CommissionsManager";
 import { OrganizersManager } from "@/components/admin/OrganizersManager";
+import { RevenueDashboard } from "@/components/admin/RevenueDashboard";
 import { toast } from "sonner";
 
 interface SessionUser {
@@ -25,6 +26,8 @@ interface AdminStats {
   totalEvents: number;
   ticketsSold: number;
   activeUsers: number;
+  platformCommissionMonth: number;
+  salesCompletedMonth: number;
 }
 
 export default function AdminPage() {
@@ -34,7 +37,7 @@ export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [activeTab, setActiveTab] = useState<"eventos" | "organizadores" | "galeria" | "invites" | "contacto" | "comisiones">("eventos");
+  const [activeTab, setActiveTab] = useState<"eventos" | "organizadores" | "galeria" | "invites" | "contacto" | "comisiones" | "ingresos">("eventos");
 
   useEffect(() => {
     checkAuth();
@@ -91,8 +94,12 @@ export default function AdminPage() {
     fetchStats();
   };
 
-  const formatNumber = (n: number) =>
-    new Intl.NumberFormat("en-US").format(n);
+  const formatMoney = (n: number) =>
+    new Intl.NumberFormat("es-MX", {
+      style: "currency",
+      currency: "MXN",
+      maximumFractionDigits: 0,
+    }).format(n);
 
   if (isLoading) {
     return (
@@ -177,13 +184,13 @@ export default function AdminPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards - Liquid Glass con datos reales */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <div className="liquid-glass p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white/70 text-sm mb-1">Total Eventos</p>
                 <p className="text-3xl font-bold text-white">
-                  {stats !== null ? formatNumber(stats.totalEvents) : "—"}
+                  {stats !== null ? stats.totalEvents.toLocaleString("es-MX") : "—"}
                 </p>
               </div>
               <div className="w-12 h-12 liquid-glass rounded-xl flex items-center justify-center">
@@ -197,7 +204,7 @@ export default function AdminPage() {
               <div>
                 <p className="text-white/70 text-sm mb-1">Boletos Vendidos</p>
                 <p className="text-3xl font-bold text-white">
-                  {stats !== null ? formatNumber(stats.ticketsSold) : "—"}
+                  {stats !== null ? stats.ticketsSold.toLocaleString("es-MX") : "—"}
                 </p>
               </div>
               <div className="w-12 h-12 liquid-glass rounded-xl flex items-center justify-center">
@@ -211,11 +218,39 @@ export default function AdminPage() {
               <div>
                 <p className="text-white/70 text-sm mb-1">Usuarios Activos</p>
                 <p className="text-3xl font-bold text-white">
-                  {stats !== null ? formatNumber(stats.activeUsers) : "—"}
+                  {stats !== null ? stats.activeUsers.toLocaleString("es-MX") : "—"}
                 </p>
               </div>
               <div className="w-12 h-12 liquid-glass rounded-xl flex items-center justify-center">
                 <Users className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </div>
+
+          <div className="liquid-glass p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/70 text-sm mb-1">Comisión este mes</p>
+                <p className="text-2xl font-bold text-white">
+                  {stats !== null ? formatMoney(stats.platformCommissionMonth) : "—"}
+                </p>
+              </div>
+              <div className="w-12 h-12 liquid-glass rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </div>
+
+          <div className="liquid-glass p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/70 text-sm mb-1">Ventas del mes</p>
+                <p className="text-2xl font-bold text-white">
+                  {stats !== null ? stats.salesCompletedMonth.toLocaleString("es-MX") : "—"}
+                </p>
+              </div>
+              <div className="w-12 h-12 liquid-glass rounded-xl flex items-center justify-center">
+                <Ticket className="w-6 h-6 text-white" />
               </div>
             </div>
           </div>
@@ -285,6 +320,18 @@ export default function AdminPage() {
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab("ingresos")}
+            className={`px-4 py-2 rounded-xl font-medium transition-all ${
+              activeTab === "ingresos"
+                ? "liquid-glass bg-white text-black"
+                : "liquid-glass text-white/80 hover:text-white"
+            }`}
+          >
+            <TrendingUp className="w-4 h-4 inline mr-2" />
+            Ingresos
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab("comisiones")}
             className={`px-4 py-2 rounded-xl font-medium transition-all ${
               activeTab === "comisiones"
@@ -343,6 +390,17 @@ export default function AdminPage() {
               Personas que enviaron el formulario de contacto desde la página principal.
             </p>
             <ContactLeadsManager />
+          </div>
+        )}
+
+        {activeTab === "ingresos" && (
+          <div className="liquid-glass p-6">
+            <h2 className="text-xl font-bold text-white mb-2">Ingresos y comisiones</h2>
+            <p className="text-white/70 text-sm mb-6">
+              Ganancias de Somnus por comisión configurada y cargos de servicio, con
+              desglose por evento y organizador.
+            </p>
+            <RevenueDashboard />
           </div>
         )}
 

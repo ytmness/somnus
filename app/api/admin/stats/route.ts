@@ -4,6 +4,11 @@ import { prisma } from "@/lib/db/prisma";
 
 export const dynamic = "force-dynamic";
 
+function startOfCurrentMonth(): Date {
+  const d = new Date();
+  return new Date(d.getFullYear(), d.getMonth(), 1, 0, 0, 0, 0);
+}
+
 /**
  * GET /api/admin/stats
  * Estadísticas del panel de administración (solo ADMIN)
@@ -15,16 +20,28 @@ export async function GET() {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
-    const [totalEvents, ticketsSold, activeUsers] = await Promise.all([
+    const monthStart = startOfCurrentMonth();
+
+    const [totalEvents, ticketsSold, activeUsers, monthSales] = await Promise.all([
       prisma.event.count(),
       prisma.ticket.count(),
       prisma.user.count({ where: { isActive: true } }),
+      prisma.sale.aggregate({
+        where: {
+          status: "COMPLETED",
+          paidAt: { gte: monthStart },
+        },
+        _count: true,
+        _sum: { platformFeeAmount: true },
+      }),
     ]);
 
     return NextResponse.json({
       totalEvents,
       ticketsSold,
       activeUsers,
+      salesCompletedMonth: monthSales._count,
+      platformCommissionMonth: Number(monthSales._sum.platformFeeAmount ?? 0),
     });
   } catch (error) {
     console.error("Admin stats error:", error);

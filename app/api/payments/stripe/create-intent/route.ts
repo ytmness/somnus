@@ -4,12 +4,20 @@ import { getStripe } from "@/lib/payments/stripe";
 import { assertOrganizerCanReceivePayments } from "@/lib/payments/connect";
 import { calculateSaleAmounts } from "@/lib/payments/commissions";
 import { isStripeEnabled } from "@/lib/payments/config";
+import {
+  cancelPaymentIntentForSale,
+  canReusePaymentIntent,
+  retrievePaymentIntentForSale,
+} from "@/lib/payments/stripe-connect-charge";
 
 export const dynamic = "force-dynamic";
 
 /**
  * POST /api/payments/stripe/create-intent
  * Crea o reutiliza un PaymentIntent para una venta pendiente.
+ *
+ * US platform + MX organizers: direct charge on the connected account
+ * (destination charges fail on confirm even without application_fee).
  */
 export async function POST(request: NextRequest) {
   try {
@@ -43,21 +51,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (sale.paymentIntentId) {
-      const stripe = getStripe();
-      const existing = await stripe.paymentIntents.retrieve(sale.paymentIntentId);
-      if (
-        existing.status !== "canceled" &&
-        existing.status !== "succeeded" &&
-        existing.client_secret
-      ) {
-        return NextResponse.json({
-          clientSecret: existing.client_secret,
-          paymentIntentId: existing.id,
-        });
-      }
-    }
-
     const amounts = await calculateSaleAmounts(sale.eventId, Number(sale.subtotal));
     const organizerInfo = await assertOrganizerCanReceivePayments(sale.eventId).catch(
       (err: Error) => {
@@ -68,7 +61,32 @@ export async function POST(request: NextRequest) {
       }
     );
 
+    const connectedAccountId = organizerInfo?.stripeAccountId || null;
     const stripe = getStripe();
+
+    if (sale.paymentIntentId) {
+      const existing = await retrievePaymentIntentForSale(
+        stripe,
+        sale.paymentIntentId,
+        connectedAccountId || sale.stripeConnectedAccountId
+      );
+
+      if (canReusePaymentIntent(existing)) {
+        return NextResponse.json({
+          clientSecret: existing.client_secret,
+          paymentIntentId: existing.id,
+          stripeAccountId: connectedAccountId,
+        });
+      }
+
+      if (existing.status !== "canceled" && existing.status !== "succeeded") {
+        await cancelPaymentIntentForSale(
+          stripe,
+          existing.id,
+          connectedAccountId || sale.stripeConnectedAccountId
+        );
+      }
+    }
 
     const intentParams: Parameters<typeof stripe.paymentIntents.create>[0] = {
       amount: amounts.totalCents,
@@ -80,25 +98,29 @@ export async function POST(request: NextRequest) {
         eventId: sale.eventId,
         organizerId: organizerInfo?.organizerId || "",
         platformFeeAmount: String(amounts.platformFeeCents),
-        connectedAccountId: organizerInfo?.stripeAccountId || "",
+        connectedAccountId: connectedAccountId || "",
+        chargeType: connectedAccountId ? "direct" : "platform",
         source: "somnus.live",
       },
     };
 
-    if (organizerInfo?.stripeAccountId) {
-      intentParams.transfer_data = {
-        destination: organizerInfo.stripeAccountId,
-      };
+    const requestOptions: Parameters<typeof stripe.paymentIntents.create>[1] = {
+      idempotencyKey: `sale:${sale.id}:create_intent:v4-direct`,
+    };
+
+    if (connectedAccountId) {
       const platformKeepsCents =
         amounts.platformFeeCents + amounts.serviceFeeCents;
       if (platformKeepsCents > 0) {
         intentParams.application_fee_amount = platformKeepsCents;
       }
+      requestOptions.stripeAccount = connectedAccountId;
     }
 
-    const paymentIntent = await stripe.paymentIntents.create(intentParams, {
-      idempotencyKey: `sale:${sale.id}:create_intent`,
-    });
+    const paymentIntent = await stripe.paymentIntents.create(
+      intentParams,
+      requestOptions
+    );
 
     await prisma.sale.update({
       where: { id: sale.id },
@@ -110,7 +132,7 @@ export async function POST(request: NextRequest) {
         providerStatus: paymentIntent.status,
         platformFeeAmount: amounts.platformFeePesos,
         organizerNetAmount: amounts.organizerNetPesos,
-        stripeConnectedAccountId: organizerInfo?.stripeAccountId || null,
+        stripeConnectedAccountId: connectedAccountId,
         tax: amounts.serviceFeePesos,
         total: amounts.totalPesos,
       },
@@ -119,6 +141,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,
       paymentIntentId: paymentIntent.id,
+      stripeAccountId: connectedAccountId,
     });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);

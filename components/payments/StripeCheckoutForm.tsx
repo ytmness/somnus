@@ -125,12 +125,16 @@ function CheckoutInner({
 export function StripeCheckoutForm(props: StripeCheckoutFormProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [publishableKey, setPublishableKey] = useState<string | null>(null);
+  const [stripeAccountId, setStripeAccountId] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const stripePromise = useMemo(
-    () => (publishableKey ? loadStripe(publishableKey) : null),
-    [publishableKey]
-  );
+  const stripePromise = useMemo(() => {
+    if (!publishableKey) return null;
+    return loadStripe(
+      publishableKey,
+      stripeAccountId ? { stripeAccount: stripeAccountId } : undefined
+    );
+  }, [publishableKey, stripeAccountId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -155,6 +159,7 @@ export function StripeCheckoutForm(props: StripeCheckoutFormProps) {
         if (!cancelled) {
           setPublishableKey(config.publishableKey);
           setClientSecret(data.clientSecret);
+          setStripeAccountId(data.stripeAccountId || null);
         }
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Error al cargar el pago";

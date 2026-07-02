@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db/prisma";
 import {
   createConnectedAccount,
   createAccountLink,
+  prefillConnectedAccount,
   syncOrganizerStripeStatus,
 } from "@/lib/payments/connect";
 import { getAppUrl } from "@/lib/payments/config";
@@ -36,6 +37,7 @@ export async function POST(_request: NextRequest) {
     }
 
     const stripeAccountId = await createConnectedAccount(organizer.id);
+    await prefillConnectedAccount(organizer.id);
     const appUrl = getAppUrl();
     const returnUrl = `${appUrl}/organizador?stripe=return`;
     const refreshUrl = `${appUrl}/organizador?stripe=refresh`;

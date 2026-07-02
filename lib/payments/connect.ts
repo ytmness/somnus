@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db/prisma";
 import { getStripe } from "@/lib/payments/stripe";
+import { dedupeRequirements } from "@/lib/payments/stripe-requirements";
 import type { Organizer } from "@prisma/client";
 
 export type OrganizerStripeStatus = {
@@ -41,10 +42,10 @@ export async function syncOrganizerStripeStatus(
 
   const chargesEnabled = account.charges_enabled ?? false;
   const payoutsEnabled = account.payouts_enabled ?? false;
-  const requirementsDue = [
+  const requirementsDue = dedupeRequirements([
     ...(account.requirements?.currently_due || []),
     ...(account.requirements?.past_due || []),
-  ];
+  ]);
 
   let onboardingStatus: Organizer["stripeOnboardingStatus"] = "PENDING";
   if (chargesEnabled && payoutsEnabled) {
@@ -97,12 +98,17 @@ export async function createConnectedAccount(
     const account = await stripe.accounts.create({
       type: "express",
       country: "MX",
-      email: organizer.contactEmail,
+      email: organizer.contactEmail || organizer.user.email,
       capabilities: {
         card_payments: { requested: true },
         transfers: { requested: true },
       },
       business_type: "individual",
+      business_profile: {
+        mcc: "7922",
+        url: "https://somnus.live",
+        product_description: "Venta de boletos para eventos en vivo (Somnus)",
+      },
       metadata: {
         organizerId: organizer.id,
         userId: organizer.userId,
@@ -133,6 +139,31 @@ export async function createConnectedAccount(
 }
 
 /**
+ * Actualiza solo business_profile (Express no permite editar email/individual vía API).
+ */
+export async function prefillConnectedAccount(organizerId: string): Promise<void> {
+  const organizer = await prisma.organizer.findUnique({
+    where: { id: organizerId },
+  });
+
+  if (!organizer?.stripeAccountId) return;
+
+  const stripe = getStripe();
+
+  try {
+    await stripe.accounts.update(organizer.stripeAccountId, {
+      business_profile: {
+        mcc: "7922",
+        url: "https://somnus.live",
+        product_description: "Venta de boletos para eventos en vivo (Somnus)",
+      },
+    });
+  } catch {
+    // No bloquear onboarding si Stripe rechaza el prefill
+  }
+}
+
+/**
  * Genera un Account Link para onboarding de Stripe Connect.
  */
 export async function createAccountLink(
@@ -146,6 +177,9 @@ export async function createAccountLink(
     refresh_url: refreshUrl,
     return_url: returnUrl,
     type: "account_onboarding",
+    collection_options: {
+      fields: "eventually_due",
+    },
   });
   return link.url;
 }

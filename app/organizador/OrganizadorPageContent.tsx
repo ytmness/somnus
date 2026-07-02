@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Calendar, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
 import { OrganizationsManager } from "@/components/organizador/OrganizationsManager";
 import { OrganizerEventsManager } from "@/components/organizador/OrganizerEventsManager";
+import { formatStripeRequirements } from "@/lib/payments/stripe-requirements";
 
 interface Organization {
   id: string;
@@ -281,11 +282,20 @@ export default function OrganizadorPageContent() {
                       )}
                       {status?.requirementsDue && status.requirementsDue.length > 0 && (
                         <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-4 text-sm text-amber-200">
-                          <p className="font-medium mb-1">Requisitos pendientes:</p>
+                          <p className="font-medium mb-1">
+                            Falta completar tu perfil en Stripe
+                          </p>
+                          <p className="text-amber-100/80 mb-2">
+                            Stripe te pedirá estos datos en su formulario seguro
+                            (incluye banco, identificación y dirección). Somnus no
+                            guarda esa información.
+                          </p>
                           <ul className="list-disc list-inside space-y-1">
-                            {status.requirementsDue.map((req) => (
-                              <li key={req}>{req}</li>
-                            ))}
+                            {formatStripeRequirements(status.requirementsDue).map(
+                              (req) => (
+                                <li key={req}>{req}</li>
+                              )
+                            )}
                           </ul>
                         </div>
                       )}

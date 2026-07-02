@@ -69,6 +69,7 @@ for w in data:
 
 if [ -n "$WEBHOOK_ID" ]; then
   echo "Webhook existente: $WEBHOOK_ID"
+  WEBHOOK_RESP=$(curl -s -u "${SK}:" "https://api.stripe.com/v1/webhook_endpoints/${WEBHOOK_ID}")
 else
   WEBHOOK_RESP=$(curl -s -u "${SK}:" https://api.stripe.com/v1/webhook_endpoints \
     -d "url=${WEBHOOK_URL}" \
@@ -87,18 +88,17 @@ else
   echo "Webhook creado: $WEBHOOK_ID"
 fi
 
-WHSEC=$(curl -s -u "${SK}:" "https://api.stripe.com/v1/webhook_endpoints/${WEBHOOK_ID}" | python3 -c "
-import sys, json
-d = json.load(sys.stdin)
-print(d.get('secret',''))
-" 2>/dev/null || true)
+WHSEC=$(echo "$WEBHOOK_RESP" | python3 -c "import sys,json; print(json.load(sys.stdin).get('secret',''))" 2>/dev/null || true)
 
-if [ -z "$WHSEC" ]; then
-  echo "ERROR: No se obtuvo signing secret del webhook."
+if [ -z "$WHSEC" ] && [ -f .env ] && grep -q '^STRIPE_WEBHOOK_SECRET=whsec_' .env; then
+  echo "STRIPE_WEBHOOK_SECRET: se mantiene el valor actual en .env (Stripe no devuelve el secret de webhooks existentes)."
+elif [ -z "$WHSEC" ]; then
+  echo "AVISO: Falta whsec_ en .env. Copialo desde Stripe Dashboard → Webhooks → $WEBHOOK_ID"
   exit 1
+else
+  set_kv "STRIPE_WEBHOOK_SECRET" "$WHSEC"
+  echo "STRIPE_WEBHOOK_SECRET actualizado"
 fi
-set_kv "STRIPE_WEBHOOK_SECRET" "$WHSEC"
-echo "STRIPE_WEBHOOK_SECRET actualizado"
 
 echo "==> 5/5 Reiniciando PM2"
 pm2 restart somnus --update-env

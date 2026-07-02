@@ -36,14 +36,22 @@ if [ -z "$WEBHOOK_ID" ]; then
     -d "enabled_events[]=charge.dispute.created" \
     -d "enabled_events[]=account.updated")
   WEBHOOK_ID=$(echo "$RESP" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))")
+  WHSEC=$(echo "$RESP" | python3 -c "import sys,json; print(json.load(sys.stdin).get('secret',''))")
   if [ -z "$WEBHOOK_ID" ]; then
     echo "ERROR:"; echo "$RESP"; exit 1
   fi
   echo "created:$WEBHOOK_ID"
 else
   echo "exists:$WEBHOOK_ID"
+  WHSEC=""
 fi
 
-WHSEC=$(curl -s -u "${SK}:" "https://api.stripe.com/v1/webhook_endpoints/${WEBHOOK_ID}" | python3 -c "import sys,json; print(json.load(sys.stdin).get('secret',''))")
-set_kv "STRIPE_WEBHOOK_SECRET" "$WHSEC"
-echo "whsec_set"
+if [ -z "$WHSEC" ] && grep -q '^STRIPE_WEBHOOK_SECRET=whsec_' .env 2>/dev/null; then
+  echo "whsec_unchanged"
+elif [ -n "$WHSEC" ]; then
+  set_kv "STRIPE_WEBHOOK_SECRET" "$WHSEC"
+  echo "whsec_set"
+else
+  echo "whsec_missing: copia el signing secret desde Stripe Dashboard → Webhooks"
+  exit 1
+fi
