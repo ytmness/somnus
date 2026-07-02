@@ -20,12 +20,14 @@ import {
   formatEventCalendarDate,
   eventCalendarKey,
   localTodayCalendarKey,
+  isEventPastByCalendar,
 } from "@/lib/utils";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
 
 const HERO_VIDEO = "/assets/Adobe Express 2026-02-17 16.05.01.mp4";
 
-function convertEventToConcert(event: any): Concert & { eventDate?: string } {
+function convertEventToConcert(event: any): Concert {
   const formattedDate = formatEventCalendarDate(event.eventDate);
 
   const heroImage =
@@ -165,8 +167,6 @@ export default function HomePage() {
   }, []);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -183,22 +183,6 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    const loadSession = async () => {
-      try {
-        const response = await fetch("/api/auth/session");
-        const data = await response.json();
-        if (data.user) {
-          setUser(data.user);
-          setUserRole(data.user?.role || null);
-        }
-      } catch (error) {
-        console.error("Error al cargar sesión:", error);
-      }
-    };
-    loadSession();
-  }, []);
-
-  useEffect(() => {
     const loadEvents = async () => {
       try {
         setIsLoading(true);
@@ -210,26 +194,31 @@ export default function HomePage() {
           const withTickets = data.data.filter(
             (e: any) => e.ticketTypes && e.ticketTypes.length > 0
           );
-          // Mismo criterio que el admin (día calendario del evento en UTC vs hoy local)
           const todayKey = localTodayCalendarKey();
-          const futureEvents = withTickets.filter(
-            (e: any) => eventCalendarKey(e.eventDate) >= todayKey
-          );
-          const pastEvents = withTickets.filter(
-            (e: any) => eventCalendarKey(e.eventDate) < todayKey
-          );
-          // Ordenar: primero los activos (para hero), luego por fecha. Pasados por fecha desc.
-          const futureConverted = futureEvents
+
+          // "Upcoming" = eventos marcados activos en admin (no solo por fecha futura)
+          const adminActiveEvents = withTickets.filter((e: any) => e.isActive);
+          const activeConverted = adminActiveEvents
             .sort((a: any, b: any) => {
-              if (a.isActive !== b.isActive) return a.isActive ? -1 : 1;
+              if (a.isFeatured !== b.isFeatured) return a.isFeatured ? -1 : 1;
               return new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime();
             })
             .map(convertEventToConcert);
+
+          // Pasados = inactivos cuya fecha ya pasó
+          const pastEvents = withTickets.filter(
+            (e: any) =>
+              !e.isActive && eventCalendarKey(e.eventDate) < todayKey
+          );
           const pastConverted = pastEvents
-            .sort((a: any, b: any) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime())
+            .sort(
+              (a: any, b: any) =>
+                new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime()
+            )
             .map(convertEventToConcert);
-          setConcerts(futureConverted.concat(pastConverted));
-          setActiveConcerts(futureConverted);
+
+          setConcerts(activeConverted.concat(pastConverted));
+          setActiveConcerts(activeConverted);
           setPastConcerts(pastConverted);
         }
       } catch (error) {
@@ -365,69 +354,7 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Navbar igual que admin */}
-        <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-5 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => router.push("/")}
-            className="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-            aria-label="SOMNUS"
-          >
-            SOMNUS
-          </button>
-
-          <nav className="flex items-center gap-2 sm:gap-4 lg:gap-6">
-            <a
-              href="#eventos"
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-            >
-              Events
-            </a>
-            <Link
-              href="/galeria"
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
-            >
-              Gallery
-            </Link>
-            {userRole === "ADMIN" && (
-              <Link
-                href="/admin"
-                className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-              >
-                Panel
-              </Link>
-            )}
-            {(userRole === "ACCESOS" || userRole === "ADMIN") && (
-              <Link
-                href="/accesos"
-                className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-              >
-                Access
-              </Link>
-            )}
-            <Link
-              href="/mis-boletos"
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
-            >
-              My Tickets
-            </Link>
-            {user ? (
-              <button
-                onClick={() => router.push("/mis-boletos")}
-                className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1 uppercase tracking-wider"
-              >
-                {user?.name || user?.email}
-              </button>
-            ) : (
-              <button
-                onClick={() => router.push("/login")}
-                className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1 uppercase tracking-wider"
-              >
-                Login
-              </button>
-            )}
-          </nav>
-        </header>
+        <SiteHeader eventsHref="#eventos" />
 
         {/* Contenido Hero - centro */}
         <div className="relative z-20 w-full max-w-4xl mx-auto px-4 text-center">
@@ -448,9 +375,26 @@ export default function HomePage() {
               href="#eventos"
               className="somnus-btn px-10 py-4 text-base inline-flex items-center gap-2"
             >
-              View events
+              Ver eventos
             </a>
+            <button
+              type="button"
+              onClick={() => router.push("/register")}
+              className="px-10 py-4 text-base inline-flex items-center gap-2 rounded-full border-2 border-white/40 text-white font-medium uppercase tracking-wider hover:bg-white/10 transition-colors"
+            >
+              Crear cuenta gratis
+            </button>
           </div>
+          <p className="mt-4 text-white/50 text-sm">
+            ¿Ya tienes cuenta?{" "}
+            <button
+              type="button"
+              onClick={() => router.push("/login")}
+              className="text-white/80 underline hover:text-white"
+            >
+              Inicia sesión
+            </button>
+          </p>
 
           {/* Scroll indicator */}
           <div
@@ -491,7 +435,11 @@ export default function HomePage() {
                     <EventCardZamna
                       key={concert.id}
                       concert={concert}
-                      isPast={false}
+                      isPast={
+                        concert.eventDate
+                          ? isEventPastByCalendar(concert.eventDate)
+                          : false
+                      }
                       isFeatured={index === 0}
                       carouselGlass
                       onSelect={() => handleSelectConcert(concert)}
@@ -566,9 +514,25 @@ export default function HomePage() {
               <h2 className="somnus-title-secondary text-4xl md:text-5xl lg:text-6xl uppercase tracking-wider mb-6">
                 Sé parte de Somnus
               </h2>
-              <p className="somnus-text-body text-lg text-white/60 max-w-md mx-auto lg:mx-0">
+              <p className="somnus-text-body text-lg text-white/60 max-w-md mx-auto lg:mx-0 mb-8">
                 Únete a nuestra comunidad y recibe información de los mejores eventos en vivo.
               </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <button
+                  type="button"
+                  onClick={() => router.push("/register")}
+                  className="somnus-btn px-8 py-3.5"
+                >
+                  Crear mi cuenta
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push("/login")}
+                  className="px-8 py-3.5 rounded-full border border-white/30 text-white/90 hover:bg-white/10 transition-colors uppercase tracking-wider text-sm font-medium"
+                >
+                  Ya tengo cuenta
+                </button>
+              </div>
             </div>
 
             {/* Columna derecha - Formulario */}

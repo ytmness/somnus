@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, Calendar, Ticket, Users, ImageIcon, Link2, Mail } from "lucide-react";
+import { Plus, Calendar, Ticket, Users, ImageIcon, Link2, Mail, Percent, Building2 } from "lucide-react";
 import { EventsTable } from "@/components/admin/EventsTable";
 import { CreateEventModal } from "@/components/admin/CreateEventModal";
 import { GalleryManager } from "@/components/admin/GalleryManager";
 import { InvitesManager } from "@/components/admin/InvitesManager";
 import { ContactLeadsManager } from "@/components/admin/ContactLeadsManager";
+import { CommissionsManager } from "@/components/admin/CommissionsManager";
+import { OrganizersManager } from "@/components/admin/OrganizersManager";
 import { toast } from "sonner";
 
 interface SessionUser {
@@ -32,7 +34,7 @@ export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [activeTab, setActiveTab] = useState<"eventos" | "galeria" | "invites" | "contacto">("eventos");
+  const [activeTab, setActiveTab] = useState<"eventos" | "organizadores" | "galeria" | "invites" | "contacto" | "comisiones">("eventos");
 
   useEffect(() => {
     checkAuth();
@@ -235,6 +237,18 @@ export default function AdminPage() {
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab("organizadores")}
+            className={`px-4 py-2 rounded-xl font-medium transition-all ${
+              activeTab === "organizadores"
+                ? "liquid-glass bg-white text-black"
+                : "liquid-glass text-white/80 hover:text-white"
+            }`}
+          >
+            <Building2 className="w-4 h-4 inline mr-2" />
+            Organizadores
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab("galeria")}
             className={`px-4 py-2 rounded-xl font-medium transition-all ${
               activeTab === "galeria"
@@ -269,6 +283,18 @@ export default function AdminPage() {
             <Mail className="w-4 h-4 inline mr-2" />
             Contacto
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("comisiones")}
+            className={`px-4 py-2 rounded-xl font-medium transition-all ${
+              activeTab === "comisiones"
+                ? "liquid-glass bg-white text-black"
+                : "liquid-glass text-white/80 hover:text-white"
+            }`}
+          >
+            <Percent className="w-4 h-4 inline mr-2" />
+            Comisiones
+          </button>
         </div>
 
         {activeTab === "eventos" && (
@@ -277,6 +303,13 @@ export default function AdminPage() {
               <h2 className="text-xl font-bold text-white">Eventos</h2>
             </div>
             <EventsTable key={refreshKey} />
+          </div>
+        )}
+
+        {activeTab === "organizadores" && (
+          <div className="liquid-glass p-6">
+            <h2 className="text-xl font-bold text-white mb-6">Organizadores</h2>
+            <OrganizersManager />
           </div>
         )}
 
@@ -310,6 +343,16 @@ export default function AdminPage() {
               Personas que enviaron el formulario de contacto desde la página principal.
             </p>
             <ContactLeadsManager />
+          </div>
+        )}
+
+        {activeTab === "comisiones" && (
+          <div className="liquid-glass p-6">
+            <h2 className="text-xl font-bold text-white mb-6">Comisiones de plataforma</h2>
+            <p className="text-white/70 text-sm mb-6">
+              Configura comisiones globales, por organizador o por evento. Resolución: evento → organizador → global.
+            </p>
+            <CommissionsManager />
           </div>
         )}
       </main>

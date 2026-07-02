@@ -1,28 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient as createSSRClient } from "@supabase/ssr";
 import { prisma } from "@/lib/db/prisma";
+import { resolvePublicRegistrationRole } from "@/lib/auth/registration";
 import { otpVerifySchema } from "@/lib/validations/schemas";
 
 export const dynamic = "force-dynamic";
+
+type CookieToSet = {
+  name: string;
+  value: string;
+  options?: Record<string, unknown>;
+};
 
 /**
  * POST /api/auth/otp/verify
  * Verificar código OTP (8 dígitos) via Supabase Auth
  */
 export async function POST(request: NextRequest) {
-  const response = new NextResponse();
-
   try {
     const body = await request.json();
     const result = otpVerifySchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
-        { error: "Invalid data", details: result.error.errors },
+        { error: "Datos inválidos", details: result.error.errors },
         { status: 400 }
       );
     }
 
     const { email, token } = result.data;
+    const pendingCookies: CookieToSet[] = [];
 
     const supabase = createSSRClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,9 +39,7 @@ export async function POST(request: NextRequest) {
             return request.cookies.getAll();
           },
           setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options);
-            });
+            pendingCookies.push(...cookiesToSet);
           },
         },
       }
@@ -49,10 +53,11 @@ export async function POST(request: NextRequest) {
 
     if (authError || !authData?.user) {
       console.error("[OTP VERIFY] Error:", authError);
-      return NextResponse.json(
-        { error: authError?.message || "Invalid or expired OTP code" },
-        { status: 400 }
-      );
+      const msg =
+        authError?.code === "otp_expired"
+          ? "El código expiró. Solicita uno nuevo."
+          : authError?.message || "Código inválido o expirado";
+      return NextResponse.json({ error: msg }, { status: 400 });
     }
 
     let user = await prisma.user.findUnique({
@@ -62,9 +67,9 @@ export async function POST(request: NextRequest) {
     if (!user) {
       user = await prisma.user.create({
         data: {
-          email,
+          email: email.trim().toLowerCase(),
           name: email.split("@")[0],
-          role: "CLIENTE",
+          role: resolvePublicRegistrationRole(),
           isActive: true,
           password: "",
           emailVerified: true,
@@ -78,12 +83,9 @@ export async function POST(request: NextRequest) {
       user.emailVerified = true;
     }
 
-    // verifyOtp devuelve la sesión; evita getSession (warning de Supabase)
-    const session = authData?.session;
-
     const jsonResponse = NextResponse.json({
       success: true,
-      message: "OTP code verified successfully",
+      message: "OTP verificado correctamente",
       user: {
         id: user.id,
         email: user.email,
@@ -91,26 +93,18 @@ export async function POST(request: NextRequest) {
         role: user.role,
         emailVerified: user.emailVerified,
       },
-      session: session
-        ? { access_token: session.access_token, refresh_token: session.refresh_token }
-        : null,
     });
 
-    response.cookies.getAll().forEach((cookie) => {
-      jsonResponse.cookies.set(cookie.name, cookie.value, {
-        httpOnly: cookie.httpOnly,
-        secure: cookie.secure,
-        sameSite: cookie.sameSite as any,
-        path: cookie.path,
-        maxAge: cookie.maxAge,
-      });
+    pendingCookies.forEach(({ name, value, options }) => {
+      jsonResponse.cookies.set(name, value, options as Parameters<typeof jsonResponse.cookies.set>[2]);
     });
 
     return jsonResponse;
-  } catch (error: any) {
-    console.error("[OTP VERIFY] Error general:", error);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("[OTP VERIFY] Error general:", msg);
     return NextResponse.json(
-      { error: "Error verifying OTP code", details: error.message },
+      { error: "Error al verificar el código", details: msg },
       { status: 500 }
     );
   }

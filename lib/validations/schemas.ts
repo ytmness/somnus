@@ -9,9 +9,15 @@ export const loginSchema = z.object({
 });
 
 export const registerSchema = z.object({
-  email: z.string().email("Invalid email"),
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  role: z.enum(["ADMIN", "VENDEDOR", "SUPERVISOR", "ACCESOS", "CLIENTE"]).optional(),
+  email: z.string().email("Correo inválido"),
+  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+  phone: z
+    .string()
+    .trim()
+    .optional()
+    .refine((v) => !v || (v.length >= 10 && v.length <= 20), {
+      message: "Teléfono inválido (mínimo 10 dígitos)",
+    }),
 });
 
 export const otpVerifySchema = z.object({
@@ -58,7 +64,19 @@ export const createEventSchema = z.object({
   maxCapacity: z.number().int().positive("Capacity must be greater than 0"),
   salesStartDate: z.string().or(z.date()),
   salesEndDate: z.string().or(z.date()),
+  organizationId: z.string().uuid("Invalid organization ID").optional(),
+  organizerId: z.string().uuid("Invalid organizer ID").optional(),
   ticketTypes: z.array(ticketTypeSchema).min(1, "At least one ticket type is required"),
+});
+
+export const organizationSchema = z.object({
+  name: z.string().min(1, "Organization name is required"),
+  description: z.string().optional(),
+  logoUrl: z.union([z.string().url(), z.literal("")]).optional(),
+});
+
+export const updateOrganizationSchema = organizationSchema.partial().extend({
+  isActive: z.boolean().optional(),
 });
 
 export const updateTicketTypeSchema = ticketTypeSchema
@@ -70,6 +88,7 @@ export const updateTicketTypeSchema = ticketTypeSchema
 
 export const updateEventSchema = createEventSchema.partial().extend({
   isActive: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
   showQR: z.boolean().optional(),
   ticketTypes: z.array(updateTicketTypeSchema).optional(),
 });
@@ -77,5 +96,6 @@ export const updateEventSchema = createEventSchema.partial().extend({
 export type CreateEventInput = z.infer<typeof createEventSchema>;
 export type UpdateEventInput = z.infer<typeof updateEventSchema>;
 export type TicketTypeInput = z.infer<typeof ticketTypeSchema>;
+export type OrganizationInput = z.infer<typeof organizationSchema>;
 
 

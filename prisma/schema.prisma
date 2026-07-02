@@ -17,6 +17,7 @@ datasource db {
 
 enum UserRole {
   ADMIN       // Control total del sistema
+  ORGANIZER   // Organizador de eventos (marketplace)
   VENDEDOR    // Puede vender e imprimir boletos
   SUPERVISOR  // Puede ver reportes y cortes
   ACCESOS     // Solo puede escanear boletos
@@ -28,7 +29,8 @@ model User {
   email         String   @unique
   password      String
   name          String
-  role          UserRole @default(VENDEDOR)
+  phone         String?
+  role          UserRole @default(ORGANIZER)
   isActive      Boolean  @default(true)
   
   // Verificación de email
@@ -44,10 +46,98 @@ model User {
   scans         TicketScan[]
   reprints      TicketReprint[]
   auditLogs     AuditLog[]
+  organizer     Organizer?
 
   @@index([email])
   @@index([role])
   @@index([emailVerified])
+}
+
+// =====================================================
+// ORGANIZADORES (MARKETPLACE)
+// =====================================================
+
+enum StripeOnboardingStatus {
+  NOT_STARTED
+  PENDING
+  ACTIVE
+  RESTRICTED
+}
+
+model Organizer {
+  id                     String                 @id @default(uuid())
+  userId                 String                 @unique
+  businessName           String
+  contactEmail           String
+  stripeAccountId        String?                @unique
+  stripeOnboardingStatus StripeOnboardingStatus @default(NOT_STARTED)
+  chargesEnabled         Boolean                @default(false)
+  payoutsEnabled         Boolean                @default(false)
+  isActive               Boolean                @default(true)
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+
+  user            User             @relation(fields: [userId], references: [id])
+  events          Event[]
+  organizations   Organization[]
+  commissionRules CommissionRule[]
+
+  @@index([stripeAccountId])
+  @@index([stripeOnboardingStatus])
+}
+
+model Organization {
+  id          String   @id @default(uuid())
+  organizerId String
+  name        String
+  description String?
+  logoUrl     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  organizer Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  events    Event[]
+
+  @@index([organizerId])
+  @@index([isActive])
+}
+
+// =====================================================
+// COMISIONES DE PLATAFORMA
+// =====================================================
+
+enum CommissionScope {
+  GLOBAL
+  ORGANIZER
+  EVENT
+}
+
+enum CommissionType {
+  PERCENTAGE
+  FIXED
+  PERCENTAGE_PLUS_FIXED
+}
+
+model CommissionRule {
+  id                    String          @id @default(uuid())
+  scope                 CommissionScope
+  organizerId           String?
+  eventId               String?         @unique
+  commissionType        CommissionType
+  commissionPercentage  Decimal?        @db.Decimal(5, 2)
+  commissionFixedAmount Decimal?        @db.Decimal(10, 2)
+  currency              String          @default("MXN")
+  isActive              Boolean         @default(true)
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  organizer Organizer? @relation(fields: [organizerId], references: [id])
+  event     Event?     @relation(fields: [eventId], references: [id])
+
+  @@index([scope])
+  @@index([organizerId])
+  @@index([isActive])
 }
 
 // =====================================================
@@ -67,20 +157,29 @@ model Event {
   imageUrl          String?
   maxCapacity       Int      // Aforo máximo autorizado (ej: 5000)
   isActive          Boolean  @default(true)
+  isFeatured        Boolean  @default(false) // Destacado en hero (solo ADMIN)
   showQR            Boolean  @default(true) // Mostrar QR en mis-boletos (control desde admin)
   salesStartDate    DateTime
   salesEndDate      DateTime
+  organizerId       String?  // null = evento de plataforma
+  organizationId    String?  // marca/organización bajo la que se publica
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
   // Relaciones
+  organizer         Organizer?        @relation(fields: [organizerId], references: [id])
+  organization      Organization?     @relation(fields: [organizationId], references: [id])
   ticketTypes       TicketType[]
   sales             Sale[]
   tableSlotInvites  TableSlotInvite[]
   tableInvitePools  TableInvitePool[]
+  commissionRule    CommissionRule?
 
   @@index([eventDate])
   @@index([isActive])
+  @@index([isFeatured])
+  @@index([organizerId])
+  @@index([organizationId])
 }
 
 // =====================================================
@@ -183,8 +282,18 @@ model Sale {
   tableSlotInviteId   String?     @unique
   
   // Pago
-  paymentMethod       String?     // "efectivo", "tarjeta", "stripe", etc
-  paymentId           String?     // ID de pago externo (Stripe, MercadoPago)
+  paymentMethod       String?     // "efectivo", "tarjeta", "stripe", "clip", etc
+  paymentId           String?     // ID de pago externo
+  paymentProvider     String?     // "clip" | "stripe"
+  providerStatus      String?     // requires_payment_method, succeeded, canceled, refunded
+  paymentIntentId     String?     @unique
+  checkoutSessionId   String?     @unique
+  stripeChargeId      String?
+  stripeConnectedAccountId String?
+  stripeCustomerId    String?
+  platformFeeAmount   Decimal?    @db.Decimal(10, 2)
+  organizerNetAmount  Decimal?    @db.Decimal(10, 2)
+  lastWebhookEventId  String?
   paidAt              DateTime?
   
   createdAt           DateTime    @default(now())
@@ -201,6 +310,9 @@ model Sale {
   @@index([status])
   @@index([createdAt])
   @@index([buyerEmail])
+  @@index([paymentProvider])
+  @@index([paymentIntentId])
+  @@index([providerStatus])
 }
 
 // Líneas de la venta (antes de pagar, para recrear tickets)
@@ -491,4 +603,23 @@ model SystemConfig {
   updatedAt   DateTime @updatedAt
 
   @@index([key])
+}
+
+// =====================================================
+// WEBHOOKS DE PAGO (AUDITORÍA E IDEMPOTENCIA)
+// =====================================================
+
+model PaymentWebhookEvent {
+  id              String    @id @default(cuid())
+  provider        String    // "stripe" | "clip"
+  providerEventId String    @unique
+  type            String
+  saleId          String?
+  livemode        Boolean   @default(false)
+  payload         Json
+  processedAt     DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@index([provider, type])
+  @@index([saleId])
 }

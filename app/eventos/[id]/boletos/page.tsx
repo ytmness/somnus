@@ -7,7 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, ArrowLeft, Plus, Minus, X, Ticket, Calendar, MapPin } from "lucide-react";
 import { toast } from "sonner";
-import { calculateClipCommission } from "@/lib/utils";
+import { calculateServiceFee } from "@/lib/utils";
 import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
 import { EventMap } from "@/components/eventos/EventMap";
 
@@ -145,14 +145,14 @@ export default function EventBoletosPage() {
 
   const getSubtotal = () =>
     cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  // Comisión Clip (3.9%) + IVA 16% sobre comisión: la paga el cliente
+  // Cargo de servicio (3.9%) + IVA: lo paga el cliente
   const getTotal = () => {
     const sub = getSubtotal();
-    const { totalCommission } = calculateClipCommission(sub);
+    const { totalCommission } = calculateServiceFee(sub);
     return sub + totalCommission;
   };
   const getCommission = () => {
-    const { totalCommission } = calculateClipCommission(getSubtotal());
+    const { totalCommission } = calculateServiceFee(getSubtotal());
     return totalCommission;
   };
 
@@ -182,7 +182,7 @@ export default function EventBoletosPage() {
           buyerName: checkoutData.buyerName,
           buyerEmail: checkoutData.buyerEmail,
           buyerPhone: checkoutData.buyerPhone || null,
-          paymentMethod: "clip",
+          paymentMethod: "stripe",
         }),
       });
 

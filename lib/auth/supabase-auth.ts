@@ -8,7 +8,7 @@ export interface SessionUser {
   id: string;
   email: string;
   name: string;
-  role: "ADMIN" | "VENDEDOR" | "SUPERVISOR" | "ACCESOS" | "CLIENTE";
+  role: "ADMIN" | "ORGANIZER" | "VENDEDOR" | "SUPERVISOR" | "ACCESOS" | "CLIENTE";
   authUserId: string; // ID de Supabase Auth
 }
 

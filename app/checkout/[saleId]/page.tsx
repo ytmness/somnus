@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { ClipCheckoutForm } from "@/components/payments/ClipCheckoutForm";
+import { StripeCheckoutForm } from "@/components/payments/StripeCheckoutForm";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -46,8 +46,6 @@ export default function CheckoutPage() {
     loadSale();
   }, [saleId, router]);
 
-  // Polling defensivo: evita quedarte en pantalla de tarjeta si Clip procesa
-  // pero el redirect falla por timing/network.
   useEffect(() => {
     if (!saleId) return;
     if (pollTimerRef.current) window.clearInterval(pollTimerRef.current);
@@ -117,7 +115,7 @@ export default function CheckoutPage() {
           >
             ← SOMNUS
           </Link>
-          <span className="text-white/60 text-sm">Pago seguro con Clip</span>
+          <span className="text-white/60 text-sm">Pago seguro con Stripe</span>
         </div>
       </header>
 
@@ -130,7 +128,7 @@ export default function CheckoutPage() {
         </p>
 
         <div className="somnus-card p-6 sm:p-8">
-          <ClipCheckoutForm
+          <StripeCheckoutForm
             saleId={saleId}
             amountInPesos={totalPesos}
             buyerEmail={sale.buyerEmail}
@@ -141,7 +139,7 @@ export default function CheckoutPage() {
         </div>
 
         <p className="text-white/50 text-xs text-center mt-6">
-          Tu información está protegida. Somnus utiliza Clip para procesar pagos de forma segura.
+          Tu información está protegida. Somnus utiliza Stripe para procesar pagos de forma segura.
         </p>
       </main>
     </div>

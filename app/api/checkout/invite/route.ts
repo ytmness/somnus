@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { getSession } from "@/lib/auth/supabase-auth";
-import { calculateClipCommission } from "@/lib/utils";
+import { calculateSaleAmounts } from "@/lib/payments/commissions";
+import { isStripeEnabled } from "@/lib/payments/config";
 import { ticketTableLabel } from "@/lib/table-invite";
 import crypto from "crypto";
 
@@ -18,7 +19,7 @@ function generateInviteToken(): string {
  */
 export async function POST(request: NextRequest) {
   try {
-    if (!process.env.CLIP_AUTH_TOKEN) {
+    if (!isStripeEnabled()) {
       return NextResponse.json(
         { error: "El pago con tarjeta no está disponible. Contacta al administrador." },
         { status: 503 }
@@ -186,9 +187,9 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    const { totalCommission } = calculateClipCommission(subtotal);
-    const tax = Math.round(totalCommission * 100) / 100;
-    const total = Math.round((subtotal + totalCommission) * 100) / 100;
+    const amounts = await calculateSaleAmounts(invite.eventId, subtotal);
+    const tax = amounts.serviceFeePesos;
+    const total = amounts.totalPesos;
 
     let userId: string | null = null;
     try {
@@ -210,6 +211,9 @@ export async function POST(request: NextRequest) {
             subtotal,
             tax,
             total,
+            platformFeeAmount: amounts.platformFeePesos,
+            organizerNetAmount: amounts.organizerNetPesos,
+            paymentProvider: "stripe",
             buyerName: buyerName.trim(),
             buyerEmail: buyerEmail.trim(),
             buyerPhone: buyerPhone?.trim() || null,

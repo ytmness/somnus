@@ -106,28 +106,33 @@ export function calculateTotal(subtotal: number): number {
   return subtotal + calculateTax(subtotal);
 }
 
-/** Comisión Clip: 3.9% + IVA 16% sobre la comisión. Lo paga el cliente. */
-const CLIP_COMMISSION_RATE = 0.039;
+/** Cargo de servicio de pasarela: 3.9% + IVA 16% sobre la comisión. Lo paga el cliente. */
+const SERVICE_FEE_RATE = 0.039;
 const IVA_RATE = 0.16;
 
 /**
- * Calcula la comisión de Clip (3.9%) + IVA (16% sobre la comisión).
- * Ej: $10 → comisión $0.39, IVA $0.06 → total comisión ≈ $0.45
+ * Calcula el cargo de servicio (3.9%) + IVA (16% sobre la comisión).
  */
-export function calculateClipCommission(subtotal: number): {
+export function calculateServiceFee(subtotal: number): {
   commissionBase: number;
   ivaOnCommission: number;
   totalCommission: number;
 } {
-  const commissionBase = subtotal * CLIP_COMMISSION_RATE;
+  const commissionBase = subtotal * SERVICE_FEE_RATE;
   const ivaOnCommission = commissionBase * IVA_RATE;
   const totalCommission = commissionBase + ivaOnCommission;
   return { commissionBase, ivaOnCommission, totalCommission };
 }
 
-/** Total que paga el cliente: subtotal + comisión Clip (+ IVA sobre comisión). Redondeado a 2 decimales. */
-export function calculateTotalWithClipCommission(subtotal: number): number {
-  const { totalCommission } = calculateClipCommission(subtotal);
+/** @deprecated Usar calculateServiceFee */
+export const calculateClipCommission = calculateServiceFee;
+
+/** Total que paga el cliente: subtotal + cargo de servicio. Redondeado a 2 decimales. */
+export function calculateTotalWithServiceFee(subtotal: number): number {
+  const { totalCommission } = calculateServiceFee(subtotal);
   return Math.round((subtotal + totalCommission) * 100) / 100;
 }
+
+/** @deprecated Usar calculateTotalWithServiceFee */
+export const calculateTotalWithClipCommission = calculateTotalWithServiceFee;
 

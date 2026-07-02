@@ -77,12 +77,14 @@ export function Header({ cartItemsCount, onCartClick }: HeaderProps) {
               <>
                 {user ? (
                   <>
-                    {user.role === "CLIENTE" && (
-                      <Link href="/mis-boletos" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#5B8DEF] transition-colors text-base font-medium">
-                        <Ticket className="w-5 h-5" />
-                        <span>Mis Boletos</span>
-                      </Link>
-                    )}
+                    <Link href="/mis-boletos" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#5B8DEF] transition-colors text-base font-medium">
+                      <Ticket className="w-5 h-5" />
+                      <span>Mis Boletos</span>
+                    </Link>
+                    <Link href="/organizador" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#5B8DEF] transition-colors text-base font-medium">
+                      <User className="w-5 h-5" />
+                      <span>Publicar eventos</span>
+                    </Link>
                     {(user.role === "ACCESOS" || user.role === "ADMIN") && (
                       <Link href="/accesos" className="flex items-center gap-2 text-[#f9fbf6] hover:text-[#5B8DEF] transition-colors text-base font-medium">
                         <ScanLine className="w-5 h-5" />
@@ -185,16 +187,23 @@ export function Header({ cartItemsCount, onCartClick }: HeaderProps) {
                       <span className="font-medium">{user.name}</span>
                     </div>
 
-                    {user.role === "CLIENTE" && (
-                      <Link 
-                        href="/mis-boletos" 
-                        onClick={closeMobileMenu}
-                        className="flex items-center gap-3 px-4 py-3 text-[#f9fbf6] hover:bg-[#49484e] rounded-lg transition-colors"
-                      >
-                        <Ticket className="w-5 h-5 text-[#5B8DEF]" />
-                        <span className="font-medium">Mis Boletos</span>
-                      </Link>
-                    )}
+                    <Link 
+                      href="/mis-boletos" 
+                      onClick={closeMobileMenu}
+                      className="flex items-center gap-3 px-4 py-3 text-[#f9fbf6] hover:bg-[#49484e] rounded-lg transition-colors"
+                    >
+                      <Ticket className="w-5 h-5 text-[#5B8DEF]" />
+                      <span className="font-medium">Mis Boletos</span>
+                    </Link>
+
+                    <Link 
+                      href="/organizador" 
+                      onClick={closeMobileMenu}
+                      className="flex items-center gap-3 px-4 py-3 text-[#f9fbf6] hover:bg-[#49484e] rounded-lg transition-colors"
+                    >
+                      <User className="w-5 h-5 text-[#5B8DEF]" />
+                      <span className="font-medium">Publicar eventos</span>
+                    </Link>
 
                     {(user.role === "ACCESOS" || user.role === "ADMIN") && (
                       <Link 

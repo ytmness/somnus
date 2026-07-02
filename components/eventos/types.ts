@@ -16,6 +16,8 @@ export interface Concert {
   image: string;
   minPrice: number;
   sections: TicketSection[];
+  /** ISO del evento (para saber si ya pasó en calendario) */
+  eventDate?: string;
 }
 
 export interface CartItem {

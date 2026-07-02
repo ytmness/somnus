@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { getSession } from "@/lib/auth/supabase-auth";
 import { generateQRHash, generateQRPayload } from "@/lib/services/qr-generator";
-import { calculateClipCommission } from "@/lib/utils";
+import { calculateSaleAmounts } from "@/lib/payments/commissions";
+import { isStripeEnabled } from "@/lib/payments/config";
 import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
 
 // Marcar como dinámica porque usa cookies
@@ -124,19 +125,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const useClip = paymentMethod === "clip" && !!process.env.CLIP_AUTH_TOKEN;
-
-    if (paymentMethod === "clip" && !process.env.CLIP_AUTH_TOKEN) {
+    if (!isStripeEnabled()) {
       return NextResponse.json(
         { error: "El pago con tarjeta no está disponible. Contacta al administrador." },
         { status: 503 }
       );
     }
 
-    // Comisión Clip (3.9%) + IVA 16% sobre la comisión: la paga el cliente
-    const { totalCommission } = calculateClipCommission(subtotal);
-    const tax = useClip ? Math.round(totalCommission * 100) / 100 : 0;
-    const total = useClip ? Math.round((subtotal + totalCommission) * 100) / 100 : subtotal;
+    const useOnlinePayment = paymentMethod !== "simulado";
+
+    const amounts = await calculateSaleAmounts(eventId, subtotal);
+    const tax = useOnlinePayment ? amounts.serviceFeePesos : 0;
+    const total = useOnlinePayment ? amounts.totalPesos : subtotal;
 
     // Obtener usuario si está autenticado
     const user = await getSession();
@@ -148,20 +148,23 @@ export async function POST(request: NextRequest) {
         eventId,
         userId,
         channel: "ONLINE",
-        status: useClip ? "PENDING" : paymentMethod === "simulado" ? "COMPLETED" : "PENDING",
+        status: useOnlinePayment ? "PENDING" : paymentMethod === "simulado" ? "COMPLETED" : "PENDING",
         subtotal: subtotal,
         tax: tax,
         total: total,
+        platformFeeAmount: useOnlinePayment ? amounts.platformFeePesos : null,
+        organizerNetAmount: useOnlinePayment ? amounts.organizerNetPesos : null,
+        paymentProvider: useOnlinePayment ? "stripe" : null,
         buyerName,
         buyerEmail,
         buyerPhone: buyerPhone || null,
-        paymentMethod: useClip ? null : paymentMethod || "simulado",
-        paidAt: useClip ? null : paymentMethod === "simulado" ? new Date() : null,
+        paymentMethod: useOnlinePayment ? null : paymentMethod || "simulado",
+        paidAt: useOnlinePayment ? null : paymentMethod === "simulado" ? new Date() : null,
       },
     });
 
-    // Si es Clip: crear SaleItems y redirigir a pago
-    if (useClip) {
+    // Si es pago online: crear SaleItems y redirigir a checkout
+    if (useOnlinePayment) {
       await prisma.saleItem.createMany({
         data: ticketDetails.map((d) => ({
           saleId: sale.id,

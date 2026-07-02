@@ -2,7 +2,7 @@
  * Asignar rol a un usuario por email
  * Ejecutar: ADMIN_EMAIL=sergiooresa@gmail.com ADMIN_ROLE=ADMIN npx tsx scripts/set-user-role.ts
  *
- * Roles: ADMIN | VENDEDOR | SUPERVISOR | ACCESOS | CLIENTE
+ * Roles: ADMIN | ORGANIZER | VENDEDOR | SUPERVISOR | ACCESOS | CLIENTE
  */
 
 import { prisma } from "../lib/db/prisma";
@@ -11,6 +11,7 @@ async function main() {
   const email = process.env.ADMIN_EMAIL || process.env.USER_EMAIL;
   const role = (process.env.ADMIN_ROLE || process.env.USER_ROLE || "CLIENTE") as
     | "ADMIN"
+    | "ORGANIZER"
     | "VENDEDOR"
     | "SUPERVISOR"
     | "ACCESOS"
@@ -22,7 +23,7 @@ async function main() {
     process.exit(1);
   }
 
-  const validRoles = ["ADMIN", "VENDEDOR", "SUPERVISOR", "ACCESOS", "CLIENTE"];
+  const validRoles = ["ADMIN", "ORGANIZER", "VENDEDOR", "SUPERVISOR", "ACCESOS", "CLIENTE"];
   if (!validRoles.includes(role)) {
     console.error(`❌ Rol inválido: ${role}. Usa: ${validRoles.join(" | ")}`);
     process.exit(1);

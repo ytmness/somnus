@@ -1,6 +1,6 @@
 import { X, Trash2, ShoppingBag } from "lucide-react";
 import { CartItem } from "./types";
-import { calculateClipCommission } from "@/lib/utils";
+import { calculateServiceFee } from "@/lib/utils";
 
 interface CartProps {
   items: CartItem[];
@@ -11,7 +11,7 @@ interface CartProps {
 
 export function Cart({ items, onClose, onRemoveItem, onCheckout }: CartProps) {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const { totalCommission } = calculateClipCommission(subtotal);
+  const { totalCommission } = calculateServiceFee(subtotal);
   const total = subtotal + totalCommission;
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/auth/supabase-auth";
+import { isInOtpCooldown, markOtpSent } from "@/lib/auth/otp-cooldown";
+import { resolvePublicRegistrationRole } from "@/lib/auth/registration";
 import { prisma } from "@/lib/db/prisma";
 import { registerSchema } from "@/lib/validations/schemas";
 
@@ -18,24 +20,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, name, role } = result.data;
-    const userRole = (role || "CLIENTE") as any;
+    const { email, name, phone } = result.data;
+    const emailTrim = email.trim().toLowerCase();
+    const userRole = resolvePublicRegistrationRole();
+    const phoneClean = phone?.trim() || null;
+
+    if (isInOtpCooldown(emailTrim)) {
+      return NextResponse.json({
+        success: true,
+        message: "Código enviado. Revisa tu correo.",
+        cooldown: true,
+      });
+    }
 
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { email: emailTrim },
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "Este email ya está registrado" },
+        {
+          error: "Este correo ya está registrado. Inicia sesión.",
+          code: "EMAIL_EXISTS",
+        },
         { status: 400 }
       );
     }
 
     const user = await prisma.user.create({
       data: {
-        email,
-        name,
+        email: emailTrim,
+        name: name.trim(),
+        phone: phoneClean,
         role: userRole,
         isActive: true,
         password: "",
@@ -45,21 +61,30 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServerClient();
     const { error: otpError } = await supabase.auth.signInWithOtp({
-      email,
+      email: emailTrim,
       options: { shouldCreateUser: true },
     });
 
     if (otpError) {
       await prisma.user.delete({ where: { id: user.id } }).catch(() => {});
+      const isRateLimit =
+        otpError.message?.toLowerCase().includes("rate") ||
+        otpError.code === "rate_limit_exceeded";
       return NextResponse.json(
-        { error: otpError.message || "Error al enviar código de verificación" },
-        { status: 400 }
+        {
+          error: isRateLimit
+            ? "Demasiados intentos. Espera 1 minuto."
+            : otpError.message || "Error al enviar código de verificación",
+        },
+        { status: isRateLimit ? 429 : 400 }
       );
     }
 
+    markOtpSent(emailTrim);
+
     return NextResponse.json({
       success: true,
-      message: "Usuario registrado. Verifica tu email con el código de 8 dígitos enviado.",
+      message: "Cuenta creada. Revisa tu correo con el código de 8 dígitos.",
       requiresVerification: true,
       user: {
         id: user.id,
@@ -69,10 +94,11 @@ export async function POST(request: NextRequest) {
         emailVerified: user.emailVerified,
       },
     });
-  } catch (error: any) {
-    console.error("[REGISTER] Error general:", error);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("[REGISTER] Error general:", msg);
     return NextResponse.json(
-      { error: "Error al registrar usuario", details: error.message },
+      { error: "Error al registrar usuario", details: msg },
       { status: 500 }
     );
   }

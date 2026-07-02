@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
+import { canViewOwnTickets } from "@/lib/auth/registration";
 import { getSession } from "@/lib/auth/supabase-auth";
 
 // Marcar como dinámica porque usa cookies
@@ -22,10 +23,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Si no es cliente, verificar que tenga permisos
-    if (user.role !== "CLIENTE") {
+    if (!canViewOwnTickets(user.role)) {
       return NextResponse.json(
-        { error: "Solo los clientes pueden ver sus boletos" },
+        { error: "Tu rol no tiene acceso a boletos de compra" },
         { status: 403 }
       );
     }

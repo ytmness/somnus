@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/auth/supabase-auth";
 import { isInOtpCooldown, markOtpSent } from "@/lib/auth/otp-cooldown";
+import { prisma } from "@/lib/db/prisma";
 import { loginSchema } from "@/lib/validations/schemas";
 
 /**
@@ -19,7 +20,21 @@ export async function POST(request: NextRequest) {
     }
 
     const { email } = result.data;
-    const emailTrim = email.trim();
+    const emailTrim = email.trim().toLowerCase();
+
+    const existingUser = await prisma.user.findUnique({
+      where: { email: emailTrim },
+    });
+
+    if (!existingUser) {
+      return NextResponse.json(
+        {
+          error: "No encontramos una cuenta con ese correo. Crea una cuenta primero.",
+          code: "USER_NOT_FOUND",
+        },
+        { status: 404 }
+      );
+    }
 
     if (isInOtpCooldown(emailTrim)) {
       return NextResponse.json({

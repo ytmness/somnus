@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Shield, Mail, Lock, Ticket } from "lucide-react";
 import { toast } from "sonner";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 
 function LoginContent() {
   const router = useRouter();
@@ -14,24 +15,6 @@ function LoginContent() {
   const emailParam = searchParams.get("email") || "";
   const [email, setEmail] = useState(emailParam);
   const [isLoading, setIsLoading] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
-  // Cargar sesión del usuario
-  useEffect(() => {
-    const loadSession = async () => {
-      try {
-        const response = await fetch("/api/auth/session");
-        const data = await response.json();
-        if (data.success && data.data) {
-          setUser(data.data.user);
-          setUserRole(data.data.user?.role || null);
-        }
-      } catch (error) {
-        console.error("Error al cargar sesión:", error);
-      }
-    };
-    loadSession();
-  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,14 +31,17 @@ function LoginContent() {
 
       if (!response.ok) {
         if (response.status === 429) {
-          toast.error(data.error || "Demasiados intentos. Espera un minuto y vuelve a intentar.");
+          toast.error(data.error || "Demasiados intentos. Espera un minuto.");
+        } else if (data.code === "USER_NOT_FOUND") {
+          toast.error(data.error);
+          router.push(`/register?email=${encodeURIComponent(email)}`);
         } else {
-          throw new Error(data.error || "Error sending verification code");
+          throw new Error(data.error || "Error al enviar el código");
         }
         return;
       }
 
-      toast.success("Verification code sent! Check your email");
+      toast.success("Código enviado. Revisa tu correo.");
       router.push(`/verificar-email?email=${encodeURIComponent(email)}`);
       router.refresh();
     } catch (error: any) {
@@ -67,57 +53,7 @@ function LoginContent() {
 
   return (
     <div className="min-h-screen somnus-bg-main overflow-x-hidden">
-      {/* Navbar igual que landing - compacto, sin logo imagen */}
-      <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-5 flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => router.push("/")}
-          className="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-          aria-label="SOMNUS"
-        >
-          SOMNUS
-        </button>
-
-        <nav className="flex items-center gap-2 sm:gap-4 lg:gap-6">
-          <button
-            onClick={() => router.push("/")}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-          >
-            Events
-          </button>
-          <button
-            onClick={() => router.push("/galeria")}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
-          >
-            Gallery
-          </button>
-          {userRole === "ADMIN" && (
-            <Link
-              href="/admin"
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-            >
-              Panel
-            </Link>
-          )}
-          {(userRole === "ACCESOS" || userRole === "ADMIN") && (
-            <button
-              onClick={() => router.push("/accesos")}
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
-            >
-              Access
-            </button>
-          )}
-          <button
-            onClick={() => router.push("/mis-boletos")}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
-          >
-            My Tickets
-          </button>
-          <span className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1">
-            {user?.name || user?.email || "Login"}
-          </span>
-        </nav>
-      </header>
+      <SiteHeader eventsHref="/" />
 
       {/* Contenido principal */}
       <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-32">
@@ -248,9 +184,9 @@ function LoginContent() {
 
                   <div className="mt-6 pt-6 border-t border-white/10">
                     <p className="somnus-text-body text-center text-sm">
-                      Don&apos;t have an account?{" "}
+                      ¿Primera vez en Somnus?{" "}
                       <Link href="/register" className="text-white hover:underline transition-colors font-medium">
-                        Sign up here
+                        Crea tu cuenta gratis
                       </Link>
                     </p>
                   </div>

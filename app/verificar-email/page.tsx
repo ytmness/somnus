@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Mail, RefreshCw, Calendar, Shield, Scan, LogIn, User, CheckCircle, Lock } from "lucide-react";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { resolvePostAuthRedirect } from "@/lib/auth/registration";
 
 function VerificarEmailContent() {
   const router = useRouter();
@@ -18,24 +20,6 @@ function VerificarEmailContent() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    const loadSession = async () => {
-      try {
-        const response = await fetch("/api/auth/session");
-        const data = await response.json();
-        if (data.success && data.data) {
-          setUser(data.data.user);
-          setUserRole(data.data.user?.role || null);
-        }
-      } catch (error) {
-        console.error("Error al cargar sesión:", error);
-      }
-    };
-    loadSession();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +28,7 @@ function VerificarEmailContent() {
       const response = await fetch("/api/auth/otp/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           email: formData.email,
           token: formData.code,
@@ -56,17 +41,11 @@ function VerificarEmailContent() {
         throw new Error(data.error || "Error verifying OTP code");
       }
 
-      toast.success("Code verified successfully!");
+      toast.success("¡Código verificado!");
 
-      const redirectPath = data.user?.role === "ADMIN" ? "/admin"
-        : data.user?.role === "VENDEDOR" ? "/vendedor"
-        : data.user?.role === "SUPERVISOR" ? "/supervisor"
-        : data.user?.role === "CLIENTE" ? "/mis-boletos"
-        : "/";
+      const redirectPath = resolvePostAuthRedirect(data.user?.role || "ORGANIZER");
 
-      await new Promise(resolve => setTimeout(resolve, 100));
-      router.push(redirectPath);
-      router.refresh();
+      window.location.href = redirectPath;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -103,57 +82,7 @@ function VerificarEmailContent() {
 
   return (
     <div className="min-h-screen somnus-bg-main overflow-x-hidden">
-      {/* Header igual que login */}
-      <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-5 flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => router.push("/")}
-          className="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-          aria-label="SOMNUS"
-        >
-          SOMNUS
-        </button>
-
-        <nav className="flex items-center gap-2 sm:gap-4 lg:gap-6">
-          <button
-            onClick={() => router.push("/")}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-          >
-            Events
-          </button>
-          <button
-            onClick={() => router.push("/galeria")}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
-          >
-            Gallery
-          </button>
-          {userRole === "ADMIN" && (
-            <Link
-              href="/admin"
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-            >
-              Panel
-            </Link>
-          )}
-          {(userRole === "ACCESOS" || userRole === "ADMIN") && (
-            <button
-              onClick={() => router.push("/accesos")}
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
-            >
-              Access
-            </button>
-          )}
-          <button
-            onClick={() => router.push("/mis-boletos")}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
-          >
-            My Tickets
-          </button>
-          <span className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1">
-            {user?.name || user?.email || "Login"}
-          </span>
-        </nav>
-      </header>
+      <SiteHeader eventsHref="/" />
 
       {/* Contenido principal - mismo layout que login */}
       <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-32">

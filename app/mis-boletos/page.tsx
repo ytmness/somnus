@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
 import { Ticket, Calendar, MapPin, User, ArrowLeft, Download, QrCode, Shield, Scan, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
 import { formatEventCalendarDate } from "@/lib/utils";
+import { SiteHeader, type SessionUser } from "@/components/layout/SiteHeader";
 
 interface TicketData {
   id: string;
@@ -47,14 +47,17 @@ export default function MisBoletosPage() {
   const router = useRouter();
   const [tickets, setTickets] = useState<TicketData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
+  const [user, setUser] = useState<SessionUser | null>(null);
+
+  const handleUserChange = useCallback((sessionUser: SessionUser | null) => {
+    setUser(sessionUser);
+  }, []);
 
   useEffect(() => {
     const loadTickets = async () => {
       try {
         setIsLoading(true);
-        const sessionResponse = await fetch("/api/auth/session");
+        const sessionResponse = await fetch("/api/auth/session", { credentials: "include" });
         const sessionData = await sessionResponse.json();
 
         if (!sessionData.user) {
@@ -63,14 +66,7 @@ export default function MisBoletosPage() {
           return;
         }
 
-        if (sessionData.user.role !== "CLIENTE") {
-          toast.error("Esta página es solo para clientes");
-          router.push("/");
-          return;
-        }
-
         setUser(sessionData.user);
-        setUserRole(sessionData.user?.role || null);
 
         const response = await fetch("/api/tickets/my-tickets");
         const data = await response.json();
@@ -107,35 +103,7 @@ export default function MisBoletosPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen somnus-bg-main">
-        <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-5 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => router.push("/")}
-            className="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-          >
-            SOMNUS
-          </button>
-          <nav className="flex items-center gap-2 sm:gap-4 lg:gap-6">
-            <button
-              onClick={() => router.push("/")}
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-            >
-              Eventos
-            </button>
-            <button
-              onClick={() => router.push("/galeria")}
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
-            >
-              Gallery
-            </button>
-            <button
-              onClick={() => router.push("/mis-boletos")}
-              className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1"
-            >
-              Mis Boletos
-            </button>
-          </nav>
-        </header>
+        <SiteHeader eventsHref="/" onUserChange={handleUserChange} />
         <main className="w-full py-8 pt-24 lg:pt-32">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center py-20">
@@ -150,60 +118,7 @@ export default function MisBoletosPage() {
 
   return (
     <div className="min-h-screen somnus-bg-main overflow-x-hidden">
-      {/* Navbar igual que página principal */}
-      <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-5 flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => router.push("/")}
-          className="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-          aria-label="SOMNUS"
-        >
-          SOMNUS
-        </button>
-
-        <nav className="flex items-center gap-2 sm:gap-4 lg:gap-6">
-          <button
-            onClick={() => router.push("/")}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-          >
-            Eventos
-          </button>
-          <button
-            onClick={() => router.push("/galeria")}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
-          >
-            Gallery
-          </button>
-          {userRole === "ADMIN" && (
-            <Link
-              href="/admin"
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-            >
-              Panel
-            </Link>
-          )}
-          {(userRole === "ACCESOS" || userRole === "ADMIN") && (
-            <button
-              onClick={() => router.push("/accesos")}
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
-            >
-              Accesos
-            </button>
-          )}
-          <button
-            onClick={() => router.push("/mis-boletos")}
-            className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1"
-          >
-            Mis Boletos
-          </button>
-          <button
-            onClick={() => router.push("/login")}
-            className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1"
-          >
-            {user?.name || user?.email || "Login"}
-          </button>
-        </nav>
-      </header>
+      <SiteHeader eventsHref="/" onUserChange={handleUserChange} />
 
       <main className="w-full py-8 pt-20 sm:pt-24 lg:pt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -242,7 +157,7 @@ export default function MisBoletosPage() {
                 Compra boletos para tus eventos favoritos
               </p>
               <p className="somnus-text-body text-sm text-white/60 mb-6 max-w-md mx-auto">
-                ¿Acabas de pagar con Clip? Cierra sesión e inicia con el <strong>mismo email</strong> que usaste en el checkout. Los boletos se asocian a ese correo.
+                ¿Acabas de pagar? Cierra sesión e inicia con el <strong>mismo email</strong> que usaste en el checkout. Los boletos se asocian a ese correo.
               </p>
               <button
                 onClick={() => router.push("/")}

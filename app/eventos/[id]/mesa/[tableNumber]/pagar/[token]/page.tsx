@@ -565,7 +565,7 @@ export default function PagarInvitePage() {
               >
                 {isProcessing ? "Procesando…" : "Pagar"}
               </button>
-              <p className="text-center text-[10px] text-white/40">Pago seguro con Clip</p>
+              <p className="text-center text-[10px] text-white/40">Pago seguro con Stripe</p>
             </div>
           </div>
         )}
@@ -585,7 +585,7 @@ export default function PagarInvitePage() {
             <ArrowLeft className="w-4 h-4" />
             SOMNUS
           </Link>
-          <span className="text-white/60 text-sm">Pago seguro con Clip</span>
+          <span className="text-white/60 text-sm">Pago seguro con Stripe</span>
         </div>
       </header>
 
@@ -720,7 +720,7 @@ export default function PagarInvitePage() {
 
         {invite.tableReserved || invite.status === "PAID" ? null : (
           <p className="text-white/50 text-xs text-center">
-            Serás redirigido a la pasarela de Clip para ingresar los datos de tu tarjeta.
+            Serás redirigido al checkout seguro con Stripe para ingresar los datos de tu tarjeta.
           </p>
         )}
       </main>
