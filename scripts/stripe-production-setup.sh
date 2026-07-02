@@ -44,7 +44,9 @@ if [ -z "$ACCOUNT_ID" ]; then
   exit 1
 fi
 echo "Cuenta: $ACCOUNT_ID ($ACCOUNT_EMAIL) país=$ACCOUNT_COUNTRY"
-if [ "$PLATFORM_COUNTRY" = "MX" ] && [ "$ACCOUNT_COUNTRY" != "mx" ]; then
+ACCOUNT_COUNTRY_UPPER=$(echo "$ACCOUNT_COUNTRY" | tr '[:lower:]' '[:upper:]')
+PLATFORM_COUNTRY_UPPER=$(echo "$PLATFORM_COUNTRY" | tr '[:lower:]' '[:upper:]')
+if [ "$PLATFORM_COUNTRY_UPPER" = "MX" ] && [ "$ACCOUNT_COUNTRY_UPPER" != "MX" ]; then
   echo "ERROR: STRIPE_PLATFORM_COUNTRY=MX pero la cuenta Stripe es país=$ACCOUNT_COUNTRY."
   echo "Crea o usa una cuenta Stripe registrada en México (RFC) para application fees con organizadores MX."
   exit 1
