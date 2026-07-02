@@ -7,7 +7,7 @@ import { isStripeEnabled } from "@/lib/payments/config";
 import {
   cancelPaymentIntentForSale,
   canReusePaymentIntent,
-  isApplicationFeeBlockedForConnectedAccount,
+  isDestinationChargePaymentIntent,
   retrievePaymentIntentForSale,
 } from "@/lib/payments/stripe-connect-charge";
 
@@ -15,10 +15,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * POST /api/payments/stripe/create-intent
- * Crea o reutiliza un PaymentIntent para una venta pendiente.
- *
- * US platform + MX organizers: direct charge on the connected account
- * (destination charges fail on confirm even without application_fee).
+ * Destination charge en la plataforma (MX) con application_fee + transfer al organizador.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -64,9 +61,6 @@ export async function POST(request: NextRequest) {
 
     const connectedAccountId = organizerInfo?.stripeAccountId || null;
     const stripe = getStripe();
-    const blockApplicationFee = connectedAccountId
-      ? await isApplicationFeeBlockedForConnectedAccount(stripe, connectedAccountId)
-      : false;
 
     if (sale.paymentIntentId) {
       const existing = await retrievePaymentIntentForSale(
@@ -75,11 +69,14 @@ export async function POST(request: NextRequest) {
         connectedAccountId || sale.stripeConnectedAccountId
       );
 
-      if (canReusePaymentIntent(existing, { blockApplicationFee })) {
+      const matchesFlow =
+        !connectedAccountId ||
+        isDestinationChargePaymentIntent(existing, connectedAccountId);
+
+      if (canReusePaymentIntent(existing) && matchesFlow) {
         return NextResponse.json({
           clientSecret: existing.client_secret,
           paymentIntentId: existing.id,
-          stripeAccountId: connectedAccountId,
         });
       }
 
@@ -103,33 +100,26 @@ export async function POST(request: NextRequest) {
         organizerId: organizerInfo?.organizerId || "",
         platformFeeAmount: String(amounts.platformFeeCents),
         serviceFeeAmount: String(amounts.serviceFeeCents),
-        platformKeepsCents: String(
-          amounts.platformFeeCents + amounts.serviceFeeCents
-        ),
         connectedAccountId: connectedAccountId || "",
-        chargeType: connectedAccountId ? "direct" : "platform",
-        applicationFeeBlocked: blockApplicationFee ? "true" : "false",
+        chargeType: connectedAccountId ? "destination" : "platform",
         source: "somnus.live",
       },
     };
 
-    const requestOptions: Parameters<typeof stripe.paymentIntents.create>[1] = {
-      idempotencyKey: `sale:${sale.id}:create_intent:v5-no-app-fee`,
-    };
-
     if (connectedAccountId) {
+      intentParams.transfer_data = {
+        destination: connectedAccountId,
+      };
       const platformKeepsCents =
         amounts.platformFeeCents + amounts.serviceFeeCents;
-      if (platformKeepsCents > 0 && !blockApplicationFee) {
+      if (platformKeepsCents > 0) {
         intentParams.application_fee_amount = platformKeepsCents;
       }
-      requestOptions.stripeAccount = connectedAccountId;
     }
 
-    const paymentIntent = await stripe.paymentIntents.create(
-      intentParams,
-      requestOptions
-    );
+    const paymentIntent = await stripe.paymentIntents.create(intentParams, {
+      idempotencyKey: `sale:${sale.id}:create_intent:v6-mx-destination`,
+    });
 
     await prisma.sale.update({
       where: { id: sale.id },
@@ -150,7 +140,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,
       paymentIntentId: paymentIntent.id,
-      stripeAccountId: connectedAccountId,
     });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);

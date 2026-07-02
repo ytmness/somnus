@@ -1,5 +1,8 @@
 #!/bin/bash
-# Configura Stripe Connect en producción: claves, webhook, verificación y reinicio PM2.
+# Configura Stripe Connect en producción (plataforma México): claves, webhook, verificación y PM2.
+#
+# Prerequisito: cuenta Stripe registrada en México con Connect activo (Marketplace + Express).
+#
 # Uso en VPS:
 #   export STRIPE_PK="pk_live_..."
 #   export STRIPE_SK="sk_live_..."
@@ -11,6 +14,7 @@ cd /var/www/somnus
 PK="${STRIPE_PK:?Set STRIPE_PK (pk_live_...)}"
 SK="${STRIPE_SK:?Set STRIPE_SK (sk_live_...)}"
 WEBHOOK_URL="${STRIPE_WEBHOOK_URL:-https://somnus.live/api/stripe/webhook}"
+PLATFORM_COUNTRY="${STRIPE_PLATFORM_COUNTRY:-MX}"
 
 set_kv() {
   local key="$1"
@@ -27,17 +31,24 @@ set_kv "NEXT_PUBLIC_APP_URL" "https://somnus.live"
 set_kv "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY" "$PK"
 set_kv "STRIPE_PUBLISHABLE_KEY" "$PK"
 set_kv "STRIPE_SECRET_KEY" "$SK"
+set_kv "STRIPE_PLATFORM_COUNTRY" "$PLATFORM_COUNTRY"
 
-echo "==> 2/5 Verificando cuenta Stripe"
+echo "==> 2/5 Verificando cuenta Stripe (país plataforma: $PLATFORM_COUNTRY)"
 ACCOUNT_JSON=$(curl -s -u "${SK}:" https://api.stripe.com/v1/account)
 ACCOUNT_ID=$(echo "$ACCOUNT_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))" 2>/dev/null || true)
 ACCOUNT_EMAIL=$(echo "$ACCOUNT_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('email',''))" 2>/dev/null || true)
+ACCOUNT_COUNTRY=$(echo "$ACCOUNT_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('country',''))" 2>/dev/null || true)
 if [ -z "$ACCOUNT_ID" ]; then
   echo "ERROR: No se pudo leer la cuenta Stripe. Revisa STRIPE_SK."
   echo "$ACCOUNT_JSON" | head -c 500
   exit 1
 fi
-echo "Cuenta: $ACCOUNT_ID ($ACCOUNT_EMAIL)"
+echo "Cuenta: $ACCOUNT_ID ($ACCOUNT_EMAIL) país=$ACCOUNT_COUNTRY"
+if [ "$PLATFORM_COUNTRY" = "MX" ] && [ "$ACCOUNT_COUNTRY" != "mx" ]; then
+  echo "ERROR: STRIPE_PLATFORM_COUNTRY=MX pero la cuenta Stripe es país=$ACCOUNT_COUNTRY."
+  echo "Crea o usa una cuenta Stripe registrada en México (RFC) para application fees con organizadores MX."
+  exit 1
+fi
 
 echo "==> 3/5 Verificando Stripe Connect"
 CONNECT_TEST=$(curl -s -u "${SK}:" -X POST https://api.stripe.com/v1/accounts \

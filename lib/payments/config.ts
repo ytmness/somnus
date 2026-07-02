@@ -25,3 +25,8 @@ export function isInstallmentsEnabled(): boolean {
 export function getAppUrl(): string {
   return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 }
+
+/** País de la cuenta plataforma Stripe (MX en producción Somnus). */
+export function getStripePlatformCountry(): string {
+  return (process.env.STRIPE_PLATFORM_COUNTRY || "MX").toUpperCase();
+}

@@ -1,5 +1,7 @@
 import type Stripe from "stripe";
+import { getStripePlatformCountry } from "@/lib/payments/config";
 
+/** Países conectados donde una plataforma US no puede usar application_fee (Stripe). */
 const US_PLATFORM_BLOCKED_CONNECTED = new Set([
   "MX",
   "BR",
@@ -9,14 +11,26 @@ const US_PLATFORM_BLOCKED_CONNECTED = new Set([
   "TH",
 ]);
 
-/** Destination/on_behalf_of charges fail confirm for US platform + MX connected. */
+/** PI con on_behalf_of (workaround US→MX obsoleto). */
 export function isLegacyDestinationCharge(pi: Stripe.PaymentIntent): boolean {
-  return Boolean(pi.transfer_data?.destination || pi.on_behalf_of);
+  return Boolean(pi.on_behalf_of);
+}
+
+/** PI destination charge válido para organizador conectado. */
+export function isDestinationChargePaymentIntent(
+  pi: Stripe.PaymentIntent,
+  connectedAccountId: string
+): boolean {
+  const dest =
+    typeof pi.transfer_data?.destination === "string"
+      ? pi.transfer_data.destination
+      : pi.transfer_data?.destination?.id;
+  return dest === connectedAccountId;
 }
 
 /**
- * Stripe blocks application_fee_amount on confirm for US platforms paying out
- * to connected accounts in several countries (including MX).
+ * Futuro multi-región: true si application_fee no está permitido para este par
+ * plataforma↔conectada. Con plataforma MX + organizador MX siempre es false.
  */
 export async function isApplicationFeeBlockedForConnectedAccount(
   stripe: Stripe,
@@ -24,16 +38,15 @@ export async function isApplicationFeeBlockedForConnectedAccount(
 ): Promise<boolean> {
   const connected = await stripe.accounts.retrieve(connectedAccountId);
   const connectedCountry = connected.country?.toUpperCase();
-  const platformCountry = (
-    process.env.STRIPE_PLATFORM_COUNTRY || "US"
-  ).toUpperCase();
+  const platformCountry = getStripePlatformCountry();
 
   if (!connectedCountry || platformCountry === connectedCountry) {
     return false;
   }
 
   return (
-    platformCountry === "US" && US_PLATFORM_BLOCKED_CONNECTED.has(connectedCountry)
+    platformCountry === "US" &&
+    US_PLATFORM_BLOCKED_CONNECTED.has(connectedCountry)
   );
 }
 
@@ -50,7 +63,7 @@ export async function retrievePaymentIntentForSale(
         { stripeAccount: connectedAccountId }
       );
     } catch {
-      // Legacy intents were created on the platform account.
+      // PIs legacy direct charge viven en la cuenta conectada.
     }
   }
   return stripe.paymentIntents.retrieve(paymentIntentId);
@@ -70,19 +83,15 @@ export async function cancelPaymentIntentForSale(
       await stripe.paymentIntents.cancel(paymentIntentId, {}, opts);
       return;
     } catch {
-      // try next context
+      // intentar otro contexto
     }
   }
 }
 
-export function canReusePaymentIntent(
-  pi: Stripe.PaymentIntent,
-  options?: { blockApplicationFee?: boolean }
-): boolean {
+export function canReusePaymentIntent(pi: Stripe.PaymentIntent): boolean {
   if (!pi.client_secret) return false;
   if (pi.status === "canceled" || pi.status === "succeeded") return false;
   if (pi.last_payment_error) return false;
   if (isLegacyDestinationCharge(pi)) return false;
-  if (options?.blockApplicationFee && pi.application_fee_amount) return false;
   return true;
 }
