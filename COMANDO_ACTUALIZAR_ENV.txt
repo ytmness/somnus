@@ -1,0 +1,15 @@
+# Comando para actualizar DIRECT_URL en el servidor
+
+# Editar .env
+nano .env
+
+# Cambiar esta línea:
+# DIRECT_URL=postgresql://postgres:5S73wOjVjiSyRvFV@db.rbcqxxbddvbomwarmjvd.supabase.co:5432/postgres
+
+# Por esta (Transaction Mode - puerto 6543):
+DIRECT_URL=postgres://postgres:5S73wOjVjiSyRvFV@db.rbcqxxbddvbomwarmjvd.supabase.co:6543/postgres
+
+# Guardar: CTRL + O, ENTER, CTRL + X
+
+# Luego ejecutar:
+npm run db:push

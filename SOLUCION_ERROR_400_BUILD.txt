@@ -1,0 +1,131 @@
+═══════════════════════════════════════════════════════════════
+  SOLUCIÓN: Error 400 - Build Desactualizado
+═══════════════════════════════════════════════════════════════
+
+PROBLEMA:
+- Error 400 al cargar archivos CSS y JS
+- ChunkLoadError: Loading chunk failed
+- El build está desactualizado o corrupto
+
+SOLUCIÓN COMPLETA:
+───────────────────────────────────────────────────────────────
+
+1. CONECTAR AL SERVIDOR
+───────────────────────────────────────────────────────────────
+ssh root@144.202.72.150
+
+───────────────────────────────────────────────────────────────
+
+2. IR AL DIRECTORIO Y DETENER PM2
+───────────────────────────────────────────────────────────────
+cd /var/www/somnus
+pm2 stop somnus
+
+───────────────────────────────────────────────────────────────
+
+3. LIMPIAR COMPLETAMENTE EL BUILD
+───────────────────────────────────────────────────────────────
+# Eliminar build anterior completamente
+rm -rf .next
+rm -rf node_modules/.cache
+rm -rf .next/cache
+
+───────────────────────────────────────────────────────────────
+
+4. ACTUALIZAR CÓDIGO DESDE GIT
+───────────────────────────────────────────────────────────────
+git fetch origin
+git reset --hard origin/main
+git pull origin main
+
+───────────────────────────────────────────────────────────────
+
+5. VERIFICAR QUE LOS ARCHIVOS ESTÁN ACTUALIZADOS
+───────────────────────────────────────────────────────────────
+# Verificar que tiene los cambios
+grep -n "somnus-title" app/page.tsx | head -2
+grep -n "BRAND IDENTITY" app/page.tsx | head -2
+
+───────────────────────────────────────────────────────────────
+
+6. REBUILD COMPLETO DESDE CERO
+───────────────────────────────────────────────────────────────
+npm run build
+
+# Esperar a que termine completamente (puede tardar 2-3 minutos)
+
+───────────────────────────────────────────────────────────────
+
+7. VERIFICAR QUE EL BUILD SE CREÓ CORRECTAMENTE
+───────────────────────────────────────────────────────────────
+ls -la .next/static/css/ | head -5
+ls -la .next/static/chunks/ | head -5
+
+# Deberías ver archivos nuevos con nombres diferentes
+
+───────────────────────────────────────────────────────────────
+
+8. REINICIAR PM2
+───────────────────────────────────────────────────────────────
+pm2 restart somnus
+
+# O si no existe:
+pm2 start npm --name "somnus" -- start
+
+───────────────────────────────────────────────────────────────
+
+9. VERIFICAR LOGS
+───────────────────────────────────────────────────────────────
+pm2 logs somnus --lines 30
+
+# Buscar errores o advertencias
+
+───────────────────────────────────────────────────────────────
+
+10. VERIFICAR QUE RESPONDE
+───────────────────────────────────────────────────────────────
+curl http://localhost:3000 | head -50
+
+# Debería mostrar HTML sin errores
+
+───────────────────────────────────────────────────────────────
+
+═══════════════════════════════════════════════════════════════
+  COMANDOS EN UNA SOLA LÍNEA (copiar y pegar)
+═══════════════════════════════════════════════════════════════
+
+cd /var/www/somnus && pm2 stop somnus && rm -rf .next node_modules/.cache && git fetch origin && git reset --hard origin/main && git pull origin main && npm run build && pm2 restart somnus && pm2 logs somnus --lines 20
+
+───────────────────────────────────────────────────────────────
+
+═══════════════════════════════════════════════════════════════
+  SI SIGUE FALLANDO - VERIFICAR NGINX
+═══════════════════════════════════════════════════════════════
+
+# Verificar configuración de Nginx
+sudo nano /etc/nginx/sites-available/somnus
+
+# Asegurarse de que tiene:
+# proxy_pass http://localhost:3000;
+# proxy_http_version 1.1;
+# proxy_set_header Upgrade $http_upgrade;
+# proxy_set_header Connection 'upgrade';
+# proxy_set_header Host $host;
+# proxy_cache_bypass $http_upgrade;
+
+# Reiniciar Nginx
+sudo systemctl restart nginx
+
+───────────────────────────────────────────────────────────────
+
+═══════════════════════════════════════════════════════════════
+  LIMPIAR CACHÉ DEL NAVEGADOR
+═══════════════════════════════════════════════════════════════
+
+Después de hacer el rebuild:
+1. Presiona Ctrl+Shift+Delete
+2. Selecciona "Caché" o "Cached images and files"
+3. Limpia la caché
+4. O usa modo incógnito (Ctrl+Shift+N)
+
+───────────────────────────────────────────────────────────────

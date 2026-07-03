@@ -1,0 +1,45 @@
+═══════════════════════════════════════════════════════════════
+  COMANDOS FINALES PARA COMPLETAR CONFIGURACIÓN
+═══════════════════════════════════════════════════════════════
+
+1. VERIFICAR QUE NGINX PUEDE CONECTARSE
+───────────────────────────────────────────────────────────────
+curl http://localhost
+
+# Debería mostrar HTML de tu aplicación Next.js
+
+───────────────────────────────────────────────────────────────
+
+2. CONFIGURAR PM2 PARA INICIAR AL ARRANCAR
+───────────────────────────────────────────────────────────────
+pm2 save
+pm2 startup
+
+# Ejecutar el comando que muestre (algo como):
+# sudo env PATH=... pm2 startup systemd -u root --hp /root
+
+───────────────────────────────────────────────────────────────
+
+3. VERIFICAR ESTADO FINAL
+───────────────────────────────────────────────────────────────
+pm2 status
+systemctl status nginx
+curl http://localhost:3000
+curl http://localhost
+
+───────────────────────────────────────────────────────────────
+
+4. VER LOGS SI HAY PROBLEMAS
+───────────────────────────────────────────────────────────────
+pm2 logs somnus --lines 50
+tail -20 /var/log/nginx/somnus-error.log
+tail -20 /var/log/nginx/somnus-access.log
+
+───────────────────────────────────────────────────────────────
+
+NOTA SOBRE EL WARNING DE wp-admin:
+───────────────────────────────────────────────────────────────
+El warning sobre /wp-admin/setup-config.php es normal si alguien
+está intentando acceder a rutas de WordPress. No afecta el funcionamiento.
+
+═══════════════════════════════════════════════════════════════

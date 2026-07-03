@@ -1,0 +1,42 @@
+# Comandos para corregir .env en el servidor
+
+# 1. Ver configuración actual
+cat /var/www/somnus/.env | grep -E "DATABASE_URL|DIRECT_URL"
+
+# 2. Editar .env
+nano /var/www/somnus/.env
+
+# 3. Buscar estas líneas y CORREGIRLAS:
+
+# ANTES (INCORRECTO):
+# DATABASE_URL=postgres://postgres:[PASSWORD]@...
+# DIRECT_URL=postgres://postgres:[PASSWORD]@...
+
+# DESPUÉS (CORRECTO - usar Session Pooler):
+DATABASE_URL=postgres://postgres.rbcqxxbddvbomwarmjvd:5S73wOjVjiSyRvFV@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+
+DIRECT_URL=postgres://postgres.rbcqxxbddvbomwarmjvd:5S73wOjVjiSyRvFV@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+
+# IMPORTANTE:
+# - Usuario debe ser: postgres.rbcqxxbddvbomwarmjvd (con el proyecto ref)
+# - Host debe ser: aws-0-us-east-1.pooler.supabase.com
+# - Puerto: 5432
+# - Password: 5S73wOjVjiSyRvFV
+
+# Guardar: CTRL+O, ENTER, CTRL+X
+
+# 4. Verificar que se guardó correctamente
+cat /var/www/somnus/.env | grep -E "DATABASE_URL|DIRECT_URL"
+
+# 5. Reiniciar la aplicación
+pm2 restart somnus
+
+# 6. Ver logs para verificar que conecta
+pm2 logs somnus --lines 30
+
+# 7. Probar conexión a la base de datos
+cd /var/www/somnus
+npm run db:generate
+
+# Si funciona, deberías ver:
+# ✔ Generated Prisma Client

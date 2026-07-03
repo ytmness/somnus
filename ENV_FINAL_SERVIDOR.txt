@@ -1,0 +1,19 @@
+# Configuración .env COMPLETA para Servidor Somnus
+# Solo falta reemplazar [TU-PASSWORD] con tu contraseña de PostgreSQL
+
+NEXT_PUBLIC_SUPABASE_URL=https://rbcqxxbddvbomwarmjvd.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiY3F4eGJkZHZib213YXJtanZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0ODQ4NjksImV4cCI6MjA4NTA2MDg2OX0.gXGvt33WNSxTPThkoJumGt97ipbbSAvkCDty6zC-er4
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiY3F4eGJkZHZib213YXJtanZkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTQ4NDg2OSwiZXhwIjoyMDg1MDYwODY5fQ.Cj2FfgTE6VU_Sshv-hwXQ2xNFTvM52043ew6ucwzHPc
+# Session Mode (recomendado para servidores persistentes con IPv4)
+DATABASE_URL=postgres://postgres.rbcqxxbddvbomwarmjvd:[TU-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+
+# Direct Connection (para migraciones - requiere IPv6 o usar transaction mode si no funciona)
+DIRECT_URL=postgresql://postgres:[TU-PASSWORD]@db.rbcqxxbddvbomwarmjvd.supabase.co:5432/postgres
+
+# Si DIRECT_URL no funciona, usa Transaction Mode (puerto 6543):
+# DIRECT_URL=postgres://postgres:[TU-PASSWORD]@db.rbcqxxbddvbomwarmjvd.supabase.co:6543/postgres
+NEXT_PUBLIC_APP_URL=https://somnus.live
+NEXT_PUBLIC_APP_NAME=Somnus - Boletera
+QR_SECRET_KEY=somnus-qr-secret-2025-cambiar-en-produccion
+JWT_SECRET=8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a
+NODE_ENV=production

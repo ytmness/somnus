@@ -1,0 +1,69 @@
+═══════════════════════════════════════════════════════════════
+  REGISTROS DNS PARA CONFIGURAR EN GODADDY
+═══════════════════════════════════════════════════════════════
+
+DOMINIO: somnus.live
+IP DEL SERVIDOR: 144.202.72.150
+
+───────────────────────────────────────────────────────────────
+  REGISTROS A CONFIGURAR
+───────────────────────────────────────────────────────────────
+
+Tipo: A
+Nombre: @
+Valor: 144.202.72.150
+TTL: 600 segundos (o el mínimo disponible)
+
+───────────────────────────────────────────────────────────────
+
+Tipo: A  
+Nombre: www
+Valor: 144.202.72.150
+TTL: 600 segundos (o el mínimo disponible)
+
+───────────────────────────────────────────────────────────────
+  REGISTROS QUE DEBES ELIMINAR O CAMBIAR
+───────────────────────────────────────────────────────────────
+
+❌ ELIMINAR o CAMBIAR:
+- Tipo: A, Nombre: @, Valor: Parked
+  → CAMBIAR a: 144.202.72.150
+
+❌ ELIMINAR o CAMBIAR:
+- Tipo: CNAME, Nombre: www, Valor: somnus.live.
+  → CAMBIAR a registro A con valor: 144.202.72.150
+
+───────────────────────────────────────────────────────────────
+  REGISTROS QUE DEBES DEJAR COMO ESTÁN
+───────────────────────────────────────────────────────────────
+
+✅ DEJAR COMO ESTÁN (no modificar):
+- Tipo: NS, Nombre: @, Valor: ns47.domaincontrol.com.
+- Tipo: NS, Nombre: @, Valor: ns48.domaincontrol.com.
+- Tipo: SOA, Nombre: @
+- Tipo: TXT, Nombre: _dmarc (si existe)
+
+───────────────────────────────────────────────────────────────
+  PASOS EN GODADDY
+───────────────────────────────────────────────────────────────
+
+1. Ve a: https://dcc.godaddy.com/
+2. Inicia sesión
+3. Busca "somnus.live" y haz clic en "DNS" o "Manage DNS"
+4. Edita el registro A de "@" y cambia el valor a: 144.202.72.150
+5. Si existe CNAME de "www", elimínalo
+6. Crea o edita registro A de "www" con valor: 144.202.72.150
+7. Guarda los cambios
+8. Espera 5-10 minutos para propagación DNS
+
+───────────────────────────────────────────────────────────────
+  VERIFICAR DESPUÉS DE CONFIGURAR
+───────────────────────────────────────────────────────────────
+
+En Windows PowerShell o CMD:
+  nslookup somnus.live
+  nslookup www.somnus.live
+
+Ambos deberían mostrar: 144.202.72.150
+
+═══════════════════════════════════════════════════════════════

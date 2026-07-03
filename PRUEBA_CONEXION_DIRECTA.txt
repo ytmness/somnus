@@ -1,0 +1,40 @@
+# Probar conexión a la base de datos directamente
+
+# 1. Probar con Prisma CLI (debe funcionar si el .env está bien)
+cd /var/www/somnus
+npm run db:generate
+
+# Si esto funciona, el problema es que PM2 no está leyendo el .env
+# Si esto falla, el problema es la conexión misma
+
+# 2. Si db:generate funciona, probar conexión con psql (si está instalado)
+# Instalar cliente PostgreSQL si no está
+apt install -y postgresql-client
+
+# Probar conexión directa
+psql "postgres://postgres.rbcqxxbddvbomwarmjvd:5S73wOjVjiSyRvFV@aws-0-us-east-1.pooler.supabase.com:5432/postgres" -c "SELECT 1;"
+
+# 3. Si la conexión directa funciona, el problema es PM2
+# Solución: usar dotenv-cli o crear un script que cargue el .env
+
+# 4. Crear script de inicio que carga el .env explícitamente
+cat > /var/www/somnus/start.sh << 'EOF'
+#!/bin/bash
+cd /var/www/somnus
+export $(cat .env | grep -v '^#' | xargs)
+npm start
+EOF
+
+chmod +x /var/www/somnus/start.sh
+
+# 5. Detener PM2 actual
+pm2 stop somnus
+pm2 delete somnus
+
+# 6. Iniciar con el script que carga el .env
+cd /var/www/somnus
+pm2 start ./start.sh --name "somnus"
+
+# 7. Ver logs
+sleep 5
+pm2 logs somnus --lines 30

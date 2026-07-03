@@ -1,0 +1,56 @@
+# PASO A PASO: Corregir .env en el servidor
+
+# 1. Ver configuración actual (para ver qué está mal)
+cat /var/www/somnus/.env | grep -E "DATABASE_URL|DIRECT_URL"
+
+# 2. Hacer backup del .env actual
+cp /var/www/somnus/.env /var/www/somnus/.env.backup
+
+# 3. Editar .env
+nano /var/www/somnus/.env
+
+# 4. Buscar estas líneas (pueden estar en cualquier parte del archivo):
+# DATABASE_URL=...
+# DIRECT_URL=...
+
+# 5. REEMPLAZAR con estas líneas EXACTAS:
+
+DATABASE_URL=postgres://postgres.rbcqxxbddvbomwarmjvd:5S73wOjVjiSyRvFV@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+
+DIRECT_URL=postgres://postgres.rbcqxxbddvbomwarmjvd:5S73wOjVjiSyRvFV@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+
+# IMPORTANTE:
+# - El usuario DEBE ser: postgres.rbcqxxbddvbomwarmjvd (con punto y proyecto ref)
+# - NO debe ser solo: postgres
+# - El host DEBE ser: aws-0-us-east-1.pooler.supabase.com
+# - NO debe ser: db.rbcqxxbddvbomwarmjvd.supabase.co
+# - El puerto DEBE ser: 5432
+# - La contraseña es: 5S73wOjVjiSyRvFV
+
+# 6. Guardar: CTRL+O, ENTER, CTRL+X
+
+# 7. Verificar que se guardó correctamente
+cat /var/www/somnus/.env | grep -E "DATABASE_URL|DIRECT_URL"
+
+# Debe mostrar exactamente:
+# DATABASE_URL=postgres://postgres.rbcqxxbddvbomwarmjvd:5S73wOjVjiSyRvFV@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+# DIRECT_URL=postgres://postgres.rbcqxxbddvbomwarmjvd:5S73wOjVjiSyRvFV@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+
+# 8. Reiniciar la aplicación para que cargue el nuevo .env
+pm2 restart somnus
+
+# 9. Esperar unos segundos y ver logs
+sleep 5
+pm2 logs somnus --lines 30
+
+# 10. Si todavía hay error, verificar que no haya espacios extra o caracteres raros
+cat /var/www/somnus/.env | grep -E "DATABASE_URL|DIRECT_URL" | cat -A
+
+# Si ves caracteres raros, editar de nuevo y copiar/pegar exactamente las líneas de arriba
+
+# 11. Probar conexión manualmente
+cd /var/www/somnus
+npm run db:generate
+
+# Si funciona, deberías ver:
+# ✔ Generated Prisma Client
