@@ -1,4 +1,8 @@
 import { resolvePostAuthRedirect } from "@/lib/auth/registration";
+import {
+  getPrimaryStaffRedirect,
+  getUserMemberships,
+} from "@/lib/auth/permissions";
 
 const ALLOWED_REDIRECT_PREFIXES = [
   "/",
@@ -7,6 +11,21 @@ const ALLOWED_REDIRECT_PREFIXES = [
   "/organizador",
   "/mis-boletos",
   "/eventos",
+  "/feed",
+  "/mensajes",
+  "/notificaciones",
+  "/organizaciones",
+  "/galeria",
+  "/vendedor",
+  "/supervisor",
+  "/checkout",
+  "/pago",
+  "/pago-exitoso",
+  "/invitacion",
+  "/mesa",
+  "/register",
+  "/login",
+  "/verificar-email",
 ];
 
 /**
@@ -24,7 +43,27 @@ export function sanitizeRedirectPath(next: string | null | undefined): string | 
 
 export function resolveAuthRedirectPath(
   role: string,
-  requestedNext?: string | null
+  requestedNext?: string | null,
+  staffRoles?: string[]
 ): string {
-  return sanitizeRedirectPath(requestedNext) ?? resolvePostAuthRedirect(role);
+  return sanitizeRedirectPath(requestedNext) ?? resolvePostAuthRedirect(role, staffRoles);
+}
+
+/**
+ * Resuelve redirect post-auth usando membresías staff cuando no hay `next` explícito.
+ */
+export async function resolveAuthRedirectForUser(
+  userId: string,
+  role: string,
+  requestedNext?: string | null
+): Promise<string> {
+  const sanitized = sanitizeRedirectPath(requestedNext);
+  if (sanitized) return sanitized;
+
+  const memberships = await getUserMemberships(userId);
+  const staffRedirect = getPrimaryStaffRedirect(memberships, role);
+  if (staffRedirect) return staffRedirect;
+
+  const staffRoles = memberships.map((m) => m.role);
+  return resolvePostAuthRedirect(role, staffRoles);
 }

@@ -84,6 +84,8 @@ assert(resolvePostAuthRedirect("ORGANIZER") === "/organizador", "ORGANIZER → o
 assert(resolvePostAuthRedirect("CLIENTE") === "/", "CLIENTE → home");
 assert(resolvePostAuthRedirect("ADMIN") === "/admin", "ADMIN → admin");
 assert(resolvePostAuthRedirect("ACCESOS") === "/accesos", "ACCESOS → accesos");
+assert(resolvePostAuthRedirect("VENDEDOR") === "/vendedor", "VENDEDOR → vendedor");
+assert(resolvePostAuthRedirect("SUPERVISOR") === "/supervisor", "SUPERVISOR → supervisor");
 
 console.log("\n=== canViewOwnTickets ===");
 assert(canViewOwnTickets("ORGANIZER"), "ORGANIZER puede ver boletos");

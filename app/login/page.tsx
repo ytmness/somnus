@@ -63,10 +63,14 @@ function LoginContent() {
       }
 
       toast.success("¡Bienvenido de nuevo!");
-      const redirectPath = resolveAuthRedirectPath(
-        data.user?.role || "ORGANIZER",
-        redirectParam
-      );
+      const redirectPath =
+        redirectParam != null
+          ? resolveAuthRedirectPath(
+              data.user?.role || "ORGANIZER",
+              redirectParam
+            )
+          : (data.redirectPath ??
+            resolveAuthRedirectPath(data.user?.role || "ORGANIZER"));
       window.location.href = redirectPath;
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : "Error al iniciar sesión");

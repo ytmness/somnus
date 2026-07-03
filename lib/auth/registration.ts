@@ -13,10 +13,10 @@ export function resolvePostAuthRedirect(
   staffRoles?: string[]
 ): string {
   if (role === "ADMIN") return "/admin";
-  if (staffRoles?.includes("VENDEDOR") || role === "VENDEDOR") return "/";
-  if (staffRoles?.includes("SUPERVISOR") || role === "SUPERVISOR")
-    return "/";
   if (staffRoles?.includes("ACCESOS") || role === "ACCESOS") return "/accesos";
+  if (staffRoles?.includes("VENDEDOR") || role === "VENDEDOR") return "/vendedor";
+  if (staffRoles?.includes("SUPERVISOR") || role === "SUPERVISOR")
+    return "/supervisor";
   if (role === "ORGANIZER") return "/organizador";
   return "/";
 }

@@ -13,7 +13,8 @@
     "db:update-quantities": "tsx scripts/update-ticket-quantities.ts",
     "db:delete-somnus-panorama": "tsx scripts/delete-somnus-panorama-events.ts",
     "compress-gallery": "tsx scripts/compress-gallery.ts",
-    "test:auth": "tsx scripts/test-auth-logic.ts"
+    "test:auth": "tsx scripts/test-auth-logic.ts",
+    "verify": "tsx scripts/verify-coordinator.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

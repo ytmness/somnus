@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient as createSSRClient } from "@supabase/ssr";
-import { resolveAuthRedirectPath } from "@/lib/auth/redirect-path";
+import { resolveAuthRedirectForUser } from "@/lib/auth/redirect-path";
 import { ensurePrismaUserFromAuth } from "@/lib/auth/sync-user";
 import { sanitizeRedirectPath } from "@/lib/auth/redirect-path";
 
@@ -64,7 +64,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const redirectPath = resolveAuthRedirectPath(prismaUser.role, safeNext);
+    const redirectPath = await resolveAuthRedirectForUser(
+      prismaUser.id,
+      prismaUser.role,
+      safeNext
+    );
     const response = NextResponse.redirect(new URL(redirectPath, request.url));
 
     pendingCookies.forEach(({ name, value, options }) => {

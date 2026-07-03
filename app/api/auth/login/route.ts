@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db/prisma";
 import { supabaseAdmin } from "@/lib/db/supabase";
 import { loginSchema } from "@/lib/validations/schemas";
+import { resolveAuthRedirectForUser } from "@/lib/auth/redirect-path";
 
 export const dynamic = "force-dynamic";
 
@@ -134,9 +135,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const redirectPath = await resolveAuthRedirectForUser(
+      existingUser.id,
+      existingUser.role
+    );
+
     const jsonResponse = NextResponse.json({
       success: true,
       message: "Inicio de sesión exitoso",
+      redirectPath,
       user: {
         id: existingUser.id,
         email: existingUser.email,
