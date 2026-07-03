@@ -5,8 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
-import { Mail, User, Phone, Ticket, Shield, CheckCircle } from "lucide-react";
+import { Mail, User, Phone, Ticket, Shield, CheckCircle, Lock, Eye, EyeOff } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SocialLoginButtons } from "@/components/auth/SocialLoginButtons";
+import { resolveAuthRedirectPath } from "@/lib/auth/redirect-path";
 
 function RegisterContent() {
   const router = useRouter();
@@ -17,21 +19,33 @@ function RegisterContent() {
     name: "",
     email: emailParam,
     phone: "",
+    password: "",
+    confirmPassword: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Las contraseñas no coinciden");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
           phone: formData.phone || undefined,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
         }),
       });
 
@@ -46,8 +60,9 @@ function RegisterContent() {
         throw new Error(data.error || "Error al registrar");
       }
 
-      toast.success("Te enviamos un código de 8 dígitos a tu correo");
-      router.push(`/verificar-email?email=${encodeURIComponent(formData.email)}`);
+      toast.success("¡Cuenta creada! Bienvenido a Somnus");
+      const redirectPath = resolveAuthRedirectPath(data.user?.role || "ORGANIZER");
+      window.location.href = redirectPath;
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : "Error al registrar");
     } finally {
@@ -90,10 +105,10 @@ function RegisterContent() {
                   </div>
                   <div>
                     <h3 className="somnus-title-secondary text-lg mb-2 uppercase">
-                      Sin contraseña
+                      Registro rápido
                     </h3>
                     <p className="somnus-text-body text-sm">
-                      Solo tu correo y un código de verificación
+                      Con Google, Apple o tu correo y contraseña
                     </p>
                   </div>
                 </div>
@@ -119,7 +134,7 @@ function RegisterContent() {
                       Cuenta segura
                     </h3>
                     <p className="somnus-text-body text-sm">
-                      Verificación por correo para proteger tu cuenta
+                      Tus datos protegidos con los más altos estándares
                     </p>
                   </div>
                 </div>
@@ -139,6 +154,19 @@ function RegisterContent() {
                     <p className="somnus-text-body text-sm">
                       Completa tus datos para empezar a comprar boletos
                     </p>
+                  </div>
+
+                  <SocialLoginButtons />
+
+                  <div className="relative my-6">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-white/10" />
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-3 somnus-text-body bg-transparent text-white/60">
+                        o regístrate con correo
+                      </span>
+                    </div>
                   </div>
 
                   <form onSubmit={handleSubmit} className="space-y-5">
@@ -199,12 +227,64 @@ function RegisterContent() {
                       </div>
                     </div>
 
+                    <div>
+                      <label className="block somnus-title-secondary text-sm mb-2 uppercase">
+                        Contraseña
+                      </label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          value={formData.password}
+                          onChange={(e) =>
+                            setFormData({ ...formData, password: e.target.value })
+                          }
+                          className="w-full pl-10 pr-12 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
+                          placeholder="Mínimo 8 caracteres"
+                          required
+                          minLength={8}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
+                          aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="w-5 h-5" />
+                          ) : (
+                            <Eye className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block somnus-title-secondary text-sm mb-2 uppercase">
+                        Confirmar contraseña
+                      </label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          value={formData.confirmPassword}
+                          onChange={(e) =>
+                            setFormData({ ...formData, confirmPassword: e.target.value })
+                          }
+                          className="w-full pl-10 pr-4 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
+                          placeholder="Repite tu contraseña"
+                          required
+                          minLength={8}
+                        />
+                      </div>
+                    </div>
+
                     <button
                       type="submit"
                       disabled={isLoading}
                       className="w-full somnus-btn text-base py-6 disabled:opacity-50"
                     >
-                      {isLoading ? "Creando cuenta..." : "Crear cuenta y verificar correo"}
+                      {isLoading ? "Creando cuenta..." : "Crear cuenta"}
                     </button>
                   </form>
 

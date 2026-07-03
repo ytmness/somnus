@@ -43,7 +43,10 @@ function VerificarEmailContent() {
 
       toast.success("¡Código verificado!");
 
-      const redirectPath = resolvePostAuthRedirect(data.user?.role || "ORGANIZER");
+      const redirectPath = resolvePostAuthRedirect(
+        data.user?.role || "ORGANIZER",
+        data.user?.staffRoles
+      );
 
       window.location.href = redirectPath;
     } catch (error: any) {

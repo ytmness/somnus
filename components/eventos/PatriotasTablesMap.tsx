@@ -281,7 +281,7 @@ export function PatriotasTablesMap({
             </button>
           </div>
           <div className="mt-2 text-white/60 text-xs">
-            💡 Usa estos controles para alinear las mesas con la imagen de fondo. Cuando esté perfecto, haz click en "Copiar Valores"
+            💡 Usa estos controles para alinear las mesas con la imagen de fondo. Cuando esté perfecto, haz click en &quot;Copiar Valores&quot;
           </div>
         </div>
       )}

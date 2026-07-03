@@ -1,12 +1,60 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/auth/supabase-auth";
-import { isInOtpCooldown, markOtpSent } from "@/lib/auth/otp-cooldown";
+import { createServerClient as createSSRClient } from "@supabase/ssr";
+import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db/prisma";
+import { supabaseAdmin } from "@/lib/db/supabase";
 import { loginSchema } from "@/lib/validations/schemas";
+import { resolveAuthRedirectForUser } from "@/lib/auth/redirect-path";
+
+export const dynamic = "force-dynamic";
+
+type CookieToSet = {
+  name: string;
+  value: string;
+  options?: Record<string, unknown>;
+};
+
+async function syncLegacyUserToSupabase(
+  email: string,
+  password: string,
+  prismaPassword: string
+): Promise<boolean> {
+  const passwordValid = await bcrypt.compare(password, prismaPassword);
+  if (!passwordValid) return false;
+
+  const { error: createError } = await supabaseAdmin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+  });
+
+  if (!createError) return true;
+
+  const alreadyExists =
+    createError.message?.toLowerCase().includes("already") ||
+    createError.message?.toLowerCase().includes("registered");
+
+  if (!alreadyExists) return false;
+
+  const { data: userList } = await supabaseAdmin.auth.admin.listUsers({
+    page: 1,
+    perPage: 1000,
+  });
+  const existing = userList?.users?.find(
+    (u) => u.email?.toLowerCase() === email
+  );
+  if (!existing) return false;
+
+  const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+    existing.id,
+    { password, email_confirm: true }
+  );
+  return !updateError;
+}
 
 /**
  * POST /api/auth/login
- * Enviar código OTP (8 dígitos) via Supabase Auth
+ * Inicio de sesión con email y contraseña via Supabase Auth
  */
 export async function POST(request: NextRequest) {
   try {
@@ -14,12 +62,12 @@ export async function POST(request: NextRequest) {
     const result = loginSchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
-        { error: "Invalid email", details: result.error.errors },
+        { error: "Datos inválidos", details: result.error.errors },
         { status: 400 }
       );
     }
 
-    const { email } = result.data;
+    const { email, password } = result.data;
     const emailTrim = email.trim().toLowerCase();
 
     const existingUser = await prisma.user.findUnique({
@@ -36,45 +84,89 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (isInOtpCooldown(emailTrim)) {
-      return NextResponse.json({
-        success: true,
-        message: "Verification code sent to your email",
-        cooldown: true,
-      });
+    if (!existingUser.isActive) {
+      return NextResponse.json(
+        { error: "Tu cuenta está desactivada. Contacta soporte." },
+        { status: 403 }
+      );
     }
 
-    const supabase = createServerClient();
+    const pendingCookies: CookieToSet[] = [];
 
-    const { error } = await supabase.auth.signInWithOtp({
+    const supabase = createSSRClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            pendingCookies.push(...cookiesToSet);
+          },
+        },
+      }
+    );
+
+    let { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email: emailTrim,
-      options: {
-        shouldCreateUser: true,
+      password,
+    });
+
+    if (authError && existingUser.password) {
+      const synced = await syncLegacyUserToSupabase(
+        emailTrim,
+        password,
+        existingUser.password
+      );
+      if (synced) {
+        ({ data: authData, error: authError } = await supabase.auth.signInWithPassword({
+          email: emailTrim,
+          password,
+        }));
+      }
+    }
+
+    if (authError || !authData?.user) {
+      console.error("[LOGIN] Error:", authError?.message);
+      return NextResponse.json(
+        { error: "Correo o contraseña incorrectos" },
+        { status: 401 }
+      );
+    }
+
+    const redirectPath = await resolveAuthRedirectForUser(
+      existingUser.id,
+      existingUser.role
+    );
+
+    const jsonResponse = NextResponse.json({
+      success: true,
+      message: "Inicio de sesión exitoso",
+      redirectPath,
+      user: {
+        id: existingUser.id,
+        email: existingUser.email,
+        name: existingUser.name,
+        role: existingUser.role,
+        emailVerified: existingUser.emailVerified,
       },
     });
 
-    if (error) {
-      console.error("[LOGIN] Error:", error.message, error.code);
-      const isRateLimit =
-        error.message?.toLowerCase().includes("rate") ||
-        error.code === "rate_limit_exceeded" ||
-        error.status === 429;
-      const msg = isRateLimit
-        ? "Demasiados intentos. Espera 1 minuto y vuelve a intentar."
-        : error.message || "Error sending verification code";
-      return NextResponse.json({ error: msg }, { status: isRateLimit ? 429 : 400 });
-    }
-
-    markOtpSent(emailTrim);
-
-    return NextResponse.json({
-      success: true,
-      message: "Verification code sent to your email",
+    pendingCookies.forEach(({ name, value, options }) => {
+      jsonResponse.cookies.set(
+        name,
+        value,
+        options as Parameters<typeof jsonResponse.cookies.set>[2]
+      );
     });
-  } catch (error: any) {
-    console.error("[LOGIN] Error general:", error);
+
+    return jsonResponse;
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("[LOGIN] Error general:", msg);
     return NextResponse.json(
-      { error: "Error sending verification code" },
+      { error: "Error al iniciar sesión" },
       { status: 500 }
     );
   }

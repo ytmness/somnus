@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { OrganizerDetailModal } from "./OrganizerDetailModal";
 
 interface OrganizerRow {
   id: string;
@@ -10,15 +12,25 @@ interface OrganizerRow {
   stripeOnboardingStatus: string;
   chargesEnabled: boolean;
   payoutsEnabled: boolean;
+  isActive: boolean;
   eventCount: number;
-  user: { email: string; name: string };
+  user: { email: string; name: string; isActive: boolean };
   organizations: Array<{ id: string; name: string; _count?: { events: number } }>;
 }
 
-export function OrganizersManager() {
+interface OrganizersManagerProps {
+  onViewEvents: (organizerId: string) => void;
+  onConfigureCommission: (organizerId: string) => void;
+}
+
+export function OrganizersManager({
+  onViewEvents,
+  onConfigureCommission,
+}: OrganizersManagerProps) {
   const [organizers, setOrganizers] = useState<OrganizerRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
+  const [selectedOrganizerId, setSelectedOrganizerId] = useState<string | null>(null);
 
   const load = async (search?: string) => {
     try {
@@ -45,7 +57,12 @@ export function OrganizersManager() {
     void load(q);
   };
 
-  if (loading) {
+  const handleSaved = () => {
+    setLoading(true);
+    void load(q);
+  };
+
+  if (loading && organizers.length === 0) {
     return <p className="text-white/60">Cargando organizadores...</p>;
   }
 
@@ -79,35 +96,66 @@ export function OrganizersManager() {
                 <th className="text-left py-3 px-2">Stripe</th>
                 <th className="text-left py-3 px-2">Organizaciones</th>
                 <th className="text-right py-3 px-2">Eventos</th>
+                <th className="text-right py-3 px-2">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {organizers.map((o) => (
-                <tr key={o.id} className="border-b border-white/5">
-                  <td className="py-3 px-2 text-white font-medium">{o.businessName}</td>
-                  <td className="py-3 px-2 text-white/70">{o.user.email}</td>
-                  <td className="py-3 px-2">
-                    <span
-                      className={`text-xs px-2 py-1 rounded ${
-                        o.chargesEnabled && o.payoutsEnabled
-                          ? "bg-green-500/20 text-green-300"
-                          : "bg-amber-500/20 text-amber-300"
-                      }`}
-                    >
-                      {o.stripeOnboardingStatus}
-                    </span>
-                  </td>
-                  <td className="py-3 px-2 text-white/70">
-                    {o.organizations.length > 0
-                      ? o.organizations.map((org) => org.name).join(", ")
-                      : "—"}
-                  </td>
-                  <td className="py-3 px-2 text-right text-white/80">{o.eventCount}</td>
-                </tr>
-              ))}
+              {organizers.map((o) => {
+                const stripeOk = o.chargesEnabled && o.payoutsEnabled;
+                return (
+                  <tr key={o.id} className="border-b border-white/5">
+                    <td className="py-3 px-2">
+                      <p className="text-white font-medium">{o.businessName}</p>
+                      {!o.isActive && (
+                        <span className="text-xs text-red-400">Inactivo</span>
+                      )}
+                      {!o.user.isActive && (
+                        <span className="text-xs text-amber-400 ml-2">Sin acceso</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-2 text-white/70">{o.user.email}</td>
+                    <td className="py-3 px-2">
+                      <span
+                        className={`text-xs px-2 py-1 rounded ${
+                          stripeOk
+                            ? "bg-green-500/20 text-green-300"
+                            : "bg-amber-500/20 text-amber-300"
+                        }`}
+                      >
+                        {o.stripeOnboardingStatus}
+                      </span>
+                    </td>
+                    <td className="py-3 px-2 text-white/70">
+                      {o.organizations.length > 0
+                        ? o.organizations.map((org) => org.name).join(", ")
+                        : "—"}
+                    </td>
+                    <td className="py-3 px-2 text-right text-white/80">{o.eventCount}</td>
+                    <td className="py-3 px-2 text-right">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setSelectedOrganizerId(o.id)}
+                      >
+                        Gestionar
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
+      )}
+
+      {selectedOrganizerId && (
+        <OrganizerDetailModal
+          organizerId={selectedOrganizerId}
+          onClose={() => setSelectedOrganizerId(null)}
+          onSaved={handleSaved}
+          onViewEvents={onViewEvents}
+          onConfigureCommission={onConfigureCommission}
+        />
       )}
     </div>
   );

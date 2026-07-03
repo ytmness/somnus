@@ -5,20 +5,28 @@ import { z } from "zod";
 // =====================================================
 
 export const loginSchema = z.object({
-  email: z.string().email("Invalid email"),
+  email: z.string().email("Correo inválido"),
+  password: z.string().min(8, "Mínimo 8 caracteres"),
 });
 
-export const registerSchema = z.object({
-  email: z.string().email("Correo inválido"),
-  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  phone: z
-    .string()
-    .trim()
-    .optional()
-    .refine((v) => !v || (v.length >= 10 && v.length <= 20), {
-      message: "Teléfono inválido (mínimo 10 dígitos)",
-    }),
-});
+export const registerSchema = z
+  .object({
+    email: z.string().email("Correo inválido"),
+    name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+    phone: z
+      .string()
+      .trim()
+      .optional()
+      .refine((v) => !v || (v.length >= 10 && v.length <= 20), {
+        message: "Teléfono inválido (mínimo 10 dígitos)",
+      }),
+    password: z.string().min(8, "Mínimo 8 caracteres"),
+    confirmPassword: z.string().min(8, "Mínimo 8 caracteres"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"],
+  });
 
 export const otpVerifySchema = z.object({
   email: z.string().email("Invalid email"),
@@ -75,8 +83,36 @@ export const organizationSchema = z.object({
   logoUrl: z.union([z.string().url(), z.literal("")]).optional(),
 });
 
-export const updateOrganizationSchema = organizationSchema.partial().extend({
+export const slugSchema = z
+  .string()
+  .min(2, "Slug must be at least 2 characters")
+  .max(60)
+  .regex(/^[a-z0-9-]+$/, "Slug solo puede contener letras minúsculas, números y guiones");
+
+export const organizationProfileSchema = organizationSchema.extend({
+  slug: slugSchema.optional(),
+  bannerUrl: z.union([z.string().url(), z.literal("")]).optional(),
+  websiteUrl: z.union([z.string().url(), z.literal("")]).optional(),
+  instagramUrl: z.union([z.string().url(), z.literal("")]).optional(),
+});
+
+export const updateOrganizationSchema = organizationProfileSchema.partial().extend({
   isActive: z.boolean().optional(),
+});
+
+export const orgPostSchema = z.object({
+  content: z.string().min(1, "El contenido es requerido").max(5000),
+  imageUrl: z.union([z.string().url(), z.literal("")]).optional(),
+  type: z.enum(["POST", "ANNOUNCEMENT"]).optional().default("POST"),
+  notifyFollowers: z.boolean().optional().default(false),
+});
+
+export const messageSchema = z.object({
+  body: z.string().min(1, "El mensaje no puede estar vacío").max(5000),
+});
+
+export const createConversationSchema = z.object({
+  organizationId: z.string().uuid("Invalid organization ID"),
 });
 
 export const updateTicketTypeSchema = ticketTypeSchema

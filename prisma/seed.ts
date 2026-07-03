@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import fs from "fs";
 import path from "path";
+import { createClient } from "@supabase/supabase-js";
 
 // #region agent log
 const logPath = path.resolve('.cursor', 'debug.log');
@@ -32,6 +33,54 @@ logEntry('DIRECT_URL env var',{directUrl:process.env.DIRECT_URL?.substring(0,100
 // #endregion
 
 const prisma = new PrismaClient();
+
+async function syncSupabaseAuthUser(email: string, password: string, name: string) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceKey) {
+    console.warn(`⚠️  Supabase no configurado; omitiendo sync de ${email}`);
+    return;
+  }
+
+  const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const { error: createError } = await supabaseAdmin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { name },
+  });
+
+  if (!createError) {
+    console.log(`✅ Usuario Supabase creado: ${email}`);
+    return;
+  }
+
+  const alreadyExists =
+    createError.message?.toLowerCase().includes("already") ||
+    createError.message?.toLowerCase().includes("registered");
+
+  if (!alreadyExists) {
+    console.warn(`⚠️  Error Supabase para ${email}:`, createError.message);
+    return;
+  }
+
+  const { data: userList } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+  const existing = userList?.users?.find((u) => u.email?.toLowerCase() === email.toLowerCase());
+  if (existing) {
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(existing.id, {
+      password,
+      email_confirm: true,
+    });
+    if (updateError) {
+      console.warn(`⚠️  No se pudo actualizar ${email} en Supabase:`, updateError.message);
+    } else {
+      console.log(`✅ Usuario Supabase actualizado: ${email}`);
+    }
+  }
+}
 
 async function main() {
   // #region agent log
@@ -76,6 +125,7 @@ async function main() {
   });
 
   console.log("✅ Usuario admin creado:", admin.email);
+  await syncSupabaseAuthUser("admin@somnus.com", "admin123", "Admin Somnus");
 
   // Crear usuario vendedor
   const vendedorPassword = await bcrypt.hash("vendedor123", 10);
@@ -92,6 +142,7 @@ async function main() {
   });
 
   console.log("✅ Usuario vendedor creado:", vendedor.email);
+  await syncSupabaseAuthUser("vendedor@somnus.com", "vendedor123", "Vendedor Somnus");
 
   // Crear evento de ejemplo (Víctor Mendivil)
   const event = await prisma.event.create({

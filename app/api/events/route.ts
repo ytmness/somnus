@@ -6,6 +6,7 @@ import {
   assertOrganizerCanCreateEvents,
   userOwnsOrganization,
 } from "@/lib/auth/event-access";
+import { notifyOrganizationFollowers } from "@/lib/services/notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -204,6 +205,23 @@ export async function POST(request: NextRequest) {
         changes: { event },
       },
     });
+
+    if (finalOrganizationId && event.organization) {
+      const org = await prisma.organization.findUnique({
+        where: { id: finalOrganizationId },
+        select: { slug: true, name: true },
+      });
+      if (org) {
+        await notifyOrganizationFollowers({
+          organizationId: finalOrganizationId,
+          type: "NEW_EVENT",
+          title: `Nuevo evento: ${event.name}`,
+          body: `${event.artist} · ${event.venue}`,
+          linkUrl: `/eventos/${event.id}/boletos`,
+          metadata: { organizationId: finalOrganizationId, eventId: event.id },
+        });
+      }
+    }
 
     return NextResponse.json({
       success: true,

@@ -25,7 +25,7 @@ interface ScanResponse {
   };
 }
 
-export function QRScanner() {
+export function QRScanner({ eventId }: { eventId?: string }) {
   const [isScanning, setIsScanning] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -140,7 +140,7 @@ export function QRScanner() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ qrData: decodedText }),
+        body: JSON.stringify({ qrData: decodedText, eventId }),
       });
 
       const data: ScanResponse = await response.json();

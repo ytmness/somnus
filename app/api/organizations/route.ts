@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db/prisma";
 import { getSession, hasRole } from "@/lib/auth/supabase-auth";
 import { organizationSchema } from "@/lib/validations/schemas";
 import { ensureOrganizerProfile } from "@/lib/auth/event-access";
+import { generateUniqueOrgSlug } from "@/lib/utils/org-slug";
 
 export const dynamic = "force-dynamic";
 
@@ -74,11 +75,13 @@ export async function POST(request: NextRequest) {
     }
 
     const organizer = await ensureOrganizerProfile(user!);
+    const slug = await generateUniqueOrgSlug(result.data.name);
 
     const org = await prisma.organization.create({
       data: {
         organizerId: organizer.id,
         name: result.data.name,
+        slug,
         description: result.data.description,
         logoUrl: result.data.logoUrl || null,
       },

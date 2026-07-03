@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/auth/supabase-auth";
-import { isInOtpCooldown, markOtpSent } from "@/lib/auth/otp-cooldown";
+import { createServerClient as createSSRClient } from "@supabase/ssr";
+import bcrypt from "bcryptjs";
 import { resolvePublicRegistrationRole } from "@/lib/auth/registration";
 import { prisma } from "@/lib/db/prisma";
+import { supabaseAdmin } from "@/lib/db/supabase";
 import { registerSchema } from "@/lib/validations/schemas";
+
+export const dynamic = "force-dynamic";
+
+type CookieToSet = {
+  name: string;
+  value: string;
+  options?: Record<string, unknown>;
+};
 
 /**
  * POST /api/auth/register
- * Registrar usuario en tabla User + enviar OTP (8 dígitos) via Supabase Auth
+ * Registrar usuario en Prisma + Supabase Auth (email/contraseña)
  */
 export async function POST(request: NextRequest) {
   try {
@@ -20,18 +29,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, name, phone } = result.data;
+    const { email, name, phone, password } = result.data;
     const emailTrim = email.trim().toLowerCase();
     const userRole = resolvePublicRegistrationRole();
     const phoneClean = phone?.trim() || null;
-
-    if (isInOtpCooldown(emailTrim)) {
-      return NextResponse.json({
-        success: true,
-        message: "Código enviado. Revisa tu correo.",
-        cooldown: true,
-      });
-    }
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const existingUser = await prisma.user.findUnique({
       where: { email: emailTrim },
@@ -47,45 +49,69 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = await prisma.user.create({
+    const user = (await prisma.user.create({
       data: {
         email: emailTrim,
         name: name.trim(),
         phone: phoneClean,
         role: userRole,
         isActive: true,
-        password: "",
-        emailVerified: false,
+        password: hashedPassword,
+        emailVerified: true,
       } as any,
-    }) as any;
+    })) as any;
 
-    const supabase = createServerClient();
-    const { error: otpError } = await supabase.auth.signInWithOtp({
+    const { error: supabaseError } = await supabaseAdmin.auth.admin.createUser({
       email: emailTrim,
-      options: { shouldCreateUser: true },
+      password,
+      email_confirm: true,
+      user_metadata: { name: name.trim() },
     });
 
-    if (otpError) {
+    if (supabaseError) {
       await prisma.user.delete({ where: { id: user.id } }).catch(() => {});
-      const isRateLimit =
-        otpError.message?.toLowerCase().includes("rate") ||
-        otpError.code === "rate_limit_exceeded";
+      const alreadyExists =
+        supabaseError.message?.toLowerCase().includes("already") ||
+        supabaseError.message?.toLowerCase().includes("registered");
       return NextResponse.json(
         {
-          error: isRateLimit
-            ? "Demasiados intentos. Espera 1 minuto."
-            : otpError.message || "Error al enviar código de verificación",
+          error: alreadyExists
+            ? "Este correo ya está registrado. Inicia sesión."
+            : supabaseError.message || "Error al crear la cuenta",
+          code: alreadyExists ? "EMAIL_EXISTS" : undefined,
         },
-        { status: isRateLimit ? 429 : 400 }
+        { status: 400 }
       );
     }
 
-    markOtpSent(emailTrim);
+    const pendingCookies: CookieToSet[] = [];
+    const supabase = createSSRClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            pendingCookies.push(...cookiesToSet);
+          },
+        },
+      }
+    );
 
-    return NextResponse.json({
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: emailTrim,
+      password,
+    });
+
+    if (signInError) {
+      console.error("[REGISTER] Auto-login error:", signInError.message);
+    }
+
+    const jsonResponse = NextResponse.json({
       success: true,
-      message: "Cuenta creada. Revisa tu correo con el código de 8 dígitos.",
-      requiresVerification: true,
+      message: "Cuenta creada correctamente",
       user: {
         id: user.id,
         email: user.email,
@@ -94,6 +120,16 @@ export async function POST(request: NextRequest) {
         emailVerified: user.emailVerified,
       },
     });
+
+    pendingCookies.forEach(({ name, value, options }) => {
+      jsonResponse.cookies.set(
+        name,
+        value,
+        options as Parameters<typeof jsonResponse.cookies.set>[2]
+      );
+    });
+
+    return jsonResponse;
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error("[REGISTER] Error general:", msg);

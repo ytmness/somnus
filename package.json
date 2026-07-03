@@ -13,7 +13,8 @@
     "db:update-quantities": "tsx scripts/update-ticket-quantities.ts",
     "db:delete-somnus-panorama": "tsx scripts/delete-somnus-panorama-events.ts",
     "compress-gallery": "tsx scripts/compress-gallery.ts",
-    "test:auth": "tsx scripts/test-auth-logic.ts"
+    "test:auth": "tsx scripts/test-auth-logic.ts",
+    "verify": "tsx scripts/verify-coordinator.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -74,7 +75,7 @@
     "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.20",
     "dotenv": "^17.2.3",
-    "eslint": "^9.15.0",
+    "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.18",
     "postcss": "^8.4.49",
     "prisma": "^5.22.0",

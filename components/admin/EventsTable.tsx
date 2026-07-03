@@ -28,15 +28,23 @@ interface Event {
   }[];
 }
 
-export function EventsTable() {
+interface EventsTableProps {
+  initialOrganizerFilter?: string;
+}
+
+export function EventsTable({ initialOrganizerFilter = "all" }: EventsTableProps) {
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
-  const [organizerFilter, setOrganizerFilter] = useState<string>("all");
+  const [organizerFilter, setOrganizerFilter] = useState<string>(initialOrganizerFilter);
 
   useEffect(() => {
     loadEvents();
   }, []);
+
+  useEffect(() => {
+    setOrganizerFilter(initialOrganizerFilter);
+  }, [initialOrganizerFilter]);
 
   const loadEvents = async () => {
     try {

@@ -3,13 +3,27 @@ import { createServerClient as createSSRClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db/prisma";
 import { supabaseAdmin } from "@/lib/db/supabase";
+import type { StaffRole, MembershipScope } from "@prisma/client";
+
+export interface StaffMembershipSummary {
+  id: string;
+  role: StaffRole;
+  scope: MembershipScope;
+  organizerId: string | null;
+  organizationId: string | null;
+  venueId: string | null;
+  eventId: string | null;
+  tableNumber: string | null;
+}
 
 export interface SessionUser {
   id: string;
   email: string;
   name: string;
   role: "ADMIN" | "ORGANIZER" | "VENDEDOR" | "SUPERVISOR" | "ACCESOS" | "CLIENTE";
-  authUserId: string; // ID de Supabase Auth
+  authUserId: string;
+  memberships?: StaffMembershipSummary[];
+  staffRoles?: StaffRole[];
 }
 
 /**
@@ -76,12 +90,30 @@ export async function getSession(): Promise<SessionUser | null> {
       return null;
     }
 
+    const memberships = await prisma.staffMembership.findMany({
+      where: { userId: user.id, isActive: true },
+      select: {
+        id: true,
+        role: true,
+        scope: true,
+        organizerId: true,
+        organizationId: true,
+        venueId: true,
+        eventId: true,
+        tableNumber: true,
+      },
+    });
+
+    const staffRoles = Array.from(new Set(memberships.map((m) => m.role)));
+
     return {
       id: user.id,
       email: user.email,
       name: user.name,
       role: user.role as SessionUser["role"],
       authUserId: authUser.id,
+      memberships,
+      staffRoles,
     };
   } catch (error) {
     console.error("Error getting session:", error);

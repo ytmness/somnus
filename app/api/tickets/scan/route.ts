@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
-import { getSession, hasRole } from "@/lib/auth/supabase-auth";
+import { getSession } from "@/lib/auth/supabase-auth";
+import { canScanTickets } from "@/lib/auth/permissions";
 import { parseQRPayload } from "@/lib/services/qr-generator";
 
 // Marcar como dinámica porque usa cookies
@@ -22,21 +23,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verificar rol ACCESOS (o ADMIN para pruebas)
-    if (!hasRole(user, ["ACCESOS", "ADMIN"])) {
-      return NextResponse.json(
-        { error: "No tienes permisos para escanear boletos" },
-        { status: 403 }
-      );
-    }
-
     const body = await request.json();
-    const { qrData } = body;
+    const { qrData, eventId: requestedEventId } = body;
 
     if (!qrData) {
       return NextResponse.json(
         { error: "Código QR requerido" },
         { status: 400 }
+      );
+    }
+
+    // Permiso general (sin evento aún) o por evento solicitado
+    const canScanGeneral = await canScanTickets(user, requestedEventId);
+    if (!canScanGeneral) {
+      return NextResponse.json(
+        { error: "No tienes permisos para escanear boletos" },
+        { status: 403 }
       );
     }
 
@@ -84,6 +86,23 @@ export async function POST(request: NextRequest) {
         result: "INVALID",
         message: "Código QR inválido o no existe",
       });
+    }
+
+    const ticketEventId = ticket.ticketType.event.id;
+    if (requestedEventId && requestedEventId !== ticketEventId) {
+      return NextResponse.json({
+        success: false,
+        result: "EVENT_MISMATCH",
+        message: "Este boleto no corresponde al evento seleccionado",
+      });
+    }
+
+    const canScanThisEvent = await canScanTickets(user, ticketEventId);
+    if (!canScanThisEvent) {
+      return NextResponse.json(
+        { error: "No tienes permisos para escanear en este evento" },
+        { status: 403 }
+      );
     }
 
     // Usar transacción para evitar race conditions
@@ -224,7 +243,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verificar rol ACCESOS (o ADMIN)
-    if (!hasRole(user, ["ACCESOS", "ADMIN"])) {
+    if (!(await canScanTickets(user))) {
       return NextResponse.json(
         { error: "No tienes permisos para ver estadísticas" },
         { status: 403 }

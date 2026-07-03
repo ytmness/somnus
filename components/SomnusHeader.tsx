@@ -13,10 +13,12 @@ export function SomnusHeader({ user: userProp, userRole: userRoleProp, showNav =
   const router = useRouter();
   const [user, setUser] = useState<any>(userProp ?? null);
   const [userRole, setUserRole] = useState<string | null>(userRoleProp ?? null);
+  const [staffRoles, setStaffRoles] = useState<string[]>([]);
 
   useEffect(() => {
     if (userProp !== undefined) setUser(userProp);
     if (userRoleProp !== undefined) setUserRole(userRoleProp);
+    if (userProp?.staffRoles) setStaffRoles(userProp.staffRoles);
   }, [userProp, userRoleProp]);
 
   useEffect(() => {
@@ -25,9 +27,10 @@ export function SomnusHeader({ user: userProp, userRole: userRoleProp, showNav =
       try {
         const res = await fetch("/api/auth/session");
         const data = await res.json();
-        if (data.success && data.data?.user) {
-          if (userProp === undefined) setUser(data.data.user);
-          if (userRoleProp === undefined) setUserRole(data.data.user?.role ?? null);
+        if (data.user) {
+          if (userProp === undefined) setUser(data.user);
+          if (userRoleProp === undefined) setUserRole(data.user?.role ?? null);
+          setStaffRoles(data.user?.staffRoles ?? []);
         }
       } catch {
         // ignore
@@ -69,12 +72,30 @@ export function SomnusHeader({ user: userProp, userRole: userRoleProp, showNav =
               Admin
             </button>
           )}
-          {(userRole === "ACCESOS" || userRole === "ADMIN") && (
+          {(userRole === "ACCESOS" ||
+            userRole === "ADMIN" ||
+            staffRoles.includes("ACCESOS")) && (
             <button
               onClick={() => router.push("/accesos")}
               className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
             >
               Accesos
+            </button>
+          )}
+          {staffRoles.includes("VENDEDOR") && (
+            <button
+              onClick={() => router.push("/vendedor")}
+              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
+            >
+              Vendedor
+            </button>
+          )}
+          {staffRoles.includes("SUPERVISOR") && (
+            <button
+              onClick={() => router.push("/supervisor")}
+              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
+            >
+              Supervisor
             </button>
           )}
           <button

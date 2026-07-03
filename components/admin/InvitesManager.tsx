@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Copy, Check, Link2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { effectiveTicketPriceAt, generalAdmissionUnitPrice } from "@/lib/ticket-pricing";
+import { TableStaffManager } from "@/components/admin/TableStaffManager";
 
 const MAX_TRADITIONAL_SLOTS = 500;
 const DEFAULT_MIN_CONFIRM = 20;
@@ -772,6 +773,8 @@ export function InvitesManager() {
           </table>
         </div>
       )}
+
+      {selectedEventId && <TableStaffManager eventId={selectedEventId} />}
     </div>
   );
 }

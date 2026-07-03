@@ -8,12 +8,16 @@ export function resolvePublicRegistrationRole(): "ORGANIZER" {
   return "ORGANIZER";
 }
 
-export function resolvePostAuthRedirect(role: string): string {
+export function resolvePostAuthRedirect(
+  role: string,
+  staffRoles?: string[]
+): string {
   if (role === "ADMIN") return "/admin";
-  if (role === "VENDEDOR") return "/vendedor";
-  if (role === "SUPERVISOR") return "/supervisor";
-  if (role === "ACCESOS") return "/accesos";
-  // ORGANIZER, CLIENTE y usuarios normales → home
+  if (staffRoles?.includes("ACCESOS") || role === "ACCESOS") return "/accesos";
+  if (staffRoles?.includes("VENDEDOR") || role === "VENDEDOR") return "/vendedor";
+  if (staffRoles?.includes("SUPERVISOR") || role === "SUPERVISOR")
+    return "/supervisor";
+  if (role === "ORGANIZER") return "/organizador";
   return "/";
 }
 

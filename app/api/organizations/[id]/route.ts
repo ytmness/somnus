@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db/prisma";
 import { getSession, hasRole } from "@/lib/auth/supabase-auth";
 import { updateOrganizationSchema } from "@/lib/validations/schemas";
 import { userOwnsOrganization } from "@/lib/auth/event-access";
+import { generateUniqueOrgSlug } from "@/lib/utils/org-slug";
 
 export const dynamic = "force-dynamic";
 
@@ -33,9 +34,28 @@ export async function PATCH(
       );
     }
 
+    const updateData = { ...result.data };
+    if (updateData.name) {
+      const existing = await prisma.organization.findUnique({
+        where: { id: params.id },
+        select: { name: true, slug: true },
+      });
+      if (existing && existing.name !== updateData.name && !updateData.slug) {
+        updateData.slug = await generateUniqueOrgSlug(updateData.name, params.id);
+      }
+    }
+    if (updateData.slug) {
+      const taken = await prisma.organization.findFirst({
+        where: { slug: updateData.slug, NOT: { id: params.id } },
+      });
+      if (taken) {
+        return NextResponse.json({ error: "Ese slug ya está en uso" }, { status: 400 });
+      }
+    }
+
     const org = await prisma.organization.update({
       where: { id: params.id },
-      data: result.data,
+      data: updateData,
     });
 
     return NextResponse.json({ success: true, data: org });

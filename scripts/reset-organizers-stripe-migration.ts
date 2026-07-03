@@ -6,6 +6,7 @@
  *   cd /var/www/somnus && npx tsx scripts/reset-organizers-stripe-migration.ts
  */
 import { PrismaClient } from "@prisma/client";
+import { resetAllOrganizersStripe } from "../lib/admin/reset-organizer-stripe";
 
 const prisma = new PrismaClient();
 
@@ -30,17 +31,9 @@ async function main() {
     console.log(`  - ${org.businessName || org.id}: ${org.stripeAccountId}`);
   }
 
-  const result = await prisma.organizer.updateMany({
-    where: { stripeAccountId: { not: null } },
-    data: {
-      stripeAccountId: null,
-      stripeOnboardingStatus: "NOT_STARTED",
-      chargesEnabled: false,
-      payoutsEnabled: false,
-    },
-  });
+  const count = await resetAllOrganizersStripe();
 
-  console.log(`\nListo: ${result.count} organizador(es) deben volver a onboarding en /organizador.`);
+  console.log(`\nListo: ${count} organizador(es) deben volver a onboarding en /organizador.`);
 }
 
 main()

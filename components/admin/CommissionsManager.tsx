@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -25,11 +25,20 @@ interface EventOption {
   name: string;
 }
 
-export function CommissionsManager() {
+interface CommissionsManagerProps {
+  initialOrganizerId?: string | null;
+  onPrefillConsumed?: () => void;
+}
+
+export function CommissionsManager({
+  initialOrganizerId,
+  onPrefillConsumed,
+}: CommissionsManagerProps) {
   const [rules, setRules] = useState<CommissionRule[]>([]);
   const [organizers, setOrganizers] = useState<OrganizerOption[]>([]);
   const [events, setEvents] = useState<EventOption[]>([]);
   const [loading, setLoading] = useState(true);
+  const newRuleRef = useRef<HTMLDivElement>(null);
   const [form, setForm] = useState({
     scope: "GLOBAL" as "GLOBAL" | "ORGANIZER" | "EVENT",
     organizerId: "",
@@ -58,6 +67,23 @@ export function CommissionsManager() {
   useEffect(() => {
     void load();
   }, []);
+
+  useEffect(() => {
+    if (!initialOrganizerId || loading) return;
+
+    setForm((prev) => ({
+      ...prev,
+      scope: "ORGANIZER",
+      organizerId: initialOrganizerId,
+    }));
+
+    requestAnimationFrame(() => {
+      newRuleRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    onPrefillConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- consumir prefill una vez por id
+  }, [initialOrganizerId, loading]);
 
   const handleCreate = async () => {
     try {
@@ -140,7 +166,10 @@ export function CommissionsManager() {
         </div>
       </div>
 
-      <div className="border border-white/10 rounded-lg p-6 space-y-4">
+      <div
+        ref={newRuleRef}
+        className="border border-white/10 rounded-lg p-6 space-y-4"
+      >
         <h3 className="text-lg font-semibold text-white">Nueva regla</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <label className="space-y-1">

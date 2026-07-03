@@ -7,12 +7,20 @@ import { toast } from "sonner";
 import { Calendar, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
 import { OrganizationsManager } from "@/components/organizador/OrganizationsManager";
 import { OrganizerEventsManager } from "@/components/organizador/OrganizerEventsManager";
+import { OrganizerMessagesTab } from "@/components/mensajes/OrganizerMessagesTab";
+import { StaffManager } from "@/components/admin/StaffManager";
+import { VenuesManager } from "@/components/admin/VenuesManager";
 import { formatStripeRequirements } from "@/lib/payments/stripe-requirements";
 
 interface Organization {
   id: string;
   name: string;
+  slug?: string;
   description: string | null;
+  logoUrl?: string | null;
+  bannerUrl?: string | null;
+  websiteUrl?: string | null;
+  instagramUrl?: string | null;
   isActive: boolean;
   _count?: { events: number };
 }
@@ -50,6 +58,8 @@ export default function OrganizadorPageContent() {
   const [connecting, setConnecting] = useState(false);
   const [connectError, setConnectError] = useState<string | null>(null);
   const [showPayments, setShowPayments] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"eventos" | "mensajes">("eventos");
 
   const loadOrganizations = useCallback(async () => {
     try {
@@ -86,12 +96,23 @@ export default function OrganizadorPageContent() {
   useEffect(() => {
     void loadStatus();
     const stripeParam = searchParams.get("stripe");
+    const tabParam = searchParams.get("tab");
+    if (tabParam === "mensajes") setActiveTab("mensajes");
     if (stripeParam === "return") {
       toast.success("Regresaste de Stripe. Actualizando estado...");
       setShowPayments(true);
       void loadStatus();
     }
   }, [searchParams, loadStatus]);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const res = await fetch("/api/auth/session", { credentials: "include" });
+      const json = await res.json();
+      if (json.user?.id) setCurrentUserId(json.user.id);
+    };
+    void loadUser();
+  }, []);
 
   const handleStartPublishing = async () => {
     setStarting(true);
@@ -239,11 +260,54 @@ export default function OrganizadorPageContent() {
               onRefresh={() => void loadOrganizations()}
             />
 
-            <OrganizerEventsManager
-              stripeReady={!!isReady}
-              organizations={organizations}
-              onRefreshOrgs={() => void loadOrganizations()}
-            />
+            <section className="somnus-card p-6">
+              <VenuesManager />
+            </section>
+
+            <section className="somnus-card p-6">
+              <h2 className="text-xl font-semibold mb-4">Equipo</h2>
+              <StaffManager mode="organizer" />
+            </section>
+
+            <div className="flex gap-2 border-b border-white/10">
+              <button
+                type="button"
+                onClick={() => setActiveTab("eventos")}
+                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === "eventos"
+                    ? "border-white text-white"
+                    : "border-transparent text-white/50 hover:text-white/80"
+                }`}
+              >
+                Eventos
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("mensajes")}
+                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === "mensajes"
+                    ? "border-white text-white"
+                    : "border-transparent text-white/50 hover:text-white/80"
+                }`}
+              >
+                Mensajes
+              </button>
+            </div>
+
+            {activeTab === "eventos" ? (
+              <OrganizerEventsManager
+                stripeReady={!!isReady}
+                organizations={organizations}
+                onRefreshOrgs={() => void loadOrganizations()}
+              />
+            ) : (
+              currentUserId && (
+                <OrganizerMessagesTab
+                  organizations={organizations}
+                  currentUserId={currentUserId}
+                />
+              )
+            )}
 
             <section className="somnus-card overflow-hidden">
               <button

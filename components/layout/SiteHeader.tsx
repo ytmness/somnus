@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 export interface SessionUser {
   id: string;
   email: string;
   name: string;
   role: string;
+  staffRoles?: string[];
 }
 
 interface SiteHeaderProps {
@@ -93,6 +95,30 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
           Gallery
         </Link>
 
+        {!loading && user && (
+          <>
+            <Link
+              href="/organizaciones"
+              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
+            >
+              Orgs
+            </Link>
+            <Link
+              href="/feed"
+              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
+            >
+              Feed
+            </Link>
+            <Link
+              href="/mensajes"
+              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
+            >
+              Mensajes
+            </Link>
+            <NotificationBell isLoggedIn />
+          </>
+        )}
+
         {!loading && user?.role === "ADMIN" && (
           <Link
             href="/admin"
@@ -102,12 +128,42 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
           </Link>
         )}
 
-        {!loading && (user?.role === "ACCESOS" || user?.role === "ADMIN") && (
+        {!loading &&
+          (user?.role === "ACCESOS" ||
+            user?.role === "ADMIN" ||
+            user?.staffRoles?.includes("ACCESOS")) && (
           <Link
             href="/accesos"
             className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
           >
             Access
+          </Link>
+        )}
+
+        {!loading && user?.staffRoles?.includes("VENDEDOR") && (
+          <Link
+            href="/vendedor"
+            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
+          >
+            Vendedor
+          </Link>
+        )}
+
+        {!loading && user?.staffRoles?.includes("SUPERVISOR") && (
+          <Link
+            href="/supervisor"
+            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
+          >
+            Supervisor
+          </Link>
+        )}
+
+        {!loading && user?.staffRoles?.includes("MESA_HOST") && (
+          <Link
+            href="/accesos"
+            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
+          >
+            Mis mesas
           </Link>
         )}
 
