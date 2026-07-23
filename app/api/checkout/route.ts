@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
-import { getSession } from "@/lib/auth/supabase-auth";
+import { getSession } from "@/lib/auth/session";
 import { generateQRHash, generateQRPayload } from "@/lib/services/qr-generator";
 import { calculateSaleAmounts } from "@/lib/payments/commissions";
 import { isStripeEnabled } from "@/lib/payments/config";

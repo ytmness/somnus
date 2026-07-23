@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession, hasRole } from "@/lib/auth/supabase-auth";
+import { getSession, hasRole } from "@/lib/auth/session";
 import { getPlatformTotalFromDb } from "@/lib/admin/revenue";
 import { sumApplicationFeesInRange } from "@/lib/payments/stripe-revenue";
 

@@ -1,60 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient as createSSRClient } from "@supabase/ssr";
-import bcrypt from "bcryptjs";
+import { AuthError } from "next-auth";
+import { signIn } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
-import { supabaseAdmin } from "@/lib/db/supabase";
 import { loginSchema } from "@/lib/validations/schemas";
 import { resolveAuthRedirectForUser } from "@/lib/auth/redirect-path";
 
 export const dynamic = "force-dynamic";
 
-type CookieToSet = {
-  name: string;
-  value: string;
-  options?: Record<string, unknown>;
-};
-
-async function syncLegacyUserToSupabase(
-  email: string,
-  password: string,
-  prismaPassword: string
-): Promise<boolean> {
-  const passwordValid = await bcrypt.compare(password, prismaPassword);
-  if (!passwordValid) return false;
-
-  const { error: createError } = await supabaseAdmin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-  });
-
-  if (!createError) return true;
-
-  const alreadyExists =
-    createError.message?.toLowerCase().includes("already") ||
-    createError.message?.toLowerCase().includes("registered");
-
-  if (!alreadyExists) return false;
-
-  const { data: userList } = await supabaseAdmin.auth.admin.listUsers({
-    page: 1,
-    perPage: 1000,
-  });
-  const existing = userList?.users?.find(
-    (u) => u.email?.toLowerCase() === email
-  );
-  if (!existing) return false;
-
-  const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-    existing.id,
-    { password, email_confirm: true }
-  );
-  return !updateError;
-}
-
 /**
  * POST /api/auth/login
- * Inicio de sesión con email y contraseña via Supabase Auth
+ * Email/contraseña vía Auth.js Credentials
  */
 export async function POST(request: NextRequest) {
   try {
@@ -77,7 +32,8 @@ export async function POST(request: NextRequest) {
     if (!existingUser) {
       return NextResponse.json(
         {
-          error: "No encontramos una cuenta con ese correo. Crea una cuenta primero.",
+          error:
+            "No encontramos una cuenta con ese correo. Crea una cuenta primero.",
           code: "USER_NOT_FOUND",
         },
         { status: 404 }
@@ -91,48 +47,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const pendingCookies: CookieToSet[] = [];
-
-    const supabase = createSSRClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll();
-          },
-          setAll(cookiesToSet) {
-            pendingCookies.push(...cookiesToSet);
-          },
-        },
-      }
-    );
-
-    let { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email: emailTrim,
-      password,
-    });
-
-    if (authError && existingUser.password) {
-      const synced = await syncLegacyUserToSupabase(
-        emailTrim,
+    try {
+      await signIn("credentials", {
+        email: emailTrim,
         password,
-        existingUser.password
-      );
-      if (synced) {
-        ({ data: authData, error: authError } = await supabase.auth.signInWithPassword({
-          email: emailTrim,
-          password,
-        }));
+        redirect: false,
+      });
+    } catch (err) {
+      if (err instanceof AuthError) {
+        return NextResponse.json(
+          { error: "Correo o contraseña incorrectos" },
+          { status: 401 }
+        );
       }
-    }
-
-    if (authError || !authData?.user) {
-      console.error("[LOGIN] Error:", authError?.message);
-      return NextResponse.json(
-        { error: "Correo o contraseña incorrectos" },
-        { status: 401 }
-      );
+      // Next.js puede lanzar NEXT_REDIRECT; con redirect:false no debería
+      throw err;
     }
 
     const redirectPath = await resolveAuthRedirectForUser(
@@ -140,7 +69,7 @@ export async function POST(request: NextRequest) {
       existingUser.role
     );
 
-    const jsonResponse = NextResponse.json({
+    return NextResponse.json({
       success: true,
       message: "Inicio de sesión exitoso",
       redirectPath,
@@ -152,18 +81,15 @@ export async function POST(request: NextRequest) {
         emailVerified: existingUser.emailVerified,
       },
     });
-
-    pendingCookies.forEach(({ name, value, options }) => {
-      jsonResponse.cookies.set(
-        name,
-        value,
-        options as Parameters<typeof jsonResponse.cookies.set>[2]
-      );
-    });
-
-    return jsonResponse;
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);
+    // Auth.js a veces usa redirect interno; si la cookie ya se setó, ok
+    if (msg.includes("NEXT_REDIRECT") || msg.includes("CALLBACK_REDIRECT")) {
+      return NextResponse.json({
+        success: true,
+        message: "Inicio de sesión exitoso",
+      });
+    }
     console.error("[LOGIN] Error general:", msg);
     return NextResponse.json(
       { error: "Error al iniciar sesión" },

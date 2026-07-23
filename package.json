@@ -14,7 +14,9 @@
     "db:delete-somnus-panorama": "tsx scripts/delete-somnus-panorama-events.ts",
     "compress-gallery": "tsx scripts/compress-gallery.ts",
     "test:auth": "tsx scripts/test-auth-logic.ts",
-    "verify": "tsx scripts/verify-coordinator.ts"
+    "verify": "tsx scripts/verify-coordinator.ts",
+    "db:migrate-storage": "tsx scripts/migrate-storage-to-local.ts",
+    "verify:env": "tsx scripts/verificar-env.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -34,8 +36,6 @@
     "@radix-ui/react-toast": "^1.2.4",
     "@stripe/react-stripe-js": "^6.7.0",
     "@stripe/stripe-js": "^9.9.0",
-    "@supabase/ssr": "^0.8.0",
-    "@supabase/supabase-js": "^2.45.4",
     "@tanstack/react-query": "^5.59.20",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
@@ -48,6 +48,7 @@
     "jspdf": "^2.5.2",
     "lucide-react": "^0.454.0",
     "next": "^14.2.18",
+    "next-auth": "^5.0.0-beta.32",
     "nodemailer": "^8.0.4",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",

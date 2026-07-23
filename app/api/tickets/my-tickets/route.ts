@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { canViewOwnTickets } from "@/lib/auth/registration";
-import { getSession } from "@/lib/auth/supabase-auth";
+import { getSession } from "@/lib/auth/session";
 
 // Marcar como dinámica porque usa cookies
 export const dynamic = 'force-dynamic';

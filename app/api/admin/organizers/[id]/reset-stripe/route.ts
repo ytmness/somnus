@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession, hasRole } from "@/lib/auth/supabase-auth";
+import { getSession, hasRole } from "@/lib/auth/session";
 import { resetOrganizerStripe } from "@/lib/admin/reset-organizer-stripe";
 
 export const dynamic = "force-dynamic";

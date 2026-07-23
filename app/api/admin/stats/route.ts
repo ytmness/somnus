@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSession, hasRole } from "@/lib/auth/supabase-auth";
+import { getSession, hasRole } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/prisma";
 
 export const dynamic = "force-dynamic";

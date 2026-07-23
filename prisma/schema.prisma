@@ -55,10 +55,46 @@ model User {
   sentMessages        Message[]
   conversations       Conversation[]    @relation("ConversationParticipant")
   notifications       Notification[]
+  otpCodes            OtpCode[]
+  passwordResetTokens PasswordResetToken[]
 
   @@index([email])
   @@index([role])
   @@index([emailVerified])
+}
+
+// =====================================================
+// OTP Y RESET DE CONTRASEÑA (reemplazo de Supabase Auth)
+// =====================================================
+
+model OtpCode {
+  id        String    @id @default(uuid())
+  email     String
+  codeHash  String
+  expiresAt DateTime
+  usedAt    DateTime?
+  userId    String?
+  createdAt DateTime  @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  email     String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  userId    String?
+  createdAt DateTime  @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email])
+  @@index([expiresAt])
 }
 
 // =====================================================
@@ -745,6 +781,7 @@ enum AuditAction {
   EVENT_CREATED
   EVENT_UPDATED
   EVENT_DELETED
+  SQL_EXECUTED
 }
 
 model AuditLog {

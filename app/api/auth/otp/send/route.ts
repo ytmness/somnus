@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/auth/supabase-auth";
-import { isInOtpCooldown, markOtpSent } from "@/lib/auth/otp-cooldown";
 import { z } from "zod";
+import { prisma } from "@/lib/db/prisma";
+import { isInOtpCooldown, markOtpSent } from "@/lib/auth/otp-cooldown";
+import {
+  generateVerificationCode,
+  hashToken,
+  sendVerificationCode,
+} from "@/lib/services/email";
+
+export const dynamic = "force-dynamic";
 
 const sendOtpSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -9,7 +16,7 @@ const sendOtpSchema = z.object({
 
 /**
  * POST /api/auth/otp/send
- * Reenviar código OTP (8 dígitos) via Supabase Auth
+ * Genera OTP de 8 dígitos, lo guarda hasheado y lo envía por Resend.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -22,8 +29,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email } = result.data;
-    const emailTrim = email.trim();
+    const emailTrim = result.data.email.trim().toLowerCase();
 
     if (isInOtpCooldown(emailTrim)) {
       return NextResponse.json({
@@ -33,25 +39,29 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const supabase = createServerClient();
+    const user = await prisma.user.findUnique({ where: { email: emailTrim } });
+    const code = generateVerificationCode();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email: emailTrim,
-      options: { shouldCreateUser: true },
+    await prisma.otpCode.create({
+      data: {
+        email: emailTrim,
+        codeHash: hashToken(code),
+        expiresAt,
+        userId: user?.id ?? null,
+      },
     });
 
-    if (error) {
-      const isRateLimit =
-        error.message?.toLowerCase().includes("rate") ||
-        error.code === "rate_limit_exceeded" ||
-        error.status === 429;
+    const sent = await sendVerificationCode(
+      emailTrim,
+      user?.name || emailTrim.split("@")[0],
+      code
+    );
+
+    if (!sent) {
       return NextResponse.json(
-        {
-          error: isRateLimit
-            ? "Demasiados intentos. Espera 1 minuto y vuelve a intentar."
-            : error.message || "Error al enviar código OTP",
-        },
-        { status: isRateLimit ? 429 : 400 }
+        { error: "No se pudo enviar el código. Intenta de nuevo." },
+        { status: 500 }
       );
     }
 
@@ -61,10 +71,11 @@ export async function POST(request: NextRequest) {
       success: true,
       message: "Código OTP enviado a tu email",
     });
-  } catch (error: any) {
-    console.error("[OTP SEND] Error:", error);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("[OTP SEND] Error:", msg);
     return NextResponse.json(
-      { error: "Error al enviar código OTP", details: error.message },
+      { error: "Error al enviar código OTP", details: msg },
       { status: 500 }
     );
   }

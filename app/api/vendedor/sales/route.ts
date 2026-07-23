@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
-import { getSession } from "@/lib/auth/supabase-auth";
+import { getSession } from "@/lib/auth/session";
 import { canSellTickets, getAccessibleEventIds } from "@/lib/auth/permissions";
 import { generateQRHash } from "@/lib/services/qr-generator";
 import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";

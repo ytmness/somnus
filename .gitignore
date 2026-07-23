@@ -38,6 +38,9 @@ yarn-error.log*
 .env.development
 .env.development.local
 .env.test
+
+# uploads locales (fuera de Supabase Storage)
+/uploads/
 .env.test.local
 .env.production
 .env.production.local

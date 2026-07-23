@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SocialLoginButtons } from "@/components/auth/SocialLoginButtons";
 import { resolveAuthRedirectPath } from "@/lib/auth/redirect-path";
-import { createSupabaseBrowserClient } from "@/lib/auth/supabase-browser";
 
 function LoginContent() {
   const router = useRouter();
@@ -87,12 +86,17 @@ function LoginContent() {
 
     setIsResetting(true);
     try {
-      const supabase = createSupabaseBrowserClient();
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/login?reset=sent`,
+      const response = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim() }),
       });
-      if (error) throw error;
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Error al enviar el enlace");
+      }
       toast.success("Revisa tu correo para restablecer tu contraseña");
+      router.replace("/login?reset=sent");
     } catch (error: unknown) {
       toast.error(
         error instanceof Error ? error.message : "Error al enviar el enlace"

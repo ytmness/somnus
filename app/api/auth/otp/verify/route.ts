@@ -1,25 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient as createSSRClient } from "@supabase/ssr";
+import { z } from "zod";
+import { AuthError } from "next-auth";
+import { signIn } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
-import { resolvePublicRegistrationRole } from "@/lib/auth/registration";
-import { otpVerifySchema } from "@/lib/validations/schemas";
+import { hashToken } from "@/lib/services/email";
 
 export const dynamic = "force-dynamic";
 
-type CookieToSet = {
-  name: string;
-  value: string;
-  options?: Record<string, unknown>;
-};
+const verifyOtpSchema = z.object({
+  email: z.string().email(),
+  code: z.string().min(6).max(8),
+});
 
 /**
  * POST /api/auth/otp/verify
- * Verificar código OTP (8 dígitos) via Supabase Auth
+ * Verifica OTP y abre sesión Auth.js (credentials + otpCode).
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const result = otpVerifySchema.safeParse(body);
+    const result = verifyOtpSchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
         { error: "Datos inválidos", details: result.error.errors },
@@ -27,84 +27,62 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, token } = result.data;
-    const pendingCookies: CookieToSet[] = [];
+    const email = result.data.email.trim().toLowerCase();
+    const code = result.data.code.trim();
+    const codeHash = hashToken(code);
 
-    const supabase = createSSRClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll();
-          },
-          setAll(cookiesToSet) {
-            pendingCookies.push(...cookiesToSet);
-          },
-        },
-      }
-    );
-
-    const { data: authData, error: authError } = await supabase.auth.verifyOtp({
-      email,
-      token,
-      type: "email",
-    });
-
-    if (authError || !authData?.user) {
-      console.error("[OTP VERIFY] Error:", authError);
-      const msg =
-        authError?.code === "otp_expired"
-          ? "El código expiró. Solicita uno nuevo."
-          : authError?.message || "Código inválido o expirado";
-      return NextResponse.json({ error: msg }, { status: 400 });
-    }
-
-    let user = await prisma.user.findUnique({
-      where: { email },
-    }) as any;
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          email: email.trim().toLowerCase(),
-          name: email.split("@")[0],
-          role: resolvePublicRegistrationRole(),
-          isActive: true,
-          password: "",
-          emailVerified: true,
-        } as any,
-      });
-    } else if (!user.emailVerified) {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { emailVerified: true } as any,
-      });
-      user.emailVerified = true;
-    }
-
-    const jsonResponse = NextResponse.json({
-      success: true,
-      message: "OTP verificado correctamente",
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        emailVerified: user.emailVerified,
+    const record = await prisma.otpCode.findFirst({
+      where: {
+        email,
+        codeHash,
+        usedAt: null,
+        expiresAt: { gt: new Date() },
       },
+      orderBy: { createdAt: "desc" },
     });
 
-    pendingCookies.forEach(({ name, value, options }) => {
-      jsonResponse.cookies.set(name, value, options as Parameters<typeof jsonResponse.cookies.set>[2]);
-    });
+    if (!record) {
+      return NextResponse.json(
+        { error: "Código inválido o expirado" },
+        { status: 400 }
+      );
+    }
 
-    return jsonResponse;
+    try {
+      await signIn("credentials", {
+        email,
+        otpCode: code,
+        redirect: false,
+      });
+    } catch (err) {
+      if (err instanceof AuthError) {
+        return NextResponse.json(
+          { error: "No se pudo iniciar sesión con el código" },
+          { status: 401 }
+        );
+      }
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    return NextResponse.json({
+      success: true,
+      message: "Email verificado",
+      user: user
+        ? {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            emailVerified: user.emailVerified,
+          }
+        : null,
+    });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);
-    console.error("[OTP VERIFY] Error general:", msg);
+    console.error("[OTP VERIFY] Error:", msg);
     return NextResponse.json(
-      { error: "Error al verificar el código", details: msg },
+      { error: "Error al verificar código", details: msg },
       { status: 500 }
     );
   }

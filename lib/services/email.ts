@@ -1,7 +1,5 @@
-/**
- * Servicio de envío de emails
- * OTP usa Supabase Auth. Este servicio está para otros emails (resend cuando se integre)
- */
+import { Resend } from "resend";
+import crypto from "crypto";
 
 export interface EmailOptions {
   to: string;
@@ -10,28 +8,54 @@ export interface EmailOptions {
   text?: string;
 }
 
-/**
- * Envía un email (simulado - OTP real va por Supabase Auth)
- */
-export async function sendEmail(options: EmailOptions): Promise<boolean> {
-  console.log("=".repeat(50));
-  console.log("📧 EMAIL (simulado - OTP por Supabase Auth)");
-  console.log("Para:", options.to);
-  console.log("Asunto:", options.subject);
-  console.log("=".repeat(50));
-  return true;
+function getResendClient(): Resend | null {
+  const key = process.env.RESEND_API_KEY;
+  if (!key || key.startsWith("re_xxxx")) return null;
+  return new Resend(key);
+}
+
+function getFromAddress(): string {
+  return process.env.RESEND_FROM || "Somnus <noreply@somnus.live>";
 }
 
 /**
- * Genera un código de verificación de 8 dígitos
+ * Envía un email vía Resend. En desarrollo sin API key, loguea y retorna true.
  */
+export async function sendEmail(options: EmailOptions): Promise<boolean> {
+  const client = getResendClient();
+  if (!client) {
+    console.log("=".repeat(50));
+    console.log("[email] RESEND_API_KEY no configurada — email simulado");
+    console.log("Para:", options.to);
+    console.log("Asunto:", options.subject);
+    if (options.text) console.log(options.text.slice(0, 200));
+    console.log("=".repeat(50));
+    return true;
+  }
+
+  const { error } = await client.emails.send({
+    from: getFromAddress(),
+    to: options.to,
+    subject: options.subject,
+    html: options.html,
+    text: options.text,
+  });
+
+  if (error) {
+    console.error("[email] Resend error:", error);
+    return false;
+  }
+  return true;
+}
+
 export function generateVerificationCode(): string {
   return Math.floor(10000000 + Math.random() * 90000000).toString();
 }
 
-/**
- * Envía código de verificación por email
- */
+export function hashToken(value: string): string {
+  return crypto.createHash("sha256").update(value).digest("hex");
+}
+
 export async function sendVerificationCode(
   email: string,
   name: string,
@@ -41,53 +65,60 @@ export async function sendVerificationCode(
   const html = `
     <!DOCTYPE html>
     <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #2a2c30 0%, #49484e 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-        .code { background: #5B8DEF; color: white; font-size: 32px; font-weight: bold; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; letter-spacing: 8px; }
-        .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
+    <head><meta charset="utf-8"></head>
+    <body style="font-family: Arial, sans-serif; color: #333;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: #2a2c30; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
           <h1>Somnus</h1>
           <p>Verificación de Email</p>
         </div>
-        <div class="content">
+        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
           <h2>Hola ${name},</h2>
-          <p>Tu código de verificación para iniciar sesión en Somnus:</p>
-          <div class="code">${code}</div>
+          <p>Tu código de verificación:</p>
+          <div style="background: #5B8DEF; color: white; font-size: 32px; font-weight: bold; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; letter-spacing: 8px;">
+            ${code}
+          </div>
           <p>Este código expira en 10 minutos.</p>
-          <p>Si no solicitaste este código, puedes ignorar este email.</p>
-        </div>
-        <div class="footer">
-          <p>© ${new Date().getFullYear()} Somnus. Todos los derechos reservados.</p>
         </div>
       </div>
     </body>
     </html>
   `;
-  const text = `
-Somnus - Código de Verificación
+  const text = `Somnus — Hola ${name}, tu código es: ${code}. Expira en 10 minutos.`;
+  return sendEmail({ to: email, subject, html, text });
+}
 
-Hola ${name},
-
-Tu código de verificación es: ${code}
-
-Este código expira en 10 minutos.
-
-Si no solicitaste este código, ignora este email.
+export async function sendPasswordResetEmail(
+  email: string,
+  name: string,
+  resetUrl: string
+): Promise<boolean> {
+  const subject = "Restablecer contraseña - Somnus";
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"></head>
+    <body style="font-family: Arial, sans-serif; color: #333;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: #2a2c30; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+          <h1>Somnus</h1>
+          <p>Restablecer contraseña</p>
+        </div>
+        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
+          <h2>Hola ${name},</h2>
+          <p>Haz clic en el botón para elegir una nueva contraseña:</p>
+          <p style="text-align: center; margin: 28px 0;">
+            <a href="${resetUrl}" style="background: #5B8DEF; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+              Restablecer contraseña
+            </a>
+          </p>
+          <p style="font-size: 12px; color: #666;">O copia este enlace:<br>${resetUrl}</p>
+          <p>El enlace expira en 1 hora. Si no lo pediste, ignora este correo.</p>
+        </div>
+      </div>
+    </body>
+    </html>
   `;
-
-  return sendEmail({
-    to: email,
-    subject,
-    html,
-    text,
-  });
+  const text = `Somnus — Hola ${name}. Restablece tu contraseña aquí: ${resetUrl}`;
+  return sendEmail({ to: email, subject, html, text });
 }

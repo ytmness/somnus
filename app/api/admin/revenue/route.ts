@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession, hasRole } from "@/lib/auth/supabase-auth";
+import { getSession, hasRole } from "@/lib/auth/session";
 import { getRevenueReport } from "@/lib/admin/revenue";
 
 export const dynamic = "force-dynamic";

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
-import { getSession, hasRole } from "@/lib/auth/supabase-auth";
+import { getSession, hasRole } from "@/lib/auth/session";
 import { updateOrganizationSchema } from "@/lib/validations/schemas";
 import { userOwnsOrganization } from "@/lib/auth/event-access";
 import { generateUniqueOrgSlug } from "@/lib/utils/org-slug";

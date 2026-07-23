@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db/prisma";
 import type { StaffRole, MembershipScope } from "@prisma/client";
-import type { SessionUser } from "@/lib/auth/supabase-auth";
+import type { SessionUser } from "@/lib/auth/session";
 
 export type StaffMembershipInfo = {
   id: string;

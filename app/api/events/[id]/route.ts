@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { prisma } from "@/lib/db/prisma";
-import { getSession, hasRole } from "@/lib/auth/supabase-auth";
+import { getSession, hasRole } from "@/lib/auth/session";
 import { updateEventSchema } from "@/lib/validations/schemas";
 import { userOwnsEvent } from "@/lib/auth/event-access";
 

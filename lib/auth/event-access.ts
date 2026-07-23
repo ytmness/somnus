@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db/prisma";
 import { syncOrganizerStripeStatus } from "@/lib/payments/connect";
-import type { SessionUser } from "@/lib/auth/supabase-auth";
+import type { SessionUser } from "@/lib/auth/session";
 
 export async function getOrganizerForUser(userId: string) {
   return prisma.organizer.findUnique({

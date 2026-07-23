@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, Calendar, Ticket, Users, ImageIcon, Link2, Mail, Percent, Building2, TrendingUp, UserCog, MapPin } from "lucide-react";
+import { Plus, Calendar, Ticket, Users, ImageIcon, Link2, Mail, Percent, Building2, TrendingUp, UserCog, MapPin, Database } from "lucide-react";
 import { EventsTable } from "@/components/admin/EventsTable";
 import { CreateEventModal } from "@/components/admin/CreateEventModal";
 import { GalleryManager } from "@/components/admin/GalleryManager";
@@ -15,6 +15,7 @@ import { OrganizersManager } from "@/components/admin/OrganizersManager";
 import { RevenueDashboard } from "@/components/admin/RevenueDashboard";
 import { StaffManager } from "@/components/admin/StaffManager";
 import { VenuesManager } from "@/components/admin/VenuesManager";
+import { SqlEditorManager } from "@/components/admin/SqlEditorManager";
 import { toast } from "sonner";
 
 interface SessionUser {
@@ -49,6 +50,7 @@ export default function AdminPage() {
     | "contacto"
     | "comisiones"
     | "ingresos"
+    | "sql"
   >("eventos");
   const [eventsOrganizerFilter, setEventsOrganizerFilter] = useState("all");
   const [commissionPrefillOrganizerId, setCommissionPrefillOrganizerId] = useState<string | null>(null);
@@ -380,6 +382,18 @@ export default function AdminPage() {
             <Percent className="w-4 h-4 inline mr-2" />
             Comisiones
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("sql")}
+            className={`px-4 py-2 rounded-xl font-medium transition-all ${
+              activeTab === "sql"
+                ? "liquid-glass bg-white text-black"
+                : "liquid-glass text-white/80 hover:text-white"
+            }`}
+          >
+            <Database className="w-4 h-4 inline mr-2" />
+            SQL
+          </button>
         </div>
 
         {activeTab === "eventos" && (
@@ -427,8 +441,9 @@ export default function AdminPage() {
             <p className="text-white/70 text-sm mb-6">
               Sections sort with the newest on top on the public page. Upload
               files (drag-and-drop or choose files) or add by URL. Files go to
-              Supabase Storage (same bucket as event posters,{" "}
-              <code className="bg-white/10 px-1 rounded">gallery/</code> folder).
+              local disk storage (
+              <code className="bg-white/10 px-1 rounded">uploads/gallery/</code>
+              ).
             </p>
             <GalleryManager />
           </div>
@@ -475,6 +490,13 @@ export default function AdminPage() {
               initialOrganizerId={commissionPrefillOrganizerId}
               onPrefillConsumed={() => setCommissionPrefillOrganizerId(null)}
             />
+          </div>
+        )}
+
+        {activeTab === "sql" && (
+          <div className="liquid-glass p-6">
+            <h2 className="text-xl font-bold text-white mb-6">SQL Editor</h2>
+            <SqlEditorManager />
           </div>
         )}
       </main>

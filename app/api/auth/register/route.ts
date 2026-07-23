@@ -1,22 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient as createSSRClient } from "@supabase/ssr";
 import bcrypt from "bcryptjs";
+import { AuthError } from "next-auth";
+import { signIn } from "@/auth";
 import { resolvePublicRegistrationRole } from "@/lib/auth/registration";
 import { prisma } from "@/lib/db/prisma";
-import { supabaseAdmin } from "@/lib/db/supabase";
 import { registerSchema } from "@/lib/validations/schemas";
 
 export const dynamic = "force-dynamic";
 
-type CookieToSet = {
-  name: string;
-  value: string;
-  options?: Record<string, unknown>;
-};
-
 /**
  * POST /api/auth/register
- * Registrar usuario en Prisma + Supabase Auth (email/contraseña)
+ * Crea usuario en Prisma y abre sesión con Auth.js
  */
 export async function POST(request: NextRequest) {
   try {
@@ -49,7 +43,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = (await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         email: emailTrim,
         name: name.trim(),
@@ -58,58 +52,25 @@ export async function POST(request: NextRequest) {
         isActive: true,
         password: hashedPassword,
         emailVerified: true,
-      } as any,
-    })) as any;
-
-    const { error: supabaseError } = await supabaseAdmin.auth.admin.createUser({
-      email: emailTrim,
-      password,
-      email_confirm: true,
-      user_metadata: { name: name.trim() },
+      },
     });
 
-    if (supabaseError) {
-      await prisma.user.delete({ where: { id: user.id } }).catch(() => {});
-      const alreadyExists =
-        supabaseError.message?.toLowerCase().includes("already") ||
-        supabaseError.message?.toLowerCase().includes("registered");
-      return NextResponse.json(
-        {
-          error: alreadyExists
-            ? "Este correo ya está registrado. Inicia sesión."
-            : supabaseError.message || "Error al crear la cuenta",
-          code: alreadyExists ? "EMAIL_EXISTS" : undefined,
-        },
-        { status: 400 }
-      );
-    }
-
-    const pendingCookies: CookieToSet[] = [];
-    const supabase = createSSRClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll();
-          },
-          setAll(cookiesToSet) {
-            pendingCookies.push(...cookiesToSet);
-          },
-        },
+    try {
+      await signIn("credentials", {
+        email: emailTrim,
+        password,
+        redirect: false,
+      });
+    } catch (err) {
+      if (!(err instanceof AuthError)) {
+        // posible NEXT_REDIRECT
+        console.warn("[REGISTER] signIn:", err);
+      } else {
+        console.error("[REGISTER] Auto-login error:", err.message);
       }
-    );
-
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: emailTrim,
-      password,
-    });
-
-    if (signInError) {
-      console.error("[REGISTER] Auto-login error:", signInError.message);
     }
 
-    const jsonResponse = NextResponse.json({
+    return NextResponse.json({
       success: true,
       message: "Cuenta creada correctamente",
       user: {
@@ -120,16 +81,6 @@ export async function POST(request: NextRequest) {
         emailVerified: user.emailVerified,
       },
     });
-
-    pendingCookies.forEach(({ name, value, options }) => {
-      jsonResponse.cookies.set(
-        name,
-        value,
-        options as Parameters<typeof jsonResponse.cookies.set>[2]
-      );
-    });
-
-    return jsonResponse;
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error("[REGISTER] Error general:", msg);

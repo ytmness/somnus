@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession, hasRole } from "@/lib/auth/supabase-auth";
-import { supabaseAdmin } from "@/lib/db/supabase";
-import crypto from "crypto";
+import { getSession, hasRole } from "@/lib/auth/session";
+import { saveUploadBuffer } from "@/lib/storage/local";
 
 export const dynamic = "force-dynamic";
 
-const BUCKET = "event-images";
-const MAX_SIZE = 15 * 1024 * 1024; // 15 MB
+const MAX_SIZE = 15 * 1024 * 1024;
 
 const MIME_TO_EXT: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -43,27 +41,12 @@ function isProbablyImage(file: { name: string; type: string }): boolean {
 
 /**
  * POST /api/upload/gallery-image
- * Subir imagen de galería (cualquier tipo image/* + HEIC por extensión)
  */
 export async function POST(request: NextRequest) {
   try {
-    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            "Missing SUPABASE_SERVICE_ROLE_KEY. Add it in server .env (Supabase → Settings → API).",
-        },
-        { status: 500 }
-      );
-    }
-
     const user = await getSession();
     if (!hasRole(user, ["ADMIN"])) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
     const formData = await request.formData();
@@ -73,12 +56,13 @@ export async function POST(request: NextRequest) {
       file &&
       typeof file === "object" &&
       "size" in file &&
-      typeof (file as { arrayBuffer?: () => Promise<ArrayBuffer> })
-        .arrayBuffer === "function";
+      "type" in file &&
+      typeof (file as { arrayBuffer?: () => Promise<ArrayBuffer> }).arrayBuffer ===
+        "function";
 
     if (!isFileLike) {
       return NextResponse.json(
-        { success: false, error: "No file received" },
+        { error: "No se recibió ningún archivo" },
         { status: 400 }
       );
     }
@@ -92,80 +76,36 @@ export async function POST(request: NextRequest) {
 
     if (fileObj.size > MAX_SIZE) {
       return NextResponse.json(
-        {
-          success: false,
-          error: `Image must be under ${MAX_SIZE / 1024 / 1024} MB`,
-        },
+        { error: `La imagen no debe superar ${MAX_SIZE / 1024 / 1024} MB` },
         { status: 400 }
       );
     }
 
     if (!isProbablyImage(fileObj)) {
       return NextResponse.json(
-        { success: false, error: "File must be an image" },
+        { error: "El archivo no parece una imagen" },
         { status: 400 }
       );
     }
 
     const ext = guessExt(fileObj);
-    const uniqueName = `${crypto.randomUUID()}.${ext}`;
-    const path = `gallery/${uniqueName}`;
-
-    const extLower = ext.toLowerCase();
-    const fallbackMime = (): string => {
-      if (extLower === "jpg" || extLower === "jpeg") return "image/jpeg";
-      if (extLower === "svg") return "image/svg+xml";
-      if (extLower === "heic" || extLower === "heif") return "image/heic";
-      return `image/${extLower}`;
-    };
-    const contentType =
-      fileObj.type && fileObj.type.startsWith("image/")
-        ? fileObj.type
-        : fallbackMime();
-
-    const arrayBuffer = await fileObj.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const { data, error } = await supabaseAdmin.storage
-      .from(BUCKET)
-      .upload(path, buffer, {
-        contentType,
-        upsert: false,
-      });
-
-    if (error) {
-      console.error("[Upload gallery-image]", error);
-      const msg = error.message || "Upload failed";
-      if (
-        msg.includes("Bucket not found") ||
-        msg.includes("does not exist")
-      ) {
-        return NextResponse.json(
-          {
-            success: false,
-            error:
-              "Storage bucket missing. Create a public bucket named 'event-images' in Supabase → Storage (same as event posters).",
-          },
-          { status: 500 }
-        );
-      }
-      return NextResponse.json(
-        { success: false, error: msg },
-        { status: 500 }
-      );
-    }
-
-    const { data: urlData } = supabaseAdmin.storage.from(BUCKET).getPublicUrl(data.path);
+    const buffer = Buffer.from(await fileObj.arrayBuffer());
+    const saved = await saveUploadBuffer({
+      buffer,
+      subdirectory: "gallery",
+      originalName: `image.${ext}`,
+      contentType: fileObj.type,
+    });
 
     return NextResponse.json({
       success: true,
-      data: { url: urlData.publicUrl },
+      data: { url: saved.publicUrl },
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("[Upload gallery-image]", err);
     return NextResponse.json(
-      { success: false, error: msg || "Upload failed" },
+      { error: msg || "Error al subir la imagen" },
       { status: 500 }
     );
   }

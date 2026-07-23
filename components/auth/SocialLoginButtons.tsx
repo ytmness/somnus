@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 import { toast } from "sonner";
-import { createSupabaseBrowserClient } from "@/lib/auth/supabase-browser";
 import { sanitizeRedirectPath } from "@/lib/auth/redirect-path";
 
 type Provider = "google" | "apple";
@@ -48,24 +48,8 @@ export function SocialLoginButtons({ redirectTo }: SocialLoginButtonsProps) {
   const handleOAuth = async (provider: Provider) => {
     setLoadingProvider(provider);
     try {
-      const supabase = createSupabaseBrowserClient();
-      const origin = window.location.origin;
       const safeRedirect = sanitizeRedirectPath(redirectTo ?? null) ?? "/";
-      const callbackUrl = `${origin}/auth/callback?next=${encodeURIComponent(safeRedirect)}`;
-
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: callbackUrl,
-          ...(provider === "apple"
-            ? { scopes: "name email" }
-            : {}),
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
+      await signIn(provider, { callbackUrl: safeRedirect });
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : "Error al iniciar sesión";

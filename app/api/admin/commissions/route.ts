@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth/supabase-auth";
+import { getSession } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/prisma";
 import type { CommissionScope, CommissionType } from "@prisma/client";
 

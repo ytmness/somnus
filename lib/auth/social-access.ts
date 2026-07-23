@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db/prisma";
-import type { SessionUser } from "@/lib/auth/supabase-auth";
+import type { SessionUser } from "@/lib/auth/session";
 import { userOwnsOrganization } from "@/lib/auth/event-access";
 
 export async function userCanAccessConversation(

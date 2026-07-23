@@ -1,9 +1,8 @@
 /**
- * Cooldown por email para no llamar a Supabase OTP más de una vez por minuto por email.
- * Ayuda cuando Supabase tiene límite bajo (ej. 2 emails/h).
+ * Cooldown por email para OTP (1 minuto).
  */
 const lastOtpSentAt = new Map<string, number>();
-const OTP_COOLDOWN_MS = 60_000; // 1 minuto
+const OTP_COOLDOWN_MS = 60_000;
 
 function cleanupOldEntries() {
   const cutoff = Date.now() - OTP_COOLDOWN_MS;
