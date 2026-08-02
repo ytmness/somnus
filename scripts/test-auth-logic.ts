@@ -80,7 +80,11 @@ console.log("\n=== resolvePublicRegistrationRole ===");
 assert(resolvePublicRegistrationRole() === "ORGANIZER", "registro público → ORGANIZER");
 
 console.log("\n=== resolvePostAuthRedirect ===");
-assert(resolvePostAuthRedirect("ORGANIZER") === "/organizador", "ORGANIZER → organizador");
+assert(resolvePostAuthRedirect("ORGANIZER") === "/", "ORGANIZER web → landing");
+assert(
+  resolvePostAuthRedirect("ORGANIZER", undefined, "app") === "/organizador",
+  "ORGANIZER app → organizador"
+);
 assert(resolvePostAuthRedirect("CLIENTE") === "/", "CLIENTE → home");
 assert(resolvePostAuthRedirect("ADMIN") === "/admin", "ADMIN → admin");
 assert(resolvePostAuthRedirect("ACCESOS") === "/accesos", "ACCESOS → accesos");

@@ -285,7 +285,8 @@ export async function getAccessibleEventIds(
 
 export function getPrimaryStaffRedirect(
   memberships: StaffMembershipInfo[],
-  platformRole: string
+  platformRole: string,
+  surface: "web" | "app" = "web"
 ): string | null {
   if (platformRole === "ADMIN") return "/admin";
 
@@ -314,7 +315,8 @@ export function getPrimaryStaffRedirect(
     if (legacy === "ACCESOS") return "/accesos";
   }
 
-  if (platformRole === "ORGANIZER") return "/organizador";
+  // Solo la app manda ORGANIZER al panel; en web van a landing (compradores).
+  if (platformRole === "ORGANIZER" && surface === "app") return "/organizador";
   return null;
 }
 

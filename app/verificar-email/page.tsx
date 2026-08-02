@@ -43,9 +43,12 @@ function VerificarEmailContent() {
 
       toast.success("¡Código verificado!");
 
+      const fromApp =
+        searchParams.get("app") === "1" || searchParams.get("client") === "app";
       const redirectPath = resolvePostAuthRedirect(
         data.user?.role || "ORGANIZER",
-        data.user?.staffRoles
+        data.user?.staffRoles,
+        fromApp ? "app" : "web"
       );
 
       window.location.href = redirectPath;

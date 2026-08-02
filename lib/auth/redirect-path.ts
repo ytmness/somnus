@@ -1,8 +1,15 @@
-import { resolvePostAuthRedirect } from "@/lib/auth/registration";
+import {
+  parseAuthSurface,
+  resolvePostAuthRedirect,
+  type AuthSurface,
+} from "@/lib/auth/registration";
 import {
   getPrimaryStaffRedirect,
   getUserMemberships,
 } from "@/lib/auth/permissions";
+
+export type { AuthSurface };
+export { parseAuthSurface };
 
 const ALLOWED_REDIRECT_PREFIXES = [
   "/",
@@ -45,9 +52,13 @@ export function sanitizeRedirectPath(next: string | null | undefined): string | 
 export function resolveAuthRedirectPath(
   role: string,
   requestedNext?: string | null,
-  staffRoles?: string[]
+  staffRoles?: string[],
+  surface: AuthSurface = "web"
 ): string {
-  return sanitizeRedirectPath(requestedNext) ?? resolvePostAuthRedirect(role, staffRoles);
+  return (
+    sanitizeRedirectPath(requestedNext) ??
+    resolvePostAuthRedirect(role, staffRoles, surface)
+  );
 }
 
 /**
@@ -56,15 +67,16 @@ export function resolveAuthRedirectPath(
 export async function resolveAuthRedirectForUser(
   userId: string,
   role: string,
-  requestedNext?: string | null
+  requestedNext?: string | null,
+  surface: AuthSurface = "web"
 ): Promise<string> {
   const sanitized = sanitizeRedirectPath(requestedNext);
   if (sanitized) return sanitized;
 
   const memberships = await getUserMemberships(userId);
-  const staffRedirect = getPrimaryStaffRedirect(memberships, role);
+  const staffRedirect = getPrimaryStaffRedirect(memberships, role, surface);
   if (staffRedirect) return staffRedirect;
 
   const staffRoles = memberships.map((m) => m.role);
-  return resolvePostAuthRedirect(role, staffRoles);
+  return resolvePostAuthRedirect(role, staffRoles, surface);
 }

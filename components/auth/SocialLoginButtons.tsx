@@ -9,6 +9,8 @@ type Provider = "google" | "apple";
 
 interface SocialLoginButtonsProps {
   redirectTo?: string | null;
+  /** Si true, post-login manda ORGANIZER a /organizador (app). En web va a landing. */
+  fromApp?: boolean;
 }
 
 function GoogleIcon() {
@@ -42,16 +44,21 @@ function AppleIcon() {
   );
 }
 
-export function SocialLoginButtons({ redirectTo }: SocialLoginButtonsProps) {
+export function SocialLoginButtons({
+  redirectTo,
+  fromApp = false,
+}: SocialLoginButtonsProps) {
   const [loadingProvider, setLoadingProvider] = useState<Provider | null>(null);
 
   const handleOAuth = async (provider: Provider) => {
     setLoadingProvider(provider);
     try {
       const safeRedirect = sanitizeRedirectPath(redirectTo ?? null);
-      const callbackUrl = safeRedirect
-        ? `/auth/post-login?redirect=${encodeURIComponent(safeRedirect)}`
-        : "/auth/post-login";
+      const params = new URLSearchParams();
+      if (safeRedirect) params.set("redirect", safeRedirect);
+      if (fromApp) params.set("app", "1");
+      const qs = params.toString();
+      const callbackUrl = qs ? `/auth/post-login?${qs}` : "/auth/post-login";
       await signIn(provider, { callbackUrl });
     } catch (error: unknown) {
       const message =

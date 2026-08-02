@@ -1,8 +1,18 @@
 /**
  * Lógica de registro público.
  * Todos los registros públicos son ORGANIZER en backend (marketplace).
- * El frontend trata a todos como compradores; publicar eventos es opt-in.
+ * En web se tratan como compradores (landing); publicar eventos es opt-in.
+ * El panel /organizador solo se usa como destino default en la app.
  */
+
+export type AuthSurface = "web" | "app";
+
+export function parseAuthSurface(value: unknown): AuthSurface {
+  if (value === "app" || value === 1 || value === "1" || value === true) {
+    return "app";
+  }
+  return "web";
+}
 
 export function resolvePublicRegistrationRole(): "ORGANIZER" {
   return "ORGANIZER";
@@ -10,14 +20,19 @@ export function resolvePublicRegistrationRole(): "ORGANIZER" {
 
 export function resolvePostAuthRedirect(
   role: string,
-  staffRoles?: string[]
+  staffRoles?: string[],
+  surface: AuthSurface = "web"
 ): string {
   if (role === "ADMIN") return "/admin";
   if (staffRoles?.includes("ACCESOS") || role === "ACCESOS") return "/accesos";
   if (staffRoles?.includes("VENDEDOR") || role === "VENDEDOR") return "/vendedor";
   if (staffRoles?.includes("SUPERVISOR") || role === "SUPERVISOR")
     return "/supervisor";
-  if (role === "ORGANIZER") return "/organizador";
+  // Web (Bubbl-style): compradores aterrizan en landing.
+  // App: organizadores van al panel.
+  if (role === "ORGANIZER") {
+    return surface === "app" ? "/organizador" : "/";
+  }
   return "/";
 }
 

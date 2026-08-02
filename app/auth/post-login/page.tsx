@@ -8,6 +8,9 @@ function PostLoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const requestedRedirect = searchParams.get("redirect");
+  const fromApp =
+    searchParams.get("app") === "1" || searchParams.get("client") === "app";
+  const authSurface = fromApp ? "app" : "web";
   const [message, setMessage] = useState("Completando inicio de sesión...");
 
   useEffect(() => {
@@ -33,7 +36,8 @@ function PostLoginContent() {
         const redirectPath = resolveAuthRedirectPath(
           user.role || "ORGANIZER",
           requestedRedirect,
-          user.staffRoles
+          user.staffRoles,
+          authSurface
         );
 
         if (!cancelled) {
@@ -51,7 +55,7 @@ function PostLoginContent() {
     return () => {
       cancelled = true;
     };
-  }, [requestedRedirect, router]);
+  }, [requestedRedirect, authSurface, router]);
 
   return (
     <div className="min-h-screen somnus-bg-main flex items-center justify-center p-4">

@@ -14,6 +14,9 @@ function RegisterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const emailParam = searchParams.get("email") || "";
+  const fromApp =
+    searchParams.get("app") === "1" || searchParams.get("client") === "app";
+  const authSurface = fromApp ? "app" : "web";
 
   const [formData, setFormData] = useState({
     name: "",
@@ -54,14 +57,21 @@ function RegisterContent() {
       if (!response.ok) {
         if (data.code === "EMAIL_EXISTS") {
           toast.error(data.error);
-          router.push(`/login?email=${encodeURIComponent(formData.email)}`);
+          const loginQs = new URLSearchParams({ email: formData.email });
+          if (fromApp) loginQs.set("app", "1");
+          router.push(`/login?${loginQs.toString()}`);
           return;
         }
         throw new Error(data.error || "Error al registrar");
       }
 
       toast.success("¡Cuenta creada! Bienvenido a Somnus");
-      const redirectPath = resolveAuthRedirectPath(data.user?.role || "ORGANIZER");
+      const redirectPath = resolveAuthRedirectPath(
+        data.user?.role || "ORGANIZER",
+        null,
+        undefined,
+        authSurface
+      );
       window.location.href = redirectPath;
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : "Error al registrar");
@@ -156,7 +166,7 @@ function RegisterContent() {
                     </p>
                   </div>
 
-                  <SocialLoginButtons />
+                  <SocialLoginButtons fromApp={fromApp} />
 
                   <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">

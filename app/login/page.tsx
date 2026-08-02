@@ -17,6 +17,9 @@ function LoginContent() {
   const redirectParam = searchParams.get("redirect");
   const errorParam = searchParams.get("error");
   const resetParam = searchParams.get("reset");
+  const fromApp =
+    searchParams.get("app") === "1" || searchParams.get("client") === "app";
+  const authSurface = fromApp ? "app" : "web";
 
   const [email, setEmail] = useState(emailParam);
   const [password, setPassword] = useState("");
@@ -47,7 +50,7 @@ function LoginContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, surface: authSurface }),
       });
 
       const data = await response.json();
@@ -55,7 +58,9 @@ function LoginContent() {
       if (!response.ok) {
         if (data.code === "USER_NOT_FOUND") {
           toast.error(data.error);
-          router.push(`/register?email=${encodeURIComponent(email)}`);
+          const regQs = new URLSearchParams({ email });
+          if (fromApp) regQs.set("app", "1");
+          router.push(`/register?${regQs.toString()}`);
           return;
         }
         throw new Error(data.error || "Error al iniciar sesión");
@@ -66,10 +71,17 @@ function LoginContent() {
         redirectParam != null
           ? resolveAuthRedirectPath(
               data.user?.role || "ORGANIZER",
-              redirectParam
+              redirectParam,
+              undefined,
+              authSurface
             )
           : (data.redirectPath ??
-            resolveAuthRedirectPath(data.user?.role || "ORGANIZER"));
+            resolveAuthRedirectPath(
+              data.user?.role || "ORGANIZER",
+              null,
+              undefined,
+              authSurface
+            ));
       window.location.href = redirectPath;
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : "Error al iniciar sesión");
@@ -209,7 +221,10 @@ function LoginContent() {
                     </p>
                   )}
 
-                  <SocialLoginButtons redirectTo={redirectParam} />
+                  <SocialLoginButtons
+                    redirectTo={redirectParam}
+                    fromApp={fromApp}
+                  />
 
                   <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">

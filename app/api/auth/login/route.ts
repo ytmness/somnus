@@ -3,7 +3,10 @@ import { AuthError } from "next-auth";
 import { signIn } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
 import { loginSchema } from "@/lib/validations/schemas";
-import { resolveAuthRedirectForUser } from "@/lib/auth/redirect-path";
+import {
+  parseAuthSurface,
+  resolveAuthRedirectForUser,
+} from "@/lib/auth/redirect-path";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +27,10 @@ export async function POST(request: NextRequest) {
 
     const { email, password } = result.data;
     const emailTrim = email.trim().toLowerCase();
+    const surface = parseAuthSurface(
+      (body as { surface?: unknown; app?: unknown }).surface ??
+        (body as { app?: unknown }).app
+    );
 
     const existingUser = await prisma.user.findUnique({
       where: { email: emailTrim },
@@ -66,7 +73,9 @@ export async function POST(request: NextRequest) {
 
     const redirectPath = await resolveAuthRedirectForUser(
       existingUser.id,
-      existingUser.role
+      existingUser.role,
+      null,
+      surface
     );
 
     return NextResponse.json({
