@@ -90,9 +90,33 @@ function RegisterContent() {
           router.push(`/login?${loginQs.toString()}`);
           return;
         }
+        // Cuenta creada pero falló el envío del OTP: igual mandamos a verificar
+        if (data.requiresVerification || data.code === "OTP_SEND_FAILED") {
+          toast.error(
+            data.error ||
+              "No pudimos enviar el código. Puedes reenviarlo en la siguiente pantalla."
+          );
+          const verifyQs = new URLSearchParams({
+            email: formData.email.trim().toLowerCase(),
+          });
+          if (fromApp) verifyQs.set("app", "1");
+          window.location.href = `/verificar-email?${verifyQs.toString()}`;
+          return;
+        }
         throw new Error(data.error || "Error al registrar");
       }
 
+      if (data.requiresVerification) {
+        toast.success("Cuenta creada. Revisa tu correo e ingresa el código.");
+        const verifyQs = new URLSearchParams({
+          email: formData.email.trim().toLowerCase(),
+        });
+        if (fromApp) verifyQs.set("app", "1");
+        window.location.href = `/verificar-email?${verifyQs.toString()}`;
+        return;
+      }
+
+      // Fallback (no debería ocurrir con el gate duro)
       toast.success("¡Cuenta creada! Bienvenido a Somnus");
       const redirectPath = resolveAuthRedirectPath(
         data.user?.role || "ORGANIZER",

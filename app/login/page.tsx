@@ -90,6 +90,15 @@ function LoginContent() {
           router.push(`/register?${regQs.toString()}`);
           return;
         }
+        if (data.code === "EMAIL_NOT_VERIFIED") {
+          toast.error(data.error || "Verifica tu correo para continuar");
+          const verifyQs = new URLSearchParams({
+            email: email.trim().toLowerCase(),
+          });
+          if (fromApp) verifyQs.set("app", "1");
+          window.location.href = `/verificar-email?${verifyQs.toString()}`;
+          return;
+        }
         throw new Error(data.error || "Error al iniciar sesión");
       }
 

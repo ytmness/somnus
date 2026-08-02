@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "@/lib/db/prisma";
-import { isInOtpCooldown, markOtpSent } from "@/lib/auth/otp-cooldown";
-import {
-  generateVerificationCode,
-  hashToken,
-  sendVerificationCode,
-} from "@/lib/services/email";
+import { sendEmailOtp } from "@/lib/auth/otp";
 
 export const dynamic = "force-dynamic";
 
@@ -30,46 +24,16 @@ export async function POST(request: NextRequest) {
     }
 
     const emailTrim = result.data.email.trim().toLowerCase();
+    const sent = await sendEmailOtp(emailTrim);
 
-    if (isInOtpCooldown(emailTrim)) {
-      return NextResponse.json({
-        success: true,
-        message: "Código OTP enviado a tu email",
-        cooldown: true,
-      });
+    if (!sent.ok) {
+      return NextResponse.json({ error: sent.error }, { status: 500 });
     }
-
-    const user = await prisma.user.findUnique({ where: { email: emailTrim } });
-    const code = generateVerificationCode();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
-    await prisma.otpCode.create({
-      data: {
-        email: emailTrim,
-        codeHash: hashToken(code),
-        expiresAt,
-        userId: user?.id ?? null,
-      },
-    });
-
-    const sent = await sendVerificationCode(
-      emailTrim,
-      user?.name || emailTrim.split("@")[0],
-      code
-    );
-
-    if (!sent) {
-      return NextResponse.json(
-        { error: "No se pudo enviar el código. Intenta de nuevo." },
-        { status: 500 }
-      );
-    }
-
-    markOtpSent(emailTrim);
 
     return NextResponse.json({
       success: true,
       message: "Código OTP enviado a tu email",
+      cooldown: sent.cooldown || undefined,
     });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);

@@ -1,18 +1,19 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, Suspense, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
-import { Mail, RefreshCw, Calendar, Shield, Scan, LogIn, User, CheckCircle, Lock } from "lucide-react";
+import { Mail, RefreshCw, CheckCircle, Lock } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { resolvePostAuthRedirect } from "@/lib/auth/registration";
 
 function VerificarEmailContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
+  const fromApp =
+    searchParams.get("app") === "1" || searchParams.get("client") === "app";
 
   const [formData, setFormData] = useState({
     email: email,
@@ -20,6 +21,12 @@ function VerificarEmailContent() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
+
+  useEffect(() => {
+    if (email) {
+      setFormData((prev) => ({ ...prev, email }));
+    }
+  }, [email]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,13 +45,11 @@ function VerificarEmailContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Error verifying OTP code");
+        throw new Error(data.error || "Error al verificar el código");
       }
 
-      toast.success("¡Código verificado!");
+      toast.success("¡Correo verificado!");
 
-      const fromApp =
-        searchParams.get("app") === "1" || searchParams.get("client") === "app";
       const redirectPath = resolvePostAuthRedirect(
         data.user?.role || "ORGANIZER",
         data.user?.staffRoles,
@@ -52,8 +57,10 @@ function VerificarEmailContent() {
       );
 
       window.location.href = redirectPath;
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error ? error.message : "Error al verificar el código"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +68,7 @@ function VerificarEmailContent() {
 
   const handleResendCode = async () => {
     if (!formData.email) {
-      toast.error("Please enter your email");
+      toast.error("Ingresa tu correo");
       return;
     }
     setIsResending(true);
@@ -75,12 +82,14 @@ function VerificarEmailContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Error resending code");
+        throw new Error(data.error || "Error al reenviar el código");
       }
 
-      toast.success("Code resent. Check your email.");
-    } catch (error: any) {
-      toast.error(error.message);
+      toast.success("Código reenviado. Revisa tu correo.");
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error ? error.message : "Error al reenviar el código"
+      );
     } finally {
       setIsResending(false);
     }
@@ -90,21 +99,26 @@ function VerificarEmailContent() {
     <div className="min-h-screen somnus-bg-main overflow-x-hidden">
       <SiteHeader eventsHref="/" />
 
-      {/* Contenido principal - mismo layout que login */}
       <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-32">
         <div className="w-full max-w-5xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Columna izquierda - Información */}
             <div className="hidden lg:flex flex-col justify-center space-y-8">
               <div>
                 <h1 className="somnus-title-secondary text-4xl md:text-5xl mb-4 uppercase">
-                  Verify your
+                  Verifica tu
                 </h1>
                 <div className="mb-6">
-                  <Image src="/assets/SOMNUS LOGO BLANCO.png" alt="Somnus" width={280} height={84} className="w-48 md:w-56 h-auto object-contain" />
+                  <Image
+                    src="/assets/SOMNUS LOGO BLANCO.png"
+                    alt="Somnus"
+                    width={280}
+                    height={84}
+                    className="w-48 md:w-56 h-auto object-contain"
+                  />
                 </div>
                 <p className="somnus-text-body text-lg mb-8">
-                  Enter the 8-digit code we sent to your email to complete access.
+                  Ingresa el código de 8 dígitos que enviamos a tu correo para
+                  completar el acceso.
                 </p>
               </div>
 
@@ -114,9 +128,11 @@ function VerificarEmailContent() {
                     <Mail className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">8-Digit Code</h3>
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">
+                      Código de 8 dígitos
+                    </h3>
                     <p className="somnus-text-body text-sm">
-                      Check your inbox and spam folder to find the code
+                      Revisa tu bandeja de entrada y la carpeta de spam
                     </p>
                   </div>
                 </div>
@@ -126,9 +142,11 @@ function VerificarEmailContent() {
                     <Lock className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Security</h3>
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">
+                      Seguridad
+                    </h3>
                     <p className="somnus-text-body text-sm">
-                      The code expires in 1 hour for your security
+                      El código expira en 10 minutos por tu seguridad
                     </p>
                   </div>
                 </div>
@@ -138,25 +156,26 @@ function VerificarEmailContent() {
                     <CheckCircle className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">Quick Verification</h3>
+                    <h3 className="somnus-title-secondary text-lg mb-2 uppercase">
+                      Verificación rápida
+                    </h3>
                     <p className="somnus-text-body text-sm">
-                      Once verified, you can access all events
+                      Una vez verificado, podrás comprar boletos y usar tu cuenta
                     </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Columna derecha - Formulario */}
             <div className="flex items-center justify-center">
               <div className="w-full max-w-md">
                 <div className="somnus-card p-6 sm:p-8 lg:p-10">
                   <div className="lg:hidden text-center mb-8">
                     <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
-                      Verify your Email
+                      Verifica tu correo
                     </h1>
                     <p className="somnus-text-body text-sm">
-                      Enter the 8-digit code we sent to your email
+                      Ingresa el código de 8 dígitos que enviamos a tu email
                     </p>
                   </div>
 
@@ -165,17 +184,17 @@ function VerificarEmailContent() {
                       <Lock className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
-                      Verify your Email
+                      Verifica tu correo
                     </h1>
                     <p className="somnus-text-body">
-                      Enter the 8-digit code we sent to your email
+                      Ingresa el código de 8 dígitos que enviamos a tu email
                     </p>
                   </div>
 
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                       <label className="block somnus-title-secondary text-sm mb-2 uppercase">
-                        Email
+                        Correo electrónico
                       </label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
@@ -195,7 +214,7 @@ function VerificarEmailContent() {
 
                     <div>
                       <label className="block somnus-title-secondary text-sm mb-2 uppercase">
-                        Verification Code
+                        Código de verificación
                       </label>
                       <input
                         type="text"
@@ -211,9 +230,11 @@ function VerificarEmailContent() {
                         required
                         maxLength={8}
                         pattern="[0-9]{8}"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
                       />
                       <p className="somnus-text-body text-sm mt-2 text-center">
-                        Enter the 8-digit code
+                        Ingresa el código de 8 dígitos
                       </p>
                     </div>
 
@@ -225,16 +246,17 @@ function VerificarEmailContent() {
                       {isLoading ? (
                         <span className="flex items-center gap-2 justify-center">
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Verifying...
+                          Verificando...
                         </span>
                       ) : (
-                        "Verify Email"
+                        "Verificar correo"
                       )}
                     </button>
                   </form>
 
                   <div className="mt-6 pt-6 border-t border-white/10 text-center">
                     <button
+                      type="button"
                       onClick={handleResendCode}
                       disabled={isResending || !formData.email}
                       className="text-white hover:text-white/80 font-medium transition-colors inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -242,15 +264,18 @@ function VerificarEmailContent() {
                       <RefreshCw
                         className={`w-4 h-4 ${isResending ? "animate-spin" : ""}`}
                       />
-                      {isResending ? "Resending..." : "Resend code"}
+                      {isResending ? "Reenviando..." : "Reenviar código"}
                     </button>
                   </div>
 
                   <div className="mt-6 pt-6 border-t border-white/10">
                     <p className="somnus-text-body text-center text-sm">
-                      Back to login?{" "}
-                      <Link href="/login" className="text-white hover:underline transition-colors font-medium">
-                        Sign in
+                      ¿Volver al login?{" "}
+                      <Link
+                        href="/login"
+                        className="text-white hover:underline transition-colors font-medium"
+                      >
+                        Inicia sesión
                       </Link>
                     </p>
                   </div>
@@ -266,14 +291,16 @@ function VerificarEmailContent() {
 
 export default function VerificarEmailPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen somnus-bg-main flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-white/50 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="somnus-text-body text-xl">Loading...</p>
+    <Suspense
+      fallback={
+        <div className="min-h-screen somnus-bg-main flex items-center justify-center p-4">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-white/50 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="somnus-text-body text-xl">Cargando...</p>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <VerificarEmailContent />
     </Suspense>
   );

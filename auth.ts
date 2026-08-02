@@ -106,7 +106,9 @@ function buildProviders(appleSecret: string | null): Provider[] {
         if (!password) return null;
 
         const user = await prisma.user.findUnique({ where: { email } });
-        if (!user || !user.isActive || !user.password) return null;
+        if (!user || !user.isActive || !user.password || !user.emailVerified) {
+          return null;
+        }
 
         const valid = await bcrypt.compare(password, user.password);
         if (!valid) return null;

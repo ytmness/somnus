@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 import { AuthError } from "next-auth";
 import { signIn } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
@@ -7,6 +8,7 @@ import {
   parseAuthSurface,
   resolveAuthRedirectForUser,
 } from "@/lib/auth/redirect-path";
+import { sendEmailOtp } from "@/lib/auth/otp";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +52,33 @@ export async function POST(request: NextRequest) {
     if (!existingUser.isActive) {
       return NextResponse.json(
         { error: "Tu cuenta está desactivada. Contacta soporte." },
+        { status: 403 }
+      );
+    }
+
+    // Validar contraseña antes de reenviar OTP (evita spam sin credenciales)
+    if (!existingUser.password) {
+      return NextResponse.json(
+        { error: "Correo o contraseña incorrectos" },
+        { status: 401 }
+      );
+    }
+    const passwordValid = await bcrypt.compare(password, existingUser.password);
+    if (!passwordValid) {
+      return NextResponse.json(
+        { error: "Correo o contraseña incorrectos" },
+        { status: 401 }
+      );
+    }
+
+    if (!existingUser.emailVerified) {
+      await sendEmailOtp(emailTrim, existingUser.name);
+      return NextResponse.json(
+        {
+          error:
+            "Debes verificar tu correo antes de iniciar sesión. Te enviamos un código.",
+          code: "EMAIL_NOT_VERIFIED",
+        },
         { status: 403 }
       );
     }

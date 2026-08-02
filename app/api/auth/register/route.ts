@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { AuthError } from "next-auth";
-import { signIn } from "@/auth";
 import { resolvePublicRegistrationRole } from "@/lib/auth/registration";
+import { sendEmailOtp } from "@/lib/auth/otp";
 import { prisma } from "@/lib/db/prisma";
 import { registerSchema } from "@/lib/validations/schemas";
 
@@ -10,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * POST /api/auth/register
- * Crea usuario en Prisma y abre sesión con Auth.js
+ * Crea usuario sin sesión hasta verificar email con OTP.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -51,28 +50,34 @@ export async function POST(request: NextRequest) {
         role: userRole,
         isActive: true,
         password: hashedPassword,
-        emailVerified: true,
+        emailVerified: false,
       },
     });
 
-    try {
-      await signIn("credentials", {
-        email: emailTrim,
-        password,
-        redirect: false,
-      });
-    } catch (err) {
-      if (!(err instanceof AuthError)) {
-        // posible NEXT_REDIRECT
-        console.warn("[REGISTER] signIn:", err);
-      } else {
-        console.error("[REGISTER] Auto-login error:", err.message);
-      }
+    const otp = await sendEmailOtp(emailTrim, user.name);
+    if (!otp.ok) {
+      return NextResponse.json(
+        {
+          error:
+            "Cuenta creada, pero no pudimos enviar el código. Ve a verificar email y reenvía el código.",
+          code: "OTP_SEND_FAILED",
+          requiresVerification: true,
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            emailVerified: user.emailVerified,
+          },
+        },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json({
       success: true,
-      message: "Cuenta creada correctamente",
+      message: "Cuenta creada. Revisa tu correo e ingresa el código de verificación.",
+      requiresVerification: true,
       user: {
         id: user.id,
         email: user.email,
