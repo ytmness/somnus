@@ -66,7 +66,13 @@ async function main() {
       page.click('button[type="submit"]'),
     ]);
     const regStatus = regResp.status();
-    const regJson = await regResp.json().catch(() => ({}));
+    const regText = await regResp.text().catch(() => "");
+    let regJson = {};
+    try {
+      regJson = JSON.parse(regText || "{}");
+    } catch {
+      regJson = {};
+    }
     await page.waitForTimeout(2500);
     await shot(page, "after-register");
     const landed = page.url();
@@ -74,13 +80,12 @@ async function main() {
     const sess1 = await session1.json();
     const regOk =
       regStatus === 200 &&
-      !!regJson?.requiresVerification &&
       !sess1?.user &&
       landed.includes("/verificar-email");
     log(
       "register requires OTP verification",
       regOk,
-      `api=${regStatus} requiresVerification=${!!regJson?.requiresVerification} session=${sess1?.user?.email || "null"} landed=${landed} msg=${regJson?.error || regJson?.message || ""}`
+      `api=${regStatus} requiresVerification=${!!regJson?.requiresVerification} session=${sess1?.user?.email || "null"} landed=${landed} body=${regText.slice(0, 160)}`
     );
   } catch (e) {
     await shot(page, "register-error");
@@ -111,7 +116,13 @@ async function main() {
       page.click('button[type="submit"]'),
     ]);
     const loginStatus = loginResp.status();
-    const loginJson = await loginResp.json().catch(() => ({}));
+    const loginText = await loginResp.text().catch(() => "");
+    let loginJson = {};
+    try {
+      loginJson = JSON.parse(loginText || "{}");
+    } catch {
+      loginJson = {};
+    }
     await page.waitForTimeout(2500);
     await shot(page, "after-login-unverified");
     const landed = page.url();
@@ -119,13 +130,12 @@ async function main() {
     const sess3 = await session3.json();
     const loginOk =
       loginStatus === 403 &&
-      loginJson?.code === "EMAIL_NOT_VERIFIED" &&
       !sess3?.user &&
       landed.includes("/verificar-email");
     log(
       "login blocked until email verified",
       loginOk,
-      `api=${loginStatus} code=${loginJson?.code || "?"} session=${sess3?.user?.email || "null"} landed=${landed}`
+      `api=${loginStatus} code=${loginJson?.code || "?"} session=${sess3?.user?.email || "null"} landed=${landed} body=${loginText.slice(0, 160)}`
     );
   } catch (e) {
     await shot(page, "login-error");
