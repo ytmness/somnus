@@ -29,8 +29,8 @@ export const registerSchema = z
   });
 
 export const otpVerifySchema = z.object({
-  email: z.string().email("Invalid email"),
-  token: z.string().length(8, "Code must be 8 digits"),
+  email: z.string().email("Email inválido"),
+  code: z.string().length(8, "El código debe tener 8 dígitos"),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

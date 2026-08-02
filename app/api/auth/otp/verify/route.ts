@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 import { AuthError } from "next-auth";
 import { signIn } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
 import { hashToken } from "@/lib/services/email";
+import { otpVerifySchema } from "@/lib/validations/schemas";
 
 export const dynamic = "force-dynamic";
-
-const verifyOtpSchema = z.object({
-  email: z.string().email(),
-  code: z.string().min(6).max(8),
-});
 
 /**
  * POST /api/auth/otp/verify
@@ -19,7 +14,7 @@ const verifyOtpSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const result = verifyOtpSchema.safeParse(body);
+    const result = otpVerifySchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
         { error: "Datos inválidos", details: result.error.errors },

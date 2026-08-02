@@ -68,11 +68,11 @@ assert(!loginSchema.safeParse({ email: "a@b.com", password: "short" }).success, 
 
 console.log("\n=== otpVerifySchema ===");
 assert(
-  otpVerifySchema.safeParse({ email: "a@b.com", token: "12345678" }).success,
+  otpVerifySchema.safeParse({ email: "a@b.com", code: "12345678" }).success,
   "OTP 8 dígitos"
 );
 assert(
-  !otpVerifySchema.safeParse({ email: "a@b.com", token: "1234" }).success,
+  !otpVerifySchema.safeParse({ email: "a@b.com", code: "1234" }).success,
   "rechaza OTP corto"
 );
 

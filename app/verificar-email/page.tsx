@@ -31,7 +31,7 @@ function VerificarEmailContent() {
         credentials: "include",
         body: JSON.stringify({
           email: formData.email,
-          token: formData.code,
+          code: formData.code,
         }),
       });
 

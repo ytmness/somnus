@@ -26,6 +26,7 @@ const ALLOWED_REDIRECT_PREFIXES = [
   "/register",
   "/login",
   "/verificar-email",
+  "/auth/post-login",
 ];
 
 /**

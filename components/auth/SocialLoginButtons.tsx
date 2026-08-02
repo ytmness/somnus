@@ -48,8 +48,11 @@ export function SocialLoginButtons({ redirectTo }: SocialLoginButtonsProps) {
   const handleOAuth = async (provider: Provider) => {
     setLoadingProvider(provider);
     try {
-      const safeRedirect = sanitizeRedirectPath(redirectTo ?? null) ?? "/";
-      await signIn(provider, { callbackUrl: safeRedirect });
+      const safeRedirect = sanitizeRedirectPath(redirectTo ?? null);
+      const callbackUrl = safeRedirect
+        ? `/auth/post-login?redirect=${encodeURIComponent(safeRedirect)}`
+        : "/auth/post-login";
+      await signIn(provider, { callbackUrl });
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : "Error al iniciar sesión";
