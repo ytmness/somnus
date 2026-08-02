@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { sanitizeRedirectPath } from "@/lib/auth/redirect-path";
@@ -49,8 +49,45 @@ export function SocialLoginButtons({
   fromApp = false,
 }: SocialLoginButtonsProps) {
   const [loadingProvider, setLoadingProvider] = useState<Provider | null>(null);
+  const [enabled, setEnabled] = useState<{ google: boolean; apple: boolean }>({
+    google: false,
+    apple: false,
+  });
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadProviders() {
+      try {
+        const res = await fetch("/api/authjs/providers", { cache: "no-store" });
+        const data = (await res.json()) as Record<string, unknown>;
+        if (!cancelled) {
+          setEnabled({
+            google: !!data.google,
+            apple: !!data.apple,
+          });
+        }
+      } catch {
+        if (!cancelled) {
+          setEnabled({ google: false, apple: false });
+        }
+      } finally {
+        if (!cancelled) setLoaded(true);
+      }
+    }
+    void loadProviders();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleOAuth = async (provider: Provider) => {
+    if (!enabled[provider]) {
+      toast.error(
+        `${provider === "google" ? "Google" : "Apple"} no está configurado en el servidor.`
+      );
+      return;
+    }
     setLoadingProvider(provider);
     try {
       const safeRedirect = sanitizeRedirectPath(redirectTo ?? null);
@@ -69,36 +106,58 @@ export function SocialLoginButtons({
   };
 
   const isLoading = loadingProvider !== null;
+  const anyEnabled = enabled.google || enabled.apple;
+
+  if (loaded && !anyEnabled) {
+    return (
+      <p className="text-center text-sm text-white/50">
+        Login social no disponible por ahora. Usa correo y contraseña.
+      </p>
+    );
+  }
+
+  if (!loaded) {
+    return (
+      <div className="space-y-3 opacity-50">
+        <div className="w-full h-12 rounded-lg bg-white/10 animate-pulse" />
+        <div className="w-full h-12 rounded-lg bg-white/10 animate-pulse" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
-      <button
-        type="button"
-        onClick={() => handleOAuth("google")}
-        disabled={isLoading}
-        className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-lg bg-white text-gray-900 font-medium hover:bg-white/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {loadingProvider === "google" ? (
-          <div className="w-5 h-5 border-2 border-gray-400 border-t-gray-900 rounded-full animate-spin" />
-        ) : (
-          <GoogleIcon />
-        )}
-        Continuar con Google
-      </button>
+      {enabled.google && (
+        <button
+          type="button"
+          onClick={() => handleOAuth("google")}
+          disabled={isLoading}
+          className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-lg bg-white text-gray-900 font-medium hover:bg-white/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loadingProvider === "google" ? (
+            <div className="w-5 h-5 border-2 border-gray-400 border-t-gray-900 rounded-full animate-spin" />
+          ) : (
+            <GoogleIcon />
+          )}
+          Continuar con Google
+        </button>
+      )}
 
-      <button
-        type="button"
-        onClick={() => handleOAuth("apple")}
-        disabled={isLoading}
-        className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-lg bg-black border border-white/20 text-white font-medium hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {loadingProvider === "apple" ? (
-          <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-        ) : (
-          <AppleIcon />
-        )}
-        Continuar con Apple
-      </button>
+      {enabled.apple && (
+        <button
+          type="button"
+          onClick={() => handleOAuth("apple")}
+          disabled={isLoading}
+          className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-lg bg-black border border-white/20 text-white font-medium hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loadingProvider === "apple" ? (
+            <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+          ) : (
+            <AppleIcon />
+          )}
+          Continuar con Apple
+        </button>
+      )}
     </div>
   );
 }

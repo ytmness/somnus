@@ -28,10 +28,22 @@ function LoginContent() {
   const [isResetting, setIsResetting] = useState(false);
 
   useEffect(() => {
+    if (!errorParam) return;
     if (errorParam === "auth_failed") {
       toast.error("No se pudo completar el inicio de sesión. Intenta de nuevo.");
     } else if (errorParam === "account_inactive") {
       toast.error("Tu cuenta está desactivada. Contacta soporte.");
+    } else if (
+      errorParam === "Configuration" ||
+      errorParam === "OAuthSignin" ||
+      errorParam === "OAuthCallback" ||
+      errorParam === "OAuthCreateAccount"
+    ) {
+      toast.error(
+        "Google/Apple no están configurados en el servidor. Usa correo y contraseña o contacta soporte."
+      );
+    } else if (errorParam === "AccessDenied") {
+      toast.error("Acceso denegado. Intenta con otra cuenta.");
     }
   }, [errorParam]);
 
