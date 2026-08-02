@@ -41,6 +41,33 @@ function LoginContent() {
     }
   }, [resetParam]);
 
+  useEffect(() => {
+    let cancelled = false;
+    async function redirectIfLoggedIn() {
+      try {
+        const res = await fetch("/api/auth/session", {
+          credentials: "include",
+          cache: "no-store",
+        });
+        const data = await res.json();
+        if (cancelled || !data?.user) return;
+        const path = resolveAuthRedirectPath(
+          data.user.role || "ORGANIZER",
+          redirectParam,
+          data.user.staffRoles,
+          authSurface
+        );
+        window.location.replace(path);
+      } catch {
+        // ignore
+      }
+    }
+    void redirectIfLoggedIn();
+    return () => {
+      cancelled = true;
+    };
+  }, [redirectParam, authSurface]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);

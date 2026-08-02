@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,6 +14,7 @@ function RegisterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const emailParam = searchParams.get("email") || "";
+  const redirectParam = searchParams.get("redirect");
   const fromApp =
     searchParams.get("app") === "1" || searchParams.get("client") === "app";
   const authSurface = fromApp ? "app" : "web";
@@ -27,6 +28,33 @@ function RegisterContent() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function redirectIfLoggedIn() {
+      try {
+        const res = await fetch("/api/auth/session", {
+          credentials: "include",
+          cache: "no-store",
+        });
+        const data = await res.json();
+        if (cancelled || !data?.user) return;
+        const path = resolveAuthRedirectPath(
+          data.user.role || "ORGANIZER",
+          redirectParam,
+          data.user.staffRoles,
+          authSurface
+        );
+        window.location.replace(path);
+      } catch {
+        // ignore
+      }
+    }
+    void redirectIfLoggedIn();
+    return () => {
+      cancelled = true;
+    };
+  }, [redirectParam, authSurface]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

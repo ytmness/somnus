@@ -22,7 +22,10 @@ import {
   localTodayCalendarKey,
   isEventPastByCalendar,
 } from "@/lib/utils";
-import { SiteHeader } from "@/components/layout/SiteHeader";
+import {
+  SiteHeader,
+  type SessionUser,
+} from "@/components/layout/SiteHeader";
 import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
 
 const HERO_VIDEO = "/assets/Adobe Express 2026-02-17 16.05.01.mp4";
@@ -167,6 +170,8 @@ export default function HomePage() {
   }, []);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
+  const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
+  const [sessionReady, setSessionReady] = useState(false);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -354,7 +359,13 @@ export default function HomePage() {
           </div>
         )}
 
-        <SiteHeader eventsHref="#eventos" />
+        <SiteHeader
+          eventsHref="#eventos"
+          onUserChange={(user) => {
+            setSessionUser(user);
+            setSessionReady(true);
+          }}
+        />
 
         {/* Contenido Hero - centro */}
         <div className="relative z-20 w-full max-w-4xl mx-auto px-4 text-center">
@@ -377,24 +388,41 @@ export default function HomePage() {
             >
               Ver eventos
             </a>
-            <button
-              type="button"
-              onClick={() => router.push("/register")}
-              className="px-10 py-4 text-base inline-flex items-center gap-2 rounded-full border-2 border-white/40 text-white font-medium uppercase tracking-wider hover:bg-white/10 transition-colors"
-            >
-              Crear cuenta gratis
-            </button>
+            {sessionReady && sessionUser ? (
+              <button
+                type="button"
+                onClick={() => router.push("/mis-boletos")}
+                className="px-10 py-4 text-base inline-flex items-center gap-2 rounded-full border-2 border-white/40 text-white font-medium uppercase tracking-wider hover:bg-white/10 transition-colors"
+              >
+                Mis boletos
+              </button>
+            ) : sessionReady ? (
+              <button
+                type="button"
+                onClick={() => router.push("/register")}
+                className="px-10 py-4 text-base inline-flex items-center gap-2 rounded-full border-2 border-white/40 text-white font-medium uppercase tracking-wider hover:bg-white/10 transition-colors"
+              >
+                Crear cuenta gratis
+              </button>
+            ) : null}
           </div>
-          <p className="mt-4 text-white/50 text-sm">
-            ¿Ya tienes cuenta?{" "}
-            <button
-              type="button"
-              onClick={() => router.push("/login")}
-              className="text-white/80 underline hover:text-white"
-            >
-              Inicia sesión
-            </button>
-          </p>
+          {sessionReady && !sessionUser && (
+            <p className="mt-4 text-white/50 text-sm">
+              ¿Ya tienes cuenta?{" "}
+              <button
+                type="button"
+                onClick={() => router.push("/login")}
+                className="text-white/80 underline hover:text-white"
+              >
+                Inicia sesión
+              </button>
+            </p>
+          )}
+          {sessionReady && sessionUser && (
+            <p className="mt-4 text-white/50 text-sm">
+              Hola, {sessionUser.name || sessionUser.email}
+            </p>
+          )}
 
           {/* Scroll indicator */}
           <div
