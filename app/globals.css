@@ -260,19 +260,56 @@ body::-webkit-scrollbar {
     background: linear-gradient(135deg, #5B8DEF 0%, #7BA3E8 100%);
   }
   
+  /* ===== FOCUS RING (visible keyboard focus) ===== */
+  .somnus-focus {
+    @apply outline-none;
+  }
+  .somnus-focus:focus-visible {
+    outline: 2px solid rgba(123, 163, 232, 0.9);
+    outline-offset: 3px;
+  }
+
   /* ===== BOTONES SOMNUS ===== */
   .somnus-btn {
     @apply font-bold uppercase tracking-wider px-8 py-3.5 rounded-none;
-    @apply transition-all duration-200 ease-out;
+    transition: background-color 200ms ease-out, border-color 200ms ease-out, transform 200ms ease-out, opacity 200ms ease-out;
     background: #FFFFFF;
     color: #0A0A0A;
     border: 1px solid rgba(255, 255, 255, 0.3);
   }
   
-  .somnus-btn:hover {
+  .somnus-btn:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.95);
     border-color: rgba(255, 255, 255, 0.6);
     transform: translateY(-2px);
+  }
+
+  .somnus-btn:focus-visible {
+    outline: 2px solid rgba(123, 163, 232, 0.9);
+    outline-offset: 3px;
+  }
+
+  .somnus-btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .somnus-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ===== INPUTS SOMNUS ===== */
+  .somnus-input {
+    @apply w-full rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50;
+    @apply px-4 py-3 outline-none transition-colors duration-200;
+  }
+  .somnus-input:focus-visible {
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+  }
+  .somnus-input[aria-invalid="true"] {
+    border-color: rgba(248, 113, 113, 0.7);
   }
   
   /* Video del cupido - ajuste móvil hacia la izquierda */
@@ -549,12 +586,50 @@ body::-webkit-scrollbar {
   .somnus-title-secondary {
     @apply font-semibold text-white;
     font-family: var(--font-archivo, var(--font-sans), sans-serif);
+    text-wrap: balance;
   }
   
   .somnus-text-body {
     @apply text-white/80;
     font-family: var(--font-archivo, var(--font-sans), sans-serif);
     line-height: 1.6;
+    max-width: 65ch;
+    text-wrap: pretty;
+  }
+
+  /* ===== TYPE SCALE UTILITIES ===== */
+  .somnus-eyebrow {
+    @apply uppercase text-white/70;
+    font-family: var(--font-archivo, var(--font-sans), sans-serif);
+    font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+    letter-spacing: 0.2em;
+    font-weight: 500;
+  }
+
+  .somnus-display {
+    @apply font-bold uppercase tracking-wider text-white;
+    font-family: var(--font-archivo, var(--font-sans), sans-serif);
+    font-size: clamp(2rem, 5vw, 3.75rem);
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  .somnus-lede {
+    @apply text-white/70;
+    font-family: var(--font-archivo, var(--font-sans), sans-serif);
+    font-size: clamp(1rem, 1.5vw, 1.125rem);
+    line-height: 1.65;
+    max-width: 42rem;
+    text-wrap: pretty;
+  }
+
+  /* Nav link focus helper */
+  .somnus-nav-link {
+    @apply outline-none transition-colors duration-200;
+  }
+  .somnus-nav-link:focus-visible {
+    outline: 2px solid rgba(123, 163, 232, 0.9);
+    outline-offset: 4px;
   }
   
   /* Legacy - mantener compatibilidad */
@@ -861,6 +936,47 @@ video.hero-video-no-controls,
 video.video-cupido-mobile {
   -webkit-appearance: none !important;
   appearance: none !important;
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .brand-scroll-animate {
+    animation: none !important;
+  }
+
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .somnus-title,
+  .somnus-logo {
+    animation: none !important;
+  }
+
+  .somnus-title span,
+  .somnus-logo span {
+    animation: none !important;
+  }
+
+  .somnus-subtitle {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .animate-pulse-gold,
+  .animate-bounce,
+  .animate-pulse,
+  .animate-spin {
+    animation: none !important;
+  }
+
+  .somnus-btn:hover:not(:disabled),
+  .somnus-card:hover,
+  .regia-ticket-card:hover {
+    transform: none !important;
+  }
 }
 
 video::-internal-media-controls-overlay-cast-button,

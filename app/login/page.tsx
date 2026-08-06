@@ -26,13 +26,14 @@ function LoginContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!errorParam) return;
     if (errorParam === "auth_failed") {
-      toast.error("No se pudo completar el inicio de sesión. Intenta de nuevo.");
+      toast.error("Could not complete sign-in. Please try again.");
     } else if (errorParam === "account_inactive") {
-      toast.error("Tu cuenta está desactivada. Contacta soporte.");
+      toast.error("Your account is deactivated. Contact support.");
     } else if (
       errorParam === "Configuration" ||
       errorParam === "OAuthSignin" ||
@@ -40,16 +41,16 @@ function LoginContent() {
       errorParam === "OAuthCreateAccount"
     ) {
       toast.error(
-        "Google/Apple no están configurados en el servidor. Usa correo y contraseña o contacta soporte."
+        "Google/Apple are not configured on the server. Use email and password or contact support."
       );
     } else if (errorParam === "AccessDenied") {
-      toast.error("Acceso denegado. Intenta con otra cuenta.");
+      toast.error("Access denied. Try a different account.");
     }
   }, [errorParam]);
 
   useEffect(() => {
     if (resetParam === "sent") {
-      toast.success("Te enviamos un enlace para restablecer tu contraseña.");
+      toast.success("We sent you a link to reset your password.");
     }
   }, [resetParam]);
 
@@ -82,6 +83,7 @@ function LoginContent() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setEmailError(null);
     setIsLoading(true);
 
     try {
@@ -103,7 +105,7 @@ function LoginContent() {
           return;
         }
         if (data.code === "EMAIL_NOT_VERIFIED") {
-          toast.error(data.error || "Verifica tu correo para continuar");
+          toast.error(data.error || "Verify your email to continue");
           const verifyQs = new URLSearchParams({
             email: email.trim().toLowerCase(),
           });
@@ -111,10 +113,10 @@ function LoginContent() {
           window.location.href = `/verificar-email?${verifyQs.toString()}`;
           return;
         }
-        throw new Error(data.error || "Error al iniciar sesión");
+        throw new Error(data.error || "Could not sign in");
       }
 
-      toast.success("¡Bienvenido de nuevo!");
+      toast.success("Welcome back!");
       const redirectPath =
         redirectParam != null
           ? resolveAuthRedirectPath(
@@ -132,7 +134,7 @@ function LoginContent() {
             ));
       window.location.href = redirectPath;
     } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : "Error al iniciar sesión");
+      toast.error(error instanceof Error ? error.message : "Could not sign in");
     } finally {
       setIsLoading(false);
     }
@@ -140,9 +142,10 @@ function LoginContent() {
 
   const handleForgotPassword = async () => {
     if (!email.trim()) {
-      toast.error("Ingresa tu correo para restablecer la contraseña");
+      setEmailError("Enter your email to reset your password");
       return;
     }
+    setEmailError(null);
 
     setIsResetting(true);
     try {
@@ -153,13 +156,13 @@ function LoginContent() {
       });
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.error || "Error al enviar el enlace");
+        throw new Error(data.error || "Could not send reset link");
       }
-      toast.success("Revisa tu correo para restablecer tu contraseña");
+      toast.success("Check your email to reset your password");
       router.replace("/login?reset=sent");
     } catch (error: unknown) {
       toast.error(
-        error instanceof Error ? error.message : "Error al enviar el enlace"
+        error instanceof Error ? error.message : "Could not send reset link"
       );
     } finally {
       setIsResetting(false);
@@ -175,8 +178,9 @@ function LoginContent() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             <div className="hidden lg:flex flex-col justify-center space-y-8">
               <div>
-                <h1 className="somnus-title-secondary text-4xl md:text-5xl mb-4 uppercase">
-                  Bienvenido a
+                <p className="somnus-eyebrow mb-3">Account</p>
+                <h1 className="somnus-display text-4xl md:text-5xl mb-4">
+                  Welcome to
                 </h1>
                 <div className="mb-6">
                   <Image
@@ -188,51 +192,51 @@ function LoginContent() {
                     priority
                   />
                 </div>
-                <p className="somnus-text-body text-lg mb-8">
-                  Accede a tu cuenta para gestionar tus boletos, ver tus eventos
-                  favoritos y disfrutar de experiencias exclusivas.
+                <p className="somnus-lede mb-8">
+                  Sign in to manage your tickets, browse upcoming events, and
+                  unlock exclusive experiences.
                 </p>
               </div>
 
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 border-2 border-white/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Ticket className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Ticket className="w-6 h-6 text-[#7BA3E8]" />
                   </div>
                   <div>
                     <h3 className="somnus-title-secondary text-lg mb-2 uppercase">
-                      Tus boletos
+                      Your tickets
                     </h3>
                     <p className="somnus-text-body text-sm">
-                      Accede a todas tus entradas compradas y descárgalas cuando quieras
+                      Access every ticket you bought and download them anytime
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 border-2 border-white/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-6 h-6 text-[#7BA3E8]" />
                   </div>
                   <div>
                     <h3 className="somnus-title-secondary text-lg mb-2 uppercase">
-                      Eventos exclusivos
+                      Exclusive events
                     </h3>
                     <p className="somnus-text-body text-sm">
-                      Descubre y reserva boletos para los mejores eventos en vivo
+                      Discover and book tickets for the best live experiences
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 border-2 border-white/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-6 h-6 text-[#7BA3E8]" />
                   </div>
                   <div>
                     <h3 className="somnus-title-secondary text-lg mb-2 uppercase">
-                      Seguridad garantizada
+                      Built-in security
                     </h3>
                     <p className="somnus-text-body text-sm">
-                      Tus datos están protegidos con los más altos estándares de seguridad
+                      Your data is protected with high security standards
                     </p>
                   </div>
                 </div>
@@ -244,28 +248,28 @@ function LoginContent() {
                 <div className="somnus-card p-6 sm:p-8 lg:p-10">
                   <div className="lg:hidden text-center mb-8">
                     <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
-                      Iniciar sesión
+                      Sign in
                     </h1>
                     <p className="somnus-text-body text-sm">
-                      Elige cómo quieres acceder a tu cuenta
+                      Choose how you want to access your account
                     </p>
                   </div>
 
                   <div className="hidden lg:block text-center mb-8">
-                    <div className="w-16 h-16 border-2 border-white/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Lock className="w-8 h-8 text-white" />
+                    <div className="w-16 h-16 border border-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Lock className="w-8 h-8 text-[#7BA3E8]" />
                     </div>
                     <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
-                      Iniciar sesión
+                      Sign in
                     </h1>
                     <p className="somnus-text-body">
-                      Elige cómo quieres acceder a tu cuenta
+                      Choose how you want to access your account
                     </p>
                   </div>
 
                   {emailParam && (
-                    <p className="text-green-400/90 text-sm text-center bg-green-500/10 border border-green-500/20 rounded-lg py-2 px-3 mb-6">
-                      Inicia sesión con el correo del checkout para ver tus boletos
+                    <p className="text-[#7BA3E8] text-sm text-center bg-[#5B8DEF]/10 border border-[#5B8DEF]/25 rounded-lg py-2 px-3 mb-6">
+                      Sign in with your checkout email to view your tickets
                     </p>
                   )}
 
@@ -280,7 +284,7 @@ function LoginContent() {
                     </div>
                     <div className="relative flex justify-center text-sm">
                       <span className="px-3 somnus-text-body bg-transparent text-white/60">
-                        o continúa con correo
+                        or continue with email
                       </span>
                     </div>
                   </div>
@@ -291,20 +295,36 @@ function LoginContent() {
                         htmlFor="email"
                         className="block somnus-title-secondary text-sm mb-2 uppercase"
                       >
-                        Correo electrónico
+                        Email
                       </label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none" />
                         <input
                           id="email"
                           type="email"
                           value={email}
-                          onChange={(e) => setEmail(e.target.value)}
+                          onChange={(e) => {
+                            setEmail(e.target.value);
+                            if (emailError) setEmailError(null);
+                          }}
                           required
-                          className="w-full pl-10 pr-4 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all backdrop-blur-sm"
-                          placeholder="tu@correo.com"
+                          autoComplete="email"
+                          spellCheck={false}
+                          aria-invalid={emailError ? true : undefined}
+                          aria-describedby={emailError ? "email-error" : undefined}
+                          className="somnus-input pl-10"
+                          placeholder="you@email.com"
                         />
                       </div>
+                      {emailError && (
+                        <p
+                          id="email-error"
+                          role="alert"
+                          className="mt-2 text-sm text-red-400"
+                        >
+                          {emailError}
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -313,19 +333,19 @@ function LoginContent() {
                           htmlFor="password"
                           className="block somnus-title-secondary text-sm uppercase"
                         >
-                          Contraseña
+                          Password
                         </label>
                         <button
                           type="button"
                           onClick={handleForgotPassword}
                           disabled={isResetting}
-                          className="text-xs text-white/60 hover:text-white transition-colors disabled:opacity-50"
+                          className="somnus-nav-link text-xs text-white/60 hover:text-white disabled:opacity-50"
                         >
-                          {isResetting ? "Enviando..." : "¿Olvidaste tu contraseña?"}
+                          {isResetting ? "Sending…" : "Forgot password?"}
                         </button>
                       </div>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none" />
                         <input
                           id="password"
                           type={showPassword ? "text" : "password"}
@@ -333,14 +353,15 @@ function LoginContent() {
                           onChange={(e) => setPassword(e.target.value)}
                           required
                           minLength={8}
-                          className="w-full pl-10 pr-12 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all backdrop-blur-sm"
-                          placeholder="Mínimo 8 caracteres"
+                          autoComplete="current-password"
+                          className="somnus-input pl-10 pr-12"
+                          placeholder="At least 8 characters"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
-                          aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                          className="somnus-nav-link absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
+                          aria-label={showPassword ? "Hide password" : "Show password"}
                         >
                           {showPassword ? (
                             <EyeOff className="w-5 h-5" />
@@ -358,23 +379,23 @@ function LoginContent() {
                     >
                       {isLoading ? (
                         <span className="flex items-center gap-2 justify-center">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Iniciando sesión...
+                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          Signing in…
                         </span>
                       ) : (
-                        "Iniciar sesión"
+                        "Sign in"
                       )}
                     </button>
                   </form>
 
                   <div className="mt-6 pt-6 border-t border-white/10">
                     <p className="somnus-text-body text-center text-sm">
-                      ¿Primera vez en Somnus?{" "}
+                      New to Somnus?{" "}
                       <Link
                         href="/register"
-                        className="text-white hover:underline transition-colors font-medium"
+                        className="somnus-nav-link text-white hover:underline transition-colors font-medium"
                       >
-                        Crea tu cuenta gratis
+                        Create a free account
                       </Link>
                     </p>
                   </div>

@@ -21,6 +21,7 @@ function VerificarEmailContent() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   useEffect(() => {
     if (email) {
@@ -45,10 +46,10 @@ function VerificarEmailContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Error al verificar el código");
+        throw new Error(data.error || "Could not verify code");
       }
 
-      toast.success("¡Correo verificado!");
+      toast.success("Email verified!");
 
       const redirectPath = resolvePostAuthRedirect(
         data.user?.role || "ORGANIZER",
@@ -59,7 +60,7 @@ function VerificarEmailContent() {
       window.location.href = redirectPath;
     } catch (error: unknown) {
       toast.error(
-        error instanceof Error ? error.message : "Error al verificar el código"
+        error instanceof Error ? error.message : "Could not verify code"
       );
     } finally {
       setIsLoading(false);
@@ -68,9 +69,10 @@ function VerificarEmailContent() {
 
   const handleResendCode = async () => {
     if (!formData.email) {
-      toast.error("Ingresa tu correo");
+      setEmailError("Enter your email");
       return;
     }
+    setEmailError(null);
     setIsResending(true);
     try {
       const response = await fetch("/api/auth/otp/send", {
@@ -82,13 +84,13 @@ function VerificarEmailContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Error al reenviar el código");
+        throw new Error(data.error || "Could not resend code");
       }
 
-      toast.success("Código reenviado. Revisa tu correo.");
+      toast.success("Code resent. Check your email.");
     } catch (error: unknown) {
       toast.error(
-        error instanceof Error ? error.message : "Error al reenviar el código"
+        error instanceof Error ? error.message : "Could not resend code"
       );
     } finally {
       setIsResending(false);
@@ -104,8 +106,9 @@ function VerificarEmailContent() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             <div className="hidden lg:flex flex-col justify-center space-y-8">
               <div>
-                <h1 className="somnus-title-secondary text-4xl md:text-5xl mb-4 uppercase">
-                  Verifica tu
+                <p className="somnus-eyebrow mb-3">Verification</p>
+                <h1 className="somnus-display text-4xl md:text-5xl mb-4">
+                  Verify your
                 </h1>
                 <div className="mb-6">
                   <Image
@@ -116,51 +119,51 @@ function VerificarEmailContent() {
                     className="w-48 md:w-56 h-auto object-contain"
                   />
                 </div>
-                <p className="somnus-text-body text-lg mb-8">
-                  Ingresa el código de 8 dígitos que enviamos a tu correo para
-                  completar el acceso.
+                <p className="somnus-lede mb-8">
+                  Enter the 8-digit code we sent to your email to finish signing
+                  in.
                 </p>
               </div>
 
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 border-2 border-white/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-6 h-6 text-[#7BA3E8]" />
                   </div>
                   <div>
                     <h3 className="somnus-title-secondary text-lg mb-2 uppercase">
-                      Código de 8 dígitos
+                      8-digit code
                     </h3>
                     <p className="somnus-text-body text-sm">
-                      Revisa tu bandeja de entrada y la carpeta de spam
+                      Check your inbox and spam folder
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 border-2 border-white/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Lock className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Lock className="w-6 h-6 text-[#7BA3E8]" />
                   </div>
                   <div>
                     <h3 className="somnus-title-secondary text-lg mb-2 uppercase">
-                      Seguridad
+                      Security
                     </h3>
                     <p className="somnus-text-body text-sm">
-                      El código expira en 10 minutos por tu seguridad
+                      The code expires in 10 minutes for your security
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 border-2 border-white/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-6 h-6 text-[#7BA3E8]" />
                   </div>
                   <div>
                     <h3 className="somnus-title-secondary text-lg mb-2 uppercase">
-                      Verificación rápida
+                      Quick verification
                     </h3>
                     <p className="somnus-text-body text-sm">
-                      Una vez verificado, podrás comprar boletos y usar tu cuenta
+                      Once verified, you can buy tickets and use your account
                     </p>
                   </div>
                 </div>
@@ -172,51 +175,73 @@ function VerificarEmailContent() {
                 <div className="somnus-card p-6 sm:p-8 lg:p-10">
                   <div className="lg:hidden text-center mb-8">
                     <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
-                      Verifica tu correo
+                      Verify your email
                     </h1>
                     <p className="somnus-text-body text-sm">
-                      Ingresa el código de 8 dígitos que enviamos a tu email
+                      Enter the 8-digit code we sent to your email
                     </p>
                   </div>
 
                   <div className="hidden lg:block text-center mb-8">
-                    <div className="w-16 h-16 border-2 border-white/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Lock className="w-8 h-8 text-white" />
+                    <div className="w-16 h-16 border border-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Lock className="w-8 h-8 text-[#7BA3E8]" />
                     </div>
                     <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
-                      Verifica tu correo
+                      Verify your email
                     </h1>
                     <p className="somnus-text-body">
-                      Ingresa el código de 8 dígitos que enviamos a tu email
+                      Enter the 8-digit code we sent to your email
                     </p>
                   </div>
 
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                      <label className="block somnus-title-secondary text-sm mb-2 uppercase">
-                        Correo electrónico
+                      <label
+                        htmlFor="verify-email"
+                        className="block somnus-title-secondary text-sm mb-2 uppercase"
+                      >
+                        Email
                       </label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none" />
                         <input
+                          id="verify-email"
                           type="email"
                           value={formData.email}
-                          onChange={(e) =>
-                            setFormData({ ...formData, email: e.target.value })
-                          }
-                          className="w-full pl-10 pr-4 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all backdrop-blur-sm disabled:opacity-50"
-                          placeholder="tu@email.com"
+                          onChange={(e) => {
+                            setFormData({ ...formData, email: e.target.value });
+                            if (emailError) setEmailError(null);
+                          }}
+                          className="somnus-input pl-10 disabled:opacity-50"
+                          placeholder="you@email.com"
                           required
                           disabled={!!email}
+                          autoComplete="email"
+                          spellCheck={false}
+                          aria-invalid={emailError ? true : undefined}
+                          aria-describedby={emailError ? "verify-email-error" : undefined}
                         />
                       </div>
+                      {emailError && (
+                        <p
+                          id="verify-email-error"
+                          role="alert"
+                          className="mt-2 text-sm text-red-400"
+                        >
+                          {emailError}
+                        </p>
+                      )}
                     </div>
 
                     <div>
-                      <label className="block somnus-title-secondary text-sm mb-2 uppercase">
-                        Código de verificación
+                      <label
+                        htmlFor="verify-code"
+                        className="block somnus-title-secondary text-sm mb-2 uppercase"
+                      >
+                        Verification code
                       </label>
                       <input
+                        id="verify-code"
                         type="text"
                         value={formData.code}
                         onChange={(e) =>
@@ -225,7 +250,7 @@ function VerificarEmailContent() {
                             code: e.target.value.replace(/\D/g, "").slice(0, 8),
                           })
                         }
-                        className="w-full px-4 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all text-center text-2xl tracking-widest font-mono backdrop-blur-sm"
+                        className="somnus-input text-center text-2xl tracking-widest font-mono"
                         placeholder="00000000"
                         required
                         maxLength={8}
@@ -234,7 +259,7 @@ function VerificarEmailContent() {
                         autoComplete="one-time-code"
                       />
                       <p className="somnus-text-body text-sm mt-2 text-center">
-                        Ingresa el código de 8 dígitos
+                        Enter the 8-digit code
                       </p>
                     </div>
 
@@ -245,11 +270,11 @@ function VerificarEmailContent() {
                     >
                       {isLoading ? (
                         <span className="flex items-center gap-2 justify-center">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Verificando...
+                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          Verifying…
                         </span>
                       ) : (
-                        "Verificar correo"
+                        "Verify email"
                       )}
                     </button>
                   </form>
@@ -259,23 +284,23 @@ function VerificarEmailContent() {
                       type="button"
                       onClick={handleResendCode}
                       disabled={isResending || !formData.email}
-                      className="text-white hover:text-white/80 font-medium transition-colors inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="somnus-nav-link text-white hover:text-white/80 font-medium inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <RefreshCw
                         className={`w-4 h-4 ${isResending ? "animate-spin" : ""}`}
                       />
-                      {isResending ? "Reenviando..." : "Reenviar código"}
+                      {isResending ? "Resending…" : "Resend code"}
                     </button>
                   </div>
 
                   <div className="mt-6 pt-6 border-t border-white/10">
                     <p className="somnus-text-body text-center text-sm">
-                      ¿Volver al login?{" "}
+                      Back to login?{" "}
                       <Link
                         href="/login"
-                        className="text-white hover:underline transition-colors font-medium"
+                        className="somnus-nav-link text-white hover:underline transition-colors font-medium"
                       >
-                        Inicia sesión
+                        Sign in
                       </Link>
                     </p>
                   </div>
@@ -296,7 +321,7 @@ export default function VerificarEmailPage() {
         <div className="min-h-screen somnus-bg-main flex items-center justify-center p-4">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-white/50 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="somnus-text-body text-xl">Cargando...</p>
+            <p className="somnus-text-body text-xl">Loading…</p>
           </div>
         </div>
       }

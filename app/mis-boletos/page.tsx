@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { Ticket, Calendar, MapPin, User, ArrowLeft, Download, QrCode, Shield, Scan, LogIn } from "lucide-react";
+import { Ticket, Calendar, MapPin, User, ArrowLeft, Download, QrCode } from "lucide-react";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
 import { formatEventCalendarDate } from "@/lib/utils";
@@ -47,6 +46,7 @@ export default function MisBoletosPage() {
   const router = useRouter();
   const [tickets, setTickets] = useState<TicketData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [authRequired, setAuthRequired] = useState(false);
   const [user, setUser] = useState<SessionUser | null>(null);
 
   const handleUserChange = useCallback((sessionUser: SessionUser | null) => {
@@ -61,7 +61,8 @@ export default function MisBoletosPage() {
         const sessionData = await sessionResponse.json();
 
         if (!sessionData.user) {
-          toast.error("Debes iniciar sesión");
+          setAuthRequired(true);
+          toast.error("Sign in required");
           router.push("/login");
           return;
         }
@@ -74,11 +75,11 @@ export default function MisBoletosPage() {
         if (data.success && data.data) {
           setTickets(data.data.tickets || []);
         } else {
-          toast.error(data.error || "Error al cargar boletos");
+          toast.error(data.error || "Failed to load tickets");
         }
       } catch (error) {
-        console.error("Error al cargar boletos:", error);
-        toast.error("Error al cargar tus boletos");
+        console.error("Error loading tickets:", error);
+        toast.error("Failed to load your tickets");
       } finally {
         setIsLoading(false);
       }
@@ -90,11 +91,11 @@ export default function MisBoletosPage() {
   const getStatusText = (status: string) => {
     switch (status) {
       case "VALID":
-        return "Válido";
+        return "Valid";
       case "USED":
-        return "Usado";
+        return "Used";
       case "CANCELLED":
-        return "Cancelado";
+        return "Cancelled";
       default:
         return status;
     }
@@ -108,7 +109,34 @@ export default function MisBoletosPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center py-20">
               <div className="w-16 h-16 border-4 border-white/50 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="somnus-text-body text-xl">Cargando tus boletos...</p>
+              <p className="somnus-text-body text-xl">Loading your tickets...</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (authRequired) {
+    return (
+      <div className="min-h-screen somnus-bg-main">
+        <SiteHeader eventsHref="/" onUserChange={handleUserChange} />
+        <main className="w-full py-8 pt-24 lg:pt-32">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center py-20">
+              <h1 className="somnus-display text-2xl sm:text-3xl text-white mb-3 uppercase tracking-wider">
+                Sign in required
+              </h1>
+              <p className="somnus-text-body text-white/60 mb-8">
+                Redirecting you to sign in…
+              </p>
+              <button
+                type="button"
+                onClick={() => router.push("/login")}
+                className="somnus-btn px-8 py-3.5"
+              >
+                Sign in
+              </button>
             </div>
           </div>
         </main>
@@ -124,17 +152,18 @@ export default function MisBoletosPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <button
+              type="button"
               onClick={() => router.push("/")}
-              className="inline-flex items-center gap-2 somnus-text-body hover:text-white transition-colors mb-6"
+              className="somnus-nav-link inline-flex items-center gap-2 mb-6"
             >
               <ArrowLeft className="w-4 h-4" />
-              Volver a Eventos
+              Back to Events
             </button>
 
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="somnus-title-secondary text-3xl sm:text-4xl mb-2 uppercase">
-                  Mis Boletos
+                <h1 className="somnus-display text-3xl sm:text-4xl mb-2 uppercase tracking-wider">
+                  My Tickets
                 </h1>
                 {user && (
                   <p className="somnus-text-body">
@@ -151,19 +180,20 @@ export default function MisBoletosPage() {
                 <Ticket className="w-10 h-10 text-white" />
               </div>
               <h3 className="somnus-title-secondary text-2xl mb-3 uppercase">
-                No tienes boletos aún
+                No tickets yet
               </h3>
               <p className="somnus-text-body mb-6">
-                Compra boletos para tus eventos favoritos
+                Buy tickets for your favorite events
               </p>
               <p className="somnus-text-body text-sm text-white/60 mb-6 max-w-md mx-auto">
-                ¿Acabas de pagar? Cierra sesión e inicia con el <strong>mismo email</strong> que usaste en el checkout. Los boletos se asocian a ese correo.
+                Just paid? Sign out and sign back in with the <strong>same email</strong> you used at checkout. Tickets are linked to that address.
               </p>
               <button
+                type="button"
                 onClick={() => router.push("/")}
                 className="somnus-btn px-8 py-3.5"
               >
-                Ver Eventos
+                View Events
               </button>
             </div>
           ) : (
@@ -230,7 +260,7 @@ export default function MisBoletosPage() {
                             <User className="w-5 h-5 text-white/80" />
                             <span>
                               {ticket.tableNumber}
-                              {ticket.seatNumber && ` • Asiento ${ticket.seatNumber}`}
+                              {ticket.seatNumber && ` • Seat ${ticket.seatNumber}`}
                             </span>
                           </div>
                         )}
@@ -238,18 +268,19 @@ export default function MisBoletosPage() {
 
                       <div className="flex items-center justify-between pt-4 border-t border-white/10">
                         <div>
-                          <p className="somnus-text-body text-sm">Número de boleto</p>
+                          <p className="somnus-text-body text-sm">Ticket number</p>
                           <p className="text-white font-bold text-lg">
                             {ticket.ticketNumber}
                           </p>
                         </div>
                         {ticket.pdfUrl && (
                           <button
+                            type="button"
                             onClick={() => window.open(ticket.pdfUrl!, "_blank")}
                             className="somnus-btn px-6 py-3 text-sm"
                           >
                             <Download className="w-4 h-4 mr-2 inline" />
-                            Descargar PDF
+                            Download PDF
                           </button>
                         )}
                       </div>
@@ -260,24 +291,26 @@ export default function MisBoletosPage() {
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
                                 <QrCode className="w-5 h-5 text-white/80" />
-                                <p className="somnus-title-secondary">Código QR de Acceso</p>
+                                <p className="somnus-title-secondary">Entry QR code</p>
                               </div>
                               <p className="somnus-text-body text-sm">
-                                Presenta este código QR en la entrada del evento para validar tu boleto
+                                Show this QR code at the event entrance to validate your ticket
                               </p>
                             </div>
-                            <div className="bg-white p-4 rounded-lg shadow-lg">
-                              <QRCodeSVG
-                                value={JSON.stringify({
-                                  ticketId: ticket.id,
-                                  qrHash: ticket.qrCode,
-                                  timestamp: Date.now()
-                                })}
-                                size={180}
-                                level="H"
-                                includeMargin={true}
-                              />
-                              <p className="text-center text-xs text-gray-600 mt-2 font-mono">
+                            <div className="liquid-glass rounded-xl border border-white/10 bg-[#141414]/80 p-3 sm:p-4">
+                              <div className="bg-white p-3 rounded-md inline-block">
+                                <QRCodeSVG
+                                  value={JSON.stringify({
+                                    ticketId: ticket.id,
+                                    qrHash: ticket.qrCode,
+                                    timestamp: Date.now()
+                                  })}
+                                  size={180}
+                                  level="H"
+                                  includeMargin={true}
+                                />
+                              </div>
+                              <p className="text-center text-xs text-white/50 mt-2.5 font-mono tracking-wide">
                                 {ticket.ticketNumber}
                               </p>
                             </div>

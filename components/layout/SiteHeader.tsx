@@ -16,9 +16,12 @@ export interface SessionUser {
 
 interface SiteHeaderProps {
   onUserChange?: (user: SessionUser | null) => void;
-  /** Enlace de eventos: "#eventos" en home, "/" en otras páginas */
+  /** Events link: "#eventos" on home, "/" elsewhere */
   eventsHref?: string;
 }
+
+const navLinkClass =
+  "somnus-nav-link text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white";
 
 export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeaderProps) {
   const router = useRouter();
@@ -50,10 +53,10 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
       await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
       setUser(null);
       onUserChangeRef.current?.(null);
-      toast.success("Sesión cerrada");
+      toast.success("Signed out");
       window.location.href = "/";
     } catch {
-      toast.error("Error al cerrar sesión");
+      toast.error("Could not sign out");
     }
   };
 
@@ -64,25 +67,23 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
       <button
         type="button"
         onClick={() => router.push("/")}
-        className="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-        aria-label="SOMNUS"
+        className="somnus-nav-link text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white"
+        aria-label="SOMNUS home"
+        translate="no"
       >
         SOMNUS
       </button>
 
-      <nav className="flex items-center gap-2 sm:gap-4 lg:gap-6">
+      <nav className="flex items-center gap-2 sm:gap-4 lg:gap-6" aria-label="Main">
         {eventsIsAnchor ? (
-          <a
-            href={eventsHref}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-          >
+          <a href={eventsHref} className={navLinkClass}>
             Events
           </a>
         ) : (
           <button
             type="button"
             onClick={() => router.push(eventsHref)}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
+            className={navLinkClass}
           >
             Events
           </button>
@@ -90,7 +91,7 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
 
         <Link
           href="/galeria"
-          className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
+          className={`${navLinkClass} hidden sm:inline`}
         >
           Gallery
         </Link>
@@ -99,32 +100,29 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
           <>
             <Link
               href="/organizaciones"
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
+              className={`${navLinkClass} hidden sm:inline`}
             >
               Orgs
             </Link>
             <Link
               href="/feed"
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
+              className={`${navLinkClass} hidden md:inline`}
             >
               Feed
             </Link>
             <Link
               href="/mensajes"
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
+              className={`${navLinkClass} hidden md:inline`}
             >
-              Mensajes
+              Messages
             </Link>
             <NotificationBell isLoggedIn />
           </>
         )}
 
         {!loading && user?.role === "ADMIN" && (
-          <Link
-            href="/admin"
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-          >
-            Panel
+          <Link href="/admin" className={navLinkClass}>
+            Admin
           </Link>
         )}
 
@@ -132,10 +130,7 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
           (user?.role === "ACCESOS" ||
             user?.role === "ADMIN" ||
             user?.staffRoles?.includes("ACCESOS")) && (
-          <Link
-            href="/accesos"
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-          >
+          <Link href="/accesos" className={navLinkClass}>
             Access
           </Link>
         )}
@@ -143,16 +138,16 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
         {!loading && user?.staffRoles?.includes("VENDEDOR") && (
           <Link
             href="/vendedor"
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
+            className={`${navLinkClass} hidden sm:inline`}
           >
-            Vendedor
+            Seller
           </Link>
         )}
 
         {!loading && user?.staffRoles?.includes("SUPERVISOR") && (
           <Link
             href="/supervisor"
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
+            className={`${navLinkClass} hidden sm:inline`}
           >
             Supervisor
           </Link>
@@ -161,25 +156,22 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
         {!loading && user?.staffRoles?.includes("MESA_HOST") && (
           <Link
             href="/accesos"
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
+            className={`${navLinkClass} hidden md:inline`}
           >
-            Mis mesas
+            My tables
           </Link>
         )}
 
         {!loading && user && (
           <>
-            <Link
-              href="/mis-boletos"
-              className="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-            >
-              Mis Boletos
+            <Link href="/mis-boletos" className="somnus-nav-link text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white">
+              My Tickets
             </Link>
             <Link
               href="/organizador"
-              className="text-white/60 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
+              className="somnus-nav-link text-white/60 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white hidden md:inline"
             >
-              Publicar eventos
+              Publish events
             </Link>
           </>
         )}
@@ -187,15 +179,15 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
         {!loading && (
           user ? (
             <>
-              <span className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1 uppercase tracking-wider hidden lg:inline">
+              <span className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1 uppercase tracking-wider hidden lg:inline truncate max-w-[10rem]">
                 {user.name || user.email}
               </span>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
+                className={navLinkClass}
               >
-                Salir
+                Sign out
               </button>
             </>
           ) : (
@@ -203,16 +195,16 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
               <button
                 type="button"
                 onClick={() => router.push("/register")}
-                className="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors border border-white/30 px-3 py-1.5 rounded-full hidden sm:inline"
+                className="somnus-nav-link text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white border border-white/30 px-3 py-1.5 rounded-full hidden sm:inline"
               >
-                Crear cuenta
+                Create account
               </button>
               <button
                 type="button"
                 onClick={() => router.push("/login")}
-                className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1 uppercase tracking-wider hover:text-white transition-colors"
+                className="somnus-nav-link text-white/90 text-xs sm:text-sm font-medium px-2 py-1 uppercase tracking-wider hover:text-white"
               >
-                Entrar
+                Sign in
               </button>
             </>
           )

@@ -9,7 +9,7 @@ type Provider = "google" | "apple";
 
 interface SocialLoginButtonsProps {
   redirectTo?: string | null;
-  /** Si true, post-login manda ORGANIZER a /organizador (app). En web va a landing. */
+  /** If true, post-login sends ORGANIZER to /organizador (app). On web goes to landing. */
   fromApp?: boolean;
 }
 
@@ -84,7 +84,7 @@ export function SocialLoginButtons({
   const handleOAuth = async (provider: Provider) => {
     if (!enabled[provider]) {
       toast.error(
-        `${provider === "google" ? "Google" : "Apple"} no está configurado en el servidor.`
+        `${provider === "google" ? "Google" : "Apple"} is not configured on the server.`
       );
       return;
     }
@@ -99,7 +99,7 @@ export function SocialLoginButtons({
       await signIn(provider, { callbackUrl });
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Error al iniciar sesión";
+        error instanceof Error ? error.message : "Could not sign in";
       toast.error(message);
       setLoadingProvider(null);
     }
@@ -111,7 +111,7 @@ export function SocialLoginButtons({
   if (loaded && !anyEnabled) {
     return (
       <p className="text-center text-sm text-white/50">
-        Login social no disponible por ahora. Usa correo y contraseña.
+        Social login is unavailable right now. Use email and password.
       </p>
     );
   }
@@ -132,14 +132,14 @@ export function SocialLoginButtons({
           type="button"
           onClick={() => handleOAuth("google")}
           disabled={isLoading}
-          className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-lg bg-white text-gray-900 font-medium hover:bg-white/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-lg bg-white text-gray-900 font-medium hover:bg-white/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7BA3E8]"
         >
           {loadingProvider === "google" ? (
             <div className="w-5 h-5 border-2 border-gray-400 border-t-gray-900 rounded-full animate-spin" />
           ) : (
             <GoogleIcon />
           )}
-          Continuar con Google
+          Continue with Google
         </button>
       )}
 
@@ -148,14 +148,14 @@ export function SocialLoginButtons({
           type="button"
           onClick={() => handleOAuth("apple")}
           disabled={isLoading}
-          className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-lg bg-black border border-white/20 text-white font-medium hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-lg bg-black border border-white/20 text-white font-medium hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7BA3E8]"
         >
           {loadingProvider === "apple" ? (
             <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
           ) : (
             <AppleIcon />
           )}
-          Continuar con Apple
+          Continue with Apple
         </button>
       )}
     </div>

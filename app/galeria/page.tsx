@@ -306,6 +306,21 @@ function GaleriaContent() {
               />
             ))}
           </div>
+        ) : currentImages.length === 0 ? (
+          <div
+            id="gallery-photos"
+            className="scroll-mt-28 max-w-5xl mx-auto"
+          >
+            <div className="liquid-glass rounded-2xl ring-1 ring-white/10 py-16 px-6 flex flex-col items-center justify-center gap-3 text-center">
+              <ImageIcon
+                className="w-12 h-12 text-white/30"
+                aria-hidden
+              />
+              <p className="somnus-text-body text-white/60">
+                No photos in this edition yet
+              </p>
+            </div>
+          </div>
         ) : (
           <div
             id="gallery-photos"
@@ -317,7 +332,7 @@ function GaleriaContent() {
                   key={`${activeSection}-${index}`}
                   type="button"
                   onClick={() => openLightbox(activeSection, index)}
-                  className="relative aspect-[4/5] overflow-hidden group focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]"
+                  className="relative aspect-[4/5] overflow-hidden group focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A]"
                 >
                   {!loadedImages[src] && (
                     <div className="absolute inset-0 bg-white/5 animate-pulse" />

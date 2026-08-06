@@ -28,6 +28,7 @@ function RegisterContent() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -60,9 +61,10 @@ function RegisterContent() {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error("Las contraseñas no coinciden");
+      setConfirmError("Passwords do not match");
       return;
     }
+    setConfirmError(null);
 
     setIsLoading(true);
 
@@ -90,11 +92,10 @@ function RegisterContent() {
           router.push(`/login?${loginQs.toString()}`);
           return;
         }
-        // Cuenta creada pero falló el envío del OTP: igual mandamos a verificar
         if (data.requiresVerification || data.code === "OTP_SEND_FAILED") {
           toast.error(
             data.error ||
-              "No pudimos enviar el código. Puedes reenviarlo en la siguiente pantalla."
+              "We could not send the code. You can resend it on the next screen."
           );
           const verifyQs = new URLSearchParams({
             email: formData.email.trim().toLowerCase(),
@@ -103,11 +104,11 @@ function RegisterContent() {
           window.location.href = `/verificar-email?${verifyQs.toString()}`;
           return;
         }
-        throw new Error(data.error || "Error al registrar");
+        throw new Error(data.error || "Could not create account");
       }
 
       if (data.requiresVerification) {
-        toast.success("Cuenta creada. Revisa tu correo e ingresa el código.");
+        toast.success("Account created. Check your email and enter the code.");
         const verifyQs = new URLSearchParams({
           email: formData.email.trim().toLowerCase(),
         });
@@ -116,8 +117,7 @@ function RegisterContent() {
         return;
       }
 
-      // Fallback (no debería ocurrir con el gate duro)
-      toast.success("¡Cuenta creada! Bienvenido a Somnus");
+      toast.success("Account created! Welcome to Somnus");
       const redirectPath = resolveAuthRedirectPath(
         data.user?.role || "ORGANIZER",
         null,
@@ -126,7 +126,7 @@ function RegisterContent() {
       );
       window.location.href = redirectPath;
     } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : "Error al registrar");
+      toast.error(error instanceof Error ? error.message : "Could not create account");
     } finally {
       setIsLoading(false);
     }
@@ -141,8 +141,9 @@ function RegisterContent() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             <div className="hidden lg:flex flex-col justify-center space-y-8">
               <div>
-                <h1 className="somnus-title-secondary text-4xl md:text-5xl mb-4 uppercase">
-                  Únete a
+                <p className="somnus-eyebrow mb-3">Join</p>
+                <h1 className="somnus-display text-4xl md:text-5xl mb-4">
+                  Join
                 </h1>
                 <div className="mb-6">
                   <Image
@@ -154,49 +155,49 @@ function RegisterContent() {
                     priority
                   />
                 </div>
-                <p className="somnus-text-body text-lg mb-8">
-                  Crea tu cuenta para comprar boletos, guardar tus entradas y no
-                  perderte los mejores eventos en vivo.
+                <p className="somnus-lede mb-8">
+                  Create your account to buy tickets, save your entries, and
+                  never miss the best live events.
                 </p>
               </div>
 
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 border-2 border-white/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-6 h-6 text-[#7BA3E8]" />
                   </div>
                   <div>
                     <h3 className="somnus-title-secondary text-lg mb-2 uppercase">
-                      Registro rápido
+                      Fast signup
                     </h3>
                     <p className="somnus-text-body text-sm">
-                      Con Google, Apple o tu correo y contraseña
+                      With Google, Apple, or email and password
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 border-2 border-white/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Ticket className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Ticket className="w-6 h-6 text-[#7BA3E8]" />
                   </div>
                   <div>
                     <h3 className="somnus-title-secondary text-lg mb-2 uppercase">
-                      Tus boletos
+                      Your tickets
                     </h3>
                     <p className="somnus-text-body text-sm">
-                      Accede a Mis Boletos con el mismo correo del checkout
+                      Open My Tickets with the same email you used at checkout
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 border-2 border-white/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-6 h-6 text-[#7BA3E8]" />
                   </div>
                   <div>
                     <h3 className="somnus-title-secondary text-lg mb-2 uppercase">
-                      Cuenta segura
+                      Secure account
                     </h3>
                     <p className="somnus-text-body text-sm">
-                      Tus datos protegidos con los más altos estándares
+                      Your data protected with high security standards
                     </p>
                   </div>
                 </div>
@@ -207,14 +208,14 @@ function RegisterContent() {
               <div className="w-full max-w-md">
                 <div className="somnus-card p-6 sm:p-8 lg:p-10">
                   <div className="text-center mb-8">
-                    <div className="w-16 h-16 border-2 border-white/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <User className="w-8 h-8 text-white" />
+                    <div className="w-16 h-16 border border-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <User className="w-8 h-8 text-[#7BA3E8]" />
                     </div>
                     <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
-                      Crear cuenta
+                      Create account
                     </h1>
                     <p className="somnus-text-body text-sm">
-                      Completa tus datos para empezar a comprar boletos
+                      Fill in your details to start buying tickets
                     </p>
                   </div>
 
@@ -226,91 +227,114 @@ function RegisterContent() {
                     </div>
                     <div className="relative flex justify-center text-sm">
                       <span className="px-3 somnus-text-body bg-transparent text-white/60">
-                        o regístrate con correo
+                        or sign up with email
                       </span>
                     </div>
                   </div>
 
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
-                      <label className="block somnus-title-secondary text-sm mb-2 uppercase">
-                        Nombre completo
+                      <label
+                        htmlFor="register-name"
+                        className="block somnus-title-secondary text-sm mb-2 uppercase"
+                      >
+                        Full name
                       </label>
                       <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none" />
                         <input
+                          id="register-name"
                           type="text"
                           value={formData.name}
                           onChange={(e) =>
                             setFormData({ ...formData, name: e.target.value })
                           }
-                          className="w-full pl-10 pr-4 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
-                          placeholder="Tu nombre"
+                          className="somnus-input pl-10"
+                          placeholder="Your name"
                           required
                           minLength={2}
+                          autoComplete="name"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block somnus-title-secondary text-sm mb-2 uppercase">
-                        Correo electrónico
+                      <label
+                        htmlFor="register-email"
+                        className="block somnus-title-secondary text-sm mb-2 uppercase"
+                      >
+                        Email
                       </label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none" />
                         <input
+                          id="register-email"
                           type="email"
                           value={formData.email}
                           onChange={(e) =>
                             setFormData({ ...formData, email: e.target.value })
                           }
-                          className="w-full pl-10 pr-4 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
-                          placeholder="tu@correo.com"
+                          className="somnus-input pl-10"
+                          placeholder="you@email.com"
                           required
+                          autoComplete="email"
+                          spellCheck={false}
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block somnus-title-secondary text-sm mb-2 uppercase">
-                        Teléfono <span className="text-white/40 normal-case">(opcional)</span>
+                      <label
+                        htmlFor="register-phone"
+                        className="block somnus-title-secondary text-sm mb-2 uppercase"
+                      >
+                        Phone{" "}
+                        <span className="text-white/40 normal-case">(optional)</span>
                       </label>
                       <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none" />
                         <input
+                          id="register-phone"
                           type="tel"
                           value={formData.phone}
                           onChange={(e) =>
                             setFormData({ ...formData, phone: e.target.value })
                           }
-                          className="w-full pl-10 pr-4 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
-                          placeholder="+52 81 1234 5678"
+                          className="somnus-input pl-10"
+                          placeholder="+1 555 123 4567"
+                          autoComplete="tel"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block somnus-title-secondary text-sm mb-2 uppercase">
-                        Contraseña
+                      <label
+                        htmlFor="register-password"
+                        className="block somnus-title-secondary text-sm mb-2 uppercase"
+                      >
+                        Password
                       </label>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none" />
                         <input
+                          id="register-password"
                           type={showPassword ? "text" : "password"}
                           value={formData.password}
-                          onChange={(e) =>
-                            setFormData({ ...formData, password: e.target.value })
-                          }
-                          className="w-full pl-10 pr-12 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
-                          placeholder="Mínimo 8 caracteres"
+                          onChange={(e) => {
+                            setFormData({ ...formData, password: e.target.value });
+                            if (confirmError) setConfirmError(null);
+                          }}
+                          className="somnus-input pl-10 pr-12"
+                          placeholder="At least 8 characters"
                           required
                           minLength={8}
+                          autoComplete="new-password"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
-                          aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                          className="somnus-nav-link absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
+                          aria-label={showPassword ? "Hide password" : "Show password"}
                         >
                           {showPassword ? (
                             <EyeOff className="w-5 h-5" />
@@ -322,45 +346,80 @@ function RegisterContent() {
                     </div>
 
                     <div>
-                      <label className="block somnus-title-secondary text-sm mb-2 uppercase">
-                        Confirmar contraseña
+                      <label
+                        htmlFor="register-confirm-password"
+                        className="block somnus-title-secondary text-sm mb-2 uppercase"
+                      >
+                        Confirm password
                       </label>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none" />
                         <input
+                          id="register-confirm-password"
                           type={showPassword ? "text" : "password"}
                           value={formData.confirmPassword}
-                          onChange={(e) =>
-                            setFormData({ ...formData, confirmPassword: e.target.value })
-                          }
-                          className="w-full pl-10 pr-4 py-3 rounded-lg bg-black/30 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
-                          placeholder="Repite tu contraseña"
+                          onChange={(e) => {
+                            setFormData({
+                              ...formData,
+                              confirmPassword: e.target.value,
+                            });
+                            if (confirmError) setConfirmError(null);
+                          }}
+                          className="somnus-input pl-10"
+                          placeholder="Repeat your password"
                           required
                           minLength={8}
+                          autoComplete="new-password"
+                          aria-invalid={confirmError ? true : undefined}
+                          aria-describedby={
+                            confirmError ? "confirm-password-error" : undefined
+                          }
                         />
                       </div>
+                      {confirmError && (
+                        <p
+                          id="confirm-password-error"
+                          role="alert"
+                          className="mt-2 text-sm text-red-400"
+                        >
+                          {confirmError}
+                        </p>
+                      )}
                     </div>
 
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full somnus-btn text-base py-6 disabled:opacity-50"
+                      className="w-full somnus-btn text-base py-6 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {isLoading ? "Creando cuenta..." : "Crear cuenta"}
+                      {isLoading ? (
+                        <span className="flex items-center gap-2 justify-center">
+                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          Creating account…
+                        </span>
+                      ) : (
+                        "Create account"
+                      )}
                     </button>
                   </form>
 
                   <div className="mt-6 pt-6 border-t border-white/10 space-y-3">
                     <p className="somnus-text-body text-center text-sm">
-                      ¿Ya tienes cuenta?{" "}
-                      <Link href="/login" className="text-white hover:underline font-medium">
-                        Inicia sesión
+                      Already have an account?{" "}
+                      <Link
+                        href="/login"
+                        className="somnus-nav-link text-white hover:underline font-medium"
+                      >
+                        Sign in
                       </Link>
                     </p>
                     <p className="text-center text-xs text-white/40">
-                      ¿Quieres publicar eventos? Puedes configurarlo después desde{" "}
-                      <Link href="/organizador" className="text-white/60 hover:text-white underline">
-                        Publicar eventos
+                      Want to publish events? You can set that up later from{" "}
+                      <Link
+                        href="/organizador"
+                        className="somnus-nav-link text-white/60 hover:text-white underline"
+                      >
+                        Publish events
                       </Link>
                     </p>
                   </div>

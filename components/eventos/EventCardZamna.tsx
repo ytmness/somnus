@@ -46,19 +46,30 @@ export function EventCardZamna({
     concert.artist === "Artista por Confirmar" ||
     concert.artist.toLowerCase().includes("por confirmar");
 
-  /** En carrusel, eventos pasados se ven igual que upcoming (sin opacidad ni CTA apagado). */
   const pastCarouselMatch = carouselGlass && isPast;
+  const isInteractive = pastCarouselMatch || (!isPast && !isMystery);
+
+  const handleActivate = () => {
+    if (skipOpenAfterDrag.current) {
+      skipOpenAfterDrag.current = false;
+      return;
+    }
+    if (!isMystery) onSelect();
+  };
 
   return (
     <article
-      onClick={() => {
-        if (skipOpenAfterDrag.current) {
-          skipOpenAfterDrag.current = false;
-          return;
+      role={isInteractive || isMystery ? "button" : undefined}
+      tabIndex={isInteractive || isMystery ? 0 : undefined}
+      aria-disabled={isMystery || (!pastCarouselMatch && isPast) || undefined}
+      onClick={handleActivate}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleActivate();
         }
-        if (!isMystery) onSelect();
       }}
-      className={`group relative overflow-hidden rounded-2xl flex flex-col h-full transition-colors ${
+      className={`group relative overflow-hidden rounded-2xl flex flex-col h-full transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#7BA3E8]/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] ${
         carouselGlass
           ? "border border-white/12 bg-[#08080c]/88 backdrop-blur-xl hover:border-white/18 shadow-[0_8px_40px_rgba(0,0,0,0.45)]"
           : "bg-[#1a1a1a] border border-white/15 hover:border-white/25"
@@ -161,26 +172,26 @@ export function EventCardZamna({
         </h3>
         <div className="flex flex-wrap items-center gap-4 text-sm text-white/80 mb-4">
           <span className="flex items-center gap-1.5">
-            <Calendar className="w-4 h-4 shrink-0" />
+            <Calendar className="w-4 h-4 shrink-0" aria-hidden />
             {concert.date}
           </span>
           <span className="flex items-center gap-1.5">
-            <MapPin className="w-4 h-4 shrink-0" />
+            <MapPin className="w-4 h-4 shrink-0" aria-hidden />
             {concert.venue}
           </span>
         </div>
         {!isMystery && concert.minPrice > 0 && (
-          <p className="text-white font-semibold mb-4">
+          <p className="text-white font-semibold mb-4 tabular-nums">
             From ${concert.minPrice.toLocaleString("en-US")} MXN
           </p>
         )}
         <div className="mt-auto">
           <span
-            className={`inline-block w-full text-center font-bold uppercase tracking-wider py-3 px-6 rounded-lg transition-all ${
+            className={`inline-block w-full text-center font-bold uppercase tracking-wider py-3 px-6 rounded-lg transition-colors ${
               isMystery
                 ? "bg-white/20 text-white/60 cursor-default"
                 : pastCarouselMatch || !isPast
-                  ? "bg-black text-white border border-white/20 hover:bg-white hover:text-black"
+                  ? "bg-black text-white border border-white/20 group-hover:bg-white group-hover:text-black"
                   : "bg-white/20 text-white/60 cursor-default"
             }`}
           >

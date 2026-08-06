@@ -25,6 +25,7 @@ export default function EventBoletosPage() {
 
   const [event, setEvent] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
@@ -36,37 +37,41 @@ export default function EventBoletosPage() {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
 
-  useEffect(() => {
-    const loadEvent = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch(`/api/events/${eventId}`);
-        const data = await response.json();
+  const loadEvent = async () => {
+    try {
+      setIsLoading(true);
+      setLoadError(false);
+      const response = await fetch(`/api/events/${eventId}`);
+      const data = await response.json();
 
-        if (data.success && data.data) {
-          setEvent(data.data);
-          const initial: Record<string, number> = {};
-          (data.data.ticketTypes || [])
-            .filter((tt: any) => !tt.isTable)
-            .forEach((tt: any) => {
-              initial[tt.id] = 0;
-            });
-          setQuantities(initial);
-        } else {
-          toast.error("Event not found");
-          router.push("/");
-        }
-      } catch (error) {
-        console.error("Error loading event:", error);
-        toast.error("Error loading event");
-        router.push("/");
-      } finally {
-        setIsLoading(false);
+      if (data.success && data.data) {
+        setEvent(data.data);
+        const initial: Record<string, number> = {};
+        (data.data.ticketTypes || [])
+          .filter((tt: any) => !tt.isTable)
+          .forEach((tt: any) => {
+            initial[tt.id] = 0;
+          });
+        setQuantities(initial);
+      } else {
+        setEvent(null);
+        setLoadError(true);
+        toast.error("Event not found");
       }
-    };
+    } catch (error) {
+      console.error("Error loading event:", error);
+      setEvent(null);
+      setLoadError(true);
+      toast.error("Error loading event");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    if (eventId) loadEvent();
-  }, [eventId, router]);
+  useEffect(() => {
+    if (eventId) void loadEvent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventId]);
 
   // Pre-llenar datos del comprador si está logueado (evita que no vea boletos en mis-boletos)
   useEffect(() => {
@@ -187,10 +192,10 @@ export default function EventBoletosPage() {
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Error al procesar");
+      if (!response.ok) throw new Error(data.error || "Could not process order");
 
       if (data.data?.saleId) {
-        toast.success("Redirecting to payment...");
+        toast.success("Redirecting to payment…");
         setCartItems([]);
         setShowCart(false);
         setShowCheckoutModal(false);
@@ -210,15 +215,66 @@ export default function EventBoletosPage() {
     }
   };
 
+  const selectionCount = Object.values(quantities).reduce((s, q) => s + q, 0);
+  const selectionSubtotal = ticketTypes.reduce(
+    (sum: number, tt: any) => sum + unitPrice(tt) * (quantities[tt.id] || 0),
+    0
+  );
+  const allSoldOut =
+    ticketTypes.length > 0 &&
+    ticketTypes.every((tt: any) => getAvailable(tt) <= 0);
+
   if (isLoading) {
     return (
-      <div className="min-h-screen somnus-bg-main flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="min-h-screen somnus-events-bg overflow-x-hidden">
+        <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-5">
+          <span className="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider" translate="no">
+            SOMNUS
+          </span>
+        </header>
+        <main className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+            <div className="lg:col-span-5">
+              <div className="aspect-[3/4] rounded-2xl bg-white/5 animate-pulse" />
+            </div>
+            <div className="lg:col-span-7 space-y-4">
+              <div className="h-4 w-24 bg-white/10 rounded animate-pulse" />
+              <div className="h-10 w-3/4 bg-white/10 rounded animate-pulse" />
+              <div className="h-4 w-1/2 bg-white/10 rounded animate-pulse" />
+              <div className="h-24 w-full bg-white/5 rounded-2xl animate-pulse mt-8" />
+              <div className="h-24 w-full bg-white/5 rounded-2xl animate-pulse" />
+              <p className="sr-only" role="status">Loading event…</p>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
 
-  if (!event) return null;
+  if (loadError || !event) {
+    return (
+      <div className="min-h-screen somnus-bg-main flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <h1 className="somnus-display text-3xl mb-4">Event unavailable</h1>
+          <p className="somnus-lede mx-auto mb-8 text-center">
+            We could not load this event. Check your connection and try again.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button type="button" onClick={() => void loadEvent()} className="somnus-btn">
+              Try again
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/")}
+              className="somnus-nav-link px-8 py-3.5 border border-white/30 text-white/90 uppercase tracking-wider text-sm"
+            >
+              Back to home
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const eventDate = event.eventDate
     ? new Intl.DateTimeFormat("en-US", {
@@ -242,57 +298,63 @@ export default function EventBoletosPage() {
         <button
           type="button"
           onClick={() => router.push("/")}
-          className="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
+          className="somnus-nav-link text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white"
+          aria-label="SOMNUS home"
+          translate="no"
         >
           SOMNUS
         </button>
-        <nav className="flex items-center gap-2 sm:gap-4 lg:gap-6">
+        <nav className="flex items-center gap-2 sm:gap-4 lg:gap-6" aria-label="Main">
           <a
             href="/#eventos"
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
+            className="somnus-nav-link text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white"
           >
             Events
           </a>
           <Link
             href="/galeria"
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
+            className="somnus-nav-link text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white hidden sm:inline"
           >
             Gallery
           </Link>
           <Link
             href="/mis-boletos"
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
+            className="somnus-nav-link text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white hidden sm:inline"
           >
             My Tickets
           </Link>
           <button
+            type="button"
             onClick={() => setShowCart(true)}
-            className="flex items-center gap-2 text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors relative"
+            className="somnus-nav-link flex items-center gap-2 text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white relative"
+            aria-label={`Cart${cartItems.length > 0 ? `, ${cartItems.reduce((s, i) => s + i.quantity, 0)} items` : ""}`}
           >
-            <ShoppingCart className="w-4 h-4" />
+            <ShoppingCart className="w-4 h-4" aria-hidden />
             Cart
             {cartItems.length > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-white text-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+              <span className="absolute -top-1.5 -right-1.5 bg-white text-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center tabular-nums" aria-live="polite">
                 {cartItems.reduce((s, i) => s + i.quantity, 0)}
               </span>
             )}
           </button>
           <button
+            type="button"
             onClick={() => router.push("/login")}
-            className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1 uppercase tracking-wider"
+            className="somnus-nav-link text-white/90 text-xs sm:text-sm font-medium px-2 py-1 uppercase tracking-wider"
           >
-            Login
+            Sign in
           </button>
         </nav>
       </header>
 
-      <main className="pt-20 sm:pt-24 lg:pt-28 pb-16 px-4 sm:px-6 lg:px-8">
+      <main className="pt-20 sm:pt-24 lg:pt-28 pb-28 lg:pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <button
+            type="button"
             onClick={() => router.push("/")}
-            className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-8 transition-colors"
+            className="somnus-nav-link inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-8"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4" aria-hidden />
             Back to Events
           </button>
 
@@ -362,9 +424,17 @@ export default function EventBoletosPage() {
 
                 {ticketTypes.length === 0 ? (
                   <div className="liquid-glass p-8 rounded-2xl text-center">
-                    <Ticket className="w-12 h-12 text-white/50 mx-auto mb-4" />
+                    <Ticket className="w-12 h-12 text-white/50 mx-auto mb-4" aria-hidden />
                     <p className="text-white/70">
                       No ticket types available for this event.
+                    </p>
+                  </div>
+                ) : allSoldOut ? (
+                  <div className="liquid-glass p-8 rounded-2xl text-center">
+                    <Ticket className="w-12 h-12 text-white/50 mx-auto mb-4" aria-hidden />
+                    <p className="text-white font-semibold uppercase tracking-wider mb-2">Sold out</p>
+                    <p className="text-white/65 text-sm">
+                      All tickets for this event have been sold.
                     </p>
                   </div>
                 ) : (
@@ -373,60 +443,81 @@ export default function EventBoletosPage() {
                       {ticketTypes.map((tt: any) => {
                         const available = getAvailable(tt);
                         const qty = quantities[tt.id] || 0;
+                        const soldOut = available <= 0;
                         return (
                           <div
                             key={tt.id}
-                            className="liquid-glass p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                            className={`liquid-glass p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                              soldOut ? "opacity-70" : ""
+                            }`}
                           >
-                            <div className="flex-1">
-                              <h3 className="text-white font-semibold text-lg">
-                                {tt.name}
-                              </h3>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h3 className="text-white font-semibold text-lg">
+                                  {tt.name}
+                                </h3>
+                                {soldOut && (
+                                  <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/15 text-white/80">
+                                    Sold out
+                                  </span>
+                                )}
+                              </div>
                               {tt.description && (
                                 <p className="text-white/60 text-sm mt-1">
                                   {tt.description}
                                 </p>
                               )}
-                              <p className="text-white/80 mt-2 font-medium">
+                              <p className="text-white/80 mt-2 font-medium tabular-nums">
                                 ${unitPrice(tt).toLocaleString("en-US")} MXN
                               </p>
                             </div>
-                            <div className="flex items-center gap-3">
-                              <div className="flex items-center gap-1 border border-white/20 rounded-lg">
-                                <button
-                                  type="button"
-                                  onClick={() => handleQuantityChange(tt.id, -1)}
-                                  disabled={qty === 0}
-                                  className="p-2 text-white/80 hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-l-lg transition-colors"
-                                >
-                                  <Minus className="w-4 h-4" />
-                                </button>
-                                <span className="px-4 py-2 text-white font-medium min-w-[3rem] text-center">
-                                  {qty}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => handleQuantityChange(tt.id, 1)}
-                                  disabled={qty >= available}
-                                  className="p-2 text-white/80 hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-r-lg transition-colors"
-                                >
-                                  <Plus className="w-4 h-4" />
-                                </button>
+                            {!soldOut && (
+                              <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-1 border border-white/20 rounded-lg">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQuantityChange(tt.id, -1)}
+                                    disabled={qty === 0}
+                                    aria-label={`Decrease ${tt.name} quantity`}
+                                    className="somnus-nav-link p-2 text-white/80 hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-l-lg"
+                                  >
+                                    <Minus className="w-4 h-4" aria-hidden />
+                                  </button>
+                                  <span
+                                    className="px-4 py-2 text-white font-medium min-w-[3rem] text-center tabular-nums"
+                                    aria-live="polite"
+                                    aria-atomic="true"
+                                  >
+                                    {qty}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQuantityChange(tt.id, 1)}
+                                    disabled={qty >= available}
+                                    aria-label={`Increase ${tt.name} quantity`}
+                                    className="somnus-nav-link p-2 text-white/80 hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-r-lg"
+                                  >
+                                    <Plus className="w-4 h-4" aria-hidden />
+                                  </button>
+                                </div>
                               </div>
-                            </div>
+                            )}
                           </div>
                         );
                       })}
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="hidden sm:flex flex-col sm:flex-row gap-4">
                       <Button
+                        type="button"
                         onClick={handleAddToCart}
+                        disabled={selectionCount === 0}
                         className="somnus-btn flex-1 py-4 text-base"
                       >
                         Buy Tickets
                       </Button>
                       <Button
+                        type="button"
                         onClick={() => setShowCart(true)}
                         variant="outline"
                         className="border-white/30 text-white bg-transparent hover:bg-white/10 flex-1 py-4"
@@ -450,21 +541,54 @@ export default function EventBoletosPage() {
         </div>
       </main>
 
+      {/* Sticky mobile CTA */}
+      {!allSoldOut && ticketTypes.length > 0 && (
+        <div className="fixed bottom-0 inset-x-0 z-40 sm:hidden border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-md px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-white/55 text-xs uppercase tracking-wider">
+                {selectionCount === 0 ? "Select tickets" : `${selectionCount} selected`}
+              </p>
+              <p className="text-white font-semibold tabular-nums truncate">
+                ${selectionSubtotal.toLocaleString("en-US")} MXN
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={selectionCount === 0}
+              className="somnus-btn shrink-0 px-5 py-3 text-sm"
+            >
+              Buy tickets
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Cart sidebar */}
       {showCart && (
-        <div className="fixed inset-0 z-50 flex justify-end">
-          <div
+        <div className="fixed inset-0 z-50 flex justify-end overscroll-contain" role="presentation">
+          <button
+            type="button"
             className="absolute inset-0 bg-black/50"
+            aria-label="Close cart"
             onClick={() => setShowCart(false)}
           />
-          <div className="relative w-full max-w-md bg-[#0A0A0A] border-l border-white/10 overflow-y-auto">
-            <div className="sticky top-0 bg-[#0A0A0A] border-b border-white/10 p-6 flex items-center justify-between">
-              <h3 className="text-white font-bold text-lg">Your Cart</h3>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="boletos-cart-title"
+            className="relative w-full max-w-md bg-[#0A0A0A] border-l border-white/10 overflow-y-auto"
+          >
+            <div className="sticky top-0 bg-[#0A0A0A] border-b border-white/10 p-6 flex items-center justify-between z-10">
+              <h3 id="boletos-cart-title" className="text-white font-bold text-lg">Your Cart</h3>
               <button
+                type="button"
                 onClick={() => setShowCart(false)}
-                className="text-white/70 hover:text-white p-2"
+                className="somnus-nav-link text-white/70 hover:text-white p-2"
+                aria-label="Close cart"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" aria-hidden />
               </button>
             </div>
             <div className="p-6">
@@ -477,23 +601,25 @@ export default function EventBoletosPage() {
                   {cartItems.map((item, i) => (
                     <div
                       key={i}
-                      className="flex justify-between items-center liquid-glass p-4 rounded-xl"
+                      className="flex justify-between items-center liquid-glass p-4 rounded-xl gap-3"
                     >
-                      <div>
-                        <p className="text-white font-medium">{item.name}</p>
-                        <p className="text-white/60 text-sm">
+                      <div className="min-w-0">
+                        <p className="text-white font-medium truncate">{item.name}</p>
+                        <p className="text-white/60 text-sm tabular-nums">
                           {item.quantity} × ${item.price.toLocaleString()}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-white font-bold">
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-white font-bold tabular-nums">
                           ${(item.price * item.quantity).toLocaleString()}
                         </span>
                         <button
+                          type="button"
                           onClick={() => handleRemoveFromCart(i)}
-                          className="text-white/50 hover:text-red-400"
+                          className="somnus-nav-link text-white/50 hover:text-red-400 p-1"
+                          aria-label={`Remove ${item.name}`}
                         >
-                          <X className="w-4 h-4" />
+                          <X className="w-4 h-4" aria-hidden />
                         </button>
                       </div>
                     </div>
@@ -504,17 +630,18 @@ export default function EventBoletosPage() {
                 <div className="mt-6 space-y-3">
                   <div className="flex justify-between text-white/70">
                     <span>Subtotal</span>
-                    <span>${getSubtotal().toLocaleString()}</span>
+                    <span className="tabular-nums">${getSubtotal().toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-white/70">
                     <span>Service fee (3.9% + tax)</span>
-                    <span>${getCommission().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <span className="tabular-nums">${getCommission().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between text-white font-bold text-lg border-t border-white/10 pt-3">
                     <span>Total</span>
-                    <span>${getTotal().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN</span>
+                    <span className="tabular-nums">${getTotal().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN</span>
                   </div>
                   <Button
+                    type="button"
                     onClick={() => {
                       setShowCart(false);
                       setShowCheckoutModal(true);
@@ -532,79 +659,97 @@ export default function EventBoletosPage() {
 
       {/* Checkout modal */}
       {showCheckoutModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-          <div className="liquid-glass max-w-md w-full p-6 rounded-2xl">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4 overscroll-contain">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="checkout-title"
+            className="liquid-glass max-w-md w-full p-6 rounded-2xl"
+          >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-white font-bold text-xl">
+              <h3 id="checkout-title" className="text-white font-bold text-xl">
                 Purchase information
               </h3>
               <button
+                type="button"
                 onClick={() => setShowCheckoutModal(false)}
-                className="text-white/70 hover:text-white"
+                className="somnus-nav-link text-white/70 hover:text-white p-1"
+                aria-label="Close checkout"
               >
-                <X className="w-6 h-6" />
+                <X className="w-6 h-6" aria-hidden />
               </button>
             </div>
             <div className="space-y-4 mb-6">
               <div>
-                <label className="block text-white/90 font-medium mb-2">
+                <label htmlFor="buyer-name" className="block text-white/90 font-medium mb-2">
                   Full name *
                 </label>
                 <input
+                  id="buyer-name"
+                  name="name"
                   type="text"
+                  autoComplete="name"
                   value={checkoutData.buyerName}
                   onChange={(e) =>
                     setCheckoutData({ ...checkoutData, buyerName: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-white/40"
-                  placeholder="John Doe"
+                  className="somnus-input"
+                  placeholder="Jane Doe…"
                 />
               </div>
               <div>
-                <label className="block text-white/90 font-medium mb-2">
+                <label htmlFor="buyer-email" className="block text-white/90 font-medium mb-2">
                   Email *
                 </label>
                 <input
+                  id="buyer-email"
+                  name="email"
                   type="email"
+                  autoComplete="email"
+                  spellCheck={false}
                   value={checkoutData.buyerEmail}
                   onChange={(e) =>
                     setCheckoutData({ ...checkoutData, buyerEmail: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-white/40"
-                  placeholder="john@example.com"
+                  className="somnus-input"
+                  placeholder="jane@example.com…"
                 />
               </div>
               <div>
-                <label className="block text-white/90 font-medium mb-2">
+                <label htmlFor="buyer-phone" className="block text-white/90 font-medium mb-2">
                   Phone (optional)
                 </label>
                 <input
+                  id="buyer-phone"
+                  name="tel"
                   type="tel"
+                  autoComplete="tel"
                   value={checkoutData.buyerPhone}
                   onChange={(e) =>
                     setCheckoutData({ ...checkoutData, buyerPhone: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-white/40"
-                  placeholder="+52 123 456 7890"
+                  className="somnus-input"
+                  placeholder="+52 123 456 7890…"
                 />
               </div>
               <div className="liquid-glass p-4 rounded-xl mt-4 space-y-2">
                 <div className="flex justify-between text-white/70">
                   <span>Subtotal</span>
-                  <span>${getSubtotal().toLocaleString()}</span>
+                  <span className="tabular-nums">${getSubtotal().toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-white/70">
                   <span>Service fee (3.9% + tax)</span>
-                  <span>${getCommission().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span className="tabular-nums">${getCommission().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
                 <div className="flex justify-between text-white font-bold text-xl border-t border-white/20 pt-2">
                   <span>Total</span>
-                  <span>${getTotal().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN</span>
+                  <span className="tabular-nums">${getTotal().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN</span>
                 </div>
               </div>
             </div>
             <div className="flex gap-3">
               <Button
+                type="button"
                 onClick={() => setShowCheckoutModal(false)}
                 variant="outline"
                 className="flex-1 border-white/30 text-white bg-transparent hover:bg-white/10"
@@ -613,11 +758,12 @@ export default function EventBoletosPage() {
                 Cancel
               </Button>
               <Button
+                type="button"
                 onClick={handleCheckout}
                 className="flex-1 somnus-btn"
                 disabled={isProcessingCheckout}
               >
-                {isProcessingCheckout ? "Processing..." : "Confirm purchase"}
+                {isProcessingCheckout ? "Processing…" : "Confirm purchase"}
               </Button>
             </div>
           </div>

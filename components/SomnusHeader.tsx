@@ -9,6 +9,9 @@ interface SomnusHeaderProps {
   showNav?: boolean;
 }
 
+const navLinkClass =
+  "somnus-nav-link text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white";
+
 export function SomnusHeader({ user: userProp, userRole: userRoleProp, showNav = false }: SomnusHeaderProps) {
   const router = useRouter();
   const [user, setUser] = useState<any>(userProp ?? null);
@@ -44,30 +47,34 @@ export function SomnusHeader({ user: userProp, userRole: userRoleProp, showNav =
       <button
         type="button"
         onClick={() => router.push("/")}
-        className="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-        aria-label="SOMNUS"
+        className="somnus-nav-link text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white"
+        aria-label="SOMNUS home"
+        translate="no"
       >
         SOMNUS
       </button>
 
       {showNav && (
-        <nav className="flex items-center gap-2 sm:gap-4 lg:gap-6">
+        <nav className="flex items-center gap-2 sm:gap-4 lg:gap-6" aria-label="Main">
           <button
+            type="button"
             onClick={() => router.push("/")}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
+            className={navLinkClass}
           >
-            Eventos
+            Events
           </button>
           <button
+            type="button"
             onClick={() => router.push("/galeria")}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
+            className={`${navLinkClass} hidden sm:inline`}
           >
             Gallery
           </button>
           {userRole === "ADMIN" && (
             <button
+              type="button"
               onClick={() => router.push("/admin")}
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
+              className={navLinkClass}
             >
               Admin
             </button>
@@ -76,39 +83,44 @@ export function SomnusHeader({ user: userProp, userRole: userRoleProp, showNav =
             userRole === "ADMIN" ||
             staffRoles.includes("ACCESOS")) && (
             <button
+              type="button"
               onClick={() => router.push("/accesos")}
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
+              className={`${navLinkClass} hidden md:inline`}
             >
-              Accesos
+              Access
             </button>
           )}
           {staffRoles.includes("VENDEDOR") && (
             <button
+              type="button"
               onClick={() => router.push("/vendedor")}
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
+              className={`${navLinkClass} hidden md:inline`}
             >
-              Vendedor
+              Seller
             </button>
           )}
           {staffRoles.includes("SUPERVISOR") && (
             <button
+              type="button"
               onClick={() => router.push("/supervisor")}
-              className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden md:inline"
+              className={`${navLinkClass} hidden md:inline`}
             >
               Supervisor
             </button>
           )}
           <button
+            type="button"
             onClick={() => router.push("/mis-boletos")}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
+            className={`${navLinkClass} hidden sm:inline`}
           >
-            Mis Boletos
+            My Tickets
           </button>
           <button
+            type="button"
             onClick={() => router.push("/login")}
-            className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1"
+            className="somnus-nav-link text-white/90 text-xs sm:text-sm font-medium px-2 py-1 uppercase tracking-wider hover:text-white"
           >
-            {user?.name || user?.email || "Login"}
+            {user?.name || user?.email || "Sign in"}
           </button>
         </nav>
       )}

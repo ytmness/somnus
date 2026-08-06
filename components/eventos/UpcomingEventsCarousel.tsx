@@ -51,14 +51,27 @@ function UpcomingEventsCarouselInner({
   const [isHovered, setIsHovered] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const hasInitialized = useRef(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
-    if (!swiper || isHovered || uniqueCount <= 1) return;
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mq.matches);
+    const onChange = () => setPrefersReducedMotion(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (!swiper || isHovered || uniqueCount <= 1 || prefersReducedMotion) {
+      swiper?.autoplay?.stop();
+      return;
+    }
     swiper.autoplay?.start();
     return () => {
       swiper.autoplay?.stop();
     };
-  }, [swiper, isHovered, uniqueCount]);
+  }, [swiper, isHovered, uniqueCount, prefersReducedMotion]);
 
   useEffect(() => {
     if (swiper && isHovered) swiper.autoplay?.stop();
@@ -116,10 +129,10 @@ function UpcomingEventsCarouselInner({
               e.stopPropagation();
               swiper.slidePrev();
             }}
-            aria-label="Anterior"
-            className="absolute -left-4 md:-left-12 lg:-left-16 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-black/70 hover:bg-black/90 text-white backdrop-blur-sm transition-colors border border-white/20 pointer-events-auto cursor-pointer"
+            aria-label="Previous"
+            className="somnus-nav-link absolute -left-4 md:-left-12 lg:-left-16 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-black/70 hover:bg-black/90 text-white backdrop-blur-sm transition-colors border border-white/20 pointer-events-auto cursor-pointer"
           >
-            <ChevronLeft className="w-6 h-6 md:w-7 md:h-7" />
+            <ChevronLeft className="w-6 h-6 md:w-7 md:h-7" aria-hidden />
           </button>
           <button
             type="button"
@@ -128,10 +141,10 @@ function UpcomingEventsCarouselInner({
               e.stopPropagation();
               swiper.slideNext();
             }}
-            aria-label="Siguiente"
-            className="absolute -right-4 md:-right-12 lg:-right-16 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-black/70 hover:bg-black/90 text-white backdrop-blur-sm transition-colors border border-white/20 pointer-events-auto cursor-pointer"
+            aria-label="Next"
+            className="somnus-nav-link absolute -right-4 md:-right-12 lg:-right-16 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-black/70 hover:bg-black/90 text-white backdrop-blur-sm transition-colors border border-white/20 pointer-events-auto cursor-pointer"
           >
-            <ChevronRight className="w-6 h-6 md:w-7 md:h-7" />
+            <ChevronRight className="w-6 h-6 md:w-7 md:h-7" aria-hidden />
           </button>
         </>
       )}
@@ -161,7 +174,7 @@ function UpcomingEventsCarouselInner({
           pagination={false}
           onSlideChange={(s) => setActiveIndex(s.realIndex % uniqueCount)}
           autoplay={
-            uniqueCount > 1
+            uniqueCount > 1 && !prefersReducedMotion
               ? { delay: 4000, disableOnInteraction: false }
               : false
           }
@@ -187,19 +200,25 @@ function UpcomingEventsCarouselInner({
       </div>
 
       {uniqueCount > 1 && (
-        <div className="flex justify-center gap-2 mt-6">
+        <div className="flex justify-center gap-1 mt-6" role="tablist" aria-label="Slides">
           {children.map((_, i) => (
             <button
               key={i}
               type="button"
+              role="tab"
+              aria-selected={activeIndex === i}
               onClick={() => swiper?.slideToLoop(i)}
-              aria-label={`Ir a slide ${i + 1}`}
-              className={`w-2 h-2 rounded-full transition-all ${
-                activeIndex === i
-                  ? "bg-white scale-125"
-                  : "bg-white/40 hover:bg-white/60"
-              }`}
-            />
+              aria-label={`Go to slide ${i + 1}`}
+              className="somnus-nav-link flex items-center justify-center min-w-[44px] min-h-[44px]"
+            >
+              <span
+                className={`block w-2 h-2 rounded-full transition-transform ${
+                  activeIndex === i
+                    ? "bg-white scale-125"
+                    : "bg-white/40 hover:bg-white/60"
+                }`}
+              />
+            </button>
           ))}
         </div>
       )}

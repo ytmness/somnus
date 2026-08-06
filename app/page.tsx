@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Calendar, MapPin, ChevronDown } from "lucide-react";
+import { Calendar, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { Cart } from "@/components/eventos/Cart";
 import { CartItem, Concert } from "@/components/eventos/types";
@@ -277,23 +277,21 @@ export default function HomePage() {
     return (
       <div className="min-h-screen somnus-bg-main flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white/70 text-xl">Loading events...</p>
+          <div className="w-16 h-16 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" aria-hidden />
+          <p className="text-white/70 text-xl">Loading events…</p>
         </div>
       </div>
     );
   }
 
   const nextEvent = activeConcerts.length > 0 ? activeConcerts[0] : null;
-  const displayEvents = concerts.length > 0 ? concerts : GALLERY_EVENTS;
-  const isGalleryMode = concerts.length === 0;
 
   return (
     <div className="min-h-screen somnus-bg-main">
       {/* Loader entrada - una vez por sesión */}
       {showLoader && (
-        <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center">
-          <p className="text-white text-lg uppercase tracking-[0.5em] animate-pulse">
+        <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center" role="status" aria-live="polite">
+          <p className="text-white text-lg uppercase tracking-[0.5em]">
             SOMNUS
           </p>
         </div>
@@ -328,36 +326,8 @@ export default function HomePage() {
           >
             <source src={HERO_VIDEO} type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/55" />
         </div>
-
-        {/* Próximo evento - visible al cargar, sobre el video */}
-        {nextEvent && (
-          <div className="absolute bottom-0 left-0 right-0 z-20 liquid-glass bg-black/50 border-t border-white/10">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex flex-wrap items-center gap-4 sm:gap-8 text-white">
-                <span className="text-sm uppercase tracking-wider text-white/80">
-                  Next event
-                </span>
-                <span className="font-bold text-lg">{nextEvent.artist}</span>
-                <span className="flex items-center gap-1.5 text-white/80 text-sm">
-                  <MapPin className="w-4 h-4" />
-                  {nextEvent.venue}
-                </span>
-                <span className="flex items-center gap-1.5 text-white/80 text-sm">
-                  <Calendar className="w-4 h-4" />
-                  {nextEvent.date}
-                </span>
-              </div>
-              <button
-                onClick={() => handleSelectConcert(nextEvent)}
-                className="somnus-btn shrink-0 px-6 py-3 text-sm"
-              >
-                Buy tickets
-              </button>
-            </div>
-          </div>
-        )}
 
         <SiteHeader
           eventsHref="#eventos"
@@ -367,89 +337,90 @@ export default function HomePage() {
           }}
         />
 
-        {/* Contenido Hero - centro */}
-        <div className="relative z-20 w-full max-w-4xl mx-auto px-4 text-center">
+        {/* Contenido Hero - brand primero + un CTA */}
+        <div className="relative z-20 w-full max-w-4xl mx-auto px-4 text-center pb-28 sm:pb-32">
           <Image
             src="/assets/SOMNUS LOGO BLANCO.png"
             alt="SOMNUS"
             width={400}
             height={120}
-            className="mx-auto w-64 sm:w-80 md:w-96 h-auto object-contain mb-4"
+            className="mx-auto w-64 sm:w-80 md:w-96 h-auto object-contain mb-5"
             priority
           />
-          <p className="somnus-subtitle text-xl md:text-2xl tracking-[0.4em] mb-10">
+          <p className="somnus-subtitle text-lg md:text-xl tracking-[0.4em] mb-10">
             AWAKE IN A DREAM
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col items-center gap-5">
             <a
               href="#eventos"
               className="somnus-btn px-10 py-4 text-base inline-flex items-center gap-2"
             >
-              Ver eventos
+              View events
             </a>
             {sessionReady && sessionUser ? (
               <button
                 type="button"
                 onClick={() => router.push("/mis-boletos")}
-                className="px-10 py-4 text-base inline-flex items-center gap-2 rounded-full border-2 border-white/40 text-white font-medium uppercase tracking-wider hover:bg-white/10 transition-colors"
+                className="somnus-nav-link text-sm uppercase tracking-wider text-white/70 hover:text-white underline-offset-4 hover:underline"
               >
-                Mis boletos
+                My tickets
               </button>
             ) : sessionReady ? (
               <button
                 type="button"
                 onClick={() => router.push("/register")}
-                className="px-10 py-4 text-base inline-flex items-center gap-2 rounded-full border-2 border-white/40 text-white font-medium uppercase tracking-wider hover:bg-white/10 transition-colors"
+                className="somnus-nav-link text-sm uppercase tracking-wider text-white/70 hover:text-white underline-offset-4 hover:underline"
               >
-                Crear cuenta gratis
+                Create free account
               </button>
             ) : null}
           </div>
-          {sessionReady && !sessionUser && (
-            <p className="mt-4 text-white/50 text-sm">
-              ¿Ya tienes cuenta?{" "}
+        </div>
+
+        {/* Next event bar — sole bottom edge element */}
+        {nextEvent && (
+          <div className="absolute bottom-0 left-0 right-0 z-20 border-t border-white/10 bg-black/55 backdrop-blur-xl">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-6 text-white text-center sm:text-left min-w-0">
+                <span className="somnus-eyebrow shrink-0">Next event</span>
+                <span className="font-bold text-lg md:text-xl truncate">
+                  {nextEvent.artist}
+                </span>
+                <span className="flex items-center justify-center sm:justify-start gap-4 text-white/65 text-sm">
+                  <span className="flex items-center gap-1.5 truncate">
+                    <MapPin className="w-3.5 h-3.5 shrink-0" aria-hidden />
+                    {nextEvent.venue}
+                  </span>
+                  <span className="flex items-center gap-1.5 shrink-0">
+                    <Calendar className="w-3.5 h-3.5" aria-hidden />
+                    {nextEvent.date}
+                  </span>
+                </span>
+              </div>
               <button
                 type="button"
-                onClick={() => router.push("/login")}
-                className="text-white/80 underline hover:text-white"
+                onClick={() => handleSelectConcert(nextEvent)}
+                className="somnus-btn shrink-0 px-6 py-3 text-sm"
               >
-                Inicia sesión
+                Buy tickets
               </button>
-            </p>
-          )}
-          {sessionReady && sessionUser && (
-            <p className="mt-4 text-white/50 text-sm">
-              Hola, {sessionUser.name || sessionUser.email}
-            </p>
-          )}
-
-          {/* Scroll indicator */}
-          <div
-            className="mt-16 cursor-pointer animate-bounce"
-            onClick={() =>
-              document
-                .getElementById("eventos")
-                ?.scrollIntoView({ behavior: "smooth", block: "start" })
-            }
-            aria-label="Scroll down"
-          >
-            <ChevronDown className="w-8 h-8 text-white/60 mx-auto" />
+            </div>
           </div>
-        </div>
+        )}
       </section>
 
-      {/* 2. UPCOMING EVENTS - Carrusel centrado estilo Bresh, cards Zamna */}
+      {/* 2. UPCOMING EVENTS */}
       <RevealSection>
         <section
           id="eventos"
-          className="py-28 sm:py-36 lg:py-44 px-4 sm:px-6 lg:px-8 somnus-events-bg somnus-events-bg--flyer relative overflow-hidden"
+          className="py-28 sm:py-36 lg:py-44 px-4 sm:px-6 lg:px-8 somnus-events-bg somnus-events-bg--flyer relative overflow-hidden scroll-mt-8"
         >
           <div className="max-w-7xl mx-auto relative z-10">
-            <h2 className="somnus-title-secondary text-center text-4xl md:text-5xl lg:text-6xl mb-4 uppercase tracking-wider font-bold">
+            <h2 className="somnus-display text-center mb-4">
               Upcoming Events
             </h2>
-            <p className="somnus-text-body text-center mb-16 max-w-2xl mx-auto text-lg">
+            <p className="somnus-lede text-center mx-auto mb-16">
               Get in the dream with us.
             </p>
 
@@ -474,11 +445,7 @@ export default function HomePage() {
                     />
                   ))}
                 </UpcomingEventsCarousel>
-              ) : !isGalleryMode ? (
-                <p className="text-center text-white/50 py-12">
-                  No upcoming events at the moment
-                </p>
-              ) : (
+              ) : concerts.length === 0 ? (
                 <UpcomingEventsCarousel
                   standaloneSettingsProvider={false}
                   showPosterTuner
@@ -492,15 +459,18 @@ export default function HomePage() {
                     />
                   ))}
                 </UpcomingEventsCarousel>
+              ) : (
+                <p className="text-center text-white/60 py-12">
+                  No upcoming events at the moment
+                </p>
               )}
 
-              {/* EVENTOS PASADOS — mismo carrusel y tipografía que Upcoming */}
               {pastConcerts.length > 0 && (
                 <div className="mt-24">
-                  <h2 className="somnus-title-secondary text-center text-4xl md:text-5xl lg:text-6xl mb-4 uppercase tracking-wider font-bold">
+                  <h2 className="somnus-display text-center mb-4">
                     Past events
                   </h2>
-                  <p className="somnus-text-body text-center mb-16 max-w-2xl mx-auto text-lg">
+                  <p className="somnus-lede text-center mx-auto mb-16">
                     Events that have already taken place
                   </p>
                   <UpcomingEventsCarousel
@@ -527,23 +497,22 @@ export default function HomePage() {
         </section>
       </RevealSection>
 
-      {/* 3. BRAND PRESENCE - Carrusel infinito de marcas */}
+      {/* 3. BRAND PRESENCE */}
       <BrandPresenceCarousel />
 
-      {/* 4. FORMULARIO DE CONTACTO */}
+      {/* 4. CONTACT / JOIN */}
       <RevealSection>
         <section className="py-20 sm:py-28 lg:py-36 px-4 sm:px-6 lg:px-8 border-t border-white/10">
           <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Columna izquierda - Branding */}
             <div className="text-center lg:text-left">
-              <p className="somnus-text-body text-white/70 mb-4 uppercase tracking-wider text-sm">
-                Accede a eventos exclusivos y promociones
+              <p className="somnus-eyebrow mb-4">
+                Exclusive events &amp; promotions
               </p>
-              <h2 className="somnus-title-secondary text-4xl md:text-5xl lg:text-6xl uppercase tracking-wider mb-6">
-                Sé parte de Somnus
+              <h2 className="somnus-display mb-6">
+                Be part of Somnus
               </h2>
-              <p className="somnus-text-body text-lg text-white/60 max-w-md mx-auto lg:mx-0 mb-8">
-                Únete a nuestra comunidad y recibe información de los mejores eventos en vivo.
+              <p className="somnus-lede mx-auto lg:mx-0 mb-8">
+                Join our community and get updates on the best live events.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <button
@@ -551,19 +520,18 @@ export default function HomePage() {
                   onClick={() => router.push("/register")}
                   className="somnus-btn px-8 py-3.5"
                 >
-                  Crear mi cuenta
+                  Create my account
                 </button>
                 <button
                   type="button"
                   onClick={() => router.push("/login")}
-                  className="px-8 py-3.5 rounded-full border border-white/30 text-white/90 hover:bg-white/10 transition-colors uppercase tracking-wider text-sm font-medium"
+                  className="somnus-nav-link px-8 py-3.5 rounded-none border border-white/30 text-white/90 hover:bg-white/10 uppercase tracking-wider text-sm font-medium"
                 >
-                  Ya tengo cuenta
+                  I already have an account
                 </button>
               </div>
             </div>
 
-            {/* Columna derecha - Formulario */}
             <div className="liquid-glass p-8 sm:p-10 rounded-2xl">
               <ContactForm />
             </div>
@@ -576,30 +544,31 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
           <Link
             href="/"
-            className="text-white text-xl font-bold uppercase tracking-[0.3em] hover:text-white/80 transition-colors"
+            className="somnus-nav-link text-white text-xl font-bold uppercase tracking-[0.3em] hover:text-white/80"
+            translate="no"
           >
             SOMNUS
           </Link>
 
-          <nav className="flex flex-wrap items-center justify-center gap-8 md:gap-12 text-sm">
+          <nav className="flex flex-wrap items-center justify-center gap-8 md:gap-12 text-sm" aria-label="Footer">
             <a
               href="#eventos"
-              className="text-white/60 hover:text-white transition-colors uppercase tracking-wider"
+              className="somnus-nav-link text-white/60 hover:text-white uppercase tracking-wider"
             >
-              Eventos
+              Events
             </a>
-            <a
+            <Link
               href="/galeria"
-              className="text-white/60 hover:text-white transition-colors uppercase tracking-wider"
+              className="somnus-nav-link text-white/60 hover:text-white uppercase tracking-wider"
             >
               Gallery
-            </a>
-            <a
+            </Link>
+            <Link
               href="/mis-boletos"
-              className="text-white/60 hover:text-white transition-colors uppercase tracking-wider"
+              className="somnus-nav-link text-white/60 hover:text-white uppercase tracking-wider"
             >
-              Mis Boletos
-            </a>
+              My Tickets
+            </Link>
           </nav>
         </div>
 

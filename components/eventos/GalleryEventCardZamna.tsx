@@ -21,16 +21,26 @@ export function GalleryEventCardZamna({
   const posterCtx = useCarouselPosterOptional();
   const skipOpenAfterDrag = useRef(false);
 
+  const handleActivate = () => {
+    if (skipOpenAfterDrag.current) {
+      skipOpenAfterDrag.current = false;
+      return;
+    }
+    onSelect();
+  };
+
   return (
     <article
-      onClick={() => {
-        if (skipOpenAfterDrag.current) {
-          skipOpenAfterDrag.current = false;
-          return;
+      role="button"
+      tabIndex={0}
+      onClick={handleActivate}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleActivate();
         }
-        onSelect();
       }}
-      className={`group relative overflow-hidden rounded-2xl flex flex-col h-full cursor-pointer transition-colors ${
+      className={`group relative overflow-hidden rounded-2xl flex flex-col h-full cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#7BA3E8]/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] ${
         carouselGlass
           ? "border border-white/12 bg-[#08080c]/88 backdrop-blur-xl hover:border-white/18 shadow-[0_8px_40px_rgba(0,0,0,0.45)]"
           : "bg-[#1a1a1a] border border-white/15 hover:border-white/25"
@@ -76,7 +86,7 @@ export function GalleryEventCardZamna({
               src={event.image}
               alt={event.artist}
               fill
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
+              className="object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none"
               sizes="(max-width: 768px) 100vw, 33vw"
               loading="lazy"
               quality={75}
@@ -101,16 +111,16 @@ export function GalleryEventCardZamna({
         </h3>
         <div className="flex flex-wrap items-center gap-4 text-sm text-white/80 mb-4">
           <span className="flex items-center gap-1.5">
-            <Calendar className="w-4 h-4 shrink-0" />
+            <Calendar className="w-4 h-4 shrink-0" aria-hidden />
             {event.date}
           </span>
           <span className="flex items-center gap-1.5">
-            <MapPin className="w-4 h-4 shrink-0" />
+            <MapPin className="w-4 h-4 shrink-0" aria-hidden />
             {event.venue}
           </span>
         </div>
         <div className="mt-auto">
-          <span className="inline-block w-full text-center font-bold uppercase tracking-wider py-3 px-6 rounded-lg bg-black text-white border border-white/20 hover:bg-white hover:text-black transition-all">
+          <span className="inline-block w-full text-center font-bold uppercase tracking-wider py-3 px-6 rounded-lg bg-black text-white border border-white/20 group-hover:bg-white group-hover:text-black transition-colors">
             View gallery
           </span>
         </div>

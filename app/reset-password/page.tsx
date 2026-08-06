@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { Lock } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 
@@ -13,19 +14,27 @@ function ResetPasswordForm() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
+  const [tokenError, setTokenError] = useState<string | null>(
+    token ? null : "Missing token. Request a new link from sign in."
+  );
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setPasswordError(null);
+    setConfirmError(null);
+
     if (!token) {
-      toast.error("Enlace inválido");
+      setTokenError("Missing token. Request a new link from sign in.");
       return;
     }
     if (password.length < 8) {
-      toast.error("La contraseña debe tener al menos 8 caracteres");
+      setPasswordError("Password must be at least 8 characters");
       return;
     }
     if (password !== confirm) {
-      toast.error("Las contraseñas no coinciden");
+      setConfirmError("Passwords do not match");
       return;
     }
 
@@ -37,66 +46,158 @@ function ResetPasswordForm() {
         body: JSON.stringify({ token, password }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Error");
-      toast.success(data.message || "Contraseña actualizada");
+      if (!res.ok) throw new Error(data.error || "Something went wrong");
+      toast.success(data.message || "Password updated");
       router.push("/login");
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Error");
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen somnus-bg-main">
+    <div className="min-h-screen somnus-bg-main overflow-x-hidden">
       <SiteHeader eventsHref="/" />
-      <div className="min-h-screen flex items-center justify-center px-4 pt-24">
-        <form
-          onSubmit={handleSubmit}
-          className="w-full max-w-md liquid-glass p-8 rounded-2xl space-y-4"
-        >
-          <h1 className="somnus-title-secondary text-2xl uppercase text-white">
-            Nueva contraseña
-          </h1>
-          {!token && (
-            <p className="text-red-300 text-sm">
-              Falta el token. Solicita un nuevo enlace desde{" "}
-              <Link href="/login" className="underline">
-                iniciar sesión
-              </Link>
-              .
-            </p>
-          )}
-          <label className="block text-white/80 text-sm">
-            Contraseña
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-lg bg-black/40 border border-white/20 px-3 py-2 text-white"
-              required
-              minLength={8}
-            />
-          </label>
-          <label className="block text-white/80 text-sm">
-            Confirmar
-            <input
-              type="password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              className="mt-1 w-full rounded-lg bg-black/40 border border-white/20 px-3 py-2 text-white"
-              required
-              minLength={8}
-            />
-          </label>
-          <button
-            type="submit"
-            disabled={loading || !token}
-            className="somnus-btn w-full py-3 disabled:opacity-50"
-          >
-            {loading ? "Guardando..." : "Guardar contraseña"}
-          </button>
-        </form>
+      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-32">
+        <div className="w-full max-w-md">
+          <div className="somnus-card p-6 sm:p-8 lg:p-10">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 border border-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Lock className="w-8 h-8 text-[#7BA3E8]" />
+              </div>
+              <p className="somnus-eyebrow mb-2">Security</p>
+              <h1 className="somnus-title-secondary text-3xl mb-2 uppercase">
+                New password
+              </h1>
+              <p className="somnus-text-body text-sm">
+                Choose a strong password for your Somnus account
+              </p>
+            </div>
+
+            {tokenError && (
+              <p
+                id="token-error"
+                role="alert"
+                className="mb-6 text-sm text-red-400 text-center bg-red-500/10 border border-red-500/20 rounded-lg py-2 px-3"
+              >
+                {tokenError}{" "}
+                <Link href="/login" className="somnus-nav-link underline text-white">
+                  Sign in
+                </Link>
+              </p>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label
+                  htmlFor="reset-password"
+                  className="block somnus-title-secondary text-sm mb-2 uppercase"
+                >
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none" />
+                  <input
+                    id="reset-password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (passwordError) setPasswordError(null);
+                    }}
+                    className="somnus-input pl-10"
+                    placeholder="At least 8 characters"
+                    required
+                    minLength={8}
+                    autoComplete="new-password"
+                    aria-invalid={passwordError ? true : undefined}
+                    aria-describedby={
+                      passwordError ? "reset-password-error" : undefined
+                    }
+                    disabled={!token}
+                  />
+                </div>
+                {passwordError && (
+                  <p
+                    id="reset-password-error"
+                    role="alert"
+                    className="mt-2 text-sm text-red-400"
+                  >
+                    {passwordError}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="reset-confirm"
+                  className="block somnus-title-secondary text-sm mb-2 uppercase"
+                >
+                  Confirm password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none" />
+                  <input
+                    id="reset-confirm"
+                    type="password"
+                    value={confirm}
+                    onChange={(e) => {
+                      setConfirm(e.target.value);
+                      if (confirmError) setConfirmError(null);
+                    }}
+                    className="somnus-input pl-10"
+                    placeholder="Repeat your password"
+                    required
+                    minLength={8}
+                    autoComplete="new-password"
+                    aria-invalid={confirmError ? true : undefined}
+                    aria-describedby={
+                      confirmError ? "reset-confirm-error" : undefined
+                    }
+                    disabled={!token}
+                  />
+                </div>
+                {confirmError && (
+                  <p
+                    id="reset-confirm-error"
+                    role="alert"
+                    className="mt-2 text-sm text-red-400"
+                  >
+                    {confirmError}
+                  </p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || !token}
+                className="w-full somnus-btn text-base py-6 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2 justify-center">
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    Saving…
+                  </span>
+                ) : (
+                  "Save password"
+                )}
+              </button>
+            </form>
+
+            <div className="mt-6 pt-6 border-t border-white/10">
+              <p className="somnus-text-body text-center text-sm">
+                Remember your password?{" "}
+                <Link
+                  href="/login"
+                  className="somnus-nav-link text-white hover:underline font-medium"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -106,8 +207,8 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen somnus-bg-main flex items-center justify-center text-white">
-          Cargando...
+        <div className="min-h-screen somnus-bg-main flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
         </div>
       }
     >
