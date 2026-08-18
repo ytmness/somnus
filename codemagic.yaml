@@ -1,6 +1,6 @@
 definitions:
   ios_env: &ios_env
-    node: 20
+    node: 22
     xcode: latest
     cocoapods: default
     groups:
