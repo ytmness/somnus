@@ -126,6 +126,13 @@ INICIO_RAPIDO_*.md
 /capacitor/www/_generated
 /build/ios
 
+# Certificados locales de Apple Wallet (CSR, keys, .cer). Nunca al repo.
+/.wallet-certs/
+*.p12
+*.cer
+*.certSigningRequest
+*.mobileprovision
+
 # Secretos y notas de servidor (nunca al repo)
 ENV_*.txt
 ENV_*.md
