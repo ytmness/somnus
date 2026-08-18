@@ -1,0 +1,39 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db/prisma";
+
+export const dynamic = "force-dynamic";
+
+/**
+ * GET /api/gallery/full
+ * Todas las secciones con sus imágenes (para admin)
+ */
+export async function GET() {
+  try {
+    const sections = await prisma.gallerySection.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        images: {
+          orderBy: { sortOrder: "asc" },
+        },
+      },
+    });
+
+    return NextResponse.json(
+      { success: true, data: sections },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Get gallery full error:", error);
+    return NextResponse.json(
+      { error: "Failed to load gallery" },
+      {
+        status: 500,
+        headers: { "Cache-Control": "no-store" },
+      }
+    );
+  }
+}

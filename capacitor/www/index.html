@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Somnus</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #0a0a0a;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body {
+        background-image: radial-gradient(
+            ellipse at top center,
+            rgba(255, 255, 255, 0.03) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            ellipse at bottom center,
+            rgba(0, 0, 0, 0.4) 0%,
+            #0a0a0a 100%
+          );
+      }
+
+      main {
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem;
+        padding: calc(env(safe-area-inset-top) + 2rem) 1.5rem
+          calc(env(safe-area-inset-bottom) + 2rem);
+        text-align: center;
+      }
+
+      .wordmark {
+        font-size: clamp(1.75rem, 9vw, 2.5rem);
+        font-weight: 900;
+        letter-spacing: 0.28em;
+        text-indent: 0.28em;
+        text-transform: uppercase;
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 1.0625rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        margin: 0;
+      }
+
+      p {
+        margin: 0;
+        max-width: 30ch;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.6);
+        text-wrap: pretty;
+      }
+
+      button {
+        appearance: none;
+        margin-top: 0.5rem;
+        min-height: 48px;
+        padding: 0 2.25rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 0;
+        background: #ffffff;
+        color: #0a0a0a;
+        font: inherit;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: opacity 200ms ease-out, transform 200ms ease-out;
+      }
+
+      button:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+      }
+
+      button:focus-visible {
+        outline: 2px solid rgba(123, 163, 232, 0.9);
+        outline-offset: 3px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        button {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="wordmark">Somnus</p>
+      <h1>Sin conexión</h1>
+      <p>
+        No pudimos conectar con somnus.live. Revisa tu conexión a internet e
+        inténtalo de nuevo.
+      </p>
+      <button type="button" onclick="window.location.replace('https://somnus.live')">
+        Reintentar
+      </button>
+    </main>
+  </body>
+</html>

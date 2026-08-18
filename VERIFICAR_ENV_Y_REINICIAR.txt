@@ -1,0 +1,52 @@
+# Verificar .env y forzar reinicio completo
+
+# 1. Ver EXACTAMENTE qué tiene el .env
+cat /var/www/somnus/.env | grep -E "DATABASE_URL|DIRECT_URL"
+
+# 2. Ver si hay espacios o caracteres raros
+cat /var/www/somnus/.env | grep -E "DATABASE_URL|DIRECT_URL" | cat -A
+
+# 3. Verificar que el .env está en el lugar correcto
+ls -la /var/www/somnus/.env
+
+# 4. Ver si hay otros archivos .env
+find /var/www/somnus -name ".env*" -type f
+
+# 5. Ver qué archivo .env está usando Next.js (desde los logs)
+pm2 logs somnus --lines 5 | grep -i "env\|environment"
+
+# 6. DETENER completamente PM2
+pm2 stop somnus
+pm2 delete somnus
+
+# 7. Verificar que el .env tiene el formato correcto UNA VEZ MÁS
+cat /var/www/somnus/.env | grep -E "DATABASE_URL|DIRECT_URL"
+
+# Debe mostrar EXACTAMENTE:
+# DATABASE_URL=postgres://postgres.rbcqxxbddvbomwarmjvd:5S73wOjVjiSyRvFV@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+# DIRECT_URL=postgres://postgres.rbcqxxbddvbomwarmjvd:5S73wOjVjiSyRvFV@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+
+# 8. Si NO muestra eso, editar de nuevo:
+nano /var/www/somnus/.env
+
+# Buscar DATABASE_URL y DIRECT_URL
+# Asegurarse de que tienen EXACTAMENTE:
+# - postgres.rbcqxxbddvbomwarmjvd (con punto)
+# - aws-0-us-east-1.pooler.supabase.com
+# - puerto 5432
+# - password: 5S73wOjVjiSyRvFV
+
+# 9. INICIAR PM2 de nuevo desde el directorio correcto
+cd /var/www/somnus
+pm2 start npm --name "somnus" -- start
+
+# 10. Esperar y ver logs
+sleep 10
+pm2 logs somnus --lines 30
+
+# 11. Si todavía hay error, verificar que Prisma está usando el .env correcto
+cd /var/www/somnus
+npm run db:generate
+
+# Si esto funciona, el problema es que PM2 no está leyendo el .env
+# Solución: usar dotenv o especificar el .env explícitamente

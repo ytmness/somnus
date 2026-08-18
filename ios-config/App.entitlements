@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Entitlements de la app iOS. El merchant ID debe existir en
+  Apple Developer > Identifiers > Merchant IDs y estar habilitado
+  en la capability "Apple Pay" del App ID live.somnus.app.
+-->
+<plist version="1.0">
+<dict>
+	<key>com.apple.developer.in-app-payments</key>
+	<array>
+		<string>merchant.live.somnus</string>
+	</array>
+</dict>
+</plist>

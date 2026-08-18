@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Claves que scripts/ios-postadd.sh fusiona sobre ios/App/App/Info.plist
+  despues de `npx cap add ios` en el runner de Codemagic.
+  Este archivo es la fuente de verdad: el proyecto Xcode NO se versiona.
+-->
+<plist version="1.0">
+<dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Somnus usa la camara para escanear codigos QR de boletos en el acceso al evento.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Somnus guarda en tu galeria los codigos QR y comprobantes de tus boletos.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>UIRequiresFullScreen</key>
+	<false/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>CFBundleDisplayName</key>
+	<string>Somnus</string>
+	<!-- Vuelta a la app tras 3D Secure; ver lib/native/apple-pay.ts -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>live.somnus.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>live.somnus.app</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

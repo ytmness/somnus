@@ -1,0 +1,93 @@
+# Verificación final del dominio y base de datos
+
+# ============================================
+# 1. VERIFICAR BASE DE DATOS
+# ============================================
+
+# Ver configuración actual
+cat /var/www/somnus/.env | grep -E "DATABASE_URL|DIRECT_URL"
+
+# Debe mostrar:
+# DATABASE_URL=postgres://postgres.rbcqxxbddvbomwarmjvd:5S73wOjVjiSyRvFV@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+# DIRECT_URL=postgres://postgres.rbcqxxbddvbomwarmjvd:5S73wOjVjiSyRvFV@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+
+# Ver logs de la aplicación (buscar errores de base de datos)
+pm2 logs somnus --lines 50 | grep -i "error\|fatal\|tenant"
+
+# Si NO hay errores, debería estar funcionando
+
+# ============================================
+# 2. VERIFICAR NGINX
+# ============================================
+
+# Ver configuración
+cat /etc/nginx/sites-available/somnus
+
+# Verificar que está activo
+ls -la /etc/nginx/sites-enabled/somnus
+
+# Verificar sintaxis
+nginx -t
+
+# Ver estado
+systemctl status nginx
+
+# ============================================
+# 3. PROBAR CONEXIÓN
+# ============================================
+
+# Desde el servidor
+curl http://localhost
+curl -H "Host: somnus.live" http://localhost
+curl -H "Host: www.somnus.live" http://localhost
+
+# Ver logs de acceso de Nginx
+tail -20 /var/log/nginx/somnus-access.log
+
+# Ver logs de error de Nginx
+tail -20 /var/log/nginx/somnus-error.log
+
+# ============================================
+# 4. VERIFICAR DNS DESDE TU COMPUTADORA
+# ============================================
+
+# En Windows PowerShell:
+nslookup somnus.live
+nslookup www.somnus.live
+
+# Debe mostrar: 144.202.72.150
+
+# Probar desde navegador:
+# http://somnus.live
+# http://www.somnus.live
+
+# ============================================
+# 5. SI EL DOMINIO NO FUNCIONA
+# ============================================
+
+# Verificar que el firewall permite puerto 80
+ufw status | grep 80
+
+# Verificar qué está escuchando en puerto 80
+sudo ss -tlnp | grep :80
+
+# Debe mostrar nginx escuchando en 0.0.0.0:80
+
+# ============================================
+# 6. SI HAY ERRORES DE BASE DE DATOS
+# ============================================
+
+# Editar .env
+nano /var/www/somnus/.env
+
+# Asegurarse de que DATABASE_URL y DIRECT_URL tienen:
+# - Usuario: postgres.rbcqxxbddvbomwarmjvd
+# - Host: aws-0-us-east-1.pooler.supabase.com
+# - Puerto: 5432
+# - Password: 5S73wOjVjiSyRvFV
+
+# Reiniciar aplicación
+pm2 restart somnus
+
+# Ver logs
+pm2 logs somnus --lines 30

@@ -1,0 +1,118 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db/prisma";
+import { canViewOwnTickets } from "@/lib/auth/registration";
+import { getSession } from "@/lib/auth/session";
+import { isWalletPassEnabled } from "@/lib/services/wallet-pass";
+
+// Marcar como dinámica porque usa cookies
+export const dynamic = 'force-dynamic';
+
+/**
+ * GET /api/tickets/my-tickets
+ * Obtener todos los boletos del cliente autenticado
+ * Los boletos se buscan por el email del usuario (buyerEmail en Sale)
+ */
+export async function GET(request: NextRequest) {
+  try {
+    // Obtener usuario de la sesión
+    const user = await getSession();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "No autenticado" },
+        { status: 401 }
+      );
+    }
+
+    if (!canViewOwnTickets(user.role)) {
+      return NextResponse.json(
+        { error: "Tu rol no tiene acceso a boletos de compra" },
+        { status: 403 }
+      );
+    }
+
+    // Buscar ventas por email O userId (email insensible a mayúsculas)
+    const sales = await prisma.sale.findMany({
+      where: {
+        status: "COMPLETED",
+        OR: [
+          { buyerEmail: { equals: user.email, mode: "insensitive" } },
+          { userId: user.id },
+        ],
+      },
+      include: {
+        event: {
+          select: {
+            id: true,
+            name: true,
+            artist: true,
+            venue: true,
+            eventDate: true,
+            eventTime: true,
+            imageUrl: true,
+            showQR: true,
+          },
+        },
+        tickets: {
+          include: {
+            ticketType: {
+              select: {
+                id: true,
+                name: true,
+                category: true,
+                price: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    // Formatear respuesta
+    const tickets = sales.flatMap((sale) =>
+      sale.tickets.map((ticket) => ({
+        id: ticket.id,
+        ticketNumber: ticket.ticketNumber,
+        qrCode: ticket.qrCode,
+        status: ticket.status,
+        tableNumber: ticket.tableNumber,
+        seatNumber: ticket.seatNumber,
+        pdfUrl: ticket.pdfUrl,
+        createdAt: ticket.createdAt,
+        event: sale.event,
+        ticketType: ticket.ticketType,
+        sale: {
+          id: sale.id,
+          total: Number(sale.total),
+          buyerName: sale.buyerName,
+          buyerEmail: sale.buyerEmail,
+          createdAt: sale.createdAt,
+        },
+      }))
+    );
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        tickets,
+        totalTickets: tickets.length,
+        totalSales: sales.length,
+        walletPassEnabled: isWalletPassEnabled(),
+      },
+    });
+  } catch (error) {
+    console.error("Get my tickets error:", error);
+    return NextResponse.json(
+      { error: "Error al obtener boletos" },
+      { status: 500 }
+    );
+  }
+}
+
+

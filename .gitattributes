@@ -1,0 +1,17 @@
+* text=auto
+
+# Scripts que se ejecutan en los runners macOS de Codemagic: siempre LF,
+# aunque el repo se clone en Windows.
+*.sh text eol=lf
+*.rb text eol=lf
+codemagic.yaml text eol=lf
+
+# Binarios
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.mp4 binary
+*.ico binary
+*.pkpass binary

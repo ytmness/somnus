@@ -1,0 +1,1773 @@
+{
+  "communities": {
+    "0": [
+      "app_accesos_page",
+      "app_accesos_page_accesospage",
+      "app_accesos_page_assignedevent",
+      "app_accesos_page_sessionuser",
+      "components_accesos_qrscanner",
+      "components_accesos_qrscanner_qrscanner",
+      "components_accesos_qrscanner_scanresponse",
+      "components_accesos_scannerfeedback",
+      "components_accesos_scannerfeedback_scanfeedbackprops",
+      "components_accesos_scannerfeedback_scannerfeedback",
+      "components_accesos_scannerfeedback_scanresult",
+      "components_accesos_scanstats",
+      "components_accesos_scanstats_scanstats",
+      "components_ui_card",
+      "components_ui_card_card",
+      "components_ui_card_cardaction",
+      "components_ui_card_cardcontent",
+      "components_ui_card_carddescription",
+      "components_ui_card_cardfooter",
+      "components_ui_card_cardheader",
+      "components_ui_card_cardtitle",
+      "components_ui_carousel",
+      "components_ui_carousel_carousel",
+      "components_ui_carousel_carouselapi",
+      "components_ui_carousel_carouselcontent",
+      "components_ui_carousel_carouselcontext",
+      "components_ui_carousel_carouselcontextprops",
+      "components_ui_carousel_carouselitem",
+      "components_ui_carousel_carouselnext",
+      "components_ui_carousel_carouseloptions",
+      "components_ui_carousel_carouselplugin",
+      "components_ui_carousel_carouselprevious",
+      "components_ui_carousel_carouselprops",
+      "components_ui_carousel_usecarousel",
+      "components_ui_carousel_usecarouselparameters",
+      "components_ui_dialog",
+      "components_ui_dialog_dialog",
+      "components_ui_dialog_dialogclose",
+      "components_ui_dialog_dialogcontent",
+      "components_ui_dialog_dialogdescription",
+      "components_ui_dialog_dialogfooter",
+      "components_ui_dialog_dialogheader",
+      "components_ui_dialog_dialogoverlay",
+      "components_ui_dialog_dialogportal",
+      "components_ui_dialog_dialogtitle",
+      "components_ui_dialog_dialogtrigger",
+      "html5_qrcode",
+      "lib_utils_index_cn",
+      "package_dependencies_html5_qrcode",
+      "package_dependencies_react",
+      "react"
+    ],
+    "1": [
+      "app_api_admin_commissions_route",
+      "app_api_admin_commissions_route_get",
+      "app_api_admin_commissions_route_patch",
+      "app_api_admin_commissions_route_post",
+      "app_api_admin_contact_leads_route",
+      "app_api_admin_contact_leads_route_get",
+      "app_api_admin_events_id_invites_cancel_route",
+      "app_api_admin_events_id_invites_cancel_route_post",
+      "app_api_admin_events_id_invites_route",
+      "app_api_admin_events_id_invites_route_get",
+      "app_api_admin_organizers_id_route",
+      "app_api_admin_organizers_id_route_get",
+      "app_api_admin_organizers_id_route_isvalidemail",
+      "app_api_admin_organizers_id_route_patch",
+      "app_api_admin_organizers_route",
+      "app_api_admin_organizers_route_get",
+      "app_api_admin_staff_route",
+      "app_api_admin_staff_route_delete",
+      "app_api_admin_staff_route_get",
+      "app_api_admin_staff_route_patch",
+      "app_api_admin_staff_route_post",
+      "app_api_conversations_route",
+      "app_api_conversations_route_get",
+      "app_api_conversations_route_post",
+      "app_api_feed_following_route",
+      "app_api_feed_following_route_feeditem",
+      "app_api_feed_following_route_get",
+      "app_api_gallery_images_id_route",
+      "app_api_gallery_images_id_route_delete",
+      "app_api_gallery_images_id_route_patch",
+      "app_api_gallery_route",
+      "app_api_gallery_route_get",
+      "app_api_gallery_route_post",
+      "app_api_gallery_sections_id_route",
+      "app_api_gallery_sections_id_route_delete",
+      "app_api_gallery_sections_id_route_patch",
+      "app_api_notifications_id_read_route",
+      "app_api_notifications_id_read_route_patch",
+      "app_api_notifications_read_all_route",
+      "app_api_notifications_read_all_route_patch",
+      "app_api_notifications_route",
+      "app_api_notifications_route_get",
+      "app_api_organizations_public_slug_route",
+      "app_api_organizations_public_slug_route_get",
+      "app_api_upload_event_image_route",
+      "app_api_upload_event_image_route_allowed_types",
+      "app_api_upload_event_image_route_get",
+      "app_api_upload_event_image_route_post",
+      "lib_auth_session_getsession",
+      "lib_auth_types_hasrole",
+      "lib_validations_schemas_createconversationschema"
+    ],
+    "2": [
+      "app_mensajes_mensajespageclient",
+      "app_mensajes_mensajespageclient_mensajespageclient",
+      "app_mensajes_page",
+      "app_mensajes_page_page",
+      "app_organizador_organizadorpagecontent",
+      "app_organizador_organizadorpagecontent_organizadorpagecontent",
+      "app_organizador_organizadorpagecontent_organization",
+      "app_organizador_organizadorpagecontent_organizerstatus",
+      "app_organizador_page",
+      "app_organizador_page_organizadorpage",
+      "components_admin_staffmanager",
+      "components_admin_staffmanager_membership",
+      "components_admin_staffmanager_pendinginvite",
+      "components_admin_staffmanager_role_labels",
+      "components_admin_staffmanager_roles",
+      "components_admin_staffmanager_scopes",
+      "components_admin_staffmanager_staffmanager",
+      "components_admin_staffmanager_staffmanagerprops",
+      "components_admin_venuesmanager",
+      "components_admin_venuesmanager_venue",
+      "components_admin_venuesmanager_venuesmanager",
+      "components_admin_venuesmanager_venuesmanagerprops",
+      "components_mensajes_chatpanel",
+      "components_mensajes_chatpanel_chatpanel",
+      "components_mensajes_chatpanel_chatpanelprops",
+      "components_mensajes_chatpanel_message",
+      "components_mensajes_conversationlist",
+      "components_mensajes_conversationlist_conversationitem",
+      "components_mensajes_conversationlist_conversationlist",
+      "components_mensajes_conversationlist_conversationlistprops",
+      "components_mensajes_messagebubble",
+      "components_mensajes_messagebubble_messagebubble",
+      "components_mensajes_messagebubble_messagebubbleprops",
+      "components_mensajes_organizermessagestab",
+      "components_mensajes_organizermessagestab_organization",
+      "components_mensajes_organizermessagestab_organizermessagestab",
+      "components_mensajes_organizermessagestab_organizermessagestabprops",
+      "components_organizador_organizationpostcomposer",
+      "components_organizador_organizationpostcomposer_organizationpostcomposer",
+      "components_organizador_organizationpostcomposer_organizationpostcomposerprops",
+      "components_organizador_organizationprofileeditor",
+      "components_organizador_organizationprofileeditor_organizationprofile",
+      "components_organizador_organizationprofileeditor_organizationprofileeditor",
+      "components_organizador_organizationprofileeditor_organizationprofileeditorprops",
+      "components_organizador_organizationsmanager",
+      "components_organizador_organizationsmanager_organization",
+      "components_organizador_organizationsmanager_organizationsmanager",
+      "components_organizador_organizationsmanager_organizationsmanagerprops",
+      "lib_payments_stripe_requirements_formatstriperequirements"
+    ],
+    "3": [
+      "app_api_checkout_invite_route",
+      "app_api_checkout_invite_route_generateinvitetoken",
+      "app_api_checkout_invite_route_post",
+      "app_api_events_id_tables_route",
+      "app_api_events_id_tables_route_get",
+      "app_api_events_id_tables_tablenumber_invites_route",
+      "app_api_events_id_tables_tablenumber_invites_route_generateinvitetoken",
+      "app_api_events_id_tables_tablenumber_invites_route_get",
+      "app_api_events_id_tables_tablenumber_invites_route_poolpaymenturl",
+      "app_api_events_id_tables_tablenumber_invites_route_post",
+      "app_eventos_id_boletos_page",
+      "app_eventos_id_boletos_page_cartitem",
+      "app_eventos_id_boletos_page_eventboletospage",
+      "components_admin_invitesmanager",
+      "components_admin_invitesmanager_eventoption",
+      "components_admin_invitesmanager_inviterow",
+      "components_admin_invitesmanager_invitesmanager",
+      "components_admin_tablestaffmanager",
+      "components_admin_tablestaffmanager_tablestaff",
+      "components_admin_tablestaffmanager_tablestaffmanager",
+      "components_admin_tablestaffmanager_tablestaffmanagerprops",
+      "components_eventos_eventmap",
+      "components_eventos_eventmap_eventmap",
+      "components_eventos_eventmap_eventmapprops",
+      "lib_payments_commissions",
+      "lib_payments_commissions_calculateplatformfeecents",
+      "lib_payments_commissions_calculatesaleamounts",
+      "lib_payments_commissions_calculateservicefeecents",
+      "lib_payments_commissions_calculatesplit",
+      "lib_payments_commissions_commissionsplit",
+      "lib_payments_commissions_resolvecommission",
+      "lib_payments_commissions_resolvedcommission",
+      "lib_table_invite",
+      "lib_table_invite_parsetablekeyfrompath",
+      "lib_table_invite_tickettablelabel",
+      "lib_ticket_pricing",
+      "lib_ticket_pricing_effectiveticketpriceat",
+      "lib_ticket_pricing_generaladmissionunitprice",
+      "lib_ticket_pricing_ticketforgeneralprice",
+      "lib_ticket_pricing_ticketpricephaserow",
+      "lib_utils_index_calculateservicefee",
+      "lib_utils_index_calculatetotalwithservicefee"
+    ],
+    "4": [
+      "app_api_admin_revenue_route",
+      "app_api_admin_revenue_route_get",
+      "app_api_admin_revenue_route_parsedateparam",
+      "app_api_auth_session_route",
+      "app_api_auth_session_route_get",
+      "app_api_staff_my_assignments_route",
+      "app_api_staff_my_assignments_route_get",
+      "app_api_supervisor_reports_route",
+      "app_api_supervisor_reports_route_get",
+      "app_api_tickets_scan_route",
+      "app_api_tickets_scan_route_get",
+      "app_api_tickets_scan_route_post",
+      "app_api_vendedor_sales_route",
+      "app_api_vendedor_sales_route_get",
+      "app_api_vendedor_sales_route_post",
+      "lib_admin_revenue",
+      "lib_admin_revenue_buildcompletedsalewhere",
+      "lib_admin_revenue_buildrefundedsalewhere",
+      "lib_admin_revenue_getrevenuereport",
+      "lib_admin_revenue_revenuefilters",
+      "lib_admin_revenue_tonumber",
+      "lib_auth_permissions",
+      "lib_auth_permissions_canmanagetable",
+      "lib_auth_permissions_canscantickets",
+      "lib_auth_permissions_canselltickets",
+      "lib_auth_permissions_canviewreports",
+      "lib_auth_permissions_getaccessibleeventids",
+      "lib_auth_permissions_getactivestaffroles",
+      "lib_auth_permissions_getusermemberships",
+      "lib_auth_permissions_hasstaffrole",
+      "lib_auth_permissions_legacy_staff_role_map",
+      "lib_auth_permissions_membershipcoverscontext",
+      "lib_auth_permissions_permissioncontext",
+      "lib_auth_permissions_resolveeventcontext",
+      "lib_auth_permissions_scope_rank",
+      "lib_auth_permissions_staffmembershipinfo",
+      "lib_services_qr_generator_parseqrpayload"
+    ],
+    "5": [
+      "app_feed_page",
+      "app_feed_page_feeditem",
+      "app_feed_page_feedpage",
+      "app_mis_boletos_page",
+      "app_mis_boletos_page_misboletospage",
+      "app_mis_boletos_page_ticketdata",
+      "components_layout_siteheader_sessionuser",
+      "components_organizaciones_organizationfeed",
+      "components_organizaciones_organizationfeed_eventitem",
+      "components_organizaciones_organizationfeed_organizationfeed",
+      "components_organizaciones_organizationfeed_organizationfeedprops",
+      "components_organizaciones_organizationpostcard",
+      "components_organizaciones_organizationpostcard_formatdate",
+      "components_organizaciones_organizationpostcard_organizationpostcard",
+      "components_organizaciones_organizationpostcard_organizationpostcardprops",
+      "components_organizaciones_organizationpostcard_orgpost",
+      "components_organizador_organizereventform_organizereventform",
+      "components_organizador_organizereventsmanager",
+      "components_organizador_organizereventsmanager_eventrow",
+      "components_organizador_organizereventsmanager_organizationoption",
+      "components_organizador_organizereventsmanager_organizereventsmanager",
+      "components_organizador_organizereventsmanager_organizereventsmanagerprops",
+      "lib_utils_index",
+      "lib_utils_index_calculatetax",
+      "lib_utils_index_calculatetotal",
+      "lib_utils_index_formatcurrency",
+      "lib_utils_index_formatdate",
+      "lib_utils_index_formatdatetime",
+      "lib_utils_index_formateventcalendardate",
+      "lib_utils_index_generateticketnumber"
+    ],
+    "6": [
+      "components_eventos_carousel_poster_settings",
+      "components_eventos_carousel_poster_settings_carousel_poster_defaults",
+      "components_eventos_carousel_poster_settings_carouselframingsettings",
+      "components_eventos_carousel_poster_settings_carousellayoutsettings",
+      "components_eventos_carousel_poster_settings_carouselpostersettingsprovider",
+      "components_eventos_carousel_poster_settings_dispatchctx",
+      "components_eventos_carousel_poster_settings_framing_keys",
+      "components_eventos_carousel_poster_settings_framingcontext",
+      "components_eventos_carousel_poster_settings_layout_keys",
+      "components_eventos_carousel_poster_settings_layoutcontext",
+      "components_eventos_carousel_poster_settings_loadstored",
+      "components_eventos_carousel_poster_settings_mergefull",
+      "components_eventos_carousel_poster_settings_pickframingpatch",
+      "components_eventos_carousel_poster_settings_picklayoutpatch",
+      "components_eventos_carousel_poster_settings_posterdispatchcontext",
+      "components_eventos_carousel_poster_settings_toframing",
+      "components_eventos_carousel_poster_settings_tolayout",
+      "components_eventos_carousel_poster_settings_usecarouselframing",
+      "components_eventos_carousel_poster_settings_usecarousellayout",
+      "components_eventos_carousel_poster_settings_usecarouselpostersettings",
+      "components_eventos_carousel_poster_settings_usecarouselpostersettingsoptional",
+      "components_eventos_carousel_poster_settings_useposterdispatch",
+      "components_eventos_carouselpostertuner",
+      "components_eventos_carouselpostertuner_carouselpostertuner",
+      "components_eventos_carouselpostertuner_row",
+      "components_eventos_upcomingeventscarousel",
+      "components_eventos_upcomingeventscarousel_standalonecarouselprops",
+      "components_eventos_upcomingeventscarousel_upcomingeventscarousel",
+      "components_eventos_upcomingeventscarousel_upcomingeventscarouselinner",
+      "components_eventos_upcomingeventscarousel_upcomingeventscarouselprops"
+    ],
+    "7": [
+      "ref_actualizacionvisual",
+      "ref_dom",
+      "ref_dom_iterable",
+      "ref_esnext",
+      "ref_next_env_d_ts",
+      "ref_next_types_ts",
+      "ref_node_modules",
+      "ref_ts",
+      "ref_tsx",
+      "tsconfig",
+      "tsconfig_compileroptions",
+      "tsconfig_compileroptions_allowjs",
+      "tsconfig_compileroptions_esmoduleinterop",
+      "tsconfig_compileroptions_incremental",
+      "tsconfig_compileroptions_isolatedmodules",
+      "tsconfig_compileroptions_jsx",
+      "tsconfig_compileroptions_lib",
+      "tsconfig_compileroptions_module",
+      "tsconfig_compileroptions_moduleresolution",
+      "tsconfig_compileroptions_noemit",
+      "tsconfig_compileroptions_paths",
+      "tsconfig_compileroptions_plugins",
+      "tsconfig_compileroptions_resolvejsonmodule",
+      "tsconfig_compileroptions_skiplibcheck",
+      "tsconfig_compileroptions_strict",
+      "tsconfig_exclude",
+      "tsconfig_include"
+    ],
+    "8": [
+      "app_api_auth_login_route",
+      "app_api_auth_login_route_post",
+      "app_auth_callback_route",
+      "app_auth_callback_route_get",
+      "app_auth_post_login_page",
+      "app_auth_post_login_page_postlogincontent",
+      "app_auth_post_login_page_postloginpage",
+      "app_login_page",
+      "app_login_page_logincontent",
+      "app_login_page_loginpage",
+      "app_register_page",
+      "app_register_page_registercontent",
+      "app_register_page_registerpage",
+      "components_auth_socialloginbuttons",
+      "components_auth_socialloginbuttons_appleicon",
+      "components_auth_socialloginbuttons_googleicon",
+      "components_auth_socialloginbuttons_provider",
+      "components_auth_socialloginbuttons_socialloginbuttons",
+      "components_auth_socialloginbuttons_socialloginbuttonsprops",
+      "lib_auth_permissions_getprimarystaffredirect",
+      "lib_auth_redirect_path",
+      "lib_auth_redirect_path_allowed_redirect_prefixes",
+      "lib_auth_redirect_path_resolveauthredirectforuser",
+      "lib_auth_redirect_path_resolveauthredirectpath",
+      "lib_auth_redirect_path_sanitizeredirectpath",
+      "lib_auth_registration_parseauthsurface"
+    ],
+    "9": [
+      "app_api_auth_forgot_password_route",
+      "app_api_auth_forgot_password_route_post",
+      "app_api_auth_forgot_password_route_schema",
+      "app_api_auth_logout_route",
+      "app_api_auth_logout_route_post",
+      "app_api_auth_otp_verify_route",
+      "app_api_auth_otp_verify_route_post",
+      "app_api_auth_reset_password_route",
+      "app_api_auth_reset_password_route_post",
+      "app_api_auth_reset_password_route_schema",
+      "app_api_authjs_nextauth_route",
+      "auth",
+      "auth_applesecretpromise",
+      "auth_buildappleclientsecret",
+      "auth_buildproviders",
+      "auth_handlers_auth_signin_signout",
+      "lib_services_email",
+      "lib_services_email_emailoptions",
+      "lib_services_email_getfromaddress",
+      "lib_services_email_getresendclient",
+      "lib_services_email_hashtoken",
+      "lib_services_email_sendemail",
+      "lib_services_email_sendpasswordresetemail",
+      "lib_services_email_sendverificationcode"
+    ],
+    "10": [
+      "app_api_organizations_id_route",
+      "app_api_organizations_id_route_delete",
+      "app_api_organizations_id_route_patch",
+      "app_api_organizations_route",
+      "app_api_organizations_route_get",
+      "app_api_organizations_route_post",
+      "lib_utils_org_slug",
+      "lib_utils_org_slug_generateuniqueorgslug",
+      "lib_utils_org_slug_slugifyname",
+      "lib_validations_schemas",
+      "lib_validations_schemas_createeventinput",
+      "lib_validations_schemas_logininput",
+      "lib_validations_schemas_organizationinput",
+      "lib_validations_schemas_organizationprofileschema",
+      "lib_validations_schemas_organizationschema",
+      "lib_validations_schemas_registerinput",
+      "lib_validations_schemas_slugschema",
+      "lib_validations_schemas_ticketpricephaseschema",
+      "lib_validations_schemas_tickettypeinput",
+      "lib_validations_schemas_tickettypeschema",
+      "lib_validations_schemas_updateeventinput",
+      "lib_validations_schemas_updateorganizationschema",
+      "lib_validations_schemas_updatetickettypeschema"
+    ],
+    "11": [
+      "app_api_admin_stats_route",
+      "app_api_admin_stats_route_get",
+      "app_api_admin_stats_route_startofcurrentmonth",
+      "app_api_contact_route",
+      "app_api_contact_route_post",
+      "app_api_gallery_full_route",
+      "app_api_gallery_full_route_get",
+      "app_api_organizations_public_route",
+      "app_api_organizations_public_route_get",
+      "app_api_sales_saleid_route",
+      "app_api_sales_saleid_route_get",
+      "lib_db_prisma",
+      "lib_db_prisma_globalforprisma",
+      "scripts_create_accesos_user",
+      "scripts_create_accesos_user_main",
+      "scripts_create_admin_user",
+      "scripts_create_admin_user_main",
+      "scripts_migrate_clientes_to_organizer",
+      "scripts_migrate_clientes_to_organizer_main",
+      "scripts_set_user_role",
+      "scripts_set_user_role_main"
+    ],
+    "12": [
+      "app_api_auth_register_route",
+      "app_api_auth_register_route_post",
+      "app_api_tickets_my_tickets_route",
+      "app_api_tickets_my_tickets_route_get",
+      "lib_auth_registration",
+      "lib_auth_registration_authsurface",
+      "lib_auth_registration_canviewowntickets",
+      "lib_auth_registration_resolvepublicregistrationrole",
+      "lib_auth_registration_ticket_viewer_roles",
+      "lib_auth_sync_user",
+      "lib_auth_sync_user_ensureprismauserfromoauth",
+      "lib_auth_sync_user_syncedprismauser",
+      "lib_validations_schemas_loginschema",
+      "lib_validations_schemas_otpverifyschema",
+      "lib_validations_schemas_registerschema",
+      "scripts_test_auth_logic",
+      "scripts_test_auth_logic_assert",
+      "scripts_test_auth_logic_invalidphone",
+      "scripts_test_auth_logic_mismatchpassword",
+      "scripts_test_auth_logic_nophone",
+      "scripts_test_auth_logic_validregister"
+    ],
+    "13": [
+      "app_api_events_id_route",
+      "app_api_events_id_route_delete",
+      "app_api_events_id_route_eventinclude",
+      "app_api_events_id_route_get",
+      "app_api_events_id_route_patch",
+      "app_api_events_id_table_staff_route",
+      "app_api_events_id_table_staff_route_delete",
+      "app_api_events_id_table_staff_route_get",
+      "app_api_events_id_table_staff_route_post",
+      "app_api_staff_invites_token_route",
+      "app_api_staff_invites_token_route_get",
+      "app_api_staff_invites_token_route_post",
+      "lib_auth_event_access_userownsevent",
+      "lib_staff_memberships",
+      "lib_staff_memberships_acceptstaffinvite",
+      "lib_staff_memberships_createstaffmembership",
+      "lib_staff_memberships_generateinvitetoken",
+      "lib_staff_memberships_staff_membership_include",
+      "lib_staff_memberships_staffassignmentinput",
+      "lib_staff_memberships_staffinviteinput",
+      "lib_validations_schemas_updateeventschema"
+    ],
+    "14": [
+      "app_api_events_route",
+      "app_api_events_route_buildtickettypescreate",
+      "app_api_events_route_eventinclude",
+      "app_api_events_route_get",
+      "app_api_events_route_post",
+      "app_api_organizations_id_followers_route",
+      "app_api_organizations_id_followers_route_get",
+      "app_api_organizations_id_posts_postid_route",
+      "app_api_organizations_id_posts_postid_route_delete",
+      "app_api_organizations_id_posts_postid_route_patch",
+      "app_api_organizations_id_posts_route",
+      "app_api_organizations_id_posts_route_get",
+      "app_api_organizations_id_posts_route_post",
+      "app_api_upload_org_image_route",
+      "app_api_upload_org_image_route_allowed_types",
+      "app_api_upload_org_image_route_post",
+      "lib_auth_event_access_assertorganizercancreateevents",
+      "lib_auth_event_access_userownsorganization",
+      "lib_services_notifications_notifyorganizationfollowers",
+      "lib_validations_schemas_createeventschema",
+      "lib_validations_schemas_orgpostschema"
+    ],
+    "15": [
+      "app_api_organizers_stripe_onboard_route",
+      "app_api_organizers_stripe_onboard_route_get",
+      "app_api_organizers_stripe_onboard_route_post",
+      "app_api_stripe_webhook_route",
+      "app_api_stripe_webhook_route_extractsaleid",
+      "app_api_stripe_webhook_route_post",
+      "lib_payments_connect",
+      "lib_payments_connect_createaccountlink",
+      "lib_payments_connect_createconnectedaccount",
+      "lib_payments_connect_organizerstripestatus",
+      "lib_payments_connect_prefillconnectedaccount",
+      "lib_payments_connect_syncorganizerstripestatus",
+      "lib_payments_fulfill_sale_fulfillsale",
+      "lib_payments_fulfill_sale_reversesale",
+      "lib_payments_stripe",
+      "lib_payments_stripe_centstopesos",
+      "lib_payments_stripe_getstripe",
+      "lib_payments_stripe_pesostocents",
+      "lib_payments_stripe_requirements",
+      "lib_payments_stripe_requirements_deduperequirements",
+      "lib_payments_stripe_requirements_requirement_labels"
+    ],
+    "16": [
+      "app_api_upload_gallery_image_route",
+      "app_api_upload_gallery_image_route_guessext",
+      "app_api_upload_gallery_image_route_isprobablyimage",
+      "app_api_upload_gallery_image_route_mime_to_ext",
+      "app_api_upload_gallery_image_route_post",
+      "app_uploads_path_route",
+      "app_uploads_path_route_get",
+      "app_uploads_path_route_mime",
+      "lib_storage_local",
+      "lib_storage_local_buildpublicurl",
+      "lib_storage_local_default_upload_dir",
+      "lib_storage_local_ensureuploaddirs",
+      "lib_storage_local_getuploadpublicbase",
+      "lib_storage_local_getuploadroot",
+      "lib_storage_local_resolvesafeuploadpath",
+      "lib_storage_local_saveuploadbuffer",
+      "scripts_migrate_storage_to_local",
+      "scripts_migrate_storage_to_local_download",
+      "scripts_migrate_storage_to_local_issupabasestorageurl",
+      "scripts_migrate_storage_to_local_main",
+      "scripts_migrate_storage_to_local_migrateurl"
+    ],
+    "17": [
+      "app_notificaciones_page",
+      "app_notificaciones_page_groupbydate",
+      "app_notificaciones_page_notificacionespage",
+      "app_notificaciones_page_notification",
+      "app_organizaciones_page",
+      "app_organizaciones_page_organizacionespage",
+      "app_organizaciones_page_orglistitem",
+      "app_reset_password_page",
+      "app_reset_password_page_resetpasswordform",
+      "app_reset_password_page_resetpasswordpage",
+      "components_layout_siteheader",
+      "components_layout_siteheader_siteheader",
+      "components_layout_siteheader_siteheaderprops",
+      "components_notifications_notificationbell",
+      "components_notifications_notificationbell_notificationbell",
+      "components_notifications_notificationbell_notificationbellprops",
+      "hooks_usenotifications",
+      "hooks_usenotifications_fetchnotifications",
+      "hooks_usenotifications_notification",
+      "hooks_usenotifications_usenotifications"
+    ],
+    "18": [
+      "types_index",
+      "types_index_apiresponse",
+      "types_index_createeventdto",
+      "types_index_createsaledto",
+      "types_index_createtickettypedto",
+      "types_index_dashboardstats",
+      "types_index_eventfilters",
+      "types_index_eventreport",
+      "types_index_eventwithtickettypes",
+      "types_index_inventorystatus",
+      "types_index_inventoryupdate",
+      "types_index_paginatedresponse",
+      "types_index_salefilters",
+      "types_index_saleitemdto",
+      "types_index_salesreport",
+      "types_index_salewithdetails",
+      "types_index_ticketfilters",
+      "types_index_ticketscanwithdetails",
+      "types_index_ticketvalidationresult",
+      "types_index_ticketwithdetails"
+    ],
+    "19": [
+      "components_eventos_cart",
+      "components_eventos_cart_cart",
+      "components_eventos_cart_cartprops",
+      "components_eventos_concertcard",
+      "components_eventos_concertcard_concertcard",
+      "components_eventos_concertcard_concertcardprops",
+      "components_eventos_concertcarousel",
+      "components_eventos_concertcarousel_concertcarousel",
+      "components_eventos_concertcarousel_concertcarouselprops",
+      "components_eventos_herocarousel",
+      "components_eventos_herocarousel_herocarousel",
+      "components_eventos_herocarousel_herocarouselprops",
+      "components_eventos_ticketselector",
+      "components_eventos_ticketselector_ticketselector",
+      "components_eventos_ticketselector_ticketselectorprops",
+      "components_eventos_types",
+      "components_eventos_types_cartitem",
+      "components_eventos_types_concert",
+      "components_eventos_types_ticketsection"
+    ],
+    "20": [
+      "app_api_organizers_staff_route",
+      "app_api_organizers_staff_route_delete",
+      "app_api_organizers_staff_route_get",
+      "app_api_organizers_staff_route_patch",
+      "app_api_organizers_staff_route_post",
+      "app_api_organizers_start_route",
+      "app_api_organizers_start_route_post",
+      "app_api_staff_invites_route",
+      "app_api_staff_invites_route_post",
+      "app_api_venues_route",
+      "app_api_venues_route_get",
+      "app_api_venues_route_patch",
+      "app_api_venues_route_post",
+      "lib_auth_event_access",
+      "lib_auth_event_access_ensureorganizerprofile",
+      "lib_auth_event_access_getorganizerforuser",
+      "lib_auth_permissions_canmanageteam",
+      "lib_staff_memberships_createstaffinvite"
+    ],
+    "21": [
+      "app_galeria_page",
+      "app_galeria_page_galeriacontent",
+      "app_galeria_page_galeriafallback",
+      "app_galeria_page_galeriapage",
+      "app_galeria_page_gallerysection",
+      "app_galeria_page_staticsectionsnewestfirst",
+      "components_somnusheader",
+      "components_somnusheader_somnusheader",
+      "components_somnusheader_somnusheaderprops",
+      "lib_gallery_images",
+      "lib_gallery_images_buildpanoramaimages",
+      "lib_gallery_images_gallerysection",
+      "lib_gallery_images_gallerysections",
+      "lib_gallery_images_panoramacinema",
+      "lib_gallery_images_panoramahighlights",
+      "lib_gallery_images_sampleeveryn",
+      "lib_gallery_images_somnus1highlights",
+      "lib_gallery_images_somnus2highlights"
+    ],
+    "22": [
+      "app_admin_page",
+      "app_admin_page_adminstats",
+      "app_admin_page_sessionuser",
+      "components_admin_commissionsmanager",
+      "components_admin_commissionsmanager_commissionrule",
+      "components_admin_commissionsmanager_commissionsmanager",
+      "components_admin_commissionsmanager_commissionsmanagerprops",
+      "components_admin_commissionsmanager_eventoption",
+      "components_admin_commissionsmanager_organizeroption",
+      "components_admin_contactleadsmanager",
+      "components_admin_contactleadsmanager_contactlead",
+      "components_admin_contactleadsmanager_contactleadsmanager",
+      "components_admin_organizersmanager_organizersmanager",
+      "components_admin_sqleditormanager",
+      "components_admin_sqleditormanager_historyitem",
+      "components_admin_sqleditormanager_isselectlike",
+      "components_admin_sqleditormanager_sqleditormanager"
+    ],
+    "23": [
+      "app_api_conversations_id_messages_route",
+      "app_api_conversations_id_messages_route_get",
+      "app_api_conversations_id_messages_route_post",
+      "app_api_conversations_id_read_route",
+      "app_api_conversations_id_read_route_patch",
+      "app_api_organizations_id_follow_route",
+      "app_api_organizations_id_follow_route_delete",
+      "app_api_organizations_id_follow_route_post",
+      "lib_auth_social_access",
+      "lib_auth_social_access_getconversationcounterpartyuserid",
+      "lib_auth_social_access_usercanaccessconversation",
+      "lib_auth_social_access_usercanmessageasorganization",
+      "lib_services_notifications",
+      "lib_services_notifications_createnotification",
+      "lib_services_notifications_createnotificationinput",
+      "lib_services_notifications_getorganizeruserid",
+      "lib_validations_schemas_messageschema"
+    ],
+    "24": [
+      "components_admin_createeventmodal",
+      "components_admin_createeventmodal_createeventmodal",
+      "components_admin_createeventmodal_createeventmodalprops",
+      "components_admin_createeventmodal_tickettype",
+      "components_admin_editeventmodal_tickettypedata",
+      "components_admin_imageuploadfield",
+      "components_admin_imageuploadfield_imageuploadfield",
+      "components_admin_imageuploadfield_imageuploadfieldprops",
+      "components_admin_ticketpricephasesfields",
+      "components_admin_ticketpricephasesfields_pricephaseformrow",
+      "components_admin_ticketpricephasesfields_ticketpricephasesfields",
+      "components_admin_ticketpricephasesfields_ticketpricephasesfieldsprops",
+      "components_admin_ticketpricephasesfields_todatetimelocalvalue",
+      "components_organizador_organizereventform",
+      "components_organizador_organizereventform_organizationoption",
+      "components_organizador_organizereventform_organizereventformprops",
+      "components_organizador_organizereventform_tickettype"
+    ],
+    "25": [
+      "components_eventos_individualtablesmap",
+      "components_eventos_individualtablesmap_individualtablesmap",
+      "components_eventos_individualtablesmap_individualtablesmapprops",
+      "components_eventos_individualtablesmap_section",
+      "lib_patriotas_individual_tables",
+      "lib_patriotas_individual_tables_generateviptables8x18",
+      "lib_patriotas_individual_tables_getavailabletables",
+      "lib_patriotas_individual_tables_gettablebynumber",
+      "lib_patriotas_individual_tables_gettablesbyzone",
+      "lib_patriotas_individual_tables_gettablestats",
+      "lib_patriotas_individual_tables_individualtable",
+      "lib_patriotas_individual_tables_marktableassold",
+      "lib_patriotas_individual_tables_non_vip_sections",
+      "lib_patriotas_individual_tables_patriotas_event_config",
+      "lib_patriotas_individual_tables_reservetable",
+      "lib_patriotas_individual_tables_table_zones",
+      "lib_patriotas_individual_tables_vip_tables"
+    ],
+    "26": [
+      "app_api_checkout_route",
+      "app_api_checkout_route_post",
+      "lib_payments_config_getappurl",
+      "lib_payments_fulfill_sale",
+      "lib_payments_fulfill_sale_attemptsendreceiptemail",
+      "lib_payments_fulfill_sale_fulfillsaleparams",
+      "lib_payments_fulfill_sale_fulfillsaleresult",
+      "lib_services_qr_generator",
+      "lib_services_qr_generator_generateqrhash",
+      "lib_services_qr_generator_generateqrpayload",
+      "lib_services_qr_generator_validateqrhash",
+      "lib_services_tickets_email",
+      "lib_services_tickets_email_mxnformat",
+      "lib_services_tickets_email_safetext",
+      "lib_services_tickets_email_sendticketsreceiptemail",
+      "lib_services_tickets_email_ticketwithrelations"
+    ],
+    "27": [
+      "components_eventos_carousel_poster_settings_carouselpostersettings",
+      "components_eventos_carousel_poster_settings_usecarouselposteroptional",
+      "components_eventos_carouselposterimage",
+      "components_eventos_carouselposterimage_carouselposterimage",
+      "components_eventos_carouselposterimage_clamp",
+      "components_eventos_carouselposterimage_props",
+      "components_eventos_eventcardzamna",
+      "components_eventos_eventcardzamna_eventcardzamna",
+      "components_eventos_eventcardzamna_eventcardzamnaprops",
+      "components_eventos_eventcardzamna_geteventstatus",
+      "components_eventos_galleryeventcardzamna",
+      "components_eventos_galleryeventcardzamna_galleryeventcardzamna",
+      "components_eventos_galleryeventcardzamna_galleryeventcardzamnaprops",
+      "lib_gallery_events",
+      "lib_gallery_events_gallery_events",
+      "lib_gallery_events_galleryevent"
+    ],
+    "28": [
+      "app_admin_page_adminpage",
+      "components_admin_revenuedashboard",
+      "components_admin_revenuedashboard_eventoption",
+      "components_admin_revenuedashboard_formatdate",
+      "components_admin_revenuedashboard_formatmoney",
+      "components_admin_revenuedashboard_kpicard",
+      "components_admin_revenuedashboard_organizeroption",
+      "components_admin_revenuedashboard_periodpreset",
+      "components_admin_revenuedashboard_recentsale",
+      "components_admin_revenuedashboard_revenuebyevent",
+      "components_admin_revenuedashboard_revenuebyorganizer",
+      "components_admin_revenuedashboard_revenuedashboard",
+      "components_admin_revenuedashboard_revenuereport",
+      "components_admin_revenuedashboard_revenuesummary",
+      "components_admin_revenuedashboard_toinputdate"
+    ],
+    "29": [
+      "app_api_admin_sql_route",
+      "app_api_admin_sql_route_get",
+      "app_api_admin_sql_route_hasmultiplestatements",
+      "app_api_admin_sql_route_isselectlike",
+      "app_api_admin_sql_route_post",
+      "app_api_admin_sql_route_serializerows",
+      "app_api_admin_sql_route_striptrailingsemicolons",
+      "lib_auth_session",
+      "lib_auth_session_createserverclient",
+      "lib_auth_session_getsupabaseadmin",
+      "lib_auth_session_signout",
+      "lib_auth_supabase_auth",
+      "lib_auth_types",
+      "lib_auth_types_sessionuser",
+      "lib_auth_types_staffmembershipsummary"
+    ],
+    "30": [
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_compress_gallery",
+      "package_scripts_db_delete_somnus_panorama",
+      "package_scripts_db_generate",
+      "package_scripts_db_migrate_storage",
+      "package_scripts_db_push",
+      "package_scripts_db_studio",
+      "package_scripts_db_update_quantities",
+      "package_scripts_dev",
+      "package_scripts_lint",
+      "package_scripts_start",
+      "package_scripts_test_auth",
+      "package_scripts_verify",
+      "package_scripts_verify_env"
+    ],
+    "31": [
+      "app_api_admin_revenue_verify_route",
+      "app_api_admin_revenue_verify_route_get",
+      "app_api_admin_revenue_verify_route_parsedateparam",
+      "app_api_payments_stripe_public_config_route",
+      "app_api_payments_stripe_public_config_route_get",
+      "lib_admin_revenue_getplatformtotalfromdb",
+      "lib_payments_config",
+      "lib_payments_config_getstripepublishablekey",
+      "lib_payments_config_isinstallmentsenabled",
+      "lib_payments_config_isoxxoenabled",
+      "lib_payments_config_isstripeenabled",
+      "lib_payments_stripe_revenue",
+      "lib_payments_stripe_revenue_stripefeesverification",
+      "lib_payments_stripe_revenue_sumapplicationfeesinrange"
+    ],
+    "32": [
+      "app_page",
+      "app_page_converteventtoconcert",
+      "app_page_homepage",
+      "components_brandpresencecarousel",
+      "components_brandpresencecarousel_brand_logos",
+      "components_brandpresencecarousel_brandpresencecarousel",
+      "components_contactform",
+      "components_contactform_contactform",
+      "components_revealsection",
+      "components_revealsection_revealsection",
+      "lib_utils_index_eventcalendarkey",
+      "lib_utils_index_iseventpastbycalendar",
+      "lib_utils_index_localtodaycalendarkey"
+    ],
+    "33": [
+      "components_admin_organizerdetailmodal",
+      "components_admin_organizerdetailmodal_commissionrule",
+      "components_admin_organizerdetailmodal_organizerdetail",
+      "components_admin_organizerdetailmodal_organizerdetailmodal",
+      "components_admin_organizerdetailmodal_organizerdetailmodalprops",
+      "components_admin_organizerdetailmodal_organizerevent",
+      "components_admin_organizersmanager",
+      "components_admin_organizersmanager_organizerrow",
+      "components_admin_organizersmanager_organizersmanagerprops",
+      "components_ui_button",
+      "components_ui_button_button",
+      "components_ui_button_buttonprops",
+      "components_ui_button_buttonvariants"
+    ],
+    "34": [
+      "dotenv",
+      "eslint",
+      "package_devdependencies",
+      "package_devdependencies_dotenv",
+      "package_devdependencies_eslint",
+      "package_devdependencies_tsx",
+      "package_devdependencies_types_bcryptjs",
+      "package_devdependencies_types_qrcode",
+      "package_devdependencies_types_react_dom",
+      "tsx",
+      "types_bcryptjs",
+      "types_qrcode",
+      "types_react_dom"
+    ],
+    "35": [
+      "app_api_auth_otp_send_route",
+      "app_api_auth_otp_send_route_post",
+      "app_api_auth_otp_send_route_sendotpschema",
+      "lib_auth_otp",
+      "lib_auth_otp_cooldown",
+      "lib_auth_otp_cooldown_cleanupoldentries",
+      "lib_auth_otp_cooldown_isinotpcooldown",
+      "lib_auth_otp_cooldown_lastotpsentat",
+      "lib_auth_otp_cooldown_markotpsent",
+      "lib_auth_otp_sendemailotp",
+      "lib_auth_otp_sendemailotpresult",
+      "lib_services_email_generateverificationcode"
+    ],
+    "36": [
+      "app_api_payments_stripe_create_intent_route",
+      "app_api_payments_stripe_create_intent_route_post",
+      "lib_payments_config_getstripeplatformcountry",
+      "lib_payments_connect_assertorganizercanreceivepayments",
+      "lib_payments_stripe_connect_charge",
+      "lib_payments_stripe_connect_charge_cancelpaymentintentforsale",
+      "lib_payments_stripe_connect_charge_canreusepaymentintent",
+      "lib_payments_stripe_connect_charge_isapplicationfeeblockedforconnectedaccount",
+      "lib_payments_stripe_connect_charge_isdestinationchargepaymentintent",
+      "lib_payments_stripe_connect_charge_islegacydestinationcharge",
+      "lib_payments_stripe_connect_charge_retrievepaymentintentforsale",
+      "lib_payments_stripe_connect_charge_us_platform_blocked_connected"
+    ],
+    "37": [
+      "app_layout",
+      "app_layout_anton",
+      "app_layout_archivo",
+      "app_layout_cinzel",
+      "app_layout_metadata",
+      "app_layout_rootlayout",
+      "app_layout_viewport",
+      "app_providers",
+      "app_providers_providers",
+      "components_cursorfollower",
+      "components_cursorfollower_cursorfollower",
+      "components_cursorfollower_particle"
+    ],
+    "38": [
+      "app_organizaciones_slug_organizationprofileclient",
+      "app_organizaciones_slug_organizationprofileclient_organizationprofileclient",
+      "app_organizaciones_slug_organizationprofileclient_organizationprofileclientprops",
+      "app_organizaciones_slug_page",
+      "app_organizaciones_slug_page_organizationprofilepage",
+      "components_organizaciones_followbutton",
+      "components_organizaciones_followbutton_followbutton",
+      "components_organizaciones_followbutton_followbuttonprops",
+      "components_organizaciones_organizationprofileheader",
+      "components_organizaciones_organizationprofileheader_organizationprofileheader",
+      "components_organizaciones_organizationprofileheader_organizationprofileheaderprops",
+      "components_organizaciones_organizationprofileheader_publicorgprofile"
+    ],
+    "39": [
+      "components_eventos_patriotastablesmap",
+      "components_eventos_patriotastablesmap_patriotastablesmap",
+      "components_eventos_patriotastablesmap_patriotastablesmapprops",
+      "components_eventos_patriotastablesmap_section",
+      "lib_patriotas_tables_162",
+      "lib_patriotas_tables_162_generateviptables9x18",
+      "lib_patriotas_tables_162_individualtable",
+      "lib_patriotas_tables_162_non_vip_sections_162",
+      "lib_patriotas_tables_162_svg_viewport_162",
+      "lib_patriotas_tables_162_table_zones_162",
+      "lib_patriotas_tables_162_vip_tables_162"
+    ],
+    "40": [
+      "components_admin_editeventmodal",
+      "components_admin_editeventmodal_editeventmodal",
+      "components_admin_editeventmodal_editeventmodalprops",
+      "components_admin_editeventmodal_eventdata",
+      "components_admin_editeventmodal_todatestr",
+      "components_admin_editeventmodal_todatetimelocalstr",
+      "components_admin_eventstable",
+      "components_admin_eventstable_event",
+      "components_admin_eventstable_eventstable",
+      "components_admin_eventstable_eventstableprops"
+    ],
+    "41": [
+      "components_heroexample",
+      "components_heroexample_aboutartistprops",
+      "components_heroexample_aboutartistsection",
+      "components_heroexample_eventpageexample",
+      "components_heroexample_heroexample",
+      "components_heroexample_heroexampleprops",
+      "components_heroexample_tickettiersprops",
+      "components_heroexample_tickettierssection",
+      "components_heroexample_tickettypecard",
+      "components_heroexample_tickettypecardprops"
+    ],
+    "42": [
+      "jspdf",
+      "lib_services_qr_generator_generateqrcode",
+      "lib_services_ticket_generator",
+      "lib_services_ticket_generator_createqrpayload",
+      "lib_services_ticket_generator_generatemultipleticketspdf",
+      "lib_services_ticket_generator_generateticketpdf",
+      "package_dependencies_jspdf",
+      "package_dependencies_qrcode",
+      "qrcode",
+      "types_index_ticketpdfdata"
+    ],
+    "43": [
+      "package_dependencies",
+      "package_dependencies_radix_ui_react_label",
+      "package_dependencies_radix_ui_react_tabs",
+      "package_dependencies_radix_ui_react_toast",
+      "package_dependencies_react_hook_form",
+      "package_dependencies_zustand",
+      "radix_ui_react_label",
+      "radix_ui_react_tabs",
+      "react_hook_form",
+      "zustand"
+    ],
+    "44": [
+      "app_api_admin_organizers_id_reset_stripe_route",
+      "app_api_admin_organizers_id_reset_stripe_route_post",
+      "lib_admin_reset_organizer_stripe",
+      "lib_admin_reset_organizer_stripe_resetallorganizersstripe",
+      "lib_admin_reset_organizer_stripe_resetorganizerstripe",
+      "lib_admin_reset_organizer_stripe_resetorganizerstriperesult",
+      "scripts_reset_organizers_stripe_migration",
+      "scripts_reset_organizers_stripe_migration_main",
+      "scripts_reset_organizers_stripe_migration_prisma"
+    ],
+    "45": [
+      "scripts_delete_somnus_panorama_events",
+      "scripts_delete_somnus_panorama_events_deleteeventwithsales",
+      "scripts_delete_somnus_panorama_events_feb_2026_end",
+      "scripts_delete_somnus_panorama_events_feb_2026_start",
+      "scripts_delete_somnus_panorama_events_main",
+      "scripts_delete_somnus_panorama_events_mar_2026_end",
+      "scripts_delete_somnus_panorama_events_mar_2026_start",
+      "scripts_delete_somnus_panorama_events_matchestargetevent",
+      "scripts_delete_somnus_panorama_events_prisma"
+    ],
+    "46": [
+      "app_eventos_id_mesa_tablenumber_pagar_token_page",
+      "app_eventos_id_mesa_tablenumber_pagar_token_page_eventflyersrc",
+      "app_eventos_id_mesa_tablenumber_pagar_token_page_formatpaidat",
+      "app_eventos_id_mesa_tablenumber_pagar_token_page_invitedata",
+      "app_eventos_id_mesa_tablenumber_pagar_token_page_mxn",
+      "app_eventos_id_mesa_tablenumber_pagar_token_page_pagarinvitepage",
+      "app_eventos_id_mesa_tablenumber_pagar_token_page_paymenttimelineentry"
+    ],
+    "47": [
+      "app_invitacion_token_page",
+      "app_invitacion_token_page_invitacionpage",
+      "app_invitacion_token_page_role_labels",
+      "app_verificar_email_page",
+      "app_verificar_email_page_verificaremailcontent",
+      "app_verificar_email_page_verificaremailpage",
+      "lib_auth_registration_resolvepostauthredirect"
+    ],
+    "48": [
+      "components_navbarfooter",
+      "components_navbarfooter_footermockup",
+      "components_navbarfooter_footerprops",
+      "components_navbarfooter_layoutmockup",
+      "components_navbarfooter_layoutmockupprops",
+      "components_navbarfooter_navbarmockup",
+      "components_navbarfooter_navbarprops"
+    ],
+    "49": [
+      "lib_services_inventory",
+      "lib_services_inventory_checkavailability",
+      "lib_services_inventory_geteventinventorystatus",
+      "lib_services_inventory_haseventcapacity",
+      "lib_services_inventory_releasetickets",
+      "lib_services_inventory_reservetickets",
+      "lib_services_inventory_validateviptablecapacity"
+    ],
+    "50": [
+      "scripts_manual_browser_smoke",
+      "scripts_manual_browser_smoke_log",
+      "scripts_manual_browser_smoke_main",
+      "scripts_manual_browser_smoke_out",
+      "scripts_manual_browser_smoke_results",
+      "scripts_manual_browser_smoke_shot",
+      "scripts_manual_browser_smoke_stamp"
+    ],
+    "51": [
+      "app_checkout_saleid_page",
+      "app_checkout_saleid_page_checkoutpage",
+      "components_payments_stripecheckoutform",
+      "components_payments_stripecheckoutform_checkoutinner",
+      "components_payments_stripecheckoutform_stripecheckoutform",
+      "components_payments_stripecheckoutform_stripecheckoutformprops"
+    ],
+    "52": [
+      "components_admin_gallerymanager",
+      "components_admin_gallerymanager_galleryimage",
+      "components_admin_gallerymanager_gallerymanager",
+      "components_admin_gallerymanager_gallerysection",
+      "components_admin_gallerymanager_postgalleryimage",
+      "components_admin_gallerymanager_uploadinputid"
+    ],
+    "53": [
+      "scripts_compress_gallery",
+      "scripts_compress_gallery_assets_dir",
+      "scripts_compress_gallery_compressfile",
+      "scripts_compress_gallery_findjpegs",
+      "scripts_compress_gallery_gallery_folders",
+      "scripts_compress_gallery_main"
+    ],
+    "54": [
+      "scripts_migrate_staff_memberships",
+      "scripts_migrate_staff_memberships_legacy_staff_roles",
+      "scripts_migrate_staff_memberships_main",
+      "scripts_migrate_staff_memberships_migratelegacystaffroles",
+      "scripts_migrate_staff_memberships_migratevenuesfromevents",
+      "scripts_migrate_staff_memberships_role_map"
+    ],
+    "55": [
+      "types_next_auth_d",
+      "types_next_auth_d_jwt",
+      "types_next_auth_d_next_auth",
+      "types_next_auth_d_next_auth_jwt",
+      "types_next_auth_d_session",
+      "types_next_auth_d_user"
+    ],
+    "56": [
+      "app_api_invites_token_route",
+      "app_api_invites_token_route_get",
+      "app_api_invites_token_route_handleslotinvite",
+      "app_api_invites_token_route_mesapagarurl"
+    ],
+    "57": [
+      "app_pago_estado_page",
+      "app_pago_estado_page_pagoestadopage",
+      "app_pago_estado_pagoestadocontent",
+      "app_pago_estado_pagoestadocontent_pagoestadocontent"
+    ],
+    "58": [
+      "app_vendedor_page",
+      "app_vendedor_page_eventoption",
+      "app_vendedor_page_tickettype",
+      "app_vendedor_page_vendedorpage"
+    ],
+    "59": [
+      "package",
+      "package_name",
+      "package_private",
+      "package_version"
+    ],
+    "60": [
+      "scripts_backfill_org_slugs",
+      "scripts_backfill_org_slugs_main",
+      "scripts_backfill_org_slugs_prisma",
+      "scripts_backfill_org_slugs_slugify"
+    ],
+    "61": [
+      "app_mesa_eventid_tablenumber_page",
+      "app_mesa_eventid_tablenumber_page_mesahostpage",
+      "app_mesa_eventid_tablenumber_page_slotinvite"
+    ],
+    "62": [
+      "components_eventos_header",
+      "components_eventos_header_header",
+      "components_eventos_header_headerprops"
+    ],
+    "63": [
+      "eslintrc",
+      "eslintrc_extends",
+      "ref_next_core_web_vitals"
+    ],
+    "64": [
+      "hooks_usescrollreveal",
+      "hooks_usescrollreveal_default_options",
+      "hooks_usescrollreveal_usescrollreveal"
+    ],
+    "65": [
+      "prisma_seed",
+      "prisma_seed_main",
+      "prisma_seed_prisma"
+    ],
+    "66": [
+      "scripts_create_stripe_webhook",
+      "scripts_create_stripe_webhook_set_kv",
+      "scripts_create_stripe_webhook_sh__entry"
+    ],
+    "67": [
+      "scripts_seed_commission",
+      "scripts_seed_commission_p",
+      "scripts_seed_commission_prismaclient"
+    ],
+    "68": [
+      "scripts_set_stripe_env",
+      "scripts_set_stripe_env_set_kv",
+      "scripts_set_stripe_env_sh__entry"
+    ],
+    "69": [
+      "scripts_stripe_production_setup",
+      "scripts_stripe_production_setup_set_kv",
+      "scripts_stripe_production_setup_sh__entry"
+    ],
+    "70": [
+      "scripts_update_ticket_quantities",
+      "scripts_update_ticket_quantities_main",
+      "scripts_update_ticket_quantities_prisma"
+    ],
+    "71": [
+      "scripts_verificar_env",
+      "scripts_verificar_env_optional",
+      "scripts_verificar_env_required"
+    ],
+    "72": [
+      "scripts_vps_push_deploy",
+      "scripts_vps_push_deploy_node_options",
+      "scripts_vps_push_deploy_sh__entry"
+    ],
+    "73": [
+      "app_error",
+      "app_error_error"
+    ],
+    "74": [
+      "app_eventos_id_mesa_tablenumber_invitar_page",
+      "app_eventos_id_mesa_tablenumber_invitar_page_invitarmesapage"
+    ],
+    "75": [
+      "app_eventos_id_mesas_page",
+      "app_eventos_id_mesas_page_eventmesasredirectpage"
+    ],
+    "76": [
+      "app_pago_exitoso_page",
+      "app_pago_exitoso_page_pagoexitosopage"
+    ],
+    "77": [
+      "app_supervisor_page",
+      "app_supervisor_page_supervisorpage"
+    ],
+    "78": [
+      "autoprefixer",
+      "package_devdependencies_autoprefixer"
+    ],
+    "79": [
+      "bcryptjs",
+      "package_dependencies_bcryptjs"
+    ],
+    "80": [
+      "class_variance_authority",
+      "package_dependencies_class_variance_authority"
+    ],
+    "81": [
+      "clsx",
+      "package_dependencies_clsx"
+    ],
+    "82": [
+      "date_fns",
+      "package_dependencies_date_fns"
+    ],
+    "83": [
+      "embla_carousel_react",
+      "package_dependencies_embla_carousel_react"
+    ],
+    "84": [
+      "eslint_config_next",
+      "package_devdependencies_eslint_config_next"
+    ],
+    "85": [
+      "gsap",
+      "package_dependencies_gsap"
+    ],
+    "86": [
+      "hookform_resolvers",
+      "package_dependencies_hookform_resolvers"
+    ],
+    "87": [
+      "jose",
+      "package_dependencies_jose"
+    ],
+    "88": [
+      "lucide_react",
+      "package_dependencies_lucide_react"
+    ],
+    "89": [
+      "next",
+      "package_dependencies_next"
+    ],
+    "90": [
+      "next_auth",
+      "package_dependencies_next_auth"
+    ],
+    "91": [
+      "next_config",
+      "next_config_nextconfig"
+    ],
+    "92": [
+      "nodemailer",
+      "package_dependencies_nodemailer"
+    ],
+    "93": [
+      "package_dependencies_prisma_client",
+      "prisma_client"
+    ],
+    "94": [
+      "package_dependencies_qrcode_react",
+      "qrcode_react"
+    ],
+    "95": [
+      "package_dependencies_radix_ui_react_accordion",
+      "radix_ui_react_accordion"
+    ],
+    "96": [
+      "package_dependencies_radix_ui_react_alert_dialog",
+      "radix_ui_react_alert_dialog"
+    ],
+    "97": [
+      "package_dependencies_radix_ui_react_avatar",
+      "radix_ui_react_avatar"
+    ],
+    "98": [
+      "package_dependencies_radix_ui_react_checkbox",
+      "radix_ui_react_checkbox"
+    ],
+    "99": [
+      "package_dependencies_radix_ui_react_dialog",
+      "radix_ui_react_dialog"
+    ],
+    "100": [
+      "package_dependencies_radix_ui_react_dropdown_menu",
+      "radix_ui_react_dropdown_menu"
+    ],
+    "101": [
+      "package_dependencies_radix_ui_react_popover",
+      "radix_ui_react_popover"
+    ],
+    "102": [
+      "package_dependencies_radix_ui_react_select",
+      "radix_ui_react_select"
+    ],
+    "103": [
+      "package_dependencies_radix_ui_react_separator",
+      "radix_ui_react_separator"
+    ],
+    "104": [
+      "package_dependencies_radix_ui_react_slot",
+      "radix_ui_react_slot"
+    ],
+    "105": [
+      "package_dependencies_react_dom",
+      "react_dom"
+    ],
+    "106": [
+      "package_dependencies_resend",
+      "resend"
+    ],
+    "107": [
+      "package_dependencies_sharp",
+      "sharp"
+    ],
+    "108": [
+      "package_dependencies_sonner",
+      "sonner"
+    ],
+    "109": [
+      "package_dependencies_stripe",
+      "stripe"
+    ],
+    "110": [
+      "package_dependencies_stripe_react_stripe_js",
+      "stripe_react_stripe_js"
+    ],
+    "111": [
+      "package_dependencies_stripe_stripe_js",
+      "stripe_stripe_js"
+    ],
+    "112": [
+      "package_dependencies_swiper",
+      "swiper"
+    ],
+    "113": [
+      "package_dependencies_tailwind_merge",
+      "tailwind_merge"
+    ],
+    "114": [
+      "package_dependencies_tailwindcss_animate",
+      "tailwindcss_animate"
+    ],
+    "115": [
+      "package_dependencies_tanstack_react_query",
+      "tanstack_react_query"
+    ],
+    "116": [
+      "package_dependencies_uuid",
+      "uuid"
+    ],
+    "117": [
+      "package_dependencies_zod",
+      "zod"
+    ],
+    "118": [
+      "package_devdependencies_postcss",
+      "postcss"
+    ],
+    "119": [
+      "package_devdependencies_prisma",
+      "prisma"
+    ],
+    "120": [
+      "package_devdependencies_tailwindcss",
+      "tailwindcss"
+    ],
+    "121": [
+      "package_devdependencies_types_node",
+      "types_node"
+    ],
+    "122": [
+      "package_devdependencies_types_nodemailer",
+      "types_nodemailer"
+    ],
+    "123": [
+      "package_devdependencies_types_react",
+      "types_react"
+    ],
+    "124": [
+      "package_devdependencies_types_uuid",
+      "types_uuid"
+    ],
+    "125": [
+      "package_devdependencies_typescript",
+      "typescript"
+    ],
+    "126": [
+      "postcss_config",
+      "postcss_config_config"
+    ],
+    "127": [
+      "scripts_backup_postgres",
+      "scripts_backup_postgres_sh__entry"
+    ],
+    "128": [
+      "scripts_check_stripe_country",
+      "scripts_check_stripe_country_sh__entry"
+    ],
+    "129": [
+      "scripts_customize_brand",
+      "scripts_customize_brand_sh__entry"
+    ],
+    "130": [
+      "scripts_deploy_mx_stripe_migration",
+      "scripts_deploy_mx_stripe_migration_sh__entry"
+    ],
+    "131": [
+      "scripts_deploy_push_main",
+      "scripts_deploy_push_main_sh__entry"
+    ],
+    "132": [
+      "scripts_finish_mx_setup",
+      "scripts_finish_mx_setup_sh__entry"
+    ],
+    "133": [
+      "scripts_fix_server",
+      "scripts_fix_server_sh__entry"
+    ],
+    "134": [
+      "scripts_git_commit_push",
+      "scripts_git_commit_push_sh__entry"
+    ],
+    "135": [
+      "scripts_git_push_check",
+      "scripts_git_push_check_sh__entry"
+    ],
+    "136": [
+      "scripts_list_users",
+      "scripts_list_users_main"
+    ],
+    "137": [
+      "scripts_migrate_db_to_vps",
+      "scripts_migrate_db_to_vps_sh__entry"
+    ],
+    "138": [
+      "scripts_setup_local_postgres",
+      "scripts_setup_local_postgres_sh__entry"
+    ],
+    "139": [
+      "scripts_setup_local_uploads",
+      "scripts_setup_local_uploads_sh__entry"
+    ],
+    "140": [
+      "scripts_setup_stripe_webhook",
+      "scripts_setup_stripe_webhook_sh__entry"
+    ],
+    "141": [
+      "scripts_verify_coordinator",
+      "scripts_verify_coordinator_steps"
+    ],
+    "142": [
+      "scripts_verify_stripe_env",
+      "scripts_verify_stripe_env_sh__entry"
+    ],
+    "143": [
+      "tailwind_config",
+      "tailwind_config_config"
+    ],
+    "144": [
+      "verificar_cambios_servidor",
+      "verificar_cambios_servidor_sh__entry"
+    ],
+    "145": [
+      "app_api_authjs_nextauth_route_get_post"
+    ],
+    "146": [
+      "lib_auth_sync_user_ensureprismauserfromauth"
+    ],
+    "147": [
+      "lib_patriotas_individual_tables_table_zones_8x18"
+    ],
+    "148": [
+      "lib_patriotas_individual_tables_vip_tables_8x18"
+    ],
+    "149": [
+      "lib_utils_index_calculateclipcommission"
+    ],
+    "150": [
+      "lib_utils_index_calculatetotalwithclipcommission"
+    ],
+    "151": [
+      "scripts_fix_env_app_name"
+    ]
+  },
+  "cohesion": {
+    "0": 0.06666666666666667,
+    "1": 0.0815686274509804,
+    "2": 0.05357142857142857,
+    "3": 0.0859465737514518,
+    "4": 0.10510510510510511,
+    "5": 0.10114942528735632,
+    "6": 0.10804597701149425,
+    "7": 0.07407407407407407,
+    "8": 0.14461538461538462,
+    "9": 0.13768115942028986,
+    "10": 0.11857707509881422,
+    "11": 0.1,
+    "12": 0.14285714285714285,
+    "13": 0.14761904761904762,
+    "14": 0.1523809523809524,
+    "15": 0.20476190476190476,
+    "16": 0.18571428571428572,
+    "17": 0.14210526315789473,
+    "18": 0.1,
+    "19": 0.1871345029239766,
+    "20": 0.23529411764705882,
+    "21": 0.12418300653594772,
+    "22": 0.14705882352941177,
+    "23": 0.21323529411764705,
+    "24": 0.19117647058823528,
+    "25": 0.18382352941176472,
+    "26": 0.23333333333333334,
+    "27": 0.2,
+    "28": 0.1619047619047619,
+    "29": 0.21904761904761905,
+    "30": 0.13333333333333333,
+    "31": 0.26373626373626374,
+    "32": 0.2692307692307692,
+    "33": 0.20512820512820512,
+    "34": 0.15384615384615385,
+    "35": 0.2878787878787879,
+    "36": 0.3484848484848485,
+    "37": 0.19696969696969696,
+    "38": 0.22727272727272727,
+    "39": 0.2909090909090909,
+    "40": 0.26666666666666666,
+    "41": 0.2,
+    "42": 0.26666666666666666,
+    "43": 0.2222222222222222,
+    "44": 0.3333333333333333,
+    "45": 0.2777777777777778,
+    "46": 0.38095238095238093,
+    "47": 0.38095238095238093,
+    "48": 0.2857142857142857,
+    "49": 0.2857142857142857,
+    "50": 0.38095238095238093,
+    "51": 0.4,
+    "52": 0.4666666666666667,
+    "53": 0.5333333333333333,
+    "54": 0.4666666666666667,
+    "55": 0.3333333333333333,
+    "56": 1.0,
+    "57": 0.6666666666666666,
+    "58": 0.5,
+    "59": 0.5,
+    "60": 0.6666666666666666,
+    "61": 0.6666666666666666,
+    "62": 0.6666666666666666,
+    "63": 0.6666666666666666,
+    "64": 0.6666666666666666,
+    "65": 0.6666666666666666,
+    "66": 1.0,
+    "67": 0.6666666666666666,
+    "68": 1.0,
+    "69": 1.0,
+    "70": 0.6666666666666666,
+    "71": 0.6666666666666666,
+    "72": 0.6666666666666666,
+    "73": 1.0,
+    "74": 1.0,
+    "75": 1.0,
+    "76": 1.0,
+    "77": 1.0,
+    "78": 1.0,
+    "79": 1.0,
+    "80": 1.0,
+    "81": 1.0,
+    "82": 1.0,
+    "83": 1.0,
+    "84": 1.0,
+    "85": 1.0,
+    "86": 1.0,
+    "87": 1.0,
+    "88": 1.0,
+    "89": 1.0,
+    "90": 1.0,
+    "91": 1.0,
+    "92": 1.0,
+    "93": 1.0,
+    "94": 1.0,
+    "95": 1.0,
+    "96": 1.0,
+    "97": 1.0,
+    "98": 1.0,
+    "99": 1.0,
+    "100": 1.0,
+    "101": 1.0,
+    "102": 1.0,
+    "103": 1.0,
+    "104": 1.0,
+    "105": 1.0,
+    "106": 1.0,
+    "107": 1.0,
+    "108": 1.0,
+    "109": 1.0,
+    "110": 1.0,
+    "111": 1.0,
+    "112": 1.0,
+    "113": 1.0,
+    "114": 1.0,
+    "115": 1.0,
+    "116": 1.0,
+    "117": 1.0,
+    "118": 1.0,
+    "119": 1.0,
+    "120": 1.0,
+    "121": 1.0,
+    "122": 1.0,
+    "123": 1.0,
+    "124": 1.0,
+    "125": 1.0,
+    "126": 1.0,
+    "127": 1.0,
+    "128": 1.0,
+    "129": 1.0,
+    "130": 1.0,
+    "131": 1.0,
+    "132": 1.0,
+    "133": 1.0,
+    "134": 1.0,
+    "135": 1.0,
+    "136": 1.0,
+    "137": 1.0,
+    "138": 1.0,
+    "139": 1.0,
+    "140": 1.0,
+    "141": 1.0,
+    "142": 1.0,
+    "143": 1.0,
+    "144": 1.0,
+    "145": 1.0,
+    "146": 1.0,
+    "147": 1.0,
+    "148": 1.0,
+    "149": 1.0,
+    "150": 1.0,
+    "151": 1.0
+  },
+  "gods": [
+    {
+      "id": "lib_auth_session_getsession",
+      "label": "getSession()",
+      "degree": 128
+    },
+    {
+      "id": "lib_auth_types_hasrole",
+      "label": "hasRole()",
+      "degree": 61
+    },
+    {
+      "id": "lib_utils_index_cn",
+      "label": "cn()",
+      "degree": 23
+    },
+    {
+      "id": "components_ui_button_button",
+      "label": "Button",
+      "degree": 17
+    },
+    {
+      "id": "lib_auth_event_access_userownsorganization",
+      "label": "userOwnsOrganization()",
+      "degree": 17
+    },
+    {
+      "id": "lib_ticket_pricing_effectiveticketpriceat",
+      "label": "effectiveTicketPriceAt()",
+      "degree": 16
+    },
+    {
+      "id": "lib_utils_index_formateventcalendardate",
+      "label": "formatEventCalendarDate()",
+      "degree": 15
+    },
+    {
+      "id": "package_scripts",
+      "label": "scripts",
+      "degree": 15
+    },
+    {
+      "id": "tsconfig_compileroptions",
+      "label": "compilerOptions",
+      "degree": 15
+    },
+    {
+      "id": "components_layout_siteheader_siteheader",
+      "label": "SiteHeader()",
+      "degree": 13
+    }
+  ],
+  "surprises": [
+    {
+      "source": "GET()",
+      "target": "getSession()",
+      "source_files": [
+        "app/api/events/route.ts",
+        "lib/auth/session.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; bridges separate communities; peripheral node `GET()` unexpectedly reaches hub `getSession()`"
+    },
+    {
+      "source": "DELETE()",
+      "target": "getSession()",
+      "source_files": [
+        "app/api/organizations/[id]/follow/route.ts",
+        "lib/auth/session.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; bridges separate communities; peripheral node `DELETE()` unexpectedly reaches hub `getSession()`"
+    },
+    {
+      "source": "GET()",
+      "target": "getSession()",
+      "source_files": [
+        "app/api/organizations/route.ts",
+        "lib/auth/session.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; bridges separate communities; peripheral node `GET()` unexpectedly reaches hub `getSession()`"
+    },
+    {
+      "source": "PATCH()",
+      "target": "getSession()",
+      "source_files": [
+        "app/api/venues/route.ts",
+        "lib/auth/session.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; bridges separate communities; peripheral node `PATCH()` unexpectedly reaches hub `getSession()`"
+    },
+    {
+      "source": "GET()",
+      "target": "getSession()",
+      "source_files": [
+        "app/api/admin/commissions/route.ts",
+        "lib/auth/session.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; peripheral node `GET()` unexpectedly reaches hub `getSession()`"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}
