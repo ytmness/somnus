@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
 import {
   buildTicketPass,
+  isWalletPassEnabled,
   WalletPassNotFoundError,
   WalletPassUnavailableError,
 } from "@/lib/services/wallet-pass";
@@ -24,6 +25,15 @@ export async function GET(
   const { ticketId } = params;
 
   try {
+    // La disponibilidad es una propiedad del servidor, no del usuario: se
+    // resuelve antes de autenticar para no pegarle a la BD si no hay certificados.
+    if (!isWalletPassEnabled()) {
+      return NextResponse.json(
+        { error: "Apple Wallet no está disponible en este momento" },
+        { status: 503 }
+      );
+    }
+
     const token = request.nextUrl.searchParams.get("t");
     let authorized = false;
 

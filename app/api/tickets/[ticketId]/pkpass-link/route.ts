@@ -23,16 +23,16 @@ export async function POST(
   { params }: { params: { ticketId: string } }
 ) {
   try {
-    const user = await getSession();
-    if (!user) {
-      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-    }
-
     if (!isWalletPassEnabled()) {
       return NextResponse.json(
         { error: "Apple Wallet no está disponible en este momento" },
         { status: 503 }
       );
+    }
+
+    const user = await getSession();
+    if (!user) {
+      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
     if (!(await userOwnsTicket(user, params.ticketId))) {
