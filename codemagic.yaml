@@ -13,7 +13,8 @@ definitions:
       bundle_identifier: live.somnus.app
     vars:
       BUNDLE_ID: "live.somnus.app"
-      XCODE_WORKSPACE: "ios/App/App.xcworkspace"
+      # Capacitor 8 (SPM) genera App.xcodeproj, no App.xcworkspace.
+      XCODE_PROJECT: "ios/App/App.xcodeproj"
       XCODE_SCHEME: "App"
       IOS_DEPLOYMENT_TARGET: "15.0"
 
@@ -44,11 +45,13 @@ workflows:
       - name: Generar y sincronizar proyecto iOS
         script: |
           # El proyecto Xcode no se versiona: se genera aqui en cada build.
-          # Ver ios-config/ para la configuracion que si vive en el repo.
+          # Capacitor 8 usa SPM por defecto (App.xcodeproj, sin xcworkspace).
           if [ ! -d "ios" ]; then
             npx cap add ios
           fi
           npx cap sync ios
+          test -d ios/App/App.xcodeproj
+          ls -la ios/App
 
       - name: Aplicar overlay de ios-config/
         script: bash scripts/ios-postadd.sh
@@ -61,17 +64,26 @@ workflows:
           LATEST=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || echo "0")
           NEXT=$((LATEST + 1))
           echo "Build number: $NEXT"
-          cd ios/App
-          agvtool new-version -all "$NEXT"
+          # Subshell: en Codemagic el cwd persiste entre scripts.
+          (cd ios/App && agvtool new-version -all "$NEXT")
 
       - name: Descargar provisioning profiles
-        script: xcode-project use-profiles
+        script: |
+          (cd ios/App && xcode-project use-profiles)
 
       - name: Compilar IPA
         script: |
-          xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME"
+          PROJECT="${CM_BUILD_DIR:-$PWD}/ios/App/App.xcodeproj"
+          WORKSPACE="${CM_BUILD_DIR:-$PWD}/ios/App/App.xcworkspace"
+          if [ -d "$WORKSPACE" ]; then
+            xcode-project build-ipa --workspace "$WORKSPACE" --scheme "$XCODE_SCHEME"
+          elif [ -d "$PROJECT" ]; then
+            xcode-project build-ipa --project "$PROJECT" --scheme "$XCODE_SCHEME"
+          else
+            echo "ERROR: no hay App.xcodeproj ni App.xcworkspace en ios/App" >&2
+            ls -la ios/App || true
+            exit 1
+          fi
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
