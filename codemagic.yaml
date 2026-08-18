@@ -70,15 +70,46 @@ workflows:
       - name: Descargar provisioning profiles
         script: |
           (cd ios/App && xcode-project use-profiles)
+          bash scripts/ios-align-entitlements.sh
 
       - name: Compilar IPA
         script: |
+          set -euo pipefail
           PROJECT="${CM_BUILD_DIR:-$PWD}/ios/App/App.xcodeproj"
           WORKSPACE="${CM_BUILD_DIR:-$PWD}/ios/App/App.xcworkspace"
+          # Capacitor 8 + Stripe van por SPM. Sin destination, y con
+          # CODE_SIGN_IDENTITY global, Xcode intenta firmar los paquetes y
+          # el archive sale 65. CODE_SIGNING_ALLOWED=NO aplica al archive;
+          # exportArchive (Codemagic) firma el IPA.
+          ARCHIVE_FLAGS="-destination generic/platform=iOS CODE_SIGNING_REQUIRED=YES CODE_SIGNING_ALLOWED=NO"
+          dump_xcode_log() {
+            local log
+            log="$(ls -t /tmp/xcodebuild_logs/*.log 2>/dev/null | head -n 1 || true)"
+            if [ -n "$log" ]; then
+              echo "==== xcodebuild errors ===="
+              grep -E "error:|fatal error:|Provisioning profile|entitlement|CodeSign|does not support|FAILED" "$log" | tail -n 80 || true
+              echo "==== last 80 lines of $log ===="
+              tail -n 80 "$log"
+            fi
+          }
+          trap dump_xcode_log ERR
+          defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
+          defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
+          xcodebuild -project "$PROJECT" -scheme "$XCODE_SCHEME" \
+            -destination generic/platform=iOS \
+            -resolvePackageDependencies
           if [ -d "$WORKSPACE" ]; then
-            xcode-project build-ipa --workspace "$WORKSPACE" --scheme "$XCODE_SCHEME"
+            xcode-project build-ipa \
+              --workspace "$WORKSPACE" \
+              --scheme "$XCODE_SCHEME" \
+              --disable-xcpretty \
+              --archive-flags "$ARCHIVE_FLAGS"
           elif [ -d "$PROJECT" ]; then
-            xcode-project build-ipa --project "$PROJECT" --scheme "$XCODE_SCHEME"
+            xcode-project build-ipa \
+              --project "$PROJECT" \
+              --scheme "$XCODE_SCHEME" \
+              --disable-xcpretty \
+              --archive-flags "$ARCHIVE_FLAGS"
           else
             echo "ERROR: no hay App.xcodeproj ni App.xcworkspace en ios/App" >&2
             ls -la ios/App || true

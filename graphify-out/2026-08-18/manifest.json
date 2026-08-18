@@ -2130,8 +2130,8 @@
     "semantic_hash": ""
   },
   "scripts/_temp_deploy.js": {
-    "mtime": 1787050453.0237212,
-    "ast_hash": "5553a028f4d36b23bbae1479010754c0",
+    "mtime": 1787050924.762866,
+    "ast_hash": "df8cf9964ada620d093f6a55339b96c5",
     "semantic_hash": ""
   },
   "codemagic.yaml": {
@@ -2162,6 +2162,16 @@
   "resources/splash.png": {
     "mtime": 1787050212.501523,
     "ast_hash": "5c463d098782dafd48020159a0529114",
+    "semantic_hash": ""
+  },
+  "scripts/_temp_deploy2.js": {
+    "mtime": 1787050888.9543302,
+    "ast_hash": "047507205dbc32570007b95a4eb7f3f1",
+    "semantic_hash": ""
+  },
+  "scripts/_temp_ssh.js": {
+    "mtime": 1787050917.2253714,
+    "ast_hash": "91bd81d9b6952c175324e327b376149c",
     "semantic_hash": ""
   }
 }

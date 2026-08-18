@@ -28,6 +28,8 @@ unless app_group.files.any? { |f| f.path == 'App.entitlements' }
   puts '  + App.entitlements agregado al proyecto'
 end
 
+team_id = ENV['DEVELOPMENT_TEAM'] || ENV['APPLE_DEVELOPMENT_TEAM'] || '757NQ675N5'
+
 target.build_configurations.each do |config|
   config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = BUNDLE_ID
   config.build_settings['CODE_SIGN_ENTITLEMENTS'] = ENTITLEMENTS_RELATIVE
@@ -36,6 +38,7 @@ target.build_configurations.each do |config|
   config.build_settings['MARKETING_VERSION'] = ENV['MARKETING_VERSION'] if ENV['MARKETING_VERSION']
   # El firmado lo resuelve `xcode-project use-profiles` de Codemagic.
   config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
+  config.build_settings['DEVELOPMENT_TEAM'] = team_id
 end
 
 project.build_configurations.each do |config|

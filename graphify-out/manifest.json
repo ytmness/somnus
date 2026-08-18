@@ -2040,13 +2040,13 @@
     "semantic_hash": ""
   },
   "scripts/ios-postadd.sh": {
-    "mtime": 1787049728.2022054,
+    "mtime": 1787056652.4276814,
     "ast_hash": "76a860c57a87856a724629cd51417f1e",
     "semantic_hash": ""
   },
   "scripts/ios-project-patch.rb": {
-    "mtime": 1787049450.4971204,
-    "ast_hash": "f710873b890f92c77adf1908912c1bf6",
+    "mtime": 1787056639.5960367,
+    "ast_hash": "0c30f0e2b6d70feef809721cd6656bee",
     "semantic_hash": ""
   },
   "assets/wallet-pass/README.md": {
@@ -2129,14 +2129,9 @@
     "ast_hash": "2cfb915f7f250a5cd3a33dca4a8d25f5",
     "semantic_hash": ""
   },
-  "scripts/_temp_deploy.js": {
-    "mtime": 1787050924.762866,
-    "ast_hash": "df8cf9964ada620d093f6a55339b96c5",
-    "semantic_hash": ""
-  },
   "codemagic.yaml": {
-    "mtime": 1787049971.8713555,
-    "ast_hash": "2f850b1169e68f6aae3e07ba48dd2d3c",
+    "mtime": 1787056652.4286778,
+    "ast_hash": "eb061f0bf58728b53d3ff0eaa018e53e",
     "semantic_hash": ""
   },
   "docs/IOS_APP_SETUP.md": {
@@ -2144,34 +2139,9 @@
     "ast_hash": "50927080923ef4ed54d01350e698aefd",
     "semantic_hash": ""
   },
-  "ios-config/icons/icon-1024.png": {
-    "mtime": 1787050212.4995298,
-    "ast_hash": "ce0cae352408766546ebd25b2bd5510e",
-    "semantic_hash": ""
-  },
-  "ios-config/icons/splash-2732.png": {
-    "mtime": 1787050212.4995298,
-    "ast_hash": "5c463d098782dafd48020159a0529114",
-    "semantic_hash": ""
-  },
-  "resources/icon.png": {
-    "mtime": 1787050212.5005252,
-    "ast_hash": "ce0cae352408766546ebd25b2bd5510e",
-    "semantic_hash": ""
-  },
-  "resources/splash.png": {
-    "mtime": 1787050212.501523,
-    "ast_hash": "5c463d098782dafd48020159a0529114",
-    "semantic_hash": ""
-  },
-  "scripts/_temp_deploy2.js": {
-    "mtime": 1787050888.9543302,
-    "ast_hash": "047507205dbc32570007b95a4eb7f3f1",
-    "semantic_hash": ""
-  },
-  "scripts/_temp_ssh.js": {
-    "mtime": 1787050917.2253714,
-    "ast_hash": "91bd81d9b6952c175324e327b376149c",
+  "scripts/ios-align-entitlements.sh": {
+    "mtime": 1787056652.4276814,
+    "ast_hash": "ac229902f3130bf62a30bf4e883b1051",
     "semantic_hash": ""
   }
 }
