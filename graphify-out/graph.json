@@ -161,8 +161,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_admin_commissions_route",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "route.ts"
     },
     {
@@ -172,8 +172,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "app_api_admin_commissions_route_get",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "get()"
     },
     {
@@ -183,8 +183,8 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "app_api_admin_commissions_route_post",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "post()"
     },
     {
@@ -194,8 +194,8 @@
       "source_location": "L130",
       "_origin": "ast",
       "id": "app_api_admin_commissions_route_patch",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "patch()"
     },
     {
@@ -359,8 +359,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_admin_revenue_route",
-      "community": 79,
-      "community_name": "bcryptjs",
+      "community": 1,
+      "community_name": "session.ts",
       "norm_label": "route.ts"
     },
     {
@@ -370,8 +370,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_api_admin_revenue_route_parsedateparam",
-      "community": 79,
-      "community_name": "bcryptjs",
+      "community": 1,
+      "community_name": "session.ts",
       "norm_label": "parsedateparam()"
     },
     {
@@ -381,8 +381,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "app_api_admin_revenue_route_get",
-      "community": 79,
-      "community_name": "bcryptjs",
+      "community": 1,
+      "community_name": "session.ts",
       "norm_label": "get()"
     },
     {
@@ -667,8 +667,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_auth_otp_send_route",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "route.ts"
     },
     {
@@ -678,8 +678,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_api_auth_otp_send_route_sendotpschema",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "sendotpschema"
     },
     {
@@ -689,8 +689,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_api_auth_otp_send_route_post",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "post()"
     },
     {
@@ -1019,8 +1019,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_conversations_route",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1030,8 +1030,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "app_api_conversations_route_get",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "get()"
     },
     {
@@ -1041,8 +1041,8 @@
       "source_location": "L91",
       "_origin": "ast",
       "id": "app_api_conversations_route_post",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "post()"
     },
     {
@@ -1096,8 +1096,8 @@
       "source_location": "L306",
       "_origin": "ast",
       "id": "app_api_events_id_route_delete",
-      "community": 106,
-      "community_name": "SqlEditorManager.tsx",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "delete()"
     },
     {
@@ -1107,8 +1107,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_events_id_table_staff_route",
-      "community": 15,
-      "community_name": "route.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1118,8 +1118,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "app_api_events_id_table_staff_route_get",
-      "community": 15,
-      "community_name": "route.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "get()"
     },
     {
@@ -1129,8 +1129,8 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "app_api_events_id_table_staff_route_post",
-      "community": 15,
-      "community_name": "route.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "post()"
     },
     {
@@ -1140,8 +1140,8 @@
       "source_location": "L127",
       "_origin": "ast",
       "id": "app_api_events_id_table_staff_route_delete",
-      "community": 15,
-      "community_name": "route.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "delete()"
     },
     {
@@ -1151,8 +1151,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_events_id_tables_tablenumber_invites_route",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1162,8 +1162,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "app_api_events_id_tables_tablenumber_invites_route_generateinvitetoken",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "generateinvitetoken()"
     },
     {
@@ -1173,8 +1173,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "app_api_events_id_tables_tablenumber_invites_route_poolpaymenturl",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "poolpaymenturl()"
     },
     {
@@ -1184,8 +1184,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "app_api_events_id_tables_tablenumber_invites_route_post",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "post()"
     },
     {
@@ -1195,8 +1195,8 @@
       "source_location": "L339",
       "_origin": "ast",
       "id": "app_api_events_id_tables_tablenumber_invites_route_get",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "get()"
     },
     {
@@ -1283,8 +1283,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_feed_following_route",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1294,8 +1294,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_api_feed_following_route_feeditem",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "feeditem"
     },
     {
@@ -1305,8 +1305,8 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "app_api_feed_following_route_get",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "get()"
     },
     {
@@ -1437,8 +1437,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_invites_token_route",
-      "community": 178,
-      "community_name": "inventory.ts",
+      "community": 115,
+      "community_name": "commissions.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1448,8 +1448,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "app_api_invites_token_route_mesapagarurl",
-      "community": 178,
-      "community_name": "inventory.ts",
+      "community": 115,
+      "community_name": "commissions.ts",
       "norm_label": "mesapagarurl()"
     },
     {
@@ -1459,8 +1459,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "app_api_invites_token_route_get",
-      "community": 178,
-      "community_name": "inventory.ts",
+      "community": 115,
+      "community_name": "commissions.ts",
       "norm_label": "get()"
     },
     {
@@ -1470,8 +1470,8 @@
       "source_location": "L141",
       "_origin": "ast",
       "id": "app_api_invites_token_route_handleslotinvite",
-      "community": 178,
-      "community_name": "inventory.ts",
+      "community": 115,
+      "community_name": "commissions.ts",
       "norm_label": "handleslotinvite()"
     },
     {
@@ -1481,8 +1481,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_notifications_id_read_route",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1492,8 +1492,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "app_api_notifications_id_read_route_patch",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "patch()"
     },
     {
@@ -1503,8 +1503,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_notifications_read_all_route",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1514,8 +1514,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "app_api_notifications_read_all_route_patch",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "patch()"
     },
     {
@@ -1525,8 +1525,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_notifications_route",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1536,8 +1536,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "app_api_notifications_route_get",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "get()"
     },
     {
@@ -1690,8 +1690,8 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "app_api_organizations_id_route_delete",
-      "community": 10,
-      "community_name": "schemas.ts",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "delete()"
     },
     {
@@ -1701,8 +1701,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_organizations_public_slug_route",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1712,8 +1712,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "app_api_organizations_public_slug_route_get",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "get()"
     },
     {
@@ -1833,8 +1833,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_organizers_start_route",
-      "community": 15,
-      "community_name": "route.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1844,8 +1844,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "app_api_organizers_start_route_post",
-      "community": 15,
-      "community_name": "route.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "post()"
     },
     {
@@ -1998,8 +1998,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_sales_saleid_approve_route",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "route.ts"
     },
     {
@@ -2009,8 +2009,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_api_sales_saleid_approve_route_post",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "post()"
     },
     {
@@ -2020,8 +2020,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_sales_saleid_reject_route",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "route.ts"
     },
     {
@@ -2031,8 +2031,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "app_api_sales_saleid_reject_route_post",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "post()"
     },
     {
@@ -2097,8 +2097,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_sales_pending_approvals_route",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "route.ts"
     },
     {
@@ -2108,8 +2108,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "app_api_sales_pending_approvals_route_get",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "get()"
     },
     {
@@ -2229,8 +2229,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_supervisor_reports_route",
-      "community": 79,
-      "community_name": "bcryptjs",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "route.ts"
     },
     {
@@ -2240,8 +2240,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "app_api_supervisor_reports_route_get",
-      "community": 79,
-      "community_name": "bcryptjs",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "get()"
     },
     {
@@ -2317,8 +2317,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_tickets_my_tickets_route",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "route.ts"
     },
     {
@@ -2328,8 +2328,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_api_tickets_my_tickets_route_get",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "get()"
     },
     {
@@ -2339,8 +2339,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_tickets_scan_route",
-      "community": 108,
-      "community_name": "auth.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "route.ts"
     },
     {
@@ -2350,8 +2350,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_api_tickets_scan_route_post",
-      "community": 108,
-      "community_name": "auth.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "post()"
     },
     {
@@ -2361,8 +2361,8 @@
       "source_location": "L261",
       "_origin": "ast",
       "id": "app_api_tickets_scan_route_get",
-      "community": 108,
-      "community_name": "auth.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "get()"
     },
     {
@@ -2537,8 +2537,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_user_client_tour_route",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "route.ts"
     },
     {
@@ -2548,8 +2548,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "app_api_user_client_tour_route_patch",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "patch()"
     },
     {
@@ -2592,8 +2592,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_venues_route",
-      "community": 15,
-      "community_name": "route.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "route.ts"
     },
     {
@@ -2603,8 +2603,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "app_api_venues_route_get",
-      "community": 15,
-      "community_name": "route.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "get()"
     },
     {
@@ -2614,8 +2614,8 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "app_api_venues_route_post",
-      "community": 15,
-      "community_name": "route.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "post()"
     },
     {
@@ -2625,8 +2625,8 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "app_api_venues_route_patch",
-      "community": 15,
-      "community_name": "route.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "patch()"
     },
     {
@@ -2658,19 +2658,19 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_auth_post_login_page",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "page.tsx"
     },
     {
       "label": "PostLoginContent()",
       "file_type": "code",
       "source_file": "app/auth/post-login/page.tsx",
-      "source_location": "L7",
+      "source_location": "L9",
       "_origin": "ast",
       "id": "app_auth_post_login_page_postlogincontent",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "postlogincontent()"
     },
     {
@@ -2680,8 +2680,8 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "app_auth_post_login_page_postloginpage",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "postloginpage()"
     },
     {
@@ -3109,8 +3109,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_layout",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 89,
+      "community_name": "fulfill-sale.ts",
       "norm_label": "layout.tsx"
     },
     {
@@ -3120,8 +3120,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "app_layout_archivo",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 89,
+      "community_name": "fulfill-sale.ts",
       "norm_label": "archivo"
     },
     {
@@ -3131,8 +3131,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "app_layout_anton",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 89,
+      "community_name": "fulfill-sale.ts",
       "norm_label": "anton"
     },
     {
@@ -3142,8 +3142,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "app_layout_cinzel",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 89,
+      "community_name": "fulfill-sale.ts",
       "norm_label": "cinzel"
     },
     {
@@ -3153,8 +3153,8 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "app_layout_viewport",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 89,
+      "community_name": "fulfill-sale.ts",
       "norm_label": "viewport"
     },
     {
@@ -3164,8 +3164,8 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "app_layout_metadata",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 89,
+      "community_name": "fulfill-sale.ts",
       "norm_label": "metadata"
     },
     {
@@ -3175,8 +3175,8 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "app_layout_rootlayout",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 89,
+      "community_name": "fulfill-sale.ts",
       "norm_label": "rootlayout()"
     },
     {
@@ -3186,30 +3186,30 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_login_page",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "page.tsx"
     },
     {
       "label": "LoginContent()",
       "file_type": "code",
       "source_file": "app/login/page.tsx",
-      "source_location": "L13",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "app_login_page_logincontent",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "logincontent()"
     },
     {
       "label": "LoginPage()",
       "file_type": "code",
       "source_file": "app/login/page.tsx",
-      "source_location": "L412",
+      "source_location": "L416",
       "_origin": "ast",
       "id": "app_login_page_loginpage",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "loginpage()"
     },
     {
@@ -3703,8 +3703,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_providers",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 89,
+      "community_name": "fulfill-sale.ts",
       "norm_label": "providers.tsx"
     },
     {
@@ -3714,8 +3714,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "app_providers_providers",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 89,
+      "community_name": "fulfill-sale.ts",
       "norm_label": "providers()"
     },
     {
@@ -3725,19 +3725,19 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_register_page",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "page.tsx"
     },
     {
       "label": "RegisterContent()",
       "file_type": "code",
       "source_file": "app/register/page.tsx",
-      "source_location": "L13",
+      "source_location": "L14",
       "_origin": "ast",
       "id": "app_register_page_registercontent",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "registercontent()"
     },
     {
@@ -3747,8 +3747,8 @@
       "source_location": "L436",
       "_origin": "ast",
       "id": "app_register_page_registerpage",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "registerpage()"
     },
     {
@@ -3890,30 +3890,30 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_verificar_email_page",
-      "community": 86,
-      "community_name": "test-auth-logic.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "page.tsx"
     },
     {
       "label": "VerificarEmailContent()",
       "file_type": "code",
       "source_file": "app/verificar-email/page.tsx",
-      "source_location": "L12",
+      "source_location": "L14",
       "_origin": "ast",
       "id": "app_verificar_email_page_verificaremailcontent",
-      "community": 86,
-      "community_name": "test-auth-logic.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "verificaremailcontent()"
     },
     {
       "label": "VerificarEmailPage()",
       "file_type": "code",
       "source_file": "app/verificar-email/page.tsx",
-      "source_location": "L317",
+      "source_location": "L318",
       "_origin": "ast",
       "id": "app_verificar_email_page_verificaremailpage",
-      "community": 86,
-      "community_name": "test-auth-logic.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "verificaremailpage()"
     },
     {
@@ -5526,7 +5526,7 @@
       "label": "Provider",
       "file_type": "code",
       "source_file": "components/auth/SocialLoginButtons.tsx",
-      "source_location": "L8",
+      "source_location": "L9",
       "_origin": "ast",
       "id": "components_auth_socialloginbuttons_provider",
       "community": 8,
@@ -5537,7 +5537,7 @@
       "label": "SocialLoginButtonsProps",
       "file_type": "code",
       "source_file": "components/auth/SocialLoginButtons.tsx",
-      "source_location": "L10",
+      "source_location": "L11",
       "_origin": "ast",
       "id": "components_auth_socialloginbuttons_socialloginbuttonsprops",
       "community": 8,
@@ -5548,7 +5548,7 @@
       "label": "GoogleIcon()",
       "file_type": "code",
       "source_file": "components/auth/SocialLoginButtons.tsx",
-      "source_location": "L16",
+      "source_location": "L17",
       "_origin": "ast",
       "id": "components_auth_socialloginbuttons_googleicon",
       "community": 8,
@@ -5559,7 +5559,7 @@
       "label": "AppleIcon()",
       "file_type": "code",
       "source_file": "components/auth/SocialLoginButtons.tsx",
-      "source_location": "L39",
+      "source_location": "L40",
       "_origin": "ast",
       "id": "components_auth_socialloginbuttons_appleicon",
       "community": 8,
@@ -5570,11 +5570,11 @@
       "label": "SocialLoginButtons()",
       "file_type": "code",
       "source_file": "components/auth/SocialLoginButtons.tsx",
-      "source_location": "L47",
+      "source_location": "L48",
       "_origin": "ast",
       "id": "components_auth_socialloginbuttons_socialloginbuttons",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "socialloginbuttons()"
     },
     {
@@ -5584,8 +5584,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_cart_cartcontext",
-      "community": 3,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 56,
+      "community_name": "route.ts",
       "norm_label": "cartcontext.tsx"
     },
     {
@@ -5595,8 +5595,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "components_cart_cartcontext_globalcartitem",
-      "community": 3,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 56,
+      "community_name": "route.ts",
       "norm_label": "globalcartitem"
     },
     {
@@ -5606,8 +5606,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "components_cart_cartcontext_cartcontextvalue",
-      "community": 3,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 56,
+      "community_name": "route.ts",
       "norm_label": "cartcontextvalue"
     },
     {
@@ -5617,8 +5617,8 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "components_cart_cartcontext_cartcontext",
-      "community": 3,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 56,
+      "community_name": "route.ts",
       "norm_label": "cartcontext"
     },
     {
@@ -5628,8 +5628,8 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "components_cart_cartcontext_readstorage",
-      "community": 3,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 56,
+      "community_name": "route.ts",
       "norm_label": "readstorage()"
     },
     {
@@ -5639,8 +5639,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "components_cart_cartcontext_cartprovider",
-      "community": 3,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 56,
+      "community_name": "route.ts",
       "norm_label": "cartprovider()"
     },
     {
@@ -5650,8 +5650,8 @@
       "source_location": "L123",
       "_origin": "ast",
       "id": "components_cart_cartcontext_usecart",
-      "community": 3,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 56,
+      "community_name": "route.ts",
       "norm_label": "usecart()"
     },
     {
@@ -5672,8 +5672,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_cart_headercartdrawer",
-      "community": 3,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 56,
+      "community_name": "route.ts",
       "norm_label": "headercartdrawer.tsx"
     },
     {
@@ -5683,8 +5683,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "components_cart_headercartdrawer_headercartdrawer",
-      "community": 3,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 56,
+      "community_name": "route.ts",
       "norm_label": "headercartdrawer()"
     },
     {
@@ -6266,8 +6266,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_eventos_cart",
-      "community": 19,
-      "community_name": "Concert",
+      "community": 3,
+      "community_name": "effectiveTicketPriceAt",
       "norm_label": "cart.tsx"
     },
     {
@@ -6365,8 +6365,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_eventos_eventcardzamna",
-      "community": 32,
-      "community_name": "page.tsx",
+      "community": 25,
+      "community_name": "patriotas-individual-tables.ts",
       "norm_label": "eventcardzamna.tsx"
     },
     {
@@ -6376,8 +6376,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "components_eventos_eventcardzamna_eventcardzamnaprops",
-      "community": 19,
-      "community_name": "Concert",
+      "community": 25,
+      "community_name": "patriotas-individual-tables.ts",
       "norm_label": "eventcardzamnaprops"
     },
     {
@@ -6387,8 +6387,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "components_eventos_eventcardzamna_geteventstatus",
-      "community": 32,
-      "community_name": "page.tsx",
+      "community": 25,
+      "community_name": "patriotas-individual-tables.ts",
       "norm_label": "geteventstatus()"
     },
     {
@@ -6398,8 +6398,8 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "components_eventos_eventcardzamna_eventcardzamna",
-      "community": 32,
-      "community_name": "page.tsx",
+      "community": 25,
+      "community_name": "patriotas-individual-tables.ts",
       "norm_label": "eventcardzamna()"
     },
     {
@@ -6442,8 +6442,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_eventos_galleryeventcardzamna",
-      "community": 32,
-      "community_name": "page.tsx",
+      "community": 25,
+      "community_name": "patriotas-individual-tables.ts",
       "norm_label": "galleryeventcardzamna.tsx"
     },
     {
@@ -6453,8 +6453,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "components_eventos_galleryeventcardzamna_galleryeventcardzamnaprops",
-      "community": 32,
-      "community_name": "page.tsx",
+      "community": 25,
+      "community_name": "patriotas-individual-tables.ts",
       "norm_label": "galleryeventcardzamnaprops"
     },
     {
@@ -6464,8 +6464,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "components_eventos_galleryeventcardzamna_galleryeventcardzamna",
-      "community": 32,
-      "community_name": "page.tsx",
+      "community": 25,
+      "community_name": "patriotas-individual-tables.ts",
       "norm_label": "galleryeventcardzamna()"
     },
     {
@@ -6970,8 +6970,8 @@
       "source_location": "L274",
       "_origin": "ast",
       "id": "components_eventos_carousel_poster_settings_usecarouselposteroptional",
-      "community": 32,
-      "community_name": "page.tsx",
+      "community": 25,
+      "community_name": "patriotas-individual-tables.ts",
       "norm_label": "usecarouselposteroptional()"
     },
     {
@@ -7234,8 +7234,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_native_nativeshell",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 89,
+      "community_name": "fulfill-sale.ts",
       "norm_label": "nativeshell.tsx"
     },
     {
@@ -7245,8 +7245,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "components_native_nativeshell_nativeshell",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 89,
+      "community_name": "fulfill-sale.ts",
       "norm_label": "nativeshell()"
     },
     {
@@ -7256,8 +7256,8 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "components_native_nativeshell_hidesplash",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 89,
+      "community_name": "fulfill-sale.ts",
       "norm_label": "hidesplash()"
     },
     {
@@ -7267,8 +7267,8 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "components_native_nativeshell_stylestatusbar",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 89,
+      "community_name": "fulfill-sale.ts",
       "norm_label": "stylestatusbar()"
     },
     {
@@ -7278,8 +7278,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_notifications_notificationbell",
-      "community": 56,
-      "community_name": "route.ts",
+      "community": 99,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "notificationbell.tsx"
     },
     {
@@ -7289,8 +7289,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "components_notifications_notificationbell_notificationbellprops",
-      "community": 56,
-      "community_name": "route.ts",
+      "community": 99,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "notificationbellprops"
     },
     {
@@ -7300,8 +7300,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "components_notifications_notificationbell_notificationbell",
-      "community": 56,
-      "community_name": "route.ts",
+      "community": 99,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "notificationbell()"
     },
     {
@@ -8026,8 +8026,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_tickets_addtowalletbutton",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "addtowalletbutton.tsx"
     },
     {
@@ -8037,8 +8037,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "components_tickets_addtowalletbutton_addtowalletbuttonprops",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "addtowalletbuttonprops"
     },
     {
@@ -8048,8 +8048,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "components_tickets_addtowalletbutton_addtowalletbutton",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "addtowalletbutton()"
     },
     {
@@ -8466,8 +8466,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "hooks_usenotifications",
-      "community": 56,
-      "community_name": "route.ts",
+      "community": 99,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "usenotifications.ts"
     },
     {
@@ -8477,8 +8477,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "hooks_usenotifications_notification",
-      "community": 56,
-      "community_name": "route.ts",
+      "community": 99,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "notification"
     },
     {
@@ -8488,8 +8488,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "hooks_usenotifications_fetchnotifications",
-      "community": 56,
-      "community_name": "route.ts",
+      "community": 99,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "fetchnotifications()"
     },
     {
@@ -8499,8 +8499,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "hooks_usenotifications_usenotifications",
-      "community": 56,
-      "community_name": "route.ts",
+      "community": 99,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "usenotifications()"
     },
     {
@@ -8587,8 +8587,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_admin_revenue",
-      "community": 79,
-      "community_name": "bcryptjs",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "revenue.ts"
     },
     {
@@ -8598,8 +8598,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "lib_admin_revenue_revenuefilters",
-      "community": 79,
-      "community_name": "bcryptjs",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "revenuefilters"
     },
     {
@@ -8609,8 +8609,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "lib_admin_revenue_tonumber",
-      "community": 79,
-      "community_name": "bcryptjs",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "tonumber()"
     },
     {
@@ -8620,8 +8620,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "lib_admin_revenue_buildcompletedsalewhere",
-      "community": 79,
-      "community_name": "bcryptjs",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "buildcompletedsalewhere()"
     },
     {
@@ -8631,8 +8631,8 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "lib_admin_revenue_buildrefundedsalewhere",
-      "community": 79,
-      "community_name": "bcryptjs",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "buildrefundedsalewhere()"
     },
     {
@@ -8642,8 +8642,8 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "lib_admin_revenue_getrevenuereport",
-      "community": 79,
-      "community_name": "bcryptjs",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "getrevenuereport()"
     },
     {
@@ -8653,8 +8653,8 @@
       "source_location": "L199",
       "_origin": "ast",
       "id": "lib_admin_revenue_getplatformtotalfromdb",
-      "community": 79,
-      "community_name": "bcryptjs",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "getplatformtotalfromdb()"
     },
     {
@@ -8664,8 +8664,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_auth_event_access",
-      "community": 15,
-      "community_name": "route.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "event-access.ts"
     },
     {
@@ -8686,8 +8686,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_auth_event_access_ensureorganizerprofile",
-      "community": 15,
-      "community_name": "route.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "ensureorganizerprofile()"
     },
     {
@@ -8708,8 +8708,8 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "lib_auth_event_access_userownsevent",
-      "community": 15,
-      "community_name": "route.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "userownsevent()"
     },
     {
@@ -8730,8 +8730,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_auth_otp_cooldown",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "otp-cooldown.ts"
     },
     {
@@ -8741,8 +8741,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "lib_auth_otp_cooldown_lastotpsentat",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "lastotpsentat"
     },
     {
@@ -8752,8 +8752,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "lib_auth_otp_cooldown_cleanupoldentries",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "cleanupoldentries()"
     },
     {
@@ -8763,8 +8763,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_auth_otp_cooldown_isinotpcooldown",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "isinotpcooldown()"
     },
     {
@@ -8774,8 +8774,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "lib_auth_otp_cooldown_markotpsent",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "markotpsent()"
     },
     {
@@ -8785,8 +8785,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_auth_otp",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "otp.ts"
     },
     {
@@ -8796,8 +8796,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "lib_auth_otp_sendemailotpresult",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "sendemailotpresult"
     },
     {
@@ -8807,8 +8807,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "lib_auth_otp_sendemailotp",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "sendemailotp()"
     },
     {
@@ -8917,8 +8917,8 @@
       "source_location": "L143",
       "_origin": "ast",
       "id": "lib_auth_permissions_canscantickets",
-      "community": 108,
-      "community_name": "auth.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "canscantickets()"
     },
     {
@@ -8939,8 +8939,8 @@
       "source_location": "L173",
       "_origin": "ast",
       "id": "lib_auth_permissions_canviewreports",
-      "community": 79,
-      "community_name": "bcryptjs",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "canviewreports()"
     },
     {
@@ -9038,8 +9038,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "lib_auth_redirect_path_resolveauthredirectpath",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "resolveauthredirectpath()"
     },
     {
@@ -9126,8 +9126,8 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "lib_auth_registration_canviewowntickets",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 86,
+      "community_name": "test-auth-logic.ts",
       "norm_label": "canviewowntickets()"
     },
     {
@@ -9148,8 +9148,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "lib_auth_session_getsession",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "getsession()"
     },
     {
@@ -9346,8 +9346,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_gallery_events",
-      "community": 32,
-      "community_name": "page.tsx",
+      "community": 25,
+      "community_name": "patriotas-individual-tables.ts",
       "norm_label": "gallery-events.ts"
     },
     {
@@ -9357,8 +9357,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_gallery_events_galleryevent",
-      "community": 32,
-      "community_name": "page.tsx",
+      "community": 25,
+      "community_name": "patriotas-individual-tables.ts",
       "norm_label": "galleryevent"
     },
     {
@@ -9368,8 +9368,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "lib_gallery_events_gallery_events",
-      "community": 32,
-      "community_name": "page.tsx",
+      "community": 25,
+      "community_name": "patriotas-individual-tables.ts",
       "norm_label": "gallery_events"
     },
     {
@@ -9511,8 +9511,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_native_platform",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "platform.ts"
     },
     {
@@ -9522,8 +9522,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "lib_native_platform_capacitorglobal",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "capacitorglobal"
     },
     {
@@ -9533,8 +9533,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "lib_native_platform_getcapacitor",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "getcapacitor()"
     },
     {
@@ -9544,31 +9544,64 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "lib_native_platform_isnativeplatform",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "isnativeplatform()"
+    },
+    {
+      "label": "isNativeAuthSurface()",
+      "file_type": "code",
+      "source_file": "lib/native/platform.ts",
+      "source_location": "L29",
+      "_origin": "ast",
+      "id": "lib_native_platform_isnativeauthsurface",
+      "community": 79,
+      "community_name": "bcryptjs",
+      "norm_label": "isnativeauthsurface()"
     },
     {
       "label": "isNativeIOS()",
       "file_type": "code",
       "source_file": "lib/native/platform.ts",
-      "source_location": "L29",
+      "source_location": "L42",
       "_origin": "ast",
       "id": "lib_native_platform_isnativeios",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "isnativeios()"
     },
     {
       "label": "isAppleDevice()",
       "file_type": "code",
       "source_file": "lib/native/platform.ts",
-      "source_location": "L38",
+      "source_location": "L51",
       "_origin": "ast",
       "id": "lib_native_platform_isappledevice",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "isappledevice()"
+    },
+    {
+      "label": "use-auth-surface.ts",
+      "file_type": "code",
+      "source_file": "lib/native/use-auth-surface.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "lib_native_use_auth_surface",
+      "community": 79,
+      "community_name": "bcryptjs",
+      "norm_label": "use-auth-surface.ts"
+    },
+    {
+      "label": "useNativeAuthSurface()",
+      "file_type": "code",
+      "source_file": "lib/native/use-auth-surface.ts",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "lib_native_use_auth_surface_usenativeauthsurface",
+      "community": 79,
+      "community_name": "bcryptjs",
+      "norm_label": "usenativeauthsurface()"
     },
     {
       "label": "patriotas-individual-tables.ts",
@@ -9940,8 +9973,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "lib_payments_config_getappurl",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "getappurl()"
     },
     {
@@ -10440,32 +10473,10 @@
       "norm_label": "emailoptions"
     },
     {
-      "label": "getResendClient()",
-      "file_type": "code",
-      "source_file": "lib/services/email.ts",
-      "source_location": "L11",
-      "_origin": "ast",
-      "id": "lib_services_email_getresendclient",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
-      "norm_label": "getresendclient()"
-    },
-    {
-      "label": "getFromAddress()",
-      "file_type": "code",
-      "source_file": "lib/services/email.ts",
-      "source_location": "L17",
-      "_origin": "ast",
-      "id": "lib_services_email_getfromaddress",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
-      "norm_label": "getfromaddress()"
-    },
-    {
       "label": "sendEmail()",
       "file_type": "code",
       "source_file": "lib/services/email.ts",
-      "source_location": "L24",
+      "source_location": "L11",
       "_origin": "ast",
       "id": "lib_services_email_sendemail",
       "community": 52,
@@ -10476,18 +10487,18 @@
       "label": "generateVerificationCode()",
       "file_type": "code",
       "source_file": "lib/services/email.ts",
-      "source_location": "L51",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "lib_services_email_generateverificationcode",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "generateverificationcode()"
     },
     {
       "label": "hashToken()",
       "file_type": "code",
       "source_file": "lib/services/email.ts",
-      "source_location": "L55",
+      "source_location": "L19",
       "_origin": "ast",
       "id": "lib_services_email_hashtoken",
       "community": 52,
@@ -10498,7 +10509,7 @@
       "label": "sendVerificationCode()",
       "file_type": "code",
       "source_file": "lib/services/email.ts",
-      "source_location": "L59",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "lib_services_email_sendverificationcode",
       "community": 52,
@@ -10509,7 +10520,7 @@
       "label": "sendPasswordResetEmail()",
       "file_type": "code",
       "source_file": "lib/services/email.ts",
-      "source_location": "L91",
+      "source_location": "L55",
       "_origin": "ast",
       "id": "lib_services_email_sendpasswordresetemail",
       "community": 52,
@@ -10594,6 +10605,83 @@
       "norm_label": "validateviptablecapacity()"
     },
     {
+      "label": "mailer.ts",
+      "file_type": "code",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "lib_services_mailer",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
+      "norm_label": "mailer.ts"
+    },
+    {
+      "label": "MailOptions",
+      "file_type": "code",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "lib_services_mailer_mailoptions",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
+      "norm_label": "mailoptions"
+    },
+    {
+      "label": "isLocalSmtpHost()",
+      "file_type": "code",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "lib_services_mailer_islocalsmtphost",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
+      "norm_label": "islocalsmtphost()"
+    },
+    {
+      "label": "resolveFromAddress()",
+      "file_type": "code",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "lib_services_mailer_resolvefromaddress",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
+      "norm_label": "resolvefromaddress()"
+    },
+    {
+      "label": "logSimulated()",
+      "file_type": "code",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "lib_services_mailer_logsimulated",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
+      "norm_label": "logsimulated()"
+    },
+    {
+      "label": "sendMailOrThrow()",
+      "file_type": "code",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L40",
+      "_origin": "ast",
+      "id": "lib_services_mailer_sendmailorthrow",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
+      "norm_label": "sendmailorthrow()"
+    },
+    {
+      "label": "sendMail()",
+      "file_type": "code",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L86",
+      "_origin": "ast",
+      "id": "lib_services_mailer_sendmail",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
+      "norm_label": "sendmail()"
+    },
+    {
       "label": "notifications.ts",
       "file_type": "code",
       "source_file": "lib/services/notifications.ts",
@@ -10655,8 +10743,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_services_qr_generator",
-      "community": 108,
-      "community_name": "auth.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "qr-generator.ts"
     },
     {
@@ -10677,8 +10765,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "lib_services_qr_generator_generateqrcode",
-      "community": 99,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 5,
+      "community_name": "formatEventCalendarDate",
       "norm_label": "generateqrcode()"
     },
     {
@@ -10688,8 +10776,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "lib_services_qr_generator_validateqrhash",
-      "community": 108,
-      "community_name": "auth.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "validateqrhash()"
     },
     {
@@ -10699,8 +10787,8 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "lib_services_qr_generator_generateqrpayload",
-      "community": 89,
-      "community_name": "fulfill-sale.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "generateqrpayload()"
     },
     {
@@ -10710,8 +10798,8 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "lib_services_qr_generator_parseqrpayload",
-      "community": 108,
-      "community_name": "auth.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "parseqrpayload()"
     },
     {
@@ -10721,8 +10809,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_services_ticket_generator",
-      "community": 99,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 5,
+      "community_name": "formatEventCalendarDate",
       "norm_label": "ticket-generator.ts"
     },
     {
@@ -10732,8 +10820,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_services_ticket_generator_createqrpayload",
-      "community": 99,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 5,
+      "community_name": "formatEventCalendarDate",
       "norm_label": "createqrpayload()"
     },
     {
@@ -10743,8 +10831,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "lib_services_ticket_generator_generateticketpdf",
-      "community": 99,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 5,
+      "community_name": "formatEventCalendarDate",
       "norm_label": "generateticketpdf()"
     },
     {
@@ -10754,8 +10842,8 @@
       "source_location": "L129",
       "_origin": "ast",
       "id": "lib_services_ticket_generator_generatemultipleticketspdf",
-      "community": 99,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 5,
+      "community_name": "formatEventCalendarDate",
       "norm_label": "generatemultipleticketspdf()"
     },
     {
@@ -10765,8 +10853,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_services_ticket_ownership",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 1,
+      "community_name": "session.ts",
       "norm_label": "ticket-ownership.ts"
     },
     {
@@ -10787,8 +10875,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_services_tickets_email",
-      "community": 89,
-      "community_name": "fulfill-sale.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "tickets-email.ts"
     },
     {
@@ -10798,8 +10886,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_services_tickets_email_ticketwithrelations",
-      "community": 89,
-      "community_name": "fulfill-sale.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "ticketwithrelations"
     },
     {
@@ -10809,8 +10897,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "lib_services_tickets_email_mxnformat",
-      "community": 89,
-      "community_name": "fulfill-sale.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "mxnformat()"
     },
     {
@@ -10820,8 +10908,8 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "lib_services_tickets_email_safetext",
-      "community": 89,
-      "community_name": "fulfill-sale.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "safetext()"
     },
     {
@@ -10831,8 +10919,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "lib_services_tickets_email_sendticketsreceiptemail",
-      "community": 89,
-      "community_name": "fulfill-sale.ts",
+      "community": 52,
+      "community_name": "GalleryManager.tsx",
       "norm_label": "sendticketsreceiptemail()"
     },
     {
@@ -11227,8 +11315,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_table_invite",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "table-invite.ts"
     },
     {
@@ -11238,8 +11326,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "lib_table_invite_tickettablelabel",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "tickettablelabel()"
     },
     {
@@ -11249,8 +11337,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "lib_table_invite_parsetablekeyfrompath",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "parsetablekeyfrompath()"
     },
     {
@@ -11909,8 +11997,8 @@
       "source_location": "L193",
       "_origin": "ast",
       "id": "lib_validations_schemas_createconversationschema",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "createconversationschema"
     },
     {
@@ -11931,8 +12019,8 @@
       "source_location": "L233",
       "_origin": "ast",
       "id": "lib_validations_schemas_updateeventschema",
-      "community": 106,
-      "community_name": "SqlEditorManager.tsx",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "updateeventschema"
     },
     {
@@ -12745,8 +12833,8 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "package_dependencies_radix_ui_react_toast",
-      "community": 116,
-      "community_name": "_temp_deploy2.js",
+      "community": 80,
+      "community_name": "dependencies",
       "norm_label": "@radix-ui/react-toast"
     },
     {
@@ -12756,8 +12844,8 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "radix_ui_react_toast",
-      "community": 116,
-      "community_name": "_temp_deploy2.js",
+      "community": 80,
+      "community_name": "dependencies",
       "norm_label": "@radix-ui/react-toast"
     },
     {
@@ -12921,8 +13009,8 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "package_dependencies_embla_carousel_react",
-      "community": 80,
-      "community_name": "dependencies",
+      "community": 123,
+      "community_name": "embla-carousel-react",
       "norm_label": "embla-carousel-react"
     },
     {
@@ -12932,8 +13020,8 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "embla_carousel_react",
-      "community": 80,
-      "community_name": "dependencies",
+      "community": 123,
+      "community_name": "embla-carousel-react",
       "norm_label": "embla-carousel-react"
     },
     {
@@ -13009,8 +13097,8 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "package_dependencies_jspdf",
-      "community": 99,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 5,
+      "community_name": "formatEventCalendarDate",
       "norm_label": "jspdf"
     },
     {
@@ -13020,8 +13108,8 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "jspdf",
-      "community": 99,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 5,
+      "community_name": "formatEventCalendarDate",
       "norm_label": "jspdf"
     },
     {
@@ -13141,8 +13229,8 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "package_dependencies_qrcode",
-      "community": 99,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 5,
+      "community_name": "formatEventCalendarDate",
       "norm_label": "qrcode"
     },
     {
@@ -13152,8 +13240,8 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "qrcode",
-      "community": 99,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 5,
+      "community_name": "formatEventCalendarDate",
       "norm_label": "qrcode"
     },
     {
@@ -14899,8 +14987,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_migrate_staff_memberships",
-      "community": 178,
-      "community_name": "inventory.ts",
+      "community": 108,
+      "community_name": "auth.ts",
       "norm_label": "migrate-staff-memberships.ts"
     },
     {
@@ -14910,8 +14998,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "scripts_migrate_staff_memberships_legacy_staff_roles",
-      "community": 178,
-      "community_name": "inventory.ts",
+      "community": 108,
+      "community_name": "auth.ts",
       "norm_label": "legacy_staff_roles"
     },
     {
@@ -14921,8 +15009,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "scripts_migrate_staff_memberships_role_map",
-      "community": 178,
-      "community_name": "inventory.ts",
+      "community": 108,
+      "community_name": "auth.ts",
       "norm_label": "role_map"
     },
     {
@@ -14932,8 +15020,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "scripts_migrate_staff_memberships_migratelegacystaffroles",
-      "community": 178,
-      "community_name": "inventory.ts",
+      "community": 108,
+      "community_name": "auth.ts",
       "norm_label": "migratelegacystaffroles()"
     },
     {
@@ -14943,8 +15031,8 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "scripts_migrate_staff_memberships_migratevenuesfromevents",
-      "community": 178,
-      "community_name": "inventory.ts",
+      "community": 108,
+      "community_name": "auth.ts",
       "norm_label": "migratevenuesfromevents()"
     },
     {
@@ -14954,8 +15042,8 @@
       "source_location": "L114",
       "_origin": "ast",
       "id": "scripts_migrate_staff_memberships_main",
-      "community": 178,
-      "community_name": "inventory.ts",
+      "community": 108,
+      "community_name": "auth.ts",
       "norm_label": "main()"
     },
     {
@@ -16023,8 +16111,8 @@
       "source_location": "L183",
       "_origin": "ast",
       "id": "types_index_ticketpdfdata",
-      "community": 99,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 5,
+      "community_name": "formatEventCalendarDate",
       "norm_label": "ticketpdfdata"
     },
     {
@@ -21303,8 +21391,8 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "project_roadmap_api_endpoints_a_crear",
-      "community": 115,
-      "community_name": "commissions.ts",
+      "community": 47,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "api endpoints a crear"
     },
     {
@@ -21314,8 +21402,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "project_roadmap_api_events",
-      "community": 115,
-      "community_name": "commissions.ts",
+      "community": 47,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "`/api/events`"
     },
     {
@@ -21325,8 +21413,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "project_roadmap_api_sales",
-      "community": 115,
-      "community_name": "commissions.ts",
+      "community": 47,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "`/api/sales`"
     },
     {
@@ -21336,8 +21424,8 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "project_roadmap_api_tickets",
-      "community": 115,
-      "community_name": "commissions.ts",
+      "community": 47,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "`/api/tickets`"
     },
     {
@@ -21347,8 +21435,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "project_roadmap_api_inventory",
-      "community": 115,
-      "community_name": "commissions.ts",
+      "community": 47,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "`/api/inventory`"
     },
     {
@@ -21391,8 +21479,8 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "project_roadmap_componentes_a_crear",
-      "community": 47,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 116,
+      "community_name": "_temp_deploy2.js",
       "norm_label": "componentes a crear"
     },
     {
@@ -21402,8 +21490,8 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "project_roadmap_eventos",
-      "community": 47,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 116,
+      "community_name": "_temp_deploy2.js",
       "norm_label": "eventos"
     },
     {
@@ -21413,8 +21501,8 @@
       "source_location": "L91",
       "_origin": "ast",
       "id": "project_roadmap_carrito_de_compra",
-      "community": 47,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 116,
+      "community_name": "_temp_deploy2.js",
       "norm_label": "carrito de compra"
     },
     {
@@ -21424,8 +21512,8 @@
       "source_location": "L97",
       "_origin": "ast",
       "id": "project_roadmap_boletos",
-      "community": 47,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 116,
+      "community_name": "_temp_deploy2.js",
       "norm_label": "boletos"
     },
     {
@@ -23222,10 +23310,21 @@
       "norm_label": "1. app id"
     },
     {
-      "label": "2. Apple Pay",
+      "label": "1b. Sign in with Apple (nombre \u201cSomnus\u201d, no Dev Control)",
       "file_type": "document",
       "source_file": "docs/IOS_APP_SETUP.md",
       "source_location": "L27",
+      "_origin": "ast",
+      "id": "docs_ios_app_setup_1b_sign_in_with_apple_nombre_somnus_no_dev_control",
+      "community": 224,
+      "community_name": "Plantilla de pase de Apple Wallet",
+      "norm_label": "1b. sign in with apple (nombre \u201csomnus\u201d, no dev control)"
+    },
+    {
+      "label": "2. Apple Pay",
+      "file_type": "document",
+      "source_file": "docs/IOS_APP_SETUP.md",
+      "source_location": "L41",
       "_origin": "ast",
       "id": "docs_ios_app_setup_2_apple_pay",
       "community": 224,
@@ -23236,7 +23335,7 @@
       "label": "3. Apple Wallet (Pass Type ID)",
       "file_type": "document",
       "source_file": "docs/IOS_APP_SETUP.md",
-      "source_location": "L36",
+      "source_location": "L50",
       "_origin": "ast",
       "id": "docs_ios_app_setup_3_apple_wallet_pass_type_id",
       "community": 224,
@@ -23247,7 +23346,7 @@
       "label": "4. App Store Connect API Key (Codemagic)",
       "file_type": "document",
       "source_file": "docs/IOS_APP_SETUP.md",
-      "source_location": "L63",
+      "source_location": "L77",
       "_origin": "ast",
       "id": "docs_ios_app_setup_4_app_store_connect_api_key_codemagic",
       "community": 224,
@@ -23258,7 +23357,7 @@
       "label": "5. Repositorio y primer build",
       "file_type": "document",
       "source_file": "docs/IOS_APP_SETUP.md",
-      "source_location": "L71",
+      "source_location": "L85",
       "_origin": "ast",
       "id": "docs_ios_app_setup_5_repositorio_y_primer_build",
       "community": 224,
@@ -23269,7 +23368,7 @@
       "label": "6. Capturas, privacy y env\u00edo",
       "file_type": "document",
       "source_file": "docs/IOS_APP_SETUP.md",
-      "source_location": "L88",
+      "source_location": "L102",
       "_origin": "ast",
       "id": "docs_ios_app_setup_6_capturas_privacy_y_env\u00edo",
       "community": 224,
@@ -23280,7 +23379,7 @@
       "label": "7. Qu\u00e9 no va en el repo",
       "file_type": "document",
       "source_file": "docs/IOS_APP_SETUP.md",
-      "source_location": "L97",
+      "source_location": "L111",
       "_origin": "ast",
       "id": "docs_ios_app_setup_7_qu\u00e9_no_va_en_el_repo",
       "community": 224,
@@ -35664,7 +35763,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/auth/post-login/page.tsx",
-      "source_location": "L7",
+      "source_location": "L9",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_auth_post_login_page",
@@ -35707,6 +35806,54 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/auth/post-login/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_auth_post_login_page",
+      "target": "lib_native_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/auth/post-login/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_auth_post_login_page",
+      "target": "lib_native_platform_isnativeplatform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/auth/post-login/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_auth_post_login_page",
+      "target": "lib_native_use_auth_surface",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/auth/post-login/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_auth_post_login_page",
+      "target": "lib_native_use_auth_surface_usenativeauthsurface",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -35716,6 +35863,30 @@
       "_origin": "ast",
       "source": "app_auth_post_login_page_postlogincontent",
       "target": "lib_auth_redirect_path_resolveauthredirectpath",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/auth/post-login/page.tsx",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_auth_post_login_page_postlogincontent",
+      "target": "lib_native_platform_isnativeplatform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/auth/post-login/page.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_auth_post_login_page_postlogincontent",
+      "target": "lib_native_use_auth_surface_usenativeauthsurface",
       "confidence_score": 1.0
     },
     {
@@ -36757,7 +36928,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/login/page.tsx",
-      "source_location": "L13",
+      "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_login_page",
@@ -36768,7 +36939,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/login/page.tsx",
-      "source_location": "L412",
+      "source_location": "L416",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_login_page",
@@ -36848,16 +37019,76 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/login/page.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_login_page",
+      "target": "lib_native_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/login/page.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_login_page",
+      "target": "lib_native_platform_isnativeplatform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/login/page.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_login_page",
+      "target": "lib_native_use_auth_surface",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/login/page.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_login_page",
+      "target": "lib_native_use_auth_surface_usenativeauthsurface",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/login/page.tsx",
-      "source_location": "L122",
+      "source_location": "L126",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_login_page_logincontent",
       "target": "lib_auth_redirect_path_resolveauthredirectpath"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/login/page.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_login_page_logincontent",
+      "target": "lib_native_use_auth_surface_usenativeauthsurface"
     },
     {
       "relation": "contains",
@@ -38479,7 +38710,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/register/page.tsx",
-      "source_location": "L13",
+      "source_location": "L14",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_register_page",
@@ -38570,6 +38801,30 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/register/page.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_register_page",
+      "target": "lib_native_use_auth_surface",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/register/page.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_register_page",
+      "target": "lib_native_use_auth_surface_usenativeauthsurface",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -38580,6 +38835,18 @@
       "_origin": "ast",
       "source": "app_register_page_registercontent",
       "target": "lib_auth_redirect_path_resolveauthredirectpath"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/register/page.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_register_page_registercontent",
+      "target": "lib_native_use_auth_surface_usenativeauthsurface"
     },
     {
       "relation": "contains",
@@ -38733,7 +39000,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/verificar-email/page.tsx",
-      "source_location": "L12",
+      "source_location": "L14",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_verificar_email_page",
@@ -38744,7 +39011,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/verificar-email/page.tsx",
-      "source_location": "L317",
+      "source_location": "L318",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_verificar_email_page",
@@ -38800,16 +39067,88 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/verificar-email/page.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_verificar_email_page",
+      "target": "lib_native_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/verificar-email/page.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_verificar_email_page",
+      "target": "lib_native_platform_isnativeplatform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/verificar-email/page.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_verificar_email_page",
+      "target": "lib_native_use_auth_surface",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/verificar-email/page.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_verificar_email_page",
+      "target": "lib_native_use_auth_surface_usenativeauthsurface",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/verificar-email/page.tsx",
-      "source_location": "L54",
+      "source_location": "L55",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_verificar_email_page_verificaremailcontent",
       "target": "lib_auth_registration_resolvepostauthredirect"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/verificar-email/page.tsx",
+      "source_location": "L58",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_verificar_email_page_verificaremailcontent",
+      "target": "lib_native_platform_isnativeplatform"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/verificar-email/page.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_verificar_email_page_verificaremailcontent",
+      "target": "lib_native_use_auth_surface_usenativeauthsurface"
     },
     {
       "relation": "contains",
@@ -41196,7 +41535,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/auth/SocialLoginButtons.tsx",
-      "source_location": "L39",
+      "source_location": "L40",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_auth_socialloginbuttons",
@@ -41207,7 +41546,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/auth/SocialLoginButtons.tsx",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_auth_socialloginbuttons",
@@ -41218,7 +41557,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/auth/SocialLoginButtons.tsx",
-      "source_location": "L8",
+      "source_location": "L9",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_auth_socialloginbuttons",
@@ -41229,7 +41568,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/auth/SocialLoginButtons.tsx",
-      "source_location": "L47",
+      "source_location": "L48",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_auth_socialloginbuttons",
@@ -41240,7 +41579,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/auth/SocialLoginButtons.tsx",
-      "source_location": "L10",
+      "source_location": "L11",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_auth_socialloginbuttons",
@@ -41272,16 +41611,52 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/auth/SocialLoginButtons.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "components_auth_socialloginbuttons",
+      "target": "lib_native_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/auth/SocialLoginButtons.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "components_auth_socialloginbuttons",
+      "target": "lib_native_platform_isnativeplatform",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/auth/SocialLoginButtons.tsx",
-      "source_location": "L93",
+      "source_location": "L94",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_auth_socialloginbuttons_socialloginbuttons",
       "target": "lib_auth_redirect_path_sanitizeredirectpath"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "components/auth/SocialLoginButtons.tsx",
+      "source_location": "L97",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "components_auth_socialloginbuttons_socialloginbuttons",
+      "target": "lib_native_platform_isnativeplatform"
     },
     {
       "relation": "contains",
@@ -48887,7 +49262,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/native/platform.ts",
-      "source_location": "L38",
+      "source_location": "L51",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_native_platform",
@@ -48899,6 +49274,17 @@
       "confidence": "EXTRACTED",
       "source_file": "lib/native/platform.ts",
       "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_native_platform",
+      "target": "lib_native_platform_isnativeauthsurface",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/native/platform.ts",
+      "source_location": "L42",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_native_platform",
@@ -48917,11 +49303,23 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/native/use-auth-surface.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_native_use_auth_surface",
+      "target": "lib_native_platform",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/native/platform.ts",
-      "source_location": "L30",
+      "source_location": "L43",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_native_platform_isnativeios",
@@ -48945,10 +49343,10 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/native/platform.ts",
-      "source_location": "L32",
+      "source_location": "L38",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "lib_native_platform_isnativeios",
+      "source": "lib_native_platform_isnativeauthsurface",
       "target": "lib_native_platform_isnativeplatform",
       "confidence_score": 1.0
     },
@@ -48957,11 +49355,58 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/native/platform.ts",
-      "source_location": "L40",
+      "source_location": "L45",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_native_platform_isnativeios",
+      "target": "lib_native_platform_isnativeplatform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/native/use-auth-surface.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_native_use_auth_surface",
+      "target": "lib_native_platform_isnativeplatform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/native/use-auth-surface.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_native_use_auth_surface_usenativeauthsurface",
+      "target": "lib_native_platform_isnativeplatform"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/native/platform.ts",
+      "source_location": "L53",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_native_platform_isappledevice",
       "target": "lib_native_platform_isnativeios",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/native/use-auth-surface.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_native_use_auth_surface",
+      "target": "lib_native_use_auth_surface_usenativeauthsurface",
       "confidence_score": 1.0
     },
     {
@@ -50258,7 +50703,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/services/email.ts",
-      "source_location": "L51",
+      "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_services_email",
@@ -50269,29 +50714,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/services/email.ts",
-      "source_location": "L17",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "lib_services_email",
-      "target": "lib_services_email_getfromaddress",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/services/email.ts",
-      "source_location": "L11",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "lib_services_email",
-      "target": "lib_services_email_getresendclient",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "lib/services/email.ts",
-      "source_location": "L55",
+      "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_services_email",
@@ -50302,7 +50725,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/services/email.ts",
-      "source_location": "L24",
+      "source_location": "L11",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_services_email",
@@ -50313,7 +50736,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/services/email.ts",
-      "source_location": "L91",
+      "source_location": "L55",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_services_email",
@@ -50324,7 +50747,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/services/email.ts",
-      "source_location": "L59",
+      "source_location": "L23",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_services_email",
@@ -50332,35 +50755,47 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "calls",
-      "context": "call",
+      "relation": "imports_from",
+      "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "lib/services/email.ts",
-      "source_location": "L25",
+      "source_location": "L2",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "lib_services_email_sendemail",
-      "target": "lib_services_email_getresendclient",
+      "source": "lib_services_email",
+      "target": "lib_services_mailer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/services/email.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_services_email",
+      "target": "lib_services_mailer_sendmail",
       "confidence_score": 1.0
     },
     {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
       "source_file": "lib/services/email.ts",
-      "source_location": "L37",
+      "source_location": "L12",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_services_email_sendemail",
-      "target": "lib_services_email_getfromaddress",
-      "confidence_score": 1.0
+      "target": "lib_services_mailer_sendmail"
     },
     {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/services/email.ts",
-      "source_location": "L123",
+      "source_location": "L87",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_services_email_sendpasswordresetemail",
@@ -50372,7 +50807,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/services/email.ts",
-      "source_location": "L88",
+      "source_location": "L52",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_services_email_sendverificationcode",
@@ -50444,6 +50879,156 @@
       "source": "lib_services_inventory",
       "target": "lib_services_inventory_validateviptablecapacity",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_services_mailer",
+      "target": "lib_services_mailer_islocalsmtphost",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_services_mailer",
+      "target": "lib_services_mailer_logsimulated",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_services_mailer",
+      "target": "lib_services_mailer_mailoptions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_services_mailer",
+      "target": "lib_services_mailer_resolvefromaddress",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L86",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_services_mailer",
+      "target": "lib_services_mailer_sendmail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_services_mailer",
+      "target": "lib_services_mailer_sendmailorthrow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/services/tickets-email.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_services_tickets_email",
+      "target": "lib_services_mailer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_services_mailer_sendmailorthrow",
+      "target": "lib_services_mailer_islocalsmtphost",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L78",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_services_mailer_sendmailorthrow",
+      "target": "lib_services_mailer_resolvefromaddress",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L48",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_services_mailer_sendmailorthrow",
+      "target": "lib_services_mailer_logsimulated",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/services/mailer.ts",
+      "source_location": "L88",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_services_mailer_sendmail",
+      "target": "lib_services_mailer_sendmailorthrow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/services/tickets-email.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_services_tickets_email",
+      "target": "lib_services_mailer_sendmailorthrow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/services/tickets-email.ts",
+      "source_location": "L208",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_services_tickets_email_sendticketsreceiptemail",
+      "target": "lib_services_mailer_sendmailorthrow"
     },
     {
       "relation": "contains",
@@ -50561,7 +51146,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "lib/services/tickets-email.ts",
-      "source_location": "L2",
+      "source_location": "L1",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_services_tickets_email",
@@ -50621,7 +51206,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "lib/services/tickets-email.ts",
-      "source_location": "L2",
+      "source_location": "L1",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_services_tickets_email",
@@ -50634,7 +51219,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/services/tickets-email.ts",
-      "source_location": "L86",
+      "source_location": "L69",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_services_tickets_email_sendticketsreceiptemail",
@@ -50645,7 +51230,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "lib/services/tickets-email.ts",
-      "source_location": "L2",
+      "source_location": "L1",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_services_tickets_email",
@@ -50658,7 +51243,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/services/tickets-email.ts",
-      "source_location": "L85",
+      "source_location": "L68",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_services_tickets_email_sendticketsreceiptemail",
@@ -50841,7 +51426,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/services/tickets-email.ts",
-      "source_location": "L168",
+      "source_location": "L151",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_services_tickets_email_sendticketsreceiptemail",
@@ -50853,7 +51438,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/services/tickets-email.ts",
-      "source_location": "L88",
+      "source_location": "L71",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_services_tickets_email_sendticketsreceiptemail",
@@ -62835,6 +63420,17 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_ios_app_setup_app_ios_somnus_tr\u00e1mites_apple_y_codemagic",
+      "target": "docs_ios_app_setup_1b_sign_in_with_apple_nombre_somnus_no_dev_control",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/IOS_APP_SETUP.md",
+      "source_location": "L41",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_ios_app_setup_app_ios_somnus_tr\u00e1mites_apple_y_codemagic",
       "target": "docs_ios_app_setup_2_apple_pay",
       "confidence_score": 1.0
     },
@@ -62842,7 +63438,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/IOS_APP_SETUP.md",
-      "source_location": "L36",
+      "source_location": "L50",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_ios_app_setup_app_ios_somnus_tr\u00e1mites_apple_y_codemagic",
@@ -62853,7 +63449,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/IOS_APP_SETUP.md",
-      "source_location": "L63",
+      "source_location": "L77",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_ios_app_setup_app_ios_somnus_tr\u00e1mites_apple_y_codemagic",
@@ -62864,7 +63460,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/IOS_APP_SETUP.md",
-      "source_location": "L71",
+      "source_location": "L85",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_ios_app_setup_app_ios_somnus_tr\u00e1mites_apple_y_codemagic",
@@ -62875,7 +63471,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/IOS_APP_SETUP.md",
-      "source_location": "L88",
+      "source_location": "L102",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_ios_app_setup_app_ios_somnus_tr\u00e1mites_apple_y_codemagic",
@@ -62886,7 +63482,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/IOS_APP_SETUP.md",
-      "source_location": "L97",
+      "source_location": "L111",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_ios_app_setup_app_ios_somnus_tr\u00e1mites_apple_y_codemagic",
@@ -63841,5 +64437,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "2917eee87cac91deffc8c842f661b1e0fe48a19b"
+  "built_at_commit": "cd76761e062a3ae1a189eee4f0a72c36494a0810"
 }

@@ -122,6 +122,7 @@
   "120": "tailwindcss",
   "121": "route.ts",
   "122": "@types/nodemailer",
+  "123": "embla-carousel-react",
   "124": "@types/uuid",
   "125": "typescript",
   "126": "postcss.config.mjs",

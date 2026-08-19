@@ -95,9 +95,9 @@
     "semantic_hash": "5daf9c9a8e8ee0326d0677a2469f8ee4"
   },
   "app/api/auth/otp/send/route.ts": {
-    "mtime": 1785985391.4196188,
-    "ast_hash": "68c6b98c0f01b68612c1610f59fdb4f4",
-    "semantic_hash": "68c6b98c0f01b68612c1610f59fdb4f4"
+    "mtime": 1787100103.0313568,
+    "ast_hash": "e81f8f93bc592345e59c966ded35c486",
+    "semantic_hash": ""
   },
   "app/api/auth/otp/verify/route.ts": {
     "mtime": 1785985391.4261277,
@@ -360,9 +360,9 @@
     "semantic_hash": "fa46ee5a5f8adb1e32f4fa9c6cdcf3cc"
   },
   "app/auth/post-login/page.tsx": {
-    "mtime": 1785985393.2994237,
-    "ast_hash": "e17a37c54a6d8258da0d25c46c90ae0a",
-    "semantic_hash": "e17a37c54a6d8258da0d25c46c90ae0a"
+    "mtime": 1787100094.928581,
+    "ast_hash": "bedfc4ebe18f4b8b18ced3dee806d0ee",
+    "semantic_hash": ""
   },
   "app/checkout/[saleId]/page.tsx": {
     "mtime": 1786261593.8411965,
@@ -415,8 +415,8 @@
     "semantic_hash": ""
   },
   "app/login/page.tsx": {
-    "mtime": 1786257435.3793104,
-    "ast_hash": "3fde8dbd1d350892de0584de2831811e",
+    "mtime": 1787100087.9823945,
+    "ast_hash": "7fd1b1092e9a56f82781b406d32d2106",
     "semantic_hash": ""
   },
   "app/mensajes/MensajesPageClient.tsx": {
@@ -495,8 +495,8 @@
     "semantic_hash": ""
   },
   "app/register/page.tsx": {
-    "mtime": 1786257435.3102524,
-    "ast_hash": "b91040a3c1479235b23ae3deb1abd012",
+    "mtime": 1787100053.5144005,
+    "ast_hash": "4e5a38c897fde179b35fdc4495dc1f6d",
     "semantic_hash": ""
   },
   "app/reset-password/page.tsx": {
@@ -520,8 +520,8 @@
     "semantic_hash": "cd52042f49c8016bcef61fea1445d352"
   },
   "app/verificar-email/page.tsx": {
-    "mtime": 1786257435.3102524,
-    "ast_hash": "a2b489cbae294acf5f4ded604c2d162f",
+    "mtime": 1787100126.4114828,
+    "ast_hash": "ad5dccfcf75f0a2ef99e4dd5b9bf2c2d",
     "semantic_hash": ""
   },
   "auth.ts": {
@@ -535,7 +535,7 @@
     "semantic_hash": "4879b211783d448cb0a99181e45d19bd"
   },
   "components/ContactForm.tsx": {
-    "mtime": 1787048387.397341,
+    "mtime": 1787099174.6125386,
     "ast_hash": "22e100eb33a7acf436df6d3030bbcfa0",
     "semantic_hash": ""
   },
@@ -640,7 +640,7 @@
     "semantic_hash": "983b7b7a9e51997b01eed026bbddc5ad"
   },
   "components/admin/TicketPricePhasesFields.tsx": {
-    "mtime": 1787048387.4023309,
+    "mtime": 1787099174.6125386,
     "ast_hash": "f180beb68fc29b9394f8135d2de89ebb",
     "semantic_hash": ""
   },
@@ -650,8 +650,8 @@
     "semantic_hash": "002fd8c61b5a84e7d9c7d59ec2a9f8f5"
   },
   "components/auth/SocialLoginButtons.tsx": {
-    "mtime": 1786257435.3102524,
-    "ast_hash": "8c189255ed3067e1b6c857ed61510081",
+    "mtime": 1787100058.9684348,
+    "ast_hash": "2989c83f1eaadf4eb27c3d3feb01e0ad",
     "semantic_hash": ""
   },
   "components/eventos/CarouselPosterImage.tsx": {
@@ -690,7 +690,7 @@
     "semantic_hash": "67104f42cc7b3200302a9b0948d7edfc"
   },
   "components/eventos/GalleryEventCardZamna.tsx": {
-    "mtime": 1787048387.4023309,
+    "mtime": 1787099174.6195207,
     "ast_hash": "5d672061e1d742528425cabb52da8dd6",
     "semantic_hash": ""
   },
@@ -720,7 +720,7 @@
     "semantic_hash": "55061aae55df3d9a6278a79a9798e007"
   },
   "components/eventos/UpcomingEventsCarousel.tsx": {
-    "mtime": 1787048387.4023309,
+    "mtime": 1787099174.6185236,
     "ast_hash": "3dab28bf7d7a306c797c56687a69b77b",
     "semantic_hash": ""
   },
@@ -970,9 +970,9 @@
     "semantic_hash": "eef4a268b2fb3141b94ab63a9dc15187"
   },
   "lib/services/email.ts": {
-    "mtime": 1785985394.1465485,
-    "ast_hash": "c55e8b78a85ec078d1d9032bf73d8865",
-    "semantic_hash": "c55e8b78a85ec078d1d9032bf73d8865"
+    "mtime": 1787100093.130415,
+    "ast_hash": "3707ceb3fbac1514703fdef96e8a26f3",
+    "semantic_hash": ""
   },
   "lib/services/inventory.ts": {
     "mtime": 1785985394.1495445,
@@ -995,9 +995,9 @@
     "semantic_hash": "75c93f32111054591e1a6fd6b6041cf6"
   },
   "lib/services/tickets-email.ts": {
-    "mtime": 1785985394.1628282,
-    "ast_hash": "afa19f053ea16a8b52377d055e6b98e0",
-    "semantic_hash": "afa19f053ea16a8b52377d055e6b98e0"
+    "mtime": 1787100100.4362864,
+    "ast_hash": "146bc5bfbf73d8e801bacc563ba70794",
+    "semantic_hash": ""
   },
   "lib/staff/memberships.ts": {
     "mtime": 1785985394.1688316,
@@ -1290,9 +1290,9 @@
     "semantic_hash": "661f4bbf595f69780d8645e43926d260"
   },
   "scripts/verificar-env.ts": {
-    "mtime": 1785985396.2183282,
-    "ast_hash": "1f2f0b10922b6dc264d1a5fb10d4f12c",
-    "semantic_hash": "1f2f0b10922b6dc264d1a5fb10d4f12c"
+    "mtime": 1787100104.4634557,
+    "ast_hash": "d3e6e21c9857f5f3cc62a6e13da4c79c",
+    "semantic_hash": ""
   },
   "scripts/verify-coordinator.ts": {
     "mtime": 1785985396.2223175,
@@ -1795,7 +1795,7 @@
     "semantic_hash": ""
   },
   "components/cart/CartContext.tsx": {
-    "mtime": 1787048387.4023309,
+    "mtime": 1787099174.6220849,
     "ast_hash": "ef6d2bf63b0b0d6d1a8c8b556597cb36",
     "semantic_hash": ""
   },
@@ -1815,17 +1815,17 @@
     "semantic_hash": ""
   },
   "components/onboarding/ProductTour.tsx": {
-    "mtime": 1787048387.397341,
+    "mtime": 1787099174.6125386,
     "ast_hash": "e215557a042502b8ae3ca4660540aed6",
     "semantic_hash": ""
   },
   "components/onboarding/tours.ts": {
-    "mtime": 1787048387.3928435,
+    "mtime": 1787099174.6113546,
     "ast_hash": "c68e25de082c0083cb9218889a76c1b8",
     "semantic_hash": ""
   },
   "components/onboarding/useProductTour.ts": {
-    "mtime": 1787048387.4023309,
+    "mtime": 1787099174.6125386,
     "ast_hash": "b2eab1314ee9ad299c61330930b15d96",
     "semantic_hash": ""
   },
@@ -2010,13 +2010,13 @@
     "semantic_hash": ""
   },
   "assets/wallet-pass/Somnus.pass/pass.json": {
-    "mtime": 1787049559.157031,
-    "ast_hash": "84e32f1091a2706efbfb1585d8565f3b",
+    "mtime": 1787097228.7113569,
+    "ast_hash": "a27753eb26d0880e9706ad6a6891ae51",
     "semantic_hash": ""
   },
   "capacitor.config.ts": {
-    "mtime": 1787049391.900262,
-    "ast_hash": "cbe193b108be85a292e49583bb6fa694",
+    "mtime": 1787099998.0793996,
+    "ast_hash": "95350ba90a918ad2233e94c310b55289",
     "semantic_hash": ""
   },
   "lib/services/ticket-ownership.ts": {
@@ -2125,8 +2125,8 @@
     "semantic_hash": ""
   },
   "lib/native/platform.ts": {
-    "mtime": 1787049671.947312,
-    "ast_hash": "2cfb915f7f250a5cd3a33dca4a8d25f5",
+    "mtime": 1787100007.5944552,
+    "ast_hash": "81b0d964c67b7cdade5cecd7db2b6a55",
     "semantic_hash": ""
   },
   "codemagic.yaml": {
@@ -2135,13 +2135,23 @@
     "semantic_hash": ""
   },
   "docs/IOS_APP_SETUP.md": {
-    "mtime": 1787050097.907814,
-    "ast_hash": "50927080923ef4ed54d01350e698aefd",
+    "mtime": 1787100124.5344877,
+    "ast_hash": "1b377c09926b2f6a21f8b4737c14d6be",
     "semantic_hash": ""
   },
   "scripts/ios-align-entitlements.sh": {
     "mtime": 1787056652.4276814,
     "ast_hash": "ac229902f3130bf62a30bf4e883b1051",
+    "semantic_hash": ""
+  },
+  "lib/native/use-auth-surface.ts": {
+    "mtime": 1787100044.4153304,
+    "ast_hash": "0f1a70779c72fbc6471a97f0c794b901",
+    "semantic_hash": ""
+  },
+  "lib/services/mailer.ts": {
+    "mtime": 1787100007.7175784,
+    "ast_hash": "6d01e4c95b4f8134aa8aefc764343820",
     "semantic_hash": ""
   }
 }
