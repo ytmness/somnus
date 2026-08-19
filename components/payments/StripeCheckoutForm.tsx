@@ -211,20 +211,8 @@ export function StripeCheckoutForm(props: StripeCheckoutFormProps) {
     );
   }
 
-  if (nativeIOS && !forceCardForm) {
-    return (
-      <NativeApplePayCheckout
-        saleId={props.saleId}
-        clientSecret={clientSecret}
-        publishableKey={publishableKey}
-        amountInPesos={props.amountInPesos}
-        buyerName={props.buyerName}
-        buyerEmail={props.buyerEmail}
-        eventName={props.eventName}
-        onUseCard={() => setForceCardForm(true)}
-      />
-    );
-  }
+  // On native iOS, skip the custom Apple Pay button and go straight to
+  // Stripe's Payment Element which already offers Apple Pay + card.
 
   const options = {
     clientSecret,
