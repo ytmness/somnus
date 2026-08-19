@@ -225,9 +225,9 @@ export default function EventDetailPage() {
                   <h2 className="text-white font-semibold uppercase tracking-wider text-sm mb-3">
                     About
                   </h2>
-                  <p className="text-white/80 text-sm leading-relaxed">
+                  <div className="text-white/80 text-sm leading-relaxed whitespace-pre-line">
                     {event.description}
-                  </p>
+                  </div>
                 </div>
               )}
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Trash2, ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 import {
   TicketPricePhasesFields,
   type PricePhaseFormRow,
@@ -98,10 +99,24 @@ export function EventTicketsSection({
   };
 
   const removeTicket = (index: number) => {
-    if (data.ticketTypes.length <= 1) return;
     const target = data.ticketTypes[index];
-    if (isEdit && target.id) return;
-    if ((target.soldQuantity ?? 0) > 0) return;
+    if (data.ticketTypes.length <= 1) {
+      toast.error("Debe quedar al menos una entrada o mesa");
+      return;
+    }
+    if ((target.soldQuantity ?? 0) > 0) {
+      toast.error(
+        `"${target.name || "Entrada"}" ya tiene ventas y no se puede eliminar`
+      );
+      return;
+    }
+    if (isEdit && target.id) {
+      const label = target.name.trim() || (target.kind === "TABLE" ? "Mesa" : "Entrada");
+      const ok = window.confirm(
+        `¿Eliminar "${label}"?\n\nSe quitará al guardar el evento.`
+      );
+      if (!ok) return;
+    }
     onChange({
       ticketTypes: data.ticketTypes.filter((_, i) => i !== index),
     });
@@ -156,9 +171,7 @@ export function EventTicketsSection({
           const phaseCount = tt.pricePhases.length;
           const sold = tt.soldQuantity ?? 0;
           const canRemove =
-            data.ticketTypes.length > 1 &&
-            sold === 0 &&
-            !(isEdit && Boolean(tt.id));
+            data.ticketTypes.length > 1 && sold === 0;
           const isTable = tt.kind === "TABLE";
           const otherTiers = data.ticketTypes.filter(
             (_, i) => i !== index && Boolean(data.ticketTypes[i].id || data.ticketTypes[i].name)
@@ -229,17 +242,20 @@ export function EventTicketsSection({
                   <button
                     type="button"
                     onClick={() => removeTicket(index)}
-                    className="somnus-nav-link p-2 text-white/45 hover:text-red-400 justify-self-end"
-                    aria-label={`Remove ticket tier ${index + 1}`}
+                    className="somnus-nav-link inline-flex items-center gap-1.5 px-2 py-2 text-white/45 hover:text-red-400 justify-self-end"
+                    aria-label={`Eliminar ${tt.name || "entrada"}`}
                   >
-                    <Trash2 className="w-4 h-4" aria-hidden />
+                    <Trash2 className="w-4 h-4 shrink-0" aria-hidden />
+                    <span className="text-[10px] uppercase tracking-wider hidden sm:inline">
+                      Eliminar
+                    </span>
                   </button>
                 )}
               </div>
 
               {isEdit && sold > 0 && (
                 <p className="text-[11px] text-white/40">
-                  {sold} sold — qty cannot go below that
+                  {sold} vendidos — no se puede eliminar ni bajar la cantidad por debajo
                 </p>
               )}
 

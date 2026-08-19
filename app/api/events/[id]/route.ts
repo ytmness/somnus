@@ -273,6 +273,47 @@ export async function PATCH(
           }
         }
       }
+
+      const keptIds = new Set(
+        ticketTypes.map((tt) => tt.id).filter((id): id is string => Boolean(id))
+      );
+      const existingTiers = await prisma.ticketType.findMany({
+        where: { eventId: params.id },
+      });
+
+      for (const existing of existingTiers) {
+        if (keptIds.has(existing.id)) continue;
+        if (existing.soldQuantity > 0) {
+          return NextResponse.json(
+            {
+              error: `"${existing.name}" tiene ventas registradas y no se puede eliminar`,
+            },
+            { status: 400 }
+          );
+        }
+        await prisma.ticketType.updateMany({
+          where: { linkedTicketTypeId: existing.id },
+          data: { linkedTicketTypeId: null },
+        });
+        await prisma.ticketPricePhase.deleteMany({
+          where: { ticketTypeId: existing.id },
+        });
+        await prisma.tableGroupPriceRow.deleteMany({
+          where: { ticketTypeId: existing.id },
+        });
+        await prisma.ticketType.delete({ where: { id: existing.id } });
+      }
+
+      const remainingCount = await prisma.ticketType.count({
+        where: { eventId: params.id },
+      });
+      if (remainingCount === 0) {
+        return NextResponse.json(
+          { error: "Debe existir al menos un tipo de entrada" },
+          { status: 400 }
+        );
+      }
+
       event = await prisma.event.findUniqueOrThrow({
         where: { id: params.id },
         include: eventInclude,

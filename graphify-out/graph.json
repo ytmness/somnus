@@ -6659,7 +6659,7 @@
       "label": "StandaloneCarouselProps",
       "file_type": "code",
       "source_file": "components/eventos/UpcomingEventsCarousel.tsx",
-      "source_location": "L229",
+      "source_location": "L242",
       "_origin": "ast",
       "id": "components_eventos_upcomingeventscarousel_standalonecarouselprops",
       "community": 6,
@@ -6670,7 +6670,7 @@
       "label": "UpcomingEventsCarousel()",
       "file_type": "code",
       "source_file": "components/eventos/UpcomingEventsCarousel.tsx",
-      "source_location": "L237",
+      "source_location": "L250",
       "_origin": "ast",
       "id": "components_eventos_upcomingeventscarousel_upcomingeventscarousel",
       "community": 6,
@@ -13108,8 +13108,8 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "package_dependencies_date_fns",
-      "community": 82,
-      "community_name": "date-fns",
+      "community": 80,
+      "community_name": "dependencies",
       "norm_label": "date-fns"
     },
     {
@@ -13119,8 +13119,8 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "date_fns",
-      "community": 82,
-      "community_name": "date-fns",
+      "community": 80,
+      "community_name": "dependencies",
       "norm_label": "date-fns"
     },
     {
@@ -13130,8 +13130,8 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "package_dependencies_embla_carousel_react",
-      "community": 80,
-      "community_name": "dependencies",
+      "community": 84,
+      "community_name": "eslint-config-next",
       "norm_label": "embla-carousel-react"
     },
     {
@@ -13141,8 +13141,8 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "embla_carousel_react",
-      "community": 80,
-      "community_name": "dependencies",
+      "community": 84,
+      "community_name": "eslint-config-next",
       "norm_label": "embla-carousel-react"
     },
     {
@@ -13911,8 +13911,8 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "package_devdependencies_dotenv",
-      "community": 78,
-      "community_name": "autoprefixer",
+      "community": 82,
+      "community_name": "date-fns",
       "norm_label": "dotenv"
     },
     {
@@ -13922,8 +13922,8 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "dotenv",
-      "community": 78,
-      "community_name": "autoprefixer",
+      "community": 82,
+      "community_name": "date-fns",
       "norm_label": "dotenv"
     },
     {
@@ -13955,8 +13955,8 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "package_devdependencies_eslint_config_next",
-      "community": 84,
-      "community_name": "eslint-config-next",
+      "community": 78,
+      "community_name": "autoprefixer",
       "norm_label": "eslint-config-next"
     },
     {
@@ -13966,8 +13966,8 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "eslint_config_next",
-      "community": 84,
-      "community_name": "eslint-config-next",
+      "community": 78,
+      "community_name": "autoprefixer",
       "norm_label": "eslint-config-next"
     },
     {
@@ -44976,7 +44976,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/eventos/UpcomingEventsCarousel.tsx",
-      "source_location": "L229",
+      "source_location": "L242",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_eventos_upcomingeventscarousel",
@@ -44987,7 +44987,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/eventos/UpcomingEventsCarousel.tsx",
-      "source_location": "L237",
+      "source_location": "L250",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_eventos_upcomingeventscarousel",
@@ -65528,5 +65528,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "805e3b9f2787cac26665dc8ea635ef94f0cad55f"
+  "built_at_commit": "32fb647cf1ee5eea199625182444b0f303d69e21"
 }
