@@ -535,7 +535,7 @@
     "semantic_hash": "4879b211783d448cb0a99181e45d19bd"
   },
   "components/ContactForm.tsx": {
-    "mtime": 1787099174.6125386,
+    "mtime": 1787122918.6947985,
     "ast_hash": "22e100eb33a7acf436df6d3030bbcfa0",
     "semantic_hash": ""
   },
@@ -640,7 +640,7 @@
     "semantic_hash": "983b7b7a9e51997b01eed026bbddc5ad"
   },
   "components/admin/TicketPricePhasesFields.tsx": {
-    "mtime": 1787099174.6125386,
+    "mtime": 1787122918.6977904,
     "ast_hash": "f180beb68fc29b9394f8135d2de89ebb",
     "semantic_hash": ""
   },
@@ -690,7 +690,7 @@
     "semantic_hash": "67104f42cc7b3200302a9b0948d7edfc"
   },
   "components/eventos/GalleryEventCardZamna.tsx": {
-    "mtime": 1787099174.6195207,
+    "mtime": 1787122918.704773,
     "ast_hash": "5d672061e1d742528425cabb52da8dd6",
     "semantic_hash": ""
   },
@@ -720,7 +720,7 @@
     "semantic_hash": "55061aae55df3d9a6278a79a9798e007"
   },
   "components/eventos/UpcomingEventsCarousel.tsx": {
-    "mtime": 1787099174.6185236,
+    "mtime": 1787122918.7007825,
     "ast_hash": "3dab28bf7d7a306c797c56687a69b77b",
     "semantic_hash": ""
   },
@@ -1795,7 +1795,7 @@
     "semantic_hash": ""
   },
   "components/cart/CartContext.tsx": {
-    "mtime": 1787099174.6220849,
+    "mtime": 1787122918.704773,
     "ast_hash": "ef6d2bf63b0b0d6d1a8c8b556597cb36",
     "semantic_hash": ""
   },
@@ -1815,17 +1815,17 @@
     "semantic_hash": ""
   },
   "components/onboarding/ProductTour.tsx": {
-    "mtime": 1787099174.6125386,
+    "mtime": 1787122918.6598923,
     "ast_hash": "e215557a042502b8ae3ca4660540aed6",
     "semantic_hash": ""
   },
   "components/onboarding/tours.ts": {
-    "mtime": 1787099174.6113546,
+    "mtime": 1787122918.658896,
     "ast_hash": "c68e25de082c0083cb9218889a76c1b8",
     "semantic_hash": ""
   },
   "components/onboarding/useProductTour.ts": {
-    "mtime": 1787099174.6125386,
+    "mtime": 1787122918.6977904,
     "ast_hash": "b2eab1314ee9ad299c61330930b15d96",
     "semantic_hash": ""
   },
@@ -2110,8 +2110,8 @@
     "semantic_hash": ""
   },
   "components/payments/NativeApplePayCheckout.tsx": {
-    "mtime": 1787120321.1243114,
-    "ast_hash": "49650d38c44f7ded99907e99d7ed1d85",
+    "mtime": 1787123416.3936925,
+    "ast_hash": "daeec1f75040f7d108066206441df0a2",
     "semantic_hash": ""
   },
   "components/tickets/AddToWalletButton.tsx": {
@@ -2155,13 +2155,18 @@
     "semantic_hash": ""
   },
   "scripts/ios-patch-stripe-apple-pay.cjs": {
-    "mtime": 1787120245.495963,
-    "ast_hash": "80a86b854610bf3f5dba1daabeee0a10",
+    "mtime": 1787123458.497468,
+    "ast_hash": "befdee3dd086f4b77ff7a2f458a49483",
     "semantic_hash": ""
   },
   "scripts/ios-patch-stripe-apple-pay.sh": {
     "mtime": 1787120220.2236943,
     "ast_hash": "5e1ce2b35672ff4bb28c57debd622dd5",
+    "semantic_hash": ""
+  },
+  "lib/native/stripe-plugin.ts": {
+    "mtime": 1787123416.396685,
+    "ast_hash": "55c66375b0305bd1517a7a74b71d3b08",
     "semantic_hash": ""
   }
 }

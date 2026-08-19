@@ -1,16 +1,16 @@
 # Graph Report - somnus-master  (2026-08-19)
 
 ## Corpus Check
-- 372 files · ~977,081 words
+- 373 files · ~977,443 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2222 nodes · 3497 edges · 234 communities (134 shown, 100 thin omitted)
+- 2230 nodes · 3513 edges · 225 communities (126 shown, 99 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 4 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `b1e8cbdc`
+- Built from commit: `b54aa924`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -98,7 +98,6 @@
 - 🔧 Configuración en el Servidor
 - test-auth-logic.ts
 - jose
-- OrganizerEventsManager.tsx
 - fulfill-sale.ts
 - 🌐 Configurar DNS y Nginx para Somnus.live
 - next.config.mjs
@@ -118,15 +117,12 @@
 - react-dom
 - SqlEditorManager.tsx
 - 🔒 Configurar HTTPS/SSL para Acceso a Cámara en Móviles
-- auth.ts
 - stripe
 - @stripe/react-stripe-js
 - @stripe/stripe-js
-- redirect-path.ts
 - tailwind-merge
 - session.ts
 - commissions.ts
-- _temp_deploy2.js
 - zod
 - prisma
 - tailwindcss
@@ -165,8 +161,6 @@
 - 🔧 Eliminar Parking/Monetización del Dominio
 - 🚀 Metodología de Desarrollo con Servidor Remoto
 - 🚀 Iniciar Aplicación con PM2 - Pasos Finales
-- @types/node
-- ticket-generator.ts
 - 🗄️ Crear Base de Datos en Supabase
 - 🚀 Iniciar Aplicación con PM2
 - Migrar la base de datos a Postgres propio (sin Supabase)
@@ -175,16 +169,15 @@
 - 🚀 Inicio Rápido - Reutilización para Nuevo Cliente
 - Guía de Queries para Supabase
 - ✅ Verificación Final - Todo Está Funcionando
-- EventCardZamna.tsx
 - 🔍 Comparación de Schemas: Boletera-Regia vs Somnus
 - 🔧 Corregir Error de Sintaxis en Nginx
-- AddToWalletButton.tsx
 - 🗄️ Comandos para Crear Schema en Supabase
 - Stripe Connect — somnus.live
 - Videos (ffmpeg)
 - 🔧 Eliminar Línea Problemática del Archivo Nginx
 - 🔴 Problema: Base de Datos no Conecta con PM2
 - 📋 ESTRUCTURA DEL PROYECTO Y ROADMAP
+- inventory.ts
 - 📋 Características Principales
 - Solución
 - Aplicar schema a la base de datos
@@ -210,7 +203,6 @@
 - dotenv
 - Servicios a Crear
 - @radix-ui/react-tabs
-- bcryptjs
 - next
 - qrcode.react
 - @radix-ui/react-avatar
@@ -266,31 +258,31 @@
 ## Import Cycles
 - None detected.
 
-## Communities (234 total, 100 thin omitted)
+## Communities (225 total, 99 thin omitted)
 
 ### Community 0 - "cn"
-Cohesion: 0.17
-Nodes (15): Carousel(), CarouselApi, CarouselContent(), CarouselContext, CarouselContextProps, CarouselItem(), CarouselNext(), CarouselOptions (+7 more)
+Cohesion: 0.05
+Nodes (48): AssignedEvent, SessionUser, QRScanner(), ScanResponse, ScanFeedbackProps, ScannerFeedback(), ScanResult, ScanStats (+40 more)
 
 ### Community 1 - "session.ts"
-Cohesion: 0.07
-Nodes (40): GET(), PATCH(), POST(), GET(), POST(), GET(), POST(), GET() (+32 more)
+Cohesion: 0.08
+Nodes (40): GET(), PATCH(), POST(), GET(), POST(), GET(), GET(), isValidEmail() (+32 more)
 
 ### Community 2 - "OrganizadorPageContent.tsx"
 Cohesion: 0.15
 Nodes (11): ChatPanel(), ChatPanelProps, Message, ConversationItem, ConversationList(), ConversationListProps, MessageBubble(), MessageBubbleProps (+3 more)
 
 ### Community 3 - "effectiveTicketPriceAt"
-Cohesion: 0.24
-Nodes (5): Cart(), calculateServiceFee(), calculateTax(), calculateTotal(), calculateTotalWithServiceFee()
+Cohesion: 0.15
+Nodes (12): CartContext, CartContextValue, CartProvider(), GlobalCartItem, readStorage(), useCart(), HeaderCartDrawer(), Cart() (+4 more)
 
 ### Community 4 - "permissions.ts"
-Cohesion: 0.14
-Nodes (22): GET(), POST(), GET(), canViewOwnTickets(), TICKET_VIEWER_ROLES, getAppUrl(), userOwnsTicket(), buildTicketPass() (+14 more)
+Cohesion: 0.21
+Nodes (10): buildTicketPass(), DATE_FORMATTER, PASS_MODEL_DIR, readPem(), resolveConfig(), TicketPassResult, toRelevantDate(), WalletPassConfig (+2 more)
 
 ### Community 5 - "formatEventCalendarDate"
-Cohesion: 0.08
-Nodes (28): jspdf, generateQRCode(), createQRPayload(), generateMultipleTicketsPDF(), generateTicketPDF(), jspdf, qrcode, qrcode (+20 more)
+Cohesion: 0.10
+Nodes (19): ApiResponse, CreateEventDTO, CreateSaleDTO, CreateTicketTypeDTO, DashboardStats, EventFilters, EventReport, EventWithTicketTypes (+11 more)
 
 ### Community 6 - "carousel-poster-settings.tsx"
 Cohesion: 0.11
@@ -301,32 +293,36 @@ Cohesion: 0.07
 Nodes (26): actualizacionvisual, dom, dom.iterable, esnext, next-env.d.ts, .next/types/**/*.ts, node_modules, **/*.ts (+18 more)
 
 ### Community 8 - "redirect-path.ts"
-Cohesion: 0.20
-Nodes (12): POST(), GET(), InvitacionPage(), ROLE_LABELS, VerificarEmailContent(), getPrimaryStaffRedirect(), ALLOWED_REDIRECT_PREFIXES, resolveAuthRedirectForUser() (+4 more)
+Cohesion: 0.40
+Nodes (7): POST(), GET(), getPrimaryStaffRedirect(), ALLOWED_REDIRECT_PREFIXES, resolveAuthRedirectForUser(), sanitizeRedirectPath(), parseAuthSurface()
 
 ### Community 9 - "auth.ts"
-Cohesion: 0.07
-Nodes (48): generateInviteToken(), POST(), CheckoutLineItem, isTicketTypeVisible(), isWithinSalesWindow(), POST(), resolveTicketTypeId(), TicketDetail (+40 more)
+Cohesion: 0.06
+Nodes (44): CheckoutLineItem, isTicketTypeVisible(), isWithinSalesWindow(), POST(), resolveTicketTypeId(), TicketDetail, unitPriceForTicketType(), validateTicketTypeForPurchase() (+36 more)
 
 ### Community 10 - "schemas.ts"
-Cohesion: 0.22
-Nodes (9): GET(), DELETE(), PATCH(), POST(), ALLOWED_TYPES, POST(), userOwnsOrganization(), notifyOrganizationFollowers() (+1 more)
+Cohesion: 0.12
+Nodes (20): GET(), DELETE(), PATCH(), POST(), DELETE(), PATCH(), GET(), POST() (+12 more)
+
+### Community 11 - "prisma.ts"
+Cohesion: 0.08
+Nodes (5): appleSecretPromise, { handlers, auth, signIn, signOut }, ensurePrismaUserFromOAuth(), SyncedPrismaUser, globalForPrisma
 
 ### Community 12 - "registration.ts"
-Cohesion: 0.13
-Nodes (23): GET(), GET(), GET(), GET(), POST(), GET(), POST(), canManageTable() (+15 more)
+Cohesion: 0.06
+Nodes (44): GET(), GET(), GET(), PATCH(), patchSchema, GET(), GET(), GET() (+36 more)
 
 ### Community 13 - "route.ts"
-Cohesion: 0.14
-Nodes (5): BalanceSummary, NativeApplePayCheckout(), NativeApplePayCheckoutProps, StripeCheckoutForm(), StripeCheckoutFormProps
+Cohesion: 0.24
+Nodes (4): BalanceSummary, NativeApplePayCheckout(), StripeCheckoutForm(), StripeCheckoutFormProps
 
 ### Community 14 - "event-access.ts"
-Cohesion: 0.22
-Nodes (10): DELETE(), PATCH(), GET(), POST(), POST(), ensureOrganizerProfile(), generateUniqueOrgSlug(), slugifyName() (+2 more)
+Cohesion: 0.15
+Nodes (15): POST(), GET(), InvitacionPage(), ROLE_LABELS, AuthSurface, canViewOwnTickets(), resolvePostAuthRedirect(), resolvePublicRegistrationRole() (+7 more)
 
 ### Community 15 - "route.ts"
-Cohesion: 0.15
-Nodes (21): DELETE(), DELETE(), GET(), POST(), DELETE(), GET(), PATCH(), POST() (+13 more)
+Cohesion: 0.16
+Nodes (20): DELETE(), DELETE(), GET(), POST(), DELETE(), GET(), PATCH(), POST() (+12 more)
 
 ### Community 16 - "local.ts"
 Cohesion: 0.16
@@ -337,12 +333,12 @@ Cohesion: 0.23
 Nodes (7): OrganizationProfileClient(), OrganizationProfileClientProps, FollowButton(), FollowButtonProps, OrganizationProfileHeader(), OrganizationProfileHeaderProps, PublicOrgProfile
 
 ### Community 18 - "index.ts"
-Cohesion: 0.18
-Nodes (11): IndividualTablesMapProps, Section, getTableByNumber(), getTableStats(), IndividualTable, markTableAsSold(), NON_VIP_SECTIONS, PATRIOTAS_EVENT_CONFIG (+3 more)
+Cohesion: 0.23
+Nodes (9): jspdf, generateQRCode(), createQRPayload(), generateMultipleTicketsPDF(), generateTicketPDF(), jspdf, qrcode, qrcode (+1 more)
 
 ### Community 19 - "Concert"
-Cohesion: 0.20
-Nodes (9): CartProps, ConcertCard(), ConcertCardProps, ConcertCarouselProps, HeroCarouselProps, TicketSelectorProps, CartItem, Concert (+1 more)
+Cohesion: 0.19
+Nodes (10): CartProps, ConcertCard(), ConcertCardProps, ConcertCarouselProps, EventCardZamnaProps, HeroCarouselProps, TicketSelectorProps, CartItem (+2 more)
 
 ### Community 20 - "getSession"
 Cohesion: 0.11
@@ -353,8 +349,8 @@ Cohesion: 0.12
 Nodes (10): GallerySection, staticSectionsNewestFirst, SomnusHeader(), SomnusHeaderProps, GallerySection, gallerySections, panoramaCinema, panoramaHighlights (+2 more)
 
 ### Community 22 - "page.tsx"
-Cohesion: 0.14
-Nodes (14): CommissionRule, CommissionsManager(), CommissionsManagerProps, EventOption, OrganizerOption, Event, EventsTable(), EventsTableProps (+6 more)
+Cohesion: 0.12
+Nodes (17): CommissionRule, CommissionsManager(), CommissionsManagerProps, EventOption, OrganizerOption, Event, EventsTable(), EventsTableProps (+9 more)
 
 ### Community 23 - "route.ts"
 Cohesion: 0.22
@@ -365,24 +361,24 @@ Cohesion: 0.07
 Nodes (51): EventDetailPage(), ImageUploadField(), ImageUploadFieldProps, TableGroupPriceFields(), TableGroupPriceFieldsProps, TableGroupPriceFormRow, PricePhaseFormRow, TicketPricePhasesFields() (+43 more)
 
 ### Community 25 - "patriotas-individual-tables.ts"
-Cohesion: 0.25
-Nodes (8): CarouselPosterSettings, CarouselPosterImage(), clamp(), Props, GalleryEventCardZamna(), GalleryEventCardZamnaProps, GALLERY_EVENTS, GalleryEvent
+Cohesion: 0.50
+Nodes (4): CarouselPosterSettings, CarouselPosterImage(), clamp(), Props
 
 ### Community 26 - "📋 Checklist de Personalización"
 Cohesion: 0.05
 Nodes (37): 1. **Archivos de Configuración**, 2. **Colores y CSS**, 3. **Logos e Imágenes**, 4. **Textos Hardcodeados**, 5. **Emails**, 6. **PDFs de Boletos**, 7. **Componentes**, 8. **Base de Datos** (+29 more)
 
 ### Community 27 - "EventCardZamna.tsx"
-Cohesion: 0.07
-Nodes (43): GET(), parseDateParam(), GET(), POST(), POST(), GET(), POST(), POST() (+35 more)
+Cohesion: 0.06
+Nodes (53): GET(), parseDateParam(), generateInviteToken(), POST(), generateInviteToken(), GET(), poolPaymentUrl(), POST() (+45 more)
 
 ### Community 28 - "RevenueDashboard.tsx"
 Cohesion: 0.18
 Nodes (12): EventOption, formatDate(), formatMoney(), OrganizerOption, PeriodPreset, RecentSale, RevenueByEvent, RevenueByOrganizer (+4 more)
 
 ### Community 29 - "route.ts"
-Cohesion: 0.19
-Nodes (9): AssignedEvent, SessionUser, QRScanner(), ScanResponse, ScannerFeedback(), ScanResult, ScanStats, html5-qrcode (+1 more)
+Cohesion: 0.29
+Nodes (10): isLocalSmtpHost(), logSimulated(), MailOptions, resolveFromAddress(), sendMailOrThrow(), generateQRPayload(), mxnFormat(), safeText() (+2 more)
 
 ### Community 30 - "scripts"
 Cohesion: 0.10
@@ -393,24 +389,24 @@ Cohesion: 0.05
 Nodes (36): 1. Hero inmersivo (full-width), 1. Objetivo del Sitio, 2. Barra destacada de próximo evento, 3. Reglas Estrictas (Checklist), 3. Sección de eventos destacados, 4. Filtros rápidos, 5. Sección editorial/manifiesto + estadísticas, 6. Eventos por ciudad (+28 more)
 
 ### Community 32 - "page.tsx"
-Cohesion: 0.22
-Nodes (11): convertEventToConcert(), HomePage(), BRAND_LOGOS, BrandPresenceCarousel(), ContactForm(), ClientTourUser, useClientTour(), RevealSection() (+3 more)
+Cohesion: 0.15
+Nodes (18): convertEventToConcert(), HomePage(), BRAND_LOGOS, BrandPresenceCarousel(), ContactForm(), useCarouselPosterOptional(), EventCardZamna(), getEventStatus() (+10 more)
 
 ### Community 33 - "button.tsx"
 Cohesion: 0.22
 Nodes (8): OrganizationPostComposer(), OrganizationPostComposerProps, OrganizationProfile, OrganizationProfileEditor(), OrganizationProfileEditorProps, Organization, OrganizationsManager(), OrganizationsManagerProps
 
 ### Community 35 - "otp.ts"
-Cohesion: 0.39
-Nodes (5): createServerClient(), getSupabaseAdmin(), signOut(), SessionUser, StaffMembershipSummary
+Cohesion: 0.41
+Nodes (8): POST(), GET(), userOwnsTicket(), isWalletPassEnabled(), getSecret(), getWalletPassTokenTtlSeconds(), signWalletPassToken(), verifyWalletPassToken()
 
 ### Community 36 - "🚀 Guía de Despliegue - Servidor Somnus"
 Cohesion: 0.06
 Nodes (32): 📞 Acceso Posterior al Servidor, Activar el sitio, Cambios no se reflejan, 🔧 Comandos Útiles de PM2, Configurar el sitio, Error de base de datos, 🚀 Guía de Despliegue - Servidor Somnus, 📋 Información del Servidor (+24 more)
 
 ### Community 37 - "layout.tsx"
-Cohesion: 0.25
-Nodes (10): GET(), GET(), PATCH(), patchSchema, GET(), buildProfileForUserId(), buyerCard(), lookupBuyerProfilesByEmails() (+2 more)
+Cohesion: 0.22
+Nodes (4): NativeApplePayCheckoutProps, ApplePayResult, NativeStripe, NativeStripePlugin
 
 ### Community 38 - "OrganizationProfileClient.tsx"
 Cohesion: 0.21
@@ -429,8 +425,8 @@ Cohesion: 0.06
 Nodes (30): 📞 Acceso Posterior al Servidor, Activar el sitio, Cambios no se reflejan, 🔧 Comandos Útiles de PM2, Configurar el sitio, Error de base de datos, 🚀 Guía de Despliegue en Vultr Ubuntu, 📋 Información del Servidor (+22 more)
 
 ### Community 44 - "route.ts"
-Cohesion: 0.47
-Nodes (4): resetAllOrganizersStripe(), ResetOrganizerStripeResult, main(), prisma
+Cohesion: 0.33
+Nodes (6): POST(), resetAllOrganizersStripe(), resetOrganizerStripe(), ResetOrganizerStripeResult, main(), prisma
 
 ### Community 45 - "delete-somnus-panorama-events.ts"
 Cohesion: 0.28
@@ -441,8 +437,8 @@ Cohesion: 0.38
 Nodes (6): eventFlyerSrc(), formatPaidAt(), InviteData, mxn, PagarInvitePage(), PaymentTimelineEntry
 
 ### Community 47 - "resolvePostAuthRedirect"
-Cohesion: 0.20
-Nodes (10): API Endpoints a Crear, `/api/events`, `/api/inventory`, `/api/sales`, `/api/tickets`, Autenticación, 🚧 FASE 2: SISTEMA DE VENTA - **EN DESARROLLO**, Páginas a Crear (+2 more)
+Cohesion: 0.22
+Nodes (9): Autenticación, Boletos, Carrito de Compra, Componentes a Crear, Eventos, 🚧 FASE 2: SISTEMA DE VENTA - **EN DESARROLLO**, Páginas a Crear, Público (+1 more)
 
 ### Community 48 - "NavbarFooter.tsx"
 Cohesion: 0.29
@@ -453,28 +449,24 @@ Cohesion: 0.38
 Nodes (6): log(), main(), OUT, results, shot(), stamp
 
 ### Community 51 - "route.ts"
-Cohesion: 0.21
-Nodes (8): ScanFeedbackProps, Dialog(), DialogContent(), DialogDescription(), DialogFooter(), DialogHeader(), DialogOverlay(), DialogTitle()
+Cohesion: 0.40
+Nodes (5): API Endpoints a Crear, `/api/events`, `/api/inventory`, `/api/sales`, `/api/tickets`
 
 ### Community 52 - "GalleryManager.tsx"
-Cohesion: 0.06
-Nodes (44): POST(), schema, POST(), sendOtpSchema, POST(), POST(), POST(), schema (+36 more)
+Cohesion: 0.13
+Nodes (22): POST(), schema, POST(), sendOtpSchema, POST(), POST(), schema, buildProviders() (+14 more)
 
 ### Community 53 - "compress-gallery.ts"
 Cohesion: 0.53
 Nodes (5): ASSETS_DIR, compressFile(), findJpegs(), GALLERY_FOLDERS, main()
-
-### Community 54 - "effectiveTicketPriceAt"
-Cohesion: 0.29
-Nodes (10): ExpandablePill(), ExpandablePillProps, Card(), CardAction(), CardContent(), CardDescription(), CardFooter(), CardHeader() (+2 more)
 
 ### Community 55 - "next-auth.d.ts"
 Cohesion: 0.33
 Nodes (5): JWT, next-auth, next-auth/jwt, Session, User
 
 ### Community 56 - "route.ts"
-Cohesion: 0.14
-Nodes (12): groupByDate(), NotificacionesPage(), Notification, OrgListItem, useCartOptional(), SiteHeader(), SiteHeaderProps, NotificationBell() (+4 more)
+Cohesion: 0.12
+Nodes (15): MisBoletosPage(), TicketData, groupByDate(), NotificacionesPage(), Notification, OrgListItem, useCartOptional(), SessionUser (+7 more)
 
 ### Community 59 - "package.json"
 Cohesion: 0.50
@@ -489,24 +481,20 @@ Cohesion: 0.13
 Nodes (15): autoprefixer, @capacitor/assets, devDependencies, autoprefixer, @capacitor/assets, postcss, prisma, tsx (+7 more)
 
 ### Community 79 - "bcryptjs"
-Cohesion: 0.19
-Nodes (12): PostLoginContent(), LoginContent(), RegisterContent(), Provider, SocialLoginButtons(), SocialLoginButtonsProps, resolveAuthRedirectPath(), CapacitorGlobal (+4 more)
+Cohesion: 0.17
+Nodes (13): PostLoginContent(), LoginContent(), RegisterContent(), VerificarEmailContent(), Provider, SocialLoginButtons(), SocialLoginButtonsProps, resolveAuthRedirectPath() (+5 more)
 
 ### Community 80 - "dependencies"
 Cohesion: 0.15
-Nodes (13): @capacitor/app, @capacitor/browser, class-variance-authority, lucide-react, nodemailer, dependencies, @capacitor/app, @capacitor/browser (+5 more)
+Nodes (13): bcryptjs, @capacitor/app, class-variance-authority, lucide-react, nodemailer, dependencies, bcryptjs, @capacitor/app (+5 more)
 
 ### Community 85 - "🔧 Configuración en el Servidor"
 Cohesion: 0.07
 Nodes (29): 1. Verificar DNS, 2. Verificar HTTP (antes de SSL), 3. Verificar HTTPS (después de SSL), 4. Verificar Redirección, Certificado no se renueva automáticamente, 🎯 Checklist Final, 🚀 Comandos Rápidos, 📋 Configuración DNS en GoDaddy (+21 more)
 
 ### Community 86 - "test-auth-logic.ts"
-Cohesion: 0.25
-Nodes (10): APPLE, ensureHelper(), fs, main(), patchAmount(), patchApplePayNilRoot(), path, replaceGetRootVc() (+2 more)
-
-### Community 88 - "OrganizerEventsManager.tsx"
-Cohesion: 0.25
-Nodes (6): formatEventDate(), initials(), ProfilePageClient(), ProfileView(), ProfileViewData, ProfileViewProps
+Cohesion: 0.21
+Nodes (14): APPLE, ensureHelper(), extractFunction(), fs, main(), patchAmount(), patchEmptyItems(), patchPresentApplePay() (+6 more)
 
 ### Community 89 - "fulfill-sale.ts"
 Cohesion: 0.22
@@ -529,8 +517,8 @@ Cohesion: 0.17
 Nodes (14): FeedItem, FeedPage(), EventItem, OrganizationFeed(), OrganizationFeedProps, formatDate(), OrganizationPostCard(), OrganizationPostCardProps (+6 more)
 
 ### Community 99 - "resolvePostAuthRedirect"
-Cohesion: 0.32
-Nodes (6): MisBoletosPage(), TicketData, SessionUser, AddToWalletButton(), AddToWalletButtonProps, isAppleDevice()
+Cohesion: 0.67
+Nodes (3): AddToWalletButton(), AddToWalletButtonProps, isAppleDevice()
 
 ### Community 100 - "@radix-ui/react-dropdown-menu"
 Cohesion: 0.28
@@ -541,28 +529,16 @@ Cohesion: 0.17
 Nodes (14): BLACK, GLYPH_CROP, IOS_ASSETS, IOS_ICONS, main(), PASS_DIR, passLogo(), RESOURCES (+6 more)
 
 ### Community 106 - "SqlEditorManager.tsx"
-Cohesion: 0.09
-Nodes (29): GET(), POST(), eventInclude, PATCH(), buildTicketTypesCreate(), eventInclude, GET(), POST() (+21 more)
+Cohesion: 0.08
+Nodes (32): GET(), POST(), eventInclude, PATCH(), buildTicketTypesCreate(), eventInclude, GET(), POST() (+24 more)
 
 ### Community 107 - "🔒 Configurar HTTPS/SSL para Acceso a Cámara en Móviles"
 Cohesion: 0.09
 Nodes (21): a) **Freenom** (Gratis por 1 año), b) **DuckDNS** (Subdominio gratis permanente), Certificado expirado, 🔧 Configuración de Nginx para HTTPS, 🔒 Configurar HTTPS/SSL para Acceso a Cámara en Móviles, 💰 Costos, 📱 Después de Configurar HTTPS, El celular no puede acceder al sitio (+13 more)
 
-### Community 108 - "auth.ts"
-Cohesion: 0.32
-Nodes (3): SettingsPageClient(), PrivateProfile, PublicProfile
-
-### Community 112 - "redirect-path.ts"
-Cohesion: 0.47
-Nodes (5): initials(), PendingApprovalsManager(), PendingSale, PendingSaleItem, BuyerProfileCard
-
 ### Community 115 - "commissions.ts"
 Cohesion: 0.47
 Nodes (5): GalleryImage, GalleryManager(), GallerySection, postGalleryImage(), uploadInputId()
-
-### Community 116 - "_temp_deploy2.js"
-Cohesion: 0.50
-Nodes (4): Boletos, Carrito de Compra, Componentes a Crear, Eventos
 
 ### Community 121 - "route.ts"
 Cohesion: 0.48
@@ -591,14 +567,6 @@ Nodes (18): 1️⃣ **EDITAR EN LOCAL** (Tu PC), 2️⃣ **SUBIR A GITHUB** (Rep
 ### Community 157 - "🚀 Iniciar Aplicación con PM2 - Pasos Finales"
 Cohesion: 0.11
 Nodes (17): ✅ Checklist Final, ✅ Comandos Completos en Orden, ✅ Estado Actual, 🚀 Iniciar Aplicación con PM2 - Pasos Finales, 📝 Nota sobre Parking, Paso 1: Instalar PM2, Paso 2: Ir al Directorio, Paso 3: Iniciar la Aplicación (+9 more)
-
-### Community 158 - "@types/node"
-Cohesion: 0.31
-Nodes (7): CartContext, CartContextValue, CartProvider(), GlobalCartItem, readStorage(), useCart(), HeaderCartDrawer()
-
-### Community 159 - "ticket-generator.ts"
-Cohesion: 0.47
-Nodes (5): LEGACY_STAFF_ROLES, main(), migrateLegacyStaffRoles(), migrateVenuesFromEvents(), ROLE_MAP
 
 ### Community 160 - "🗄️ Crear Base de Datos en Supabase"
 Cohesion: 0.12
@@ -632,10 +600,6 @@ Nodes (13): 1. Ver todos los eventos, 2. Ver evento específico con tipos de bol
 Cohesion: 0.14
 Nodes (13): 1. Verificar que Nginx Puede Conectarse, 2. Ver Logs de la Aplicación, 3. Configurar PM2 para Iniciar al Arrancar, ✅ Checklist Final, 🚀 Comandos de Actualización Futura, 📊 Comandos de Monitoreo, ✅ Estado Actual, Pasos (+5 more)
 
-### Community 168 - "EventCardZamna.tsx"
-Cohesion: 0.60
-Nodes (4): useCarouselPosterOptional(), EventCardZamna(), EventCardZamnaProps, getEventStatus()
-
 ### Community 169 - "🔍 Comparación de Schemas: Boletera-Regia vs Somnus"
 Cohesion: 0.15
 Nodes (12): 1. **Tipos de Datos de Timestamp**, 2. **Constraints Únicas**, 3. **Foreign Keys - ON DELETE**, 4. **Índices**, 5. **Triggers para updatedAt**, Campos por Tabla - Comparación, 🔍 Comparación de Schemas: Boletera-Regia vs Somnus, 🎯 Conclusión (+4 more)
@@ -643,10 +607,6 @@ Nodes (12): 1. **Tipos de Datos de Timestamp**, 2. **Constraints Únicas**, 3. *
 ### Community 170 - "🔧 Corregir Error de Sintaxis en Nginx"
 Cohesion: 0.15
 Nodes (12): ✅ Checklist, 🚀 Comandos Completos, 🔧 Corregir Error de Sintaxis en Nginx, ❌ Error, Paso 1: Ver el Contenido Actual, Paso 2: Eliminar y Recrear el Archivo, Paso 3: Pegar Configuración Correcta, Paso 4: Verificar y Reiniciar (+4 more)
-
-### Community 171 - "AddToWalletButton.tsx"
-Cohesion: 1.00
-Nodes (3): GET(), handleSlotInvite(), mesaPagarUrl()
 
 ### Community 172 - "🗄️ Comandos para Crear Schema en Supabase"
 Cohesion: 0.17
@@ -671,6 +631,10 @@ Nodes (9): 📝 Archivos Creados:, 🔍 Comandos de Diagnóstico:, ❌ Lo que NO
 ### Community 177 - "📋 ESTRUCTURA DEL PROYECTO Y ROADMAP"
 Cohesion: 0.20
 Nodes (9): CI/CD, Configuración, 📦 DEPLOYMENT, 🎨 DISEÑO PENDIENTE, 📚 DOCUMENTACIÓN PENDIENTE, Esta Semana, 📋 ESTRUCTURA DEL PROYECTO Y ROADMAP, 🎯 PRIORIDADES INMEDIATAS (+1 more)
+
+### Community 178 - "inventory.ts"
+Cohesion: 0.14
+Nodes (8): GET(), handleSlotInvite(), mesaPagarUrl(), LEGACY_STAFF_ROLES, main(), migrateLegacyStaffRoles(), migrateVenuesFromEvents(), ROLE_MAP
 
 ### Community 179 - "📋 Características Principales"
 Cohesion: 0.20
@@ -761,24 +725,24 @@ Cohesion: 0.13
 Nodes (13): Certificados, Contenido, Plantilla de pase de Apple Wallet, 1. App ID, 1b. Sign in with Apple (nombre “Somnus”, no Dev Control), 2. Apple Pay, 3. Apple Wallet (Pass Type ID), 4. App Store Connect API Key (Codemagic) (+5 more)
 
 ## Knowledge Gaps
-- **973 isolated node(s):** `next/core-web-vitals`, `VERIFICAR_CAMBIOS_SERVIDOR.sh script`, `SessionUser`, `AssignedEvent`, `SessionUser` (+968 more)
+- **974 isolated node(s):** `next/core-web-vitals`, `VERIFICAR_CAMBIOS_SERVIDOR.sh script`, `SessionUser`, `AssignedEvent`, `SessionUser` (+969 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **100 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **99 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `dependencies` connect `dependencies` to `cn`, `formatEventCalendarDate`, `route.ts`, `devDependencies`, `EditEventModal.tsx`, `@radix-ui/react-label`, `package.json`, `clsx`, `@radix-ui/react-tabs`, `bcryptjs`, `next`, `qrcode.react`, `@radix-ui/react-avatar`, `clsx`, `date-fns`, `embla-carousel-react`, `@hookform/resolvers`, `sonner`, `@radix-ui/react-dialog`, `jose`, `resend`, `stripe`, `swiper`, `uuid`, `zustand`, `@prisma/client`, `tailwindcss-animate`, `@radix-ui/react-accordion`, `@radix-ui/react-alert-dialog`, `@radix-ui/react-checkbox`, `@capacitor-community/stripe`, `@capacitor/core`, `@capacitor/ios`, `@capacitor/splash-screen`, `@capacitor/status-bar`, `@radix-ui/react-popover`, `@radix-ui/react-separator`, `@radix-ui/react-select`, `@radix-ui/react-slot`, `react-dom`, `@stripe/react-stripe-js`, `@stripe/stripe-js`, `@stripe/stripe-js`, `tailwind-merge`, `session.ts`, `stripe`, `zod`, `embla-carousel-react`?**
-  _High betweenness centrality (0.075) - this node is a cross-community bridge._
-- **Why does `getSession()` connect `session.ts` to `otp.ts`, `permissions.ts`, `layout.tsx`, `OrganizationProfileClient.tsx`, `auth.ts`, `SqlEditorManager.tsx`, `schemas.ts`, `registration.ts`, `event-access.ts`, `route.ts`, `local.ts`, `route.ts`, `EventCardZamna.tsx`?**
-  _High betweenness centrality (0.041) - this node is a cross-community bridge._
-- **Why does `generateQRCode()` connect `formatEventCalendarDate` to `registration.ts`, `GalleryManager.tsx`?**
-  _High betweenness centrality (0.037) - this node is a cross-community bridge._
+- **Why does `dependencies` connect `dependencies` to `cn`, `index.ts`, `devDependencies`, `EditEventModal.tsx`, `@radix-ui/react-label`, `effectiveTicketPriceAt`, `package.json`, `clsx`, `@radix-ui/react-tabs`, `next`, `qrcode.react`, `@radix-ui/react-avatar`, `clsx`, `date-fns`, `embla-carousel-react`, `@hookform/resolvers`, `sonner`, `@radix-ui/react-dialog`, `jose`, `resend`, `stripe`, `swiper`, `uuid`, `zustand`, `@prisma/client`, `tailwindcss-animate`, `@radix-ui/react-accordion`, `@radix-ui/react-alert-dialog`, `@radix-ui/react-checkbox`, `@capacitor-community/stripe`, `@capacitor/core`, `@capacitor/ios`, `@capacitor/splash-screen`, `@capacitor/status-bar`, `@radix-ui/react-popover`, `@radix-ui/react-separator`, `@radix-ui/react-select`, `@radix-ui/react-slot`, `react-dom`, `@stripe/react-stripe-js`, `@stripe/stripe-js`, `@stripe/stripe-js`, `tailwind-merge`, `session.ts`, `stripe`, `zod`, `embla-carousel-react`?**
+  _High betweenness centrality (0.076) - this node is a cross-community bridge._
+- **Why does `getSession()` connect `session.ts` to `otp.ts`, `OrganizationProfileClient.tsx`, `auth.ts`, `SqlEditorManager.tsx`, `schemas.ts`, `route.ts`, `registration.ts`, `event-access.ts`, `route.ts`, `local.ts`, `route.ts`, `EventCardZamna.tsx`?**
+  _High betweenness centrality (0.044) - this node is a cross-community bridge._
+- **Why does `generateQRCode()` connect `index.ts` to `route.ts`?**
+  _High betweenness centrality (0.036) - this node is a cross-community bridge._
 - **What connects `next/core-web-vitals`, `VERIFICAR_CAMBIOS_SERVIDOR.sh script`, `SessionUser` to the rest of the system?**
-  _973 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _974 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `cn` be split into smaller, more focused modules?**
+  _Cohesion score 0.05048076923076923 - nodes in this community are weakly interconnected._
 - **Should `session.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.06927551560021153 - nodes in this community are weakly interconnected._
-- **Should `permissions.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.14039408866995073 - nodes in this community are weakly interconnected._
-- **Should `formatEventCalendarDate` be split into smaller, more focused modules?**
-  _Cohesion score 0.07586206896551724 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07680491551459294 - nodes in this community are weakly interconnected._
+- **Should `effectiveTicketPriceAt` be split into smaller, more focused modules?**
+  _Cohesion score 0.14619883040935672 - nodes in this community are weakly interconnected._

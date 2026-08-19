@@ -76,24 +76,86 @@ function patchAmount(text) {
   return text.split(fragile).join(robust);
 }
 
-function patchApplePayNilRoot(text) {
-  if (text.includes("No root view controller for Apple Pay")) return text;
-  const pattern =
-    /DispatchQueue\.main\.async \{\s*if let rootViewController = (?:UIApplication\.shared\.somnusKeyWindowRootViewController \?\? )?self\.plugin\?\.getRootVC\(\) \{\s*self\.plugin\?\.bridge\?\.saveCall\(call\)\s*self\.payCallId = call\.callbackId\s*applePayContext\.presentApplePay\(on: rootViewController\)\s*\}\s*\}/m;
-  const repl = `DispatchQueue.main.async {
-                if let rootViewController = UIApplication.shared.somnusKeyWindowRootViewController ?? self.plugin?.getRootVC() {
-                    self.plugin?.bridge?.saveCall(call)
-                    self.payCallId = call.callbackId
-                    applePayContext.presentApplePay(on: rootViewController)
-                } else {
-                    call.reject("No root view controller for Apple Pay")
-                }
-            }`;
-  if (!pattern.test(text)) {
-    console.warn("WARN: could not wrap Apple Pay present with nil-root reject");
+function extractFunction(text, signature) {
+  const start = text.indexOf(signature);
+  if (start < 0) return null;
+  const brace = text.indexOf("{", start);
+  if (brace < 0) return null;
+  let depth = 0;
+  for (let i = brace; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === "{") depth++;
+    else if (ch === "}") {
+      depth--;
+      if (depth === 0) {
+        return { start, end: i + 1 };
+      }
+    }
+  }
+  return null;
+}
+
+function patchEmptyItems(text) {
+  if (text.includes("paymentSummaryItems could not be parsed")) return text;
+  const needle = `        let merchantIdentifier = call.getString("merchantIdentifier") ?? ""`;
+  if (!text.includes(needle)) {
+    console.warn("WARN: merchantIdentifier block not found");
     return text;
   }
-  return text.replace(pattern, repl);
+  const insert = `        if paymentSummaryItems.isEmpty {
+            call.reject("Invalid Params. paymentSummaryItems could not be parsed")
+            return
+        }
+
+        `;
+  return text.replace(needle, insert + needle);
+}
+
+function patchRetainContext(text) {
+  if (text.includes("presentedApplePayContext")) return text;
+  const needle = "    private var shippingHandlerWorkItem: DispatchWorkItem?";
+  if (!text.includes(needle)) {
+    console.warn("WARN: shippingHandlerWorkItem not found");
+    return text;
+  }
+  return text.replace(
+    needle,
+    needle + "\n    private var presentedApplePayContext: STPApplePayContext?"
+  );
+}
+
+function patchPresentApplePay(text) {
+  const signature = "    func presentApplePay(_ call: CAPPluginCall) {";
+  const range = extractFunction(text, signature);
+  if (!range) {
+    console.warn("WARN: presentApplePay not found");
+    return text;
+  }
+  const next = `    func presentApplePay(_ call: CAPPluginCall) {
+        guard let paymentRequest = self.paymentRequest else {
+            call.reject("You should run createApplePay befor presentApplePay")
+            return
+        }
+        guard let applePayContext = STPApplePayContext(paymentRequest: paymentRequest, delegate: self) else {
+            call.reject("STPApplePayContext is failed")
+            return
+        }
+        self.presentedApplePayContext = applePayContext
+        DispatchQueue.main.async {
+            var presenter = UIApplication.shared.somnusKeyWindowRootViewController ?? self.plugin?.getRootVC()
+            while let presented = presenter?.presentedViewController {
+                presenter = presented
+            }
+            guard let presenter = presenter else {
+                call.reject("No root view controller for Apple Pay")
+                return
+            }
+            self.plugin?.bridge?.saveCall(call)
+            self.payCallId = call.callbackId
+            applePayContext.presentApplePay(on: presenter)
+        }
+    }`;
+  return text.slice(0, range.start) + next + text.slice(range.end);
 }
 
 function stripKeyWindowHelper(text) {
@@ -111,8 +173,10 @@ function main() {
   let src = fs.readFileSync(APPLE, "utf8");
   src = ensureHelper(src);
   src = patchAmount(src);
+  src = patchEmptyItems(src);
+  src = patchRetainContext(src);
   src = replaceGetRootVc(src);
-  src = patchApplePayNilRoot(src);
+  src = patchPresentApplePay(src);
   fs.writeFileSync(APPLE, src);
   console.log(`OK: ${APPLE}`);
 
