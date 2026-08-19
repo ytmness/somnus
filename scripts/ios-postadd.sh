@@ -48,4 +48,7 @@ plutil -lint "$ENTITLEMENTS_DEST"
 echo "==> Parcheando App.xcodeproj (bundle id, entitlements, deployment target)"
 ruby "$ROOT/scripts/ios-project-patch.rb"
 
+echo "==> Parcheando Stripe Apple Pay (getRootVC / amount)"
+bash "$ROOT/scripts/ios-patch-stripe-apple-pay.sh"
+
 echo "==> Overlay iOS aplicado"

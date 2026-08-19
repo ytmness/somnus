@@ -38,6 +38,13 @@ El OAuth web usa el Services ID `live.somnus.web` (`APPLE_ID` en el VPS). Si App
 
 Google Cloud Console: redirect autorizado `https://somnus.live/api/authjs/callback/google` y pantalla de consentimiento con nombre Somnus.
 
+### Apple Pay: botón que “no hace nada”
+
+En iOS 17+ el plugin `@capacitor-community/stripe` a veces no encuentra el
+`rootViewController` y `presentApplePay` cuelga sin error. Codemagic aplica
+[`scripts/ios-patch-stripe-apple-pay.cjs`](../scripts/ios-patch-stripe-apple-pay.cjs)
+en cada build. Si el sheet no abre, instala el **IPA nuevo** de TestFlight.
+
 ## 2. Apple Pay
 
 1. Crea el Merchant ID `merchant.live.somnus`.

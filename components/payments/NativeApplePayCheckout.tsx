@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Capacitor } from "@capacitor/core";
 import { ApplePayEventsEnum } from "@capacitor-community/stripe";
 import {
   APPLE_PAY_COUNTRY_CODE,
@@ -20,10 +21,12 @@ interface NativeApplePayCheckoutProps {
   onUseCard: () => void;
 }
 
+const PRESENT_TIMEOUT_MS = 20000;
+
 /**
- * No usamos isApplePayAvailable() para ocultar el botón: Stripe lo rechaza si
- * no hay tarjeta de sus redes en Wallet, aunque el iPhone sí soporte Apple Pay.
- * En iOS 15+ el sheet nativo permite pagar o agregar tarjeta.
+ * Apple Pay nativo vía @capacitor-community/stripe.
+ * El plugin a veces cuelga en presentApplePay (getRootVC nil en iOS 17+);
+ * eso se parchea en scripts/ios-patch-stripe-apple-pay.cjs en Codemagic.
  */
 export function NativeApplePayCheckout({
   saleId,
@@ -44,36 +47,56 @@ export function NativeApplePayCheckout({
     setError(null);
 
     try {
+      if (!Capacitor.isNativePlatform()) {
+        throw new Error(
+          "Apple Pay nativo solo funciona dentro de la app Somnus."
+        );
+      }
+      if (!Capacitor.isPluginAvailable("Stripe")) {
+        throw new Error(
+          "Este build no incluye el plugin de Stripe. Actualiza desde TestFlight o paga con tarjeta."
+        );
+      }
+
       const { Stripe } = await import("@capacitor-community/stripe");
-
       await Stripe.initialize({ publishableKey });
-      await Stripe.createApplePay({
-        paymentIntentClientSecret: clientSecret,
-        merchantIdentifier: APPLE_PAY_MERCHANT_ID,
-        countryCode: APPLE_PAY_COUNTRY_CODE,
-        currency: "MXN",
-        // Vacío a propósito: el plugin usa [""] por defecto y pide shipping.
-        requiredShippingContactFields: [],
-        paymentSummaryItems: [
-          {
-            label: eventName || "Somnus",
-            amount: Number(amountInPesos),
-          },
-        ],
-      });
 
-      const { paymentResult } = await Stripe.presentApplePay();
+      // Decimal explícito: el bridge iOS a veces pierde Int como tipo NSNumber.
+      const amount = Number((Math.round(Number(amountInPesos) * 100) / 100).toFixed(2));
+
+      await withTimeout(
+        Stripe.createApplePay({
+          paymentIntentClientSecret: clientSecret,
+          merchantIdentifier: APPLE_PAY_MERCHANT_ID,
+          countryCode: APPLE_PAY_COUNTRY_CODE,
+          currency: "MXN",
+          requiredShippingContactFields: [],
+          paymentSummaryItems: [
+            {
+              label: (eventName || "Somnus").slice(0, 64),
+              amount,
+            },
+          ],
+        }),
+        PRESENT_TIMEOUT_MS,
+        "Apple Pay no respondió al preparar el pago"
+      );
+
+      const { paymentResult } = await withTimeout(
+        Stripe.presentApplePay(),
+        PRESENT_TIMEOUT_MS,
+        "Apple Pay no abrió el sheet. Cierra la app, vuelve a entrar o actualiza desde TestFlight."
+      );
 
       if (paymentResult === ApplePayEventsEnum.Canceled) {
         setSubmitting(false);
         return;
       }
 
-      if (paymentResult === ApplePayEventsEnum.Failed) {
-        throw new Error("No se pudo completar el pago con Apple Pay");
-      }
-
-      if (paymentResult !== ApplePayEventsEnum.Completed) {
+      if (
+        paymentResult === ApplePayEventsEnum.Failed ||
+        paymentResult !== ApplePayEventsEnum.Completed
+      ) {
         throw new Error("No se pudo completar el pago con Apple Pay");
       }
 
@@ -82,6 +105,7 @@ export function NativeApplePayCheckout({
       const message = formatApplePayError(err);
       console.error("[NativeApplePayCheckout]", err);
       setError(message);
+      toast.error(message);
       setSubmitting(false);
     }
   }
@@ -127,6 +151,26 @@ export function NativeApplePayCheckout({
   );
 }
 
+function withTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+  message: string
+): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(message)), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      }
+    );
+  });
+}
+
 function formatApplePayError(err: unknown): string {
   const raw =
     err instanceof Error
@@ -142,14 +186,20 @@ function formatApplePayError(err: unknown): string {
     lower.includes("can not use on this device") ||
     lower.includes("cannot use on this device")
   ) {
-    return "Apple Pay no pudo abrirse. Revisa que tengas una tarjeta Visa/Mastercard/Amex en Wallet, o usa “Pagar con tarjeta”.";
+    return "Apple Pay no pudo usar las tarjetas del Wallet. Prueba con Visa/Mastercard/Amex o paga con tarjeta.";
   }
   if (
     lower.includes("not implemented") ||
-    lower.includes("plugin") ||
-    lower.includes("unimplemented")
+    lower.includes("unimplemented") ||
+    lower.includes("plugin")
   ) {
     return "Este build de la app no trae Apple Pay nativo. Actualiza desde TestFlight o paga con tarjeta.";
+  }
+  if (lower.includes("no root view controller")) {
+    return "No se pudo abrir Apple Pay en esta pantalla. Cierra la app por completo, ábrela de nuevo e intenta otra vez.";
+  }
+  if (lower.includes("stpapplepaycontext")) {
+    return "Apple Pay no está bien configurado (merchant ID). Contacta soporte o paga con tarjeta.";
   }
   return raw;
 }

@@ -2040,8 +2040,8 @@
     "semantic_hash": ""
   },
   "scripts/ios-postadd.sh": {
-    "mtime": 1787120077.886132,
-    "ast_hash": "b63bff1bb0489835b791fa52ac0dcdea",
+    "mtime": 1787056652.4276814,
+    "ast_hash": "76a860c57a87856a724629cd51417f1e",
     "semantic_hash": ""
   },
   "scripts/ios-project-patch.rb": {
@@ -2110,8 +2110,8 @@
     "semantic_hash": ""
   },
   "components/payments/NativeApplePayCheckout.tsx": {
-    "mtime": 1787120321.1243114,
-    "ast_hash": "49650d38c44f7ded99907e99d7ed1d85",
+    "mtime": 1787119401.5606256,
+    "ast_hash": "6fc2b72dcb51071ac1c88a393c4b22e5",
     "semantic_hash": ""
   },
   "components/tickets/AddToWalletButton.tsx": {
@@ -2130,13 +2130,13 @@
     "semantic_hash": ""
   },
   "codemagic.yaml": {
-    "mtime": 1787120080.4273462,
-    "ast_hash": "e8a72e89f501de435a9f9e68ed5cbc1c",
+    "mtime": 1787056652.4286778,
+    "ast_hash": "eb061f0bf58728b53d3ff0eaa018e53e",
     "semantic_hash": ""
   },
   "docs/IOS_APP_SETUP.md": {
-    "mtime": 1787120321.342727,
-    "ast_hash": "2eddf737c51823382e206fee89bc7626",
+    "mtime": 1787100124.5344877,
+    "ast_hash": "1b377c09926b2f6a21f8b4737c14d6be",
     "semantic_hash": ""
   },
   "scripts/ios-align-entitlements.sh": {
@@ -2152,16 +2152,6 @@
   "lib/services/mailer.ts": {
     "mtime": 1787100007.7175784,
     "ast_hash": "6d01e4c95b4f8134aa8aefc764343820",
-    "semantic_hash": ""
-  },
-  "scripts/ios-patch-stripe-apple-pay.cjs": {
-    "mtime": 1787120245.495963,
-    "ast_hash": "80a86b854610bf3f5dba1daabeee0a10",
-    "semantic_hash": ""
-  },
-  "scripts/ios-patch-stripe-apple-pay.sh": {
-    "mtime": 1787120220.2236943,
-    "ast_hash": "5e1ce2b35672ff4bb28c57debd622dd5",
     "semantic_hash": ""
   }
 }

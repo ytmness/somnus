@@ -42,6 +42,9 @@ workflows:
       - name: Instalar dependencias JS
         script: npm ci
 
+      - name: Parchear Stripe Apple Pay (antes de sync)
+        script: bash scripts/ios-patch-stripe-apple-pay.sh
+
       - name: Generar y sincronizar proyecto iOS
         script: |
           # El proyecto Xcode no se versiona: se genera aqui en cada build.
