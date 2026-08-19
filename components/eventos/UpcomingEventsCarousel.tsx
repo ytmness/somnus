@@ -52,6 +52,16 @@ function UpcomingEventsCarouselInner({
   const [activeIndex, setActiveIndex] = useState(0);
   const hasInitialized = useRef(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(max-width: 767px)");
+    setIsMobile(mq.matches);
+    const onMobileChange = () => setIsMobile(mq.matches);
+    mq.addEventListener("change", onMobileChange);
+    return () => mq.removeEventListener("change", onMobileChange);
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -80,12 +90,15 @@ function UpcomingEventsCarouselInner({
   const coverflowEffect = useMemo(
     () => ({
       rotate: 0,
-      stretch: layout.coverflowStretch,
-      depth: layout.coverflowDepth,
-      modifier: layout.coverflowModifier,
+      stretch: isMobile
+        ? Math.min(layout.coverflowStretch, 18)
+        : layout.coverflowStretch,
+      depth: isMobile ? Math.min(layout.coverflowDepth, 80) : layout.coverflowDepth,
+      modifier: isMobile ? 1 : layout.coverflowModifier,
       slideShadows: false,
     }),
     [
+      isMobile,
       layout.coverflowStretch,
       layout.coverflowDepth,
       layout.coverflowModifier,
@@ -109,7 +122,7 @@ function UpcomingEventsCarouselInner({
 
   if (!children || uniqueCount === 0) return null;
 
-  const stageMinSm = Math.max(layout.slideHeightMobile + 72, 560);
+  const stageMinSm = Math.max(layout.slideHeightMobile + 48, 520);
   const stageMinMd = Math.max(layout.slideHeightDesktop + 72, 640);
 
   return (
@@ -130,7 +143,7 @@ function UpcomingEventsCarouselInner({
               swiper.slidePrev();
             }}
             aria-label="Previous"
-            className="somnus-nav-link absolute -left-4 md:-left-12 lg:-left-16 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-black/70 hover:bg-black/90 text-white backdrop-blur-sm transition-colors border border-white/20 pointer-events-auto cursor-pointer"
+            className="somnus-nav-link absolute left-1 md:-left-12 lg:-left-16 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center w-10 h-10 md:w-14 md:h-14 rounded-full bg-black/70 hover:bg-black/90 text-white backdrop-blur-sm transition-colors border border-white/20 pointer-events-auto cursor-pointer"
           >
             <ChevronLeft className="w-6 h-6 md:w-7 md:h-7" aria-hidden />
           </button>
@@ -142,7 +155,7 @@ function UpcomingEventsCarouselInner({
               swiper.slideNext();
             }}
             aria-label="Next"
-            className="somnus-nav-link absolute -right-4 md:-right-12 lg:-right-16 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-black/70 hover:bg-black/90 text-white backdrop-blur-sm transition-colors border border-white/20 pointer-events-auto cursor-pointer"
+            className="somnus-nav-link absolute right-1 md:-right-12 lg:-right-16 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center w-10 h-10 md:w-14 md:h-14 rounded-full bg-black/70 hover:bg-black/90 text-white backdrop-blur-sm transition-colors border border-white/20 pointer-events-auto cursor-pointer"
           >
             <ChevronRight className="w-6 h-6 md:w-7 md:h-7" aria-hidden />
           </button>
@@ -150,7 +163,7 @@ function UpcomingEventsCarouselInner({
       )}
 
       <div
-        className="w-full px-14 md:px-20 lg:px-28 min-h-[var(--carousel-stage-sm)] md:min-h-[var(--carousel-stage-md)]"
+        className="w-full px-3 sm:px-10 md:px-20 lg:px-28 min-h-[var(--carousel-stage-sm)] md:min-h-[var(--carousel-stage-md)]"
         style={
           {
             "--carousel-stage-sm": `${stageMinSm}px`,
@@ -183,7 +196,7 @@ function UpcomingEventsCarouselInner({
           {slideNodes.map((child, i) => (
             <SwiperSlide key={i} className="!w-auto">
               <div
-                className="flex items-center justify-center [&>article]:w-full [&>article]:h-full w-[min(92vw,var(--carousel-sw))] h-[var(--carousel-sh)] md:h-[var(--carousel-sh-md)]"
+                className="flex items-stretch justify-center [&>article]:w-full [&>article]:h-full w-[min(calc(100vw-1.5rem),var(--carousel-sw))] h-[var(--carousel-sh)] md:h-[var(--carousel-sh-md)]"
                 style={
                   {
                     "--carousel-sw": `${layout.slideWidth}px`,

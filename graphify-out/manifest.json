@@ -330,8 +330,8 @@
     "semantic_hash": ""
   },
   "app/api/upload/event-image/route.ts": {
-    "mtime": 1786257435.302741,
-    "ast_hash": "aed1709267131234707eaaf098eb2ccf",
+    "mtime": 1787183379.0700157,
+    "ast_hash": "1efbb72bee4f16a8659b07bedd7ff0b0",
     "semantic_hash": ""
   },
   "app/api/upload/gallery-image/route.ts": {
@@ -340,9 +340,9 @@
     "semantic_hash": "58baf2a0fd6e885df4a3d3d08072eb35"
   },
   "app/api/upload/org-image/route.ts": {
-    "mtime": 1785985393.2672527,
-    "ast_hash": "526311d0d6b62148d17c0760d28ca596",
-    "semantic_hash": "526311d0d6b62148d17c0760d28ca596"
+    "mtime": 1787183381.5065014,
+    "ast_hash": "daf9c9a050d273b6b41a45e4c2cbe4e5",
+    "semantic_hash": ""
   },
   "app/api/vendedor/sales/route.ts": {
     "mtime": 1785985393.2762766,
@@ -510,9 +510,9 @@
     "semantic_hash": "9cd251639e8768aa96c0bedfd0ad6e63"
   },
   "app/uploads/[...path]/route.ts": {
-    "mtime": 1785985393.5498943,
-    "ast_hash": "10fc77255e3740672a51de8ac460b6c8",
-    "semantic_hash": "10fc77255e3740672a51de8ac460b6c8"
+    "mtime": 1787183389.312638,
+    "ast_hash": "e8ca597f9e0df1429ed315cb63327fd4",
+    "semantic_hash": ""
   },
   "app/vendedor/page.tsx": {
     "mtime": 1785985393.5574024,
@@ -600,8 +600,8 @@
     "semantic_hash": "99b66b1db3d8d991708bada239f01416"
   },
   "components/admin/ImageUploadField.tsx": {
-    "mtime": 1787048387.4023309,
-    "ast_hash": "daa19fa782695236b10ac5b5647a1238",
+    "mtime": 1787183385.3502295,
+    "ast_hash": "aa7639d43256a9fbbde733cf2f60b7b9",
     "semantic_hash": ""
   },
   "components/admin/InvitesManager.tsx": {
@@ -790,9 +790,9 @@
     "semantic_hash": "98e79552dea835efb9c890e9b7201b4c"
   },
   "components/organizador/OrganizationProfileEditor.tsx": {
-    "mtime": 1785985393.8733485,
-    "ast_hash": "036773f8b17ffe7eab36746d44ec0474",
-    "semantic_hash": "036773f8b17ffe7eab36746d44ec0474"
+    "mtime": 1787183387.9442954,
+    "ast_hash": "7d635c53ed3a26534b45ef55f672ce09",
+    "semantic_hash": ""
   },
   "components/organizador/OrganizationsManager.tsx": {
     "mtime": 1785985393.8884354,
@@ -1960,8 +1960,8 @@
     "semantic_hash": ""
   },
   "app/api/upload/profile-image/route.ts": {
-    "mtime": 1786263253.7054825,
-    "ast_hash": "2c45ffc8803836134a7020bfd93e4398",
+    "mtime": 1787183376.139846,
+    "ast_hash": "1cd468160bc7b8ff597a7350ec7fce9a",
     "semantic_hash": ""
   },
   "app/configuracion/page.tsx": {
@@ -1985,8 +1985,8 @@
     "semantic_hash": ""
   },
   "components/profile/SettingsPageClient.tsx": {
-    "mtime": 1786263349.3569505,
-    "ast_hash": "96f0807b75bd4419bc035b25e9f97f82",
+    "mtime": 1787183384.583281,
+    "ast_hash": "6c4a0255aef28ae6f88bf5f06d1d7723",
     "semantic_hash": ""
   },
   "lib/profile-types.ts": {
@@ -2172,6 +2172,11 @@
   "scripts/test-apple-pay-pi.js": {
     "mtime": 1787131365.2571316,
     "ast_hash": "e963a1d47a39ed88abf57f69f4ca854e",
+    "semantic_hash": ""
+  },
+  "lib/storage/upload-image-validation.ts": {
+    "mtime": 1787183371.3765793,
+    "ast_hash": "c129733b187c99130f8510ec205fe233",
     "semantic_hash": ""
   }
 }

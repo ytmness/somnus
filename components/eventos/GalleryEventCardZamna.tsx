@@ -60,7 +60,7 @@ export function GalleryEventCardZamna({
               } as React.CSSProperties)
             : carouselGlass
               ? ({
-                  "--evt-pmin-sm": "264px",
+                  "--evt-pmin-sm": "400px",
                   "--evt-pmin-md": "496px",
                 } as React.CSSProperties)
               : undefined
@@ -99,17 +99,17 @@ export function GalleryEventCardZamna({
       <div
         className={
           carouselGlass
-            ? "relative z-[2] flex flex-col flex-1 p-5 md:p-6 border-t border-white/10 bg-[#08080c]"
+            ? "relative z-[2] shrink-0 flex flex-col p-4 md:p-6 border-t border-white/10 bg-[#08080c]"
             : "flex flex-col flex-1 p-6 bg-[#141414]"
         }
       >
-        <span className="text-[10px] uppercase tracking-widest text-white/70 mb-1">
+        <span className="text-[10px] uppercase tracking-widest text-white/70 mb-1 line-clamp-1">
           {event.venue}
         </span>
-        <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
+        <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2 md:mb-3 line-clamp-2">
           {event.artist}
         </h3>
-        <div className="flex flex-wrap items-center gap-4 text-sm text-white/80 mb-4">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-white/80 mb-3 md:mb-4">
           <span className="flex items-center gap-1.5">
             <Calendar className="w-4 h-4 shrink-0" aria-hidden />
             {event.date}
@@ -119,8 +119,8 @@ export function GalleryEventCardZamna({
             {event.venue}
           </span>
         </div>
-        <div className="mt-auto">
-          <span className="inline-block w-full text-center font-bold uppercase tracking-wider py-3 px-6 rounded-lg bg-black text-white border border-white/20 group-hover:bg-white group-hover:text-black transition-colors">
+        <div>
+          <span className="inline-block w-full text-center font-bold uppercase tracking-wider py-2.5 md:py-3 px-5 md:px-6 rounded-lg bg-black text-white border border-white/20 group-hover:bg-white group-hover:text-black transition-colors text-sm md:text-base">
             View gallery
           </span>
         </div>

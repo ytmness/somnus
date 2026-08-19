@@ -960,6 +960,13 @@ video.hero-video-no-controls::-ms-media-controls {
 }
 .events-carousel-swiper .swiper-slide {
   /* NO overflow-hidden ni transform aquí; Swiper coverflow los gestiona */
+  height: auto;
+}
+
+@media (max-width: 767px) {
+  .events-carousel-swiper .swiper-slide > div {
+    margin-inline: auto;
+  }
 }
 
 /* Paginación abajo del carrusel */

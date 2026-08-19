@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 
-const STORAGE_KEY = "somnus-carousel-poster-v2";
+const STORAGE_KEY = "somnus-carousel-poster-v3";
 
 export type CarouselPosterSettings = {
   slideWidth: number;
@@ -46,9 +46,9 @@ export type CarouselFramingSettings = Pick<
 
 export const CAROUSEL_POSTER_DEFAULTS: CarouselPosterSettings = {
   slideWidth: 400,
-  slideHeightMobile: 460,
+  slideHeightMobile: 640,
   slideHeightDesktop: 744,
-  posterMinHeightSm: 264,
+  posterMinHeightSm: 400,
   posterMinHeightMd: 496,
   imageObjectFit: "cover",
   imagePosX: 50,

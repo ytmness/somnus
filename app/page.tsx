@@ -421,7 +421,7 @@ export default function HomePage() {
         <section
           id="eventos"
           data-tour="client-events"
-          className="py-28 sm:py-36 lg:py-44 px-4 sm:px-6 lg:px-8 somnus-events-bg somnus-events-bg--flyer relative overflow-hidden scroll-mt-8"
+          className="py-28 sm:py-36 lg:py-44 px-4 sm:px-6 lg:px-8 somnus-events-bg somnus-events-bg--flyer relative overflow-x-hidden scroll-mt-8"
         >
           <div className="max-w-7xl mx-auto relative z-10">
             <h2 className="somnus-display text-center mb-4">
