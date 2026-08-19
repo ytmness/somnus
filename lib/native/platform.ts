@@ -25,6 +25,19 @@ export function isNativePlatform(): boolean {
   return capacitor?.isNativePlatform?.() === true;
 }
 
+/** Login/registro: query `?app=1` o shell Capacitor (WKWebView). */
+export function isNativeAuthSurface(searchParams: {
+  get(name: string): string | null;
+}): boolean {
+  if (
+    searchParams.get("app") === "1" ||
+    searchParams.get("client") === "app"
+  ) {
+    return true;
+  }
+  return isNativePlatform();
+}
+
 /** ¿Estamos dentro de la app iOS? Único caso donde Apple Pay nativo aplica. */
 export function isNativeIOS(): boolean {
   const capacitor = getCapacitor();

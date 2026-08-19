@@ -1,5 +1,5 @@
-import nodemailer from "nodemailer";
 import { generateQRPayload, generateQRCode } from "@/lib/services/qr-generator";
+import { sendMailOrThrow } from "@/lib/services/mailer";
 import type { Ticket } from "@prisma/client";
 
 type TicketWithRelations = Ticket & {
@@ -61,23 +61,6 @@ export async function sendTicketsReceiptEmail(params: {
   } = params;
 
   const logoUrl = `${appUrl}/assets/logo.png`;
-  const smtpHost = process.env.SMTP_HOST;
-  const smtpPort = Number(process.env.SMTP_PORT || 465);
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
-  const fromEmail = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER;
-  const fromName = process.env.SMTP_FROM_NAME || "Somnus";
-
-  if (!smtpHost || !smtpUser || !smtpPass || !fromEmail) {
-    throw new Error("SMTP no configurado en variables de entorno");
-  }
-
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpPort === 465, // 465 => SSL
-    auth: { user: smtpUser, pass: smtpPass },
-  });
 
   // Inline QR como data URL (sin adjuntos tradicionales)
   const ticketCards: string[] = [];
@@ -222,8 +205,7 @@ Recibo completo: ${mxnFormat(total)}.
 Tus boletos y códigos QR se muestran dentro del correo. 
 Si tienes problemas, contáctanos en tickets@somnus.live.`;
 
-  await transporter.sendMail({
-    from: `"${fromName}" <${fromEmail}>`,
+  await sendMailOrThrow({
     to: buyerEmail,
     subject: `Tus boletos Somnus - ${eventName || "Recibo"}`,
     text,

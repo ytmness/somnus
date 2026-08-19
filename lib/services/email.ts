@@ -1,5 +1,5 @@
-import { Resend } from "resend";
 import crypto from "crypto";
+import { sendMail } from "@/lib/services/mailer";
 
 export interface EmailOptions {
   to: string;
@@ -8,44 +8,8 @@ export interface EmailOptions {
   text?: string;
 }
 
-function getResendClient(): Resend | null {
-  const key = process.env.RESEND_API_KEY;
-  if (!key || key.startsWith("re_xxxx")) return null;
-  return new Resend(key);
-}
-
-function getFromAddress(): string {
-  return process.env.RESEND_FROM || "Somnus <noreply@somnus.live>";
-}
-
-/**
- * Envía un email vía Resend. En desarrollo sin API key, loguea y retorna true.
- */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
-  const client = getResendClient();
-  if (!client) {
-    console.log("=".repeat(50));
-    console.log("[email] RESEND_API_KEY no configurada — email simulado");
-    console.log("Para:", options.to);
-    console.log("Asunto:", options.subject);
-    if (options.text) console.log(options.text.slice(0, 200));
-    console.log("=".repeat(50));
-    return true;
-  }
-
-  const { error } = await client.emails.send({
-    from: getFromAddress(),
-    to: options.to,
-    subject: options.subject,
-    html: options.html,
-    text: options.text,
-  });
-
-  if (error) {
-    console.error("[email] Resend error:", error);
-    return false;
-  }
-  return true;
+  return sendMail(options);
 }
 
 export function generateVerificationCode(): string {

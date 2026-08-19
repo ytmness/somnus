@@ -8,12 +8,13 @@ import { toast } from "sonner";
 import { Mail, RefreshCw, CheckCircle, Lock } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { resolvePostAuthRedirect } from "@/lib/auth/registration";
+import { isNativePlatform } from "@/lib/native/platform";
+import { useNativeAuthSurface } from "@/lib/native/use-auth-surface";
 
 function VerificarEmailContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
-  const fromApp =
-    searchParams.get("app") === "1" || searchParams.get("client") === "app";
+  const fromApp = useNativeAuthSurface(searchParams);
 
   const [formData, setFormData] = useState({
     email: email,
@@ -54,7 +55,7 @@ function VerificarEmailContent() {
       const redirectPath = resolvePostAuthRedirect(
         data.user?.role || "ORGANIZER",
         data.user?.staffRoles,
-        fromApp ? "app" : "web"
+        fromApp || isNativePlatform() ? "app" : "web"
       );
 
       window.location.href = redirectPath;

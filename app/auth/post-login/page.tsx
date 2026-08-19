@@ -3,14 +3,14 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { resolveAuthRedirectPath } from "@/lib/auth/redirect-path";
+import { isNativePlatform } from "@/lib/native/platform";
+import { useNativeAuthSurface } from "@/lib/native/use-auth-surface";
 
 function PostLoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const requestedRedirect = searchParams.get("redirect");
-  const fromApp =
-    searchParams.get("app") === "1" || searchParams.get("client") === "app";
-  const authSurface = fromApp ? "app" : "web";
+  const fromApp = useNativeAuthSurface(searchParams);
   const [message, setMessage] = useState("Completando inicio de sesión...");
 
   useEffect(() => {
@@ -37,7 +37,7 @@ function PostLoginContent() {
           user.role || "ORGANIZER",
           requestedRedirect,
           user.staffRoles,
-          authSurface
+          fromApp || isNativePlatform() ? "app" : "web"
         );
 
         if (!cancelled) {
@@ -55,7 +55,7 @@ function PostLoginContent() {
     return () => {
       cancelled = true;
     };
-  }, [requestedRedirect, authSurface, router]);
+  }, [requestedRedirect, fromApp, router]);
 
   return (
     <div className="min-h-screen somnus-bg-main flex items-center justify-center p-4">

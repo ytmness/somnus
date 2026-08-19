@@ -24,6 +24,20 @@ y aplica el overlay de `ios-config/` (`scripts/ios-postadd.sh`).
    - **Associated Domains** solo si más adelante se añaden universal links.
 3. Crea la app en [App Store Connect](https://appstoreconnect.apple.com/) con el mismo bundle.
 
+## 1b. Sign in with Apple (nombre “Somnus”, no Dev Control)
+
+El OAuth web usa el Services ID `live.somnus.web` (`APPLE_ID` en el VPS). Si Apple pide crear una cuenta para **Dev Control**, el Services ID está agrupado con el App ID de esa otra app.
+
+1. En [Identifiers](https://developer.apple.com/account/resources/identifiers/list) abre el App ID `live.somnus.app` y activa **Sign in with Apple**.
+2. Abre el Services ID `live.somnus.web` → **Sign in with Apple** → **Configure**:
+   - **Primary App ID:** `live.somnus.app` (Somnus), no Dev Control.
+   - **Domains:** `somnus.live`
+   - **Return URLs:** `https://somnus.live/api/authjs/callback/apple`
+3. El nombre que muestra Apple al usuario debe ser **Somnus**.
+4. La key `.p8` de equipo (`APPLE_KEY_ID` / `APPLE_TEAM_ID` en el VPS) no hace falta regenerarla.
+
+Google Cloud Console: redirect autorizado `https://somnus.live/api/authjs/callback/google` y pantalla de consentimiento con nombre Somnus.
+
 ## 2. Apple Pay
 
 1. Crea el Merchant ID `merchant.live.somnus`.

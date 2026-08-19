@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { sanitizeRedirectPath } from "@/lib/auth/redirect-path";
+import { isNativePlatform } from "@/lib/native/platform";
 
 type Provider = "google" | "apple";
 
@@ -93,7 +94,7 @@ export function SocialLoginButtons({
       const safeRedirect = sanitizeRedirectPath(redirectTo ?? null);
       const params = new URLSearchParams();
       if (safeRedirect) params.set("redirect", safeRedirect);
-      if (fromApp) params.set("app", "1");
+      if (fromApp || isNativePlatform()) params.set("app", "1");
       const qs = params.toString();
       const callbackUrl = qs ? `/auth/post-login?${qs}` : "/auth/post-login";
       await signIn(provider, { callbackUrl });

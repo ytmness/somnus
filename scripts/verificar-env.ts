@@ -15,7 +15,8 @@ const optional: Record<string, string> = {
   GOOGLE_CLIENT_ID: "OAuth Google",
   GOOGLE_CLIENT_SECRET: "OAuth Google secret",
   APPLE_ID: "Sign in with Apple",
-  RESEND_API_KEY: "Emails OTP / reset",
+  SMTP_HOST: "SMTP / Postfix (OTP, reset, recibos)",
+  EMAIL_FROM: "Remitente (p.ej. Somnus <tickets@somnus.live>)",
   UPLOAD_DIR: "Carpeta de uploads locales",
   NEXT_PUBLIC_APP_URL: "URL pública de la app",
 };

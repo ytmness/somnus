@@ -9,14 +9,14 @@ import { Mail, User, Phone, Ticket, Shield, CheckCircle, Lock, Eye, EyeOff } fro
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SocialLoginButtons } from "@/components/auth/SocialLoginButtons";
 import { resolveAuthRedirectPath } from "@/lib/auth/redirect-path";
+import { useNativeAuthSurface } from "@/lib/native/use-auth-surface";
 
 function RegisterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const emailParam = searchParams.get("email") || "";
   const redirectParam = searchParams.get("redirect");
-  const fromApp =
-    searchParams.get("app") === "1" || searchParams.get("client") === "app";
+  const fromApp = useNativeAuthSurface(searchParams);
   const authSurface = fromApp ? "app" : "web";
 
   const [formData, setFormData] = useState({

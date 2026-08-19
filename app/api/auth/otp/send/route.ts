@@ -10,7 +10,7 @@ const sendOtpSchema = z.object({
 
 /**
  * POST /api/auth/otp/send
- * Genera OTP de 8 dígitos, lo guarda hasheado y lo envía por email (SMTP/Postfix).
+ * Genera OTP de 8 dígitos, lo guarda hasheado y lo envía por SMTP (Postfix → GoDaddy).
  */
 export async function POST(request: NextRequest) {
   try {

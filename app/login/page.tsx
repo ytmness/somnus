@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SocialLoginButtons } from "@/components/auth/SocialLoginButtons";
 import { resolveAuthRedirectPath } from "@/lib/auth/redirect-path";
+import { isNativePlatform } from "@/lib/native/platform";
+import { useNativeAuthSurface } from "@/lib/native/use-auth-surface";
 
 function LoginContent() {
   const router = useRouter();
@@ -17,8 +19,7 @@ function LoginContent() {
   const redirectParam = searchParams.get("redirect");
   const errorParam = searchParams.get("error");
   const resetParam = searchParams.get("reset");
-  const fromApp =
-    searchParams.get("app") === "1" || searchParams.get("client") === "app";
+  const fromApp = useNativeAuthSurface(searchParams);
   const authSurface = fromApp ? "app" : "web";
 
   const [email, setEmail] = useState(emailParam);
@@ -35,13 +36,16 @@ function LoginContent() {
     } else if (errorParam === "account_inactive") {
       toast.error("Your account is deactivated. Contact support.");
     } else if (
-      errorParam === "Configuration" ||
       errorParam === "OAuthSignin" ||
       errorParam === "OAuthCallback" ||
-      errorParam === "OAuthCreateAccount"
+      errorParam === "OAuthCreateAccount" ||
+      errorParam === "Callback" ||
+      errorParam === "InvalidCheck"
     ) {
+      toast.error("Could not complete sign-in. Please try again.");
+    } else if (errorParam === "Configuration") {
       toast.error(
-        "Google/Apple are not configured on the server. Use email and password or contact support."
+        "Sign-in is temporarily unavailable. Try email and password or contact support."
       );
     } else if (errorParam === "AccessDenied") {
       toast.error("Access denied. Try a different account.");
@@ -68,7 +72,7 @@ function LoginContent() {
           data.user.role || "ORGANIZER",
           redirectParam,
           data.user.staffRoles,
-          authSurface
+          fromApp || isNativePlatform() ? "app" : "web"
         );
         window.location.replace(path);
       } catch {
