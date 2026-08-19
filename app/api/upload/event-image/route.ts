@@ -1,17 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession, hasRole } from "@/lib/auth/session";
 import { saveUploadBuffer } from "@/lib/storage/local";
+import {
+  guessUploadImageExt,
+  validateUploadImage,
+} from "@/lib/storage/upload-image-validation";
 
 export const dynamic = "force-dynamic";
 
 const MAX_SIZE = 5 * 1024 * 1024;
-const ALLOWED_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/gif",
-  "image/webp",
-];
 
 /**
  * POST /api/upload/event-image
@@ -49,25 +46,17 @@ export async function POST(request: NextRequest) {
       arrayBuffer: () => Promise<ArrayBuffer>;
     };
 
-    if (fileObj.size > MAX_SIZE) {
-      return NextResponse.json(
-        { error: `La imagen no debe superar ${MAX_SIZE / 1024 / 1024} MB` },
-        { status: 400 }
-      );
+    const validationError = validateUploadImage(fileObj, MAX_SIZE);
+    if (validationError) {
+      return NextResponse.json({ error: validationError }, { status: 400 });
     }
 
-    if (!ALLOWED_TYPES.includes(fileObj.type)) {
-      return NextResponse.json(
-        { error: "Formato no permitido. Usa JPG, PNG, GIF o WebP." },
-        { status: 400 }
-      );
-    }
-
+    const ext = guessUploadImageExt(fileObj);
     const buffer = Buffer.from(await fileObj.arrayBuffer());
     const saved = await saveUploadBuffer({
       buffer,
       subdirectory: "posters",
-      originalName: fileObj.name,
+      originalName: `poster.${ext}`,
       contentType: fileObj.type,
     });
 

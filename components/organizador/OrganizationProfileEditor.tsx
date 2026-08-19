@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
 import { ExternalLink, Upload } from "lucide-react";
+import { uploadHttpErrorMessage } from "@/lib/storage/upload-image-validation";
 
 export interface OrganizationProfile {
   id: string;
@@ -50,7 +51,9 @@ export function OrganizationProfileEditor({
         body: fd,
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error);
+      if (!res.ok) {
+        throw new Error(uploadHttpErrorMessage(res.status, json.error));
+      }
       setForm((f) => ({ ...f, [field]: json.data.url }));
       toast.success("Imagen subida");
     } catch (err: unknown) {

@@ -73,8 +73,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_accesos_page",
-      "community": 29,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "page.tsx"
     },
     {
@@ -84,8 +84,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "app_accesos_page_sessionuser",
-      "community": 29,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "sessionuser"
     },
     {
@@ -95,8 +95,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "app_accesos_page_assignedevent",
-      "community": 29,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "assignedevent"
     },
     {
@@ -106,8 +106,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "app_accesos_page_accesospage",
-      "community": 29,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "accesospage()"
     },
     {
@@ -271,8 +271,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_admin_organizers_id_reset_stripe_route",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 44,
+      "community_name": "route.ts",
       "norm_label": "route.ts"
     },
     {
@@ -282,8 +282,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "app_api_admin_organizers_id_reset_stripe_route_post",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 44,
+      "community_name": "route.ts",
       "norm_label": "post()"
     },
     {
@@ -645,8 +645,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_auth_logout_route",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 11,
+      "community_name": "prisma.ts",
       "norm_label": "route.ts"
     },
     {
@@ -656,8 +656,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "app_api_auth_logout_route_post",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 11,
+      "community_name": "prisma.ts",
       "norm_label": "post()"
     },
     {
@@ -722,8 +722,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_auth_register_route",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "route.ts"
     },
     {
@@ -733,8 +733,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "app_api_auth_register_route_post",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "post()"
     },
     {
@@ -799,8 +799,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_authjs_nextauth_route",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 11,
+      "community_name": "prisma.ts",
       "norm_label": "route.ts"
     },
     {
@@ -810,8 +810,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_checkout_invite_route",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "route.ts"
     },
     {
@@ -821,8 +821,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "app_api_checkout_invite_route_generateinvitetoken",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "generateinvitetoken()"
     },
     {
@@ -832,8 +832,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "app_api_checkout_invite_route_post",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "post()"
     },
     {
@@ -1151,8 +1151,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_events_id_tables_tablenumber_invites_route",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "route.ts"
     },
     {
@@ -1162,8 +1162,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "app_api_events_id_tables_tablenumber_invites_route_generateinvitetoken",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "generateinvitetoken()"
     },
     {
@@ -1173,8 +1173,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "app_api_events_id_tables_tablenumber_invites_route_poolpaymenturl",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "poolpaymenturl()"
     },
     {
@@ -1184,8 +1184,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "app_api_events_id_tables_tablenumber_invites_route_post",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "post()"
     },
     {
@@ -1195,8 +1195,8 @@
       "source_location": "L339",
       "_origin": "ast",
       "id": "app_api_events_id_tables_tablenumber_invites_route_get",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "get()"
     },
     {
@@ -1437,8 +1437,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_invites_token_route",
-      "community": 171,
-      "community_name": "AddToWalletButton.tsx",
+      "community": 178,
+      "community_name": "inventory.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1448,8 +1448,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "app_api_invites_token_route_mesapagarurl",
-      "community": 171,
-      "community_name": "AddToWalletButton.tsx",
+      "community": 178,
+      "community_name": "inventory.ts",
       "norm_label": "mesapagarurl()"
     },
     {
@@ -1459,8 +1459,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "app_api_invites_token_route_get",
-      "community": 171,
-      "community_name": "AddToWalletButton.tsx",
+      "community": 178,
+      "community_name": "inventory.ts",
       "norm_label": "get()"
     },
     {
@@ -1470,8 +1470,8 @@
       "source_location": "L141",
       "_origin": "ast",
       "id": "app_api_invites_token_route_handleslotinvite",
-      "community": 171,
-      "community_name": "AddToWalletButton.tsx",
+      "community": 178,
+      "community_name": "inventory.ts",
       "norm_label": "handleslotinvite()"
     },
     {
@@ -1668,8 +1668,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_organizations_id_route",
-      "community": 14,
-      "community_name": "event-access.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1679,8 +1679,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "app_api_organizations_id_route_patch",
-      "community": 14,
-      "community_name": "event-access.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "patch()"
     },
     {
@@ -1690,8 +1690,8 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "app_api_organizations_id_route_delete",
-      "community": 14,
-      "community_name": "event-access.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "delete()"
     },
     {
@@ -1745,8 +1745,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_organizations_route",
-      "community": 14,
-      "community_name": "event-access.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1756,8 +1756,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "app_api_organizations_route_get",
-      "community": 14,
-      "community_name": "event-access.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "get()"
     },
     {
@@ -1767,8 +1767,8 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "app_api_organizations_route_post",
-      "community": 14,
-      "community_name": "event-access.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "post()"
     },
     {
@@ -1833,8 +1833,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_organizers_start_route",
-      "community": 14,
-      "community_name": "event-access.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1844,8 +1844,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "app_api_organizers_start_route_post",
-      "community": 14,
-      "community_name": "event-access.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "post()"
     },
     {
@@ -1932,8 +1932,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_profile_id_route",
-      "community": 37,
-      "community_name": "layout.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1943,8 +1943,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "app_api_profile_id_route_get",
-      "community": 37,
-      "community_name": "layout.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "get()"
     },
     {
@@ -1954,8 +1954,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_profile_me_route",
-      "community": 37,
-      "community_name": "layout.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "route.ts"
     },
     {
@@ -1965,8 +1965,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "app_api_profile_me_route_get",
-      "community": 37,
-      "community_name": "layout.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "get()"
     },
     {
@@ -1976,8 +1976,8 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "app_api_profile_me_route_patchschema",
-      "community": 37,
-      "community_name": "layout.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "patchschema"
     },
     {
@@ -1987,8 +1987,8 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "app_api_profile_me_route_patch",
-      "community": 37,
-      "community_name": "layout.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "patch()"
     },
     {
@@ -2097,8 +2097,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_sales_pending_approvals_route",
-      "community": 37,
-      "community_name": "layout.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "route.ts"
     },
     {
@@ -2108,8 +2108,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "app_api_sales_pending_approvals_route_get",
-      "community": 37,
-      "community_name": "layout.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "get()"
     },
     {
@@ -2273,8 +2273,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_tickets_ticketid_pkpass_link_route",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "route.ts"
     },
     {
@@ -2284,8 +2284,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "app_api_tickets_ticketid_pkpass_link_route_post",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "post()"
     },
     {
@@ -2295,8 +2295,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_tickets_ticketid_pkpass_route",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "route.ts"
     },
     {
@@ -2306,8 +2306,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "app_api_tickets_ticketid_pkpass_route_get",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "get()"
     },
     {
@@ -2317,8 +2317,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_tickets_my_tickets_route",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "route.ts"
     },
     {
@@ -2328,8 +2328,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_api_tickets_my_tickets_route_get",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "get()"
     },
     {
@@ -2592,8 +2592,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_venues_route",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "route.ts"
     },
     {
@@ -2603,8 +2603,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "app_api_venues_route_get",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "get()"
     },
     {
@@ -2614,8 +2614,8 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "app_api_venues_route_post",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "post()"
     },
     {
@@ -2625,8 +2625,8 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "app_api_venues_route_patch",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "patch()"
     },
     {
@@ -2713,8 +2713,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_configuracion_page",
-      "community": 108,
-      "community_name": "auth.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "page.tsx"
     },
     {
@@ -2724,8 +2724,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "app_configuracion_page_configuracionpage",
-      "community": 108,
-      "community_name": "auth.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "configuracionpage()"
     },
     {
@@ -3076,8 +3076,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_invitacion_token_page",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "page.tsx"
     },
     {
@@ -3087,8 +3087,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "app_invitacion_token_page_role_labels",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "role_labels"
     },
     {
@@ -3098,8 +3098,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "app_invitacion_token_page_invitacionpage",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "invitacionpage()"
     },
     {
@@ -3296,8 +3296,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_mis_boletos_page",
-      "community": 99,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 56,
+      "community_name": "route.ts",
       "norm_label": "page.tsx"
     },
     {
@@ -3307,8 +3307,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "app_mis_boletos_page_ticketdata",
-      "community": 99,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 56,
+      "community_name": "route.ts",
       "norm_label": "ticketdata"
     },
     {
@@ -3318,8 +3318,8 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "app_mis_boletos_page_misboletospage",
-      "community": 99,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 56,
+      "community_name": "route.ts",
       "norm_label": "misboletospage()"
     },
     {
@@ -3659,8 +3659,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_perfil_id_page",
-      "community": 88,
-      "community_name": "OrganizerEventsManager.tsx",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "page.tsx"
     },
     {
@@ -3670,8 +3670,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "app_perfil_id_page_perfilpublicpage",
-      "community": 88,
-      "community_name": "OrganizerEventsManager.tsx",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "perfilpublicpage()"
     },
     {
@@ -3681,8 +3681,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_perfil_page",
-      "community": 88,
-      "community_name": "OrganizerEventsManager.tsx",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "page.tsx"
     },
     {
@@ -3692,8 +3692,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "app_perfil_page_perfilpage",
-      "community": 88,
-      "community_name": "OrganizerEventsManager.tsx",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "perfilpage()"
     },
     {
@@ -3890,8 +3890,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_verificar_email_page",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "page.tsx"
     },
     {
@@ -3901,8 +3901,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "app_verificar_email_page_verificaremailcontent",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "verificaremailcontent()"
     },
     {
@@ -3912,8 +3912,8 @@
       "source_location": "L318",
       "_origin": "ast",
       "id": "app_verificar_email_page_verificaremailpage",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 79,
+      "community_name": "bcryptjs",
       "norm_label": "verificaremailpage()"
     },
     {
@@ -3923,8 +3923,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "auth",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 11,
+      "community_name": "prisma.ts",
       "norm_label": "auth.ts"
     },
     {
@@ -3934,8 +3934,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "auth_buildappleclientsecret",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 11,
+      "community_name": "prisma.ts",
       "norm_label": "buildappleclientsecret()"
     },
     {
@@ -3956,8 +3956,8 @@
       "source_location": "L147",
       "_origin": "ast",
       "id": "auth_applesecretpromise",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 11,
+      "community_name": "prisma.ts",
       "norm_label": "applesecretpromise"
     },
     {
@@ -3967,8 +3967,8 @@
       "source_location": "L149",
       "_origin": "ast",
       "id": "auth_handlers_auth_signin_signout",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 11,
+      "community_name": "prisma.ts",
       "norm_label": "{ handlers, auth, signin, signout }"
     },
     {
@@ -4330,8 +4330,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_accesos_qrscanner",
-      "community": 29,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "qrscanner.tsx"
     },
     {
@@ -4341,8 +4341,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "components_accesos_qrscanner_scanresponse",
-      "community": 29,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "scanresponse"
     },
     {
@@ -4352,8 +4352,8 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "components_accesos_qrscanner_qrscanner",
-      "community": 29,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "qrscanner()"
     },
     {
@@ -4363,8 +4363,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_accesos_scanstats",
-      "community": 29,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "scanstats.tsx"
     },
     {
@@ -4374,8 +4374,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "components_accesos_scanstats_scanstats",
-      "community": 29,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "scanstats"
     },
     {
@@ -4385,8 +4385,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_accesos_scannerfeedback",
-      "community": 51,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "scannerfeedback.tsx"
     },
     {
@@ -4396,8 +4396,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "components_accesos_scannerfeedback_scanresult",
-      "community": 29,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "scanresult"
     },
     {
@@ -4407,8 +4407,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "components_accesos_scannerfeedback_scanfeedbackprops",
-      "community": 51,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "scanfeedbackprops"
     },
     {
@@ -4418,8 +4418,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "components_accesos_scannerfeedback_scannerfeedback",
-      "community": 29,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "scannerfeedback()"
     },
     {
@@ -4990,8 +4990,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_admin_pendingapprovalsmanager",
-      "community": 112,
-      "community_name": "redirect-path.ts",
+      "community": 22,
+      "community_name": "page.tsx",
       "norm_label": "pendingapprovalsmanager.tsx"
     },
     {
@@ -5001,8 +5001,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "components_admin_pendingapprovalsmanager_pendingsaleitem",
-      "community": 112,
-      "community_name": "redirect-path.ts",
+      "community": 22,
+      "community_name": "page.tsx",
       "norm_label": "pendingsaleitem"
     },
     {
@@ -5012,8 +5012,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "components_admin_pendingapprovalsmanager_pendingsale",
-      "community": 112,
-      "community_name": "redirect-path.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "pendingsale"
     },
     {
@@ -5023,8 +5023,8 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "components_admin_pendingapprovalsmanager_initials",
-      "community": 112,
-      "community_name": "redirect-path.ts",
+      "community": 22,
+      "community_name": "page.tsx",
       "norm_label": "initials()"
     },
     {
@@ -5034,8 +5034,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "components_admin_pendingapprovalsmanager_pendingapprovalsmanager",
-      "community": 112,
-      "community_name": "redirect-path.ts",
+      "community": 22,
+      "community_name": "page.tsx",
       "norm_label": "pendingapprovalsmanager()"
     },
     {
@@ -5584,8 +5584,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_cart_cartcontext",
-      "community": 158,
-      "community_name": "@types/node",
+      "community": 3,
+      "community_name": "effectiveTicketPriceAt",
       "norm_label": "cartcontext.tsx"
     },
     {
@@ -5595,8 +5595,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "components_cart_cartcontext_globalcartitem",
-      "community": 158,
-      "community_name": "@types/node",
+      "community": 3,
+      "community_name": "effectiveTicketPriceAt",
       "norm_label": "globalcartitem"
     },
     {
@@ -5606,8 +5606,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "components_cart_cartcontext_cartcontextvalue",
-      "community": 158,
-      "community_name": "@types/node",
+      "community": 3,
+      "community_name": "effectiveTicketPriceAt",
       "norm_label": "cartcontextvalue"
     },
     {
@@ -5617,8 +5617,8 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "components_cart_cartcontext_cartcontext",
-      "community": 158,
-      "community_name": "@types/node",
+      "community": 3,
+      "community_name": "effectiveTicketPriceAt",
       "norm_label": "cartcontext"
     },
     {
@@ -5628,8 +5628,8 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "components_cart_cartcontext_readstorage",
-      "community": 158,
-      "community_name": "@types/node",
+      "community": 3,
+      "community_name": "effectiveTicketPriceAt",
       "norm_label": "readstorage()"
     },
     {
@@ -5639,8 +5639,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "components_cart_cartcontext_cartprovider",
-      "community": 158,
-      "community_name": "@types/node",
+      "community": 3,
+      "community_name": "effectiveTicketPriceAt",
       "norm_label": "cartprovider()"
     },
     {
@@ -5650,8 +5650,8 @@
       "source_location": "L123",
       "_origin": "ast",
       "id": "components_cart_cartcontext_usecart",
-      "community": 158,
-      "community_name": "@types/node",
+      "community": 3,
+      "community_name": "effectiveTicketPriceAt",
       "norm_label": "usecart()"
     },
     {
@@ -5672,8 +5672,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_cart_headercartdrawer",
-      "community": 158,
-      "community_name": "@types/node",
+      "community": 3,
+      "community_name": "effectiveTicketPriceAt",
       "norm_label": "headercartdrawer.tsx"
     },
     {
@@ -5683,8 +5683,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "components_cart_headercartdrawer_headercartdrawer",
-      "community": 158,
-      "community_name": "@types/node",
+      "community": 3,
+      "community_name": "effectiveTicketPriceAt",
       "norm_label": "headercartdrawer()"
     },
     {
@@ -5760,8 +5760,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_event_form_expandablepill",
-      "community": 54,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "expandablepill.tsx"
     },
     {
@@ -5771,8 +5771,8 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "components_event_form_expandablepill_expandablepillprops",
-      "community": 54,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "expandablepillprops"
     },
     {
@@ -5782,8 +5782,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "components_event_form_expandablepill_expandablepill",
-      "community": 54,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "expandablepill()"
     },
     {
@@ -6365,8 +6365,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_eventos_eventcardzamna",
-      "community": 168,
-      "community_name": "EventCardZamna.tsx",
+      "community": 32,
+      "community_name": "page.tsx",
       "norm_label": "eventcardzamna.tsx"
     },
     {
@@ -6376,8 +6376,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "components_eventos_eventcardzamna_eventcardzamnaprops",
-      "community": 168,
-      "community_name": "EventCardZamna.tsx",
+      "community": 19,
+      "community_name": "Concert",
       "norm_label": "eventcardzamnaprops"
     },
     {
@@ -6387,8 +6387,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "components_eventos_eventcardzamna_geteventstatus",
-      "community": 168,
-      "community_name": "EventCardZamna.tsx",
+      "community": 32,
+      "community_name": "page.tsx",
       "norm_label": "geteventstatus()"
     },
     {
@@ -6398,8 +6398,8 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "components_eventos_eventcardzamna_eventcardzamna",
-      "community": 168,
-      "community_name": "EventCardZamna.tsx",
+      "community": 32,
+      "community_name": "page.tsx",
       "norm_label": "eventcardzamna()"
     },
     {
@@ -6442,8 +6442,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_eventos_galleryeventcardzamna",
-      "community": 25,
-      "community_name": "patriotas-individual-tables.ts",
+      "community": 32,
+      "community_name": "page.tsx",
       "norm_label": "galleryeventcardzamna.tsx"
     },
     {
@@ -6453,8 +6453,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "components_eventos_galleryeventcardzamna_galleryeventcardzamnaprops",
-      "community": 25,
-      "community_name": "patriotas-individual-tables.ts",
+      "community": 32,
+      "community_name": "page.tsx",
       "norm_label": "galleryeventcardzamnaprops"
     },
     {
@@ -6464,8 +6464,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "components_eventos_galleryeventcardzamna_galleryeventcardzamna",
-      "community": 25,
-      "community_name": "patriotas-individual-tables.ts",
+      "community": 32,
+      "community_name": "page.tsx",
       "norm_label": "galleryeventcardzamna()"
     },
     {
@@ -6541,8 +6541,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_eventos_individualtablesmap",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "individualtablesmap.tsx"
     },
     {
@@ -6552,8 +6552,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "components_eventos_individualtablesmap_section",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "section"
     },
     {
@@ -6563,8 +6563,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "components_eventos_individualtablesmap_individualtablesmapprops",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "individualtablesmapprops"
     },
     {
@@ -6574,8 +6574,8 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "components_eventos_individualtablesmap_individualtablesmap",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "individualtablesmap()"
     },
     {
@@ -6970,8 +6970,8 @@
       "source_location": "L274",
       "_origin": "ast",
       "id": "components_eventos_carousel_poster_settings_usecarouselposteroptional",
-      "community": 168,
-      "community_name": "EventCardZamna.tsx",
+      "community": 32,
+      "community_name": "page.tsx",
       "norm_label": "usecarouselposteroptional()"
     },
     {
@@ -7036,8 +7036,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "components_layout_siteheader_sessionuser",
-      "community": 99,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 56,
+      "community_name": "route.ts",
       "norm_label": "sessionuser"
     },
     {
@@ -7817,26 +7817,26 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_payments_nativeapplepaycheckout",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 37,
+      "community_name": "layout.tsx",
       "norm_label": "nativeapplepaycheckout.tsx"
     },
     {
       "label": "NativeApplePayCheckoutProps",
       "file_type": "code",
       "source_file": "components/payments/NativeApplePayCheckout.tsx",
-      "source_location": "L13",
+      "source_location": "L16",
       "_origin": "ast",
       "id": "components_payments_nativeapplepaycheckout_nativeapplepaycheckoutprops",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 37,
+      "community_name": "layout.tsx",
       "norm_label": "nativeapplepaycheckoutprops"
     },
     {
       "label": "NativeApplePayCheckout()",
       "file_type": "code",
       "source_file": "components/payments/NativeApplePayCheckout.tsx",
-      "source_location": "L31",
+      "source_location": "L34",
       "_origin": "ast",
       "id": "components_payments_nativeapplepaycheckout_nativeapplepaycheckout",
       "community": 13,
@@ -7850,8 +7850,8 @@
       "source_location": "L154",
       "_origin": "ast",
       "id": "components_payments_nativeapplepaycheckout_withtimeout",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 37,
+      "community_name": "layout.tsx",
       "norm_label": "withtimeout()"
     },
     {
@@ -7861,30 +7861,30 @@
       "source_location": "L174",
       "_origin": "ast",
       "id": "components_payments_nativeapplepaycheckout_formatapplepayerror",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 37,
+      "community_name": "layout.tsx",
       "norm_label": "formatapplepayerror()"
     },
     {
       "label": "routeAfterNativePayment()",
       "file_type": "code",
       "source_file": "components/payments/NativeApplePayCheckout.tsx",
-      "source_location": "L207",
+      "source_location": "L210",
       "_origin": "ast",
       "id": "components_payments_nativeapplepaycheckout_routeafternativepayment",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 37,
+      "community_name": "layout.tsx",
       "norm_label": "routeafternativepayment()"
     },
     {
       "label": "AppleMark()",
       "file_type": "code",
       "source_file": "components/payments/NativeApplePayCheckout.tsx",
-      "source_location": "L237",
+      "source_location": "L240",
       "_origin": "ast",
       "id": "components_payments_nativeapplepaycheckout_applemark",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 37,
+      "community_name": "layout.tsx",
       "norm_label": "applemark()"
     },
     {
@@ -7938,8 +7938,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_profile_profileview",
-      "community": 88,
-      "community_name": "OrganizerEventsManager.tsx",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "profileview.tsx"
     },
     {
@@ -7949,8 +7949,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "components_profile_profileview_profileviewdata",
-      "community": 88,
-      "community_name": "OrganizerEventsManager.tsx",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "profileviewdata"
     },
     {
@@ -7960,8 +7960,8 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "components_profile_profileview_formateventdate",
-      "community": 88,
-      "community_name": "OrganizerEventsManager.tsx",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "formateventdate()"
     },
     {
@@ -7971,8 +7971,8 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "components_profile_profileview_initials",
-      "community": 88,
-      "community_name": "OrganizerEventsManager.tsx",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "initials()"
     },
     {
@@ -7982,8 +7982,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "components_profile_profileview_profileviewprops",
-      "community": 88,
-      "community_name": "OrganizerEventsManager.tsx",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "profileviewprops"
     },
     {
@@ -7993,8 +7993,8 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "components_profile_profileview_profileview",
-      "community": 88,
-      "community_name": "OrganizerEventsManager.tsx",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "profileview()"
     },
     {
@@ -8004,8 +8004,8 @@
       "source_location": "L337",
       "_origin": "ast",
       "id": "components_profile_profileview_profilepageclient",
-      "community": 88,
-      "community_name": "OrganizerEventsManager.tsx",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "profilepageclient()"
     },
     {
@@ -8015,8 +8015,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_profile_settingspageclient",
-      "community": 108,
-      "community_name": "auth.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "settingspageclient.tsx"
     },
     {
@@ -8026,8 +8026,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "components_profile_settingspageclient_settingspageclient",
-      "community": 108,
-      "community_name": "auth.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "settingspageclient()"
     },
     {
@@ -8037,8 +8037,8 @@
       "source_location": "L408",
       "_origin": "ast",
       "id": "components_profile_settingspageclient_settingsrow",
-      "community": 108,
-      "community_name": "auth.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "settingsrow()"
     },
     {
@@ -8125,8 +8125,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_ui_card",
-      "community": 54,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "card.tsx"
     },
     {
@@ -8136,8 +8136,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "components_ui_card_card",
-      "community": 54,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "card()"
     },
     {
@@ -8147,8 +8147,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "components_ui_card_cardheader",
-      "community": 54,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "cardheader()"
     },
     {
@@ -8158,8 +8158,8 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "components_ui_card_cardtitle",
-      "community": 54,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "cardtitle()"
     },
     {
@@ -8169,8 +8169,8 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "components_ui_card_carddescription",
-      "community": 54,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "carddescription()"
     },
     {
@@ -8180,8 +8180,8 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "components_ui_card_cardaction",
-      "community": 54,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "cardaction()"
     },
     {
@@ -8191,8 +8191,8 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "components_ui_card_cardcontent",
-      "community": 54,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "cardcontent()"
     },
     {
@@ -8202,8 +8202,8 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "components_ui_card_cardfooter",
-      "community": 54,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "cardfooter()"
     },
     {
@@ -8367,8 +8367,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_ui_dialog",
-      "community": 51,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "dialog.tsx"
     },
     {
@@ -8378,8 +8378,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "components_ui_dialog_dialog",
-      "community": 51,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "dialog()"
     },
     {
@@ -8389,8 +8389,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "components_ui_dialog_dialogtrigger",
-      "community": 51,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "dialogtrigger()"
     },
     {
@@ -8400,8 +8400,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "components_ui_dialog_dialogportal",
-      "community": 51,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "dialogportal()"
     },
     {
@@ -8411,8 +8411,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "components_ui_dialog_dialogclose",
-      "community": 51,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "dialogclose()"
     },
     {
@@ -8422,8 +8422,8 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "components_ui_dialog_dialogoverlay",
-      "community": 51,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "dialogoverlay()"
     },
     {
@@ -8433,8 +8433,8 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "components_ui_dialog_dialogcontent",
-      "community": 51,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "dialogcontent()"
     },
     {
@@ -8444,8 +8444,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "components_ui_dialog_dialogheader",
-      "community": 51,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "dialogheader()"
     },
     {
@@ -8455,8 +8455,8 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "components_ui_dialog_dialogfooter",
-      "community": 51,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "dialogfooter()"
     },
     {
@@ -8466,8 +8466,8 @@
       "source_location": "L98",
       "_origin": "ast",
       "id": "components_ui_dialog_dialogtitle",
-      "community": 51,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "dialogtitle()"
     },
     {
@@ -8477,8 +8477,8 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "components_ui_dialog_dialogdescription",
-      "community": 51,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "dialogdescription()"
     },
     {
@@ -8587,8 +8587,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "lib_admin_reset_organizer_stripe_resetorganizerstripe",
-      "community": 1,
-      "community_name": "session.ts",
+      "community": 44,
+      "community_name": "route.ts",
       "norm_label": "resetorganizerstripe()"
     },
     {
@@ -8609,8 +8609,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_admin_revenue",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "revenue.ts"
     },
     {
@@ -8620,8 +8620,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "lib_admin_revenue_revenuefilters",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "revenuefilters"
     },
     {
@@ -8631,8 +8631,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "lib_admin_revenue_tonumber",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "tonumber()"
     },
     {
@@ -8642,8 +8642,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "lib_admin_revenue_buildcompletedsalewhere",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "buildcompletedsalewhere()"
     },
     {
@@ -8653,8 +8653,8 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "lib_admin_revenue_buildrefundedsalewhere",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "buildrefundedsalewhere()"
     },
     {
@@ -8664,8 +8664,8 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "lib_admin_revenue_getrevenuereport",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "getrevenuereport()"
     },
     {
@@ -8675,8 +8675,8 @@
       "source_location": "L199",
       "_origin": "ast",
       "id": "lib_admin_revenue_getplatformtotalfromdb",
-      "community": 27,
-      "community_name": "EventCardZamna.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "getplatformtotalfromdb()"
     },
     {
@@ -8686,8 +8686,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_auth_event_access",
-      "community": 15,
-      "community_name": "route.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "event-access.ts"
     },
     {
@@ -8708,8 +8708,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_auth_event_access_ensureorganizerprofile",
-      "community": 14,
-      "community_name": "event-access.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "ensureorganizerprofile()"
     },
     {
@@ -8719,8 +8719,8 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "lib_auth_event_access_assertorganizercancreateevents",
-      "community": 15,
-      "community_name": "route.ts",
+      "community": 106,
+      "community_name": "SqlEditorManager.tsx",
       "norm_label": "assertorganizercancreateevents()"
     },
     {
@@ -9082,8 +9082,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_auth_registration",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "registration.ts"
     },
     {
@@ -9093,8 +9093,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_auth_registration_authsurface",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "authsurface"
     },
     {
@@ -9115,8 +9115,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "lib_auth_registration_resolvepublicregistrationrole",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "resolvepublicregistrationrole()"
     },
     {
@@ -9126,8 +9126,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "lib_auth_registration_resolvepostauthredirect",
-      "community": 8,
-      "community_name": "redirect-path.ts",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "resolvepostauthredirect()"
     },
     {
@@ -9137,8 +9137,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "lib_auth_registration_ticket_viewer_roles",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "ticket_viewer_roles"
     },
     {
@@ -9148,8 +9148,8 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "lib_auth_registration_canviewowntickets",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "canviewowntickets()"
     },
     {
@@ -9159,8 +9159,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_auth_session",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 1,
+      "community_name": "session.ts",
       "norm_label": "session.ts"
     },
     {
@@ -9181,8 +9181,8 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "lib_auth_session_signout",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 1,
+      "community_name": "session.ts",
       "norm_label": "signout()"
     },
     {
@@ -9192,8 +9192,8 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "lib_auth_session_createserverclient",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 1,
+      "community_name": "session.ts",
       "norm_label": "createserverclient()"
     },
     {
@@ -9203,8 +9203,8 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "lib_auth_session_getsupabaseadmin",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 1,
+      "community_name": "session.ts",
       "norm_label": "getsupabaseadmin()"
     },
     {
@@ -9258,8 +9258,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_auth_supabase_auth",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 1,
+      "community_name": "session.ts",
       "norm_label": "supabase-auth.ts"
     },
     {
@@ -9269,8 +9269,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_auth_sync_user",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 11,
+      "community_name": "prisma.ts",
       "norm_label": "sync-user.ts"
     },
     {
@@ -9280,8 +9280,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "lib_auth_sync_user_syncedprismauser",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 11,
+      "community_name": "prisma.ts",
       "norm_label": "syncedprismauser"
     },
     {
@@ -9291,8 +9291,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "lib_auth_sync_user_ensureprismauserfromoauth",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 11,
+      "community_name": "prisma.ts",
       "norm_label": "ensureprismauserfromoauth()"
     },
     {
@@ -9302,8 +9302,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_auth_types",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 1,
+      "community_name": "session.ts",
       "norm_label": "types.ts"
     },
     {
@@ -9313,8 +9313,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_auth_types_staffmembershipsummary",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 1,
+      "community_name": "session.ts",
       "norm_label": "staffmembershipsummary"
     },
     {
@@ -9324,8 +9324,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_auth_types_sessionuser",
-      "community": 35,
-      "community_name": "otp.ts",
+      "community": 1,
+      "community_name": "session.ts",
       "norm_label": "sessionuser"
     },
     {
@@ -9368,8 +9368,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_gallery_events",
-      "community": 25,
-      "community_name": "patriotas-individual-tables.ts",
+      "community": 32,
+      "community_name": "page.tsx",
       "norm_label": "gallery-events.ts"
     },
     {
@@ -9379,8 +9379,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_gallery_events_galleryevent",
-      "community": 25,
-      "community_name": "patriotas-individual-tables.ts",
+      "community": 32,
+      "community_name": "page.tsx",
       "norm_label": "galleryevent"
     },
     {
@@ -9390,8 +9390,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "lib_gallery_events_gallery_events",
-      "community": 25,
-      "community_name": "patriotas-individual-tables.ts",
+      "community": 32,
+      "community_name": "page.tsx",
       "norm_label": "gallery_events"
     },
     {
@@ -9522,8 +9522,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_native_apple_pay",
-      "community": 13,
-      "community_name": "route.ts",
+      "community": 37,
+      "community_name": "layout.tsx",
       "norm_label": "apple-pay.ts"
     },
     {
@@ -9604,6 +9604,50 @@
       "norm_label": "isappledevice()"
     },
     {
+      "label": "stripe-plugin.ts",
+      "file_type": "code",
+      "source_file": "lib/native/stripe-plugin.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "lib_native_stripe_plugin",
+      "community": 37,
+      "community_name": "layout.tsx",
+      "norm_label": "stripe-plugin.ts"
+    },
+    {
+      "label": "NativeStripePlugin",
+      "file_type": "code",
+      "source_file": "lib/native/stripe-plugin.ts",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "lib_native_stripe_plugin_nativestripeplugin",
+      "community": 37,
+      "community_name": "layout.tsx",
+      "norm_label": "nativestripeplugin"
+    },
+    {
+      "label": "NativeStripe",
+      "file_type": "code",
+      "source_file": "lib/native/stripe-plugin.ts",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "lib_native_stripe_plugin_nativestripe",
+      "community": 37,
+      "community_name": "layout.tsx",
+      "norm_label": "nativestripe"
+    },
+    {
+      "label": "ApplePayResult",
+      "file_type": "code",
+      "source_file": "lib/native/stripe-plugin.ts",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "lib_native_stripe_plugin_applepayresult",
+      "community": 37,
+      "community_name": "layout.tsx",
+      "norm_label": "applepayresult"
+    },
+    {
       "label": "use-auth-surface.ts",
       "file_type": "code",
       "source_file": "lib/native/use-auth-surface.ts",
@@ -9632,8 +9676,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_patriotas_individual_tables",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "patriotas-individual-tables.ts"
     },
     {
@@ -9643,8 +9687,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "lib_patriotas_individual_tables_individualtable",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "individualtable"
     },
     {
@@ -9654,8 +9698,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "lib_patriotas_individual_tables_generateviptables8x18",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "generateviptables8x18()"
     },
     {
@@ -9665,8 +9709,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "lib_patriotas_individual_tables_vip_tables",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "vip_tables"
     },
     {
@@ -9676,8 +9720,8 @@
       "source_location": "L69",
       "_origin": "ast",
       "id": "lib_patriotas_individual_tables_table_zones",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "table_zones"
     },
     {
@@ -9687,8 +9731,8 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "lib_patriotas_individual_tables_non_vip_sections",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "non_vip_sections"
     },
     {
@@ -9698,8 +9742,8 @@
       "source_location": "L141",
       "_origin": "ast",
       "id": "lib_patriotas_individual_tables_gettablebynumber",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "gettablebynumber()"
     },
     {
@@ -9709,8 +9753,8 @@
       "source_location": "L145",
       "_origin": "ast",
       "id": "lib_patriotas_individual_tables_getavailabletables",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "getavailabletables()"
     },
     {
@@ -9720,8 +9764,8 @@
       "source_location": "L149",
       "_origin": "ast",
       "id": "lib_patriotas_individual_tables_gettablesbyzone",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "gettablesbyzone()"
     },
     {
@@ -9731,8 +9775,8 @@
       "source_location": "L155",
       "_origin": "ast",
       "id": "lib_patriotas_individual_tables_reservetable",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "reservetable()"
     },
     {
@@ -9742,8 +9786,8 @@
       "source_location": "L165",
       "_origin": "ast",
       "id": "lib_patriotas_individual_tables_marktableassold",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "marktableassold()"
     },
     {
@@ -9753,8 +9797,8 @@
       "source_location": "L176",
       "_origin": "ast",
       "id": "lib_patriotas_individual_tables_gettablestats",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "gettablestats()"
     },
     {
@@ -9764,8 +9808,8 @@
       "source_location": "L194",
       "_origin": "ast",
       "id": "lib_patriotas_individual_tables_patriotas_event_config",
-      "community": 18,
-      "community_name": "index.ts",
+      "community": 9,
+      "community_name": "auth.ts",
       "norm_label": "patriotas_event_config"
     },
     {
@@ -9852,8 +9896,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_payments_commissions",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "commissions.ts"
     },
     {
@@ -9863,8 +9907,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_payments_commissions_commissionsplit",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "commissionsplit"
     },
     {
@@ -9874,8 +9918,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "lib_payments_commissions_resolvedcommission",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "resolvedcommission"
     },
     {
@@ -9885,8 +9929,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "lib_payments_commissions_resolvecommission",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "resolvecommission()"
     },
     {
@@ -9896,8 +9940,8 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "lib_payments_commissions_calculateplatformfeecents",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "calculateplatformfeecents()"
     },
     {
@@ -9907,8 +9951,8 @@
       "source_location": "L102",
       "_origin": "ast",
       "id": "lib_payments_commissions_calculateservicefeecents",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "calculateservicefeecents()"
     },
     {
@@ -9918,8 +9962,8 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "lib_payments_commissions_calculatesplit",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "calculatesplit()"
     },
     {
@@ -9929,8 +9973,8 @@
       "source_location": "L142",
       "_origin": "ast",
       "id": "lib_payments_commissions_calculatesaleamounts",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "calculatesaleamounts()"
     },
     {
@@ -9995,8 +10039,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "lib_payments_config_getappurl",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "getappurl()"
     },
     {
@@ -10369,8 +10413,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_profile_types",
-      "community": 108,
-      "community_name": "auth.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "profile-types.ts"
     },
     {
@@ -10380,8 +10424,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_profile_types_publicprofile",
-      "community": 108,
-      "community_name": "auth.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "publicprofile"
     },
     {
@@ -10391,8 +10435,8 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "lib_profile_types_privateprofile",
-      "community": 108,
-      "community_name": "auth.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "privateprofile"
     },
     {
@@ -10402,8 +10446,8 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "lib_profile_types_buyerprofilecard",
-      "community": 112,
-      "community_name": "redirect-path.ts",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "buyerprofilecard"
     },
     {
@@ -10413,8 +10457,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_profile",
-      "community": 37,
-      "community_name": "layout.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "profile.ts"
     },
     {
@@ -10424,8 +10468,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_profile_publicselect",
-      "community": 37,
-      "community_name": "layout.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "publicselect"
     },
     {
@@ -10435,8 +10479,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "lib_profile_normalizeinstagram",
-      "community": 37,
-      "community_name": "layout.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "normalizeinstagram()"
     },
     {
@@ -10446,8 +10490,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "lib_profile_buildprofileforuserid",
-      "community": 37,
-      "community_name": "layout.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "buildprofileforuserid()"
     },
     {
@@ -10457,8 +10501,8 @@
       "source_location": "L147",
       "_origin": "ast",
       "id": "lib_profile_lookupbuyerprofilesbyemails",
-      "community": 37,
-      "community_name": "layout.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "lookupbuyerprofilesbyemails()"
     },
     {
@@ -10468,8 +10512,8 @@
       "source_location": "L181",
       "_origin": "ast",
       "id": "lib_profile_buyercard",
-      "community": 37,
-      "community_name": "layout.tsx",
+      "community": 12,
+      "community_name": "registration.ts",
       "norm_label": "buyercard()"
     },
     {
@@ -10633,8 +10677,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_services_mailer",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 29,
+      "community_name": "route.ts",
       "norm_label": "mailer.ts"
     },
     {
@@ -10644,8 +10688,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_services_mailer_mailoptions",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 29,
+      "community_name": "route.ts",
       "norm_label": "mailoptions"
     },
     {
@@ -10655,8 +10699,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_services_mailer_islocalsmtphost",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 29,
+      "community_name": "route.ts",
       "norm_label": "islocalsmtphost()"
     },
     {
@@ -10666,8 +10710,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "lib_services_mailer_resolvefromaddress",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 29,
+      "community_name": "route.ts",
       "norm_label": "resolvefromaddress()"
     },
     {
@@ -10677,8 +10721,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "lib_services_mailer_logsimulated",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 29,
+      "community_name": "route.ts",
       "norm_label": "logsimulated()"
     },
     {
@@ -10688,8 +10732,8 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "lib_services_mailer_sendmailorthrow",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 29,
+      "community_name": "route.ts",
       "norm_label": "sendmailorthrow()"
     },
     {
@@ -10765,8 +10809,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_services_qr_generator",
-      "community": 12,
-      "community_name": "registration.ts",
+      "community": 18,
+      "community_name": "index.ts",
       "norm_label": "qr-generator.ts"
     },
     {
@@ -10787,8 +10831,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "lib_services_qr_generator_generateqrcode",
-      "community": 5,
-      "community_name": "formatEventCalendarDate",
+      "community": 18,
+      "community_name": "index.ts",
       "norm_label": "generateqrcode()"
     },
     {
@@ -10798,8 +10842,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "lib_services_qr_generator_validateqrhash",
-      "community": 12,
-      "community_name": "registration.ts",
+      "community": 18,
+      "community_name": "index.ts",
       "norm_label": "validateqrhash()"
     },
     {
@@ -10809,8 +10853,8 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "lib_services_qr_generator_generateqrpayload",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 29,
+      "community_name": "route.ts",
       "norm_label": "generateqrpayload()"
     },
     {
@@ -10831,8 +10875,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_services_ticket_generator",
-      "community": 5,
-      "community_name": "formatEventCalendarDate",
+      "community": 18,
+      "community_name": "index.ts",
       "norm_label": "ticket-generator.ts"
     },
     {
@@ -10842,8 +10886,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_services_ticket_generator_createqrpayload",
-      "community": 5,
-      "community_name": "formatEventCalendarDate",
+      "community": 18,
+      "community_name": "index.ts",
       "norm_label": "createqrpayload()"
     },
     {
@@ -10853,8 +10897,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "lib_services_ticket_generator_generateticketpdf",
-      "community": 5,
-      "community_name": "formatEventCalendarDate",
+      "community": 18,
+      "community_name": "index.ts",
       "norm_label": "generateticketpdf()"
     },
     {
@@ -10864,8 +10908,8 @@
       "source_location": "L129",
       "_origin": "ast",
       "id": "lib_services_ticket_generator_generatemultipleticketspdf",
-      "community": 5,
-      "community_name": "formatEventCalendarDate",
+      "community": 18,
+      "community_name": "index.ts",
       "norm_label": "generatemultipleticketspdf()"
     },
     {
@@ -10886,8 +10930,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "lib_services_ticket_ownership_userownsticket",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "userownsticket()"
     },
     {
@@ -10897,8 +10941,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_services_tickets_email",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 29,
+      "community_name": "route.ts",
       "norm_label": "tickets-email.ts"
     },
     {
@@ -10908,8 +10952,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_services_tickets_email_ticketwithrelations",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 29,
+      "community_name": "route.ts",
       "norm_label": "ticketwithrelations"
     },
     {
@@ -10919,8 +10963,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "lib_services_tickets_email_mxnformat",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 29,
+      "community_name": "route.ts",
       "norm_label": "mxnformat()"
     },
     {
@@ -10930,8 +10974,8 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "lib_services_tickets_email_safetext",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 29,
+      "community_name": "route.ts",
       "norm_label": "safetext()"
     },
     {
@@ -10941,8 +10985,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "lib_services_tickets_email_sendticketsreceiptemail",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 29,
+      "community_name": "route.ts",
       "norm_label": "sendticketsreceiptemail()"
     },
     {
@@ -10952,8 +10996,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_services_wallet_pass_token",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "wallet-pass-token.ts"
     },
     {
@@ -10963,8 +11007,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_services_wallet_pass_token_getsecret",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "getsecret()"
     },
     {
@@ -10974,8 +11018,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "lib_services_wallet_pass_token_getwalletpasstokenttlseconds",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "getwalletpasstokenttlseconds()"
     },
     {
@@ -10985,8 +11029,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "lib_services_wallet_pass_token_signwalletpasstoken",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "signwalletpasstoken()"
     },
     {
@@ -10996,8 +11040,8 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "lib_services_wallet_pass_token_verifywalletpasstoken",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "verifywalletpasstoken()"
     },
     {
@@ -11106,8 +11150,8 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "lib_services_wallet_pass_iswalletpassenabled",
-      "community": 4,
-      "community_name": "permissions.ts",
+      "community": 35,
+      "community_name": "otp.ts",
       "norm_label": "iswalletpassenabled()"
     },
     {
@@ -11337,8 +11381,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_table_invite",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "table-invite.ts"
     },
     {
@@ -11348,8 +11392,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "lib_table_invite_tickettablelabel",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "tickettablelabel()"
     },
     {
@@ -11359,8 +11403,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "lib_table_invite_parsetablekeyfrompath",
-      "community": 9,
-      "community_name": "auth.ts",
+      "community": 27,
+      "community_name": "EventCardZamna.tsx",
       "norm_label": "parsetablekeyfrompath()"
     },
     {
@@ -11656,8 +11700,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "lib_utils_index_cn",
-      "community": 54,
-      "community_name": "effectiveTicketPriceAt",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "cn()"
     },
     {
@@ -11799,8 +11843,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_utils_org_slug",
-      "community": 14,
-      "community_name": "event-access.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "org-slug.ts"
     },
     {
@@ -11810,8 +11854,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_utils_org_slug_slugifyname",
-      "community": 14,
-      "community_name": "event-access.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "slugifyname()"
     },
     {
@@ -11821,8 +11865,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "lib_utils_org_slug_generateuniqueorgslug",
-      "community": 14,
-      "community_name": "event-access.ts",
+      "community": 10,
+      "community_name": "schemas.ts",
       "norm_label": "generateuniqueorgslug()"
     },
     {
@@ -11843,8 +11887,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "lib_validations_schemas_loginschema",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "loginschema"
     },
     {
@@ -11854,8 +11898,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "lib_validations_schemas_registerschema",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "registerschema"
     },
     {
@@ -11953,8 +11997,8 @@
       "source_location": "L159",
       "_origin": "ast",
       "id": "lib_validations_schemas_organizationschema",
-      "community": 14,
-      "community_name": "event-access.ts",
+      "community": 106,
+      "community_name": "SqlEditorManager.tsx",
       "norm_label": "organizationschema"
     },
     {
@@ -11986,8 +12030,8 @@
       "source_location": "L178",
       "_origin": "ast",
       "id": "lib_validations_schemas_updateorganizationschema",
-      "community": 14,
-      "community_name": "event-access.ts",
+      "community": 106,
+      "community_name": "SqlEditorManager.tsx",
       "norm_label": "updateorganizationschema"
     },
     {
@@ -12437,8 +12481,8 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "package_dependencies_capacitor_browser",
-      "community": 80,
-      "community_name": "dependencies",
+      "community": 54,
+      "community_name": "effectiveTicketPriceAt",
       "norm_label": "@capacitor/browser"
     },
     {
@@ -12448,8 +12492,8 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "capacitor_browser",
-      "community": 80,
-      "community_name": "dependencies",
+      "community": 54,
+      "community_name": "effectiveTicketPriceAt",
       "norm_label": "@capacitor/browser"
     },
     {
@@ -12943,8 +12987,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "package_dependencies_bcryptjs",
-      "community": 204,
-      "community_name": "bcryptjs",
+      "community": 80,
+      "community_name": "dependencies",
       "norm_label": "bcryptjs"
     },
     {
@@ -12954,8 +12998,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "bcryptjs",
-      "community": 204,
-      "community_name": "bcryptjs",
+      "community": 80,
+      "community_name": "dependencies",
       "norm_label": "bcryptjs"
     },
     {
@@ -13075,8 +13119,8 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "package_dependencies_html5_qrcode",
-      "community": 29,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "html5-qrcode"
     },
     {
@@ -13086,8 +13130,8 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "html5_qrcode",
-      "community": 29,
-      "community_name": "route.ts",
+      "community": 0,
+      "community_name": "cn",
       "norm_label": "html5-qrcode"
     },
     {
@@ -13119,8 +13163,8 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "package_dependencies_jspdf",
-      "community": 5,
-      "community_name": "formatEventCalendarDate",
+      "community": 18,
+      "community_name": "index.ts",
       "norm_label": "jspdf"
     },
     {
@@ -13130,8 +13174,8 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "jspdf",
-      "community": 5,
-      "community_name": "formatEventCalendarDate",
+      "community": 18,
+      "community_name": "index.ts",
       "norm_label": "jspdf"
     },
     {
@@ -13251,8 +13295,8 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "package_dependencies_qrcode",
-      "community": 5,
-      "community_name": "formatEventCalendarDate",
+      "community": 18,
+      "community_name": "index.ts",
       "norm_label": "qrcode"
     },
     {
@@ -13262,8 +13306,8 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "qrcode",
-      "community": 5,
-      "community_name": "formatEventCalendarDate",
+      "community": 18,
+      "community_name": "index.ts",
       "norm_label": "qrcode"
     },
     {
@@ -14910,21 +14954,65 @@
       "norm_label": "patchamount()"
     },
     {
-      "label": "patchApplePayNilRoot()",
+      "label": "extractFunction()",
       "file_type": "code",
       "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
       "source_location": "L79",
       "_origin": "ast",
-      "id": "scripts_ios_patch_stripe_apple_pay_patchapplepaynilroot",
+      "id": "scripts_ios_patch_stripe_apple_pay_extractfunction",
       "community": 86,
       "community_name": "test-auth-logic.ts",
-      "norm_label": "patchapplepaynilroot()"
+      "norm_label": "extractfunction()"
+    },
+    {
+      "label": "patchEmptyItems()",
+      "file_type": "code",
+      "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
+      "source_location": "L98",
+      "_origin": "ast",
+      "id": "scripts_ios_patch_stripe_apple_pay_patchemptyitems",
+      "community": 86,
+      "community_name": "test-auth-logic.ts",
+      "norm_label": "patchemptyitems()"
+    },
+    {
+      "label": "patchRetainContext()",
+      "file_type": "code",
+      "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
+      "source_location": "L114",
+      "_origin": "ast",
+      "id": "scripts_ios_patch_stripe_apple_pay_patchretaincontext",
+      "community": 86,
+      "community_name": "test-auth-logic.ts",
+      "norm_label": "patchretaincontext()"
+    },
+    {
+      "label": "patchPresentApplePay()",
+      "file_type": "code",
+      "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
+      "source_location": "L127",
+      "_origin": "ast",
+      "id": "scripts_ios_patch_stripe_apple_pay_patchpresentapplepay",
+      "community": 86,
+      "community_name": "test-auth-logic.ts",
+      "norm_label": "patchpresentapplepay()"
+    },
+    {
+      "label": "stripKeyWindowHelper()",
+      "file_type": "code",
+      "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
+      "source_location": "L161",
+      "_origin": "ast",
+      "id": "scripts_ios_patch_stripe_apple_pay_stripkeywindowhelper",
+      "community": 86,
+      "community_name": "test-auth-logic.ts",
+      "norm_label": "stripkeywindowhelper()"
     },
     {
       "label": "main()",
       "file_type": "code",
       "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
-      "source_location": "L99",
+      "source_location": "L167",
       "_origin": "ast",
       "id": "scripts_ios_patch_stripe_apple_pay_main",
       "community": 86,
@@ -15160,8 +15248,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_migrate_staff_memberships",
-      "community": 159,
-      "community_name": "ticket-generator.ts",
+      "community": 178,
+      "community_name": "inventory.ts",
       "norm_label": "migrate-staff-memberships.ts"
     },
     {
@@ -15171,8 +15259,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "scripts_migrate_staff_memberships_legacy_staff_roles",
-      "community": 159,
-      "community_name": "ticket-generator.ts",
+      "community": 178,
+      "community_name": "inventory.ts",
       "norm_label": "legacy_staff_roles"
     },
     {
@@ -15182,8 +15270,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "scripts_migrate_staff_memberships_role_map",
-      "community": 159,
-      "community_name": "ticket-generator.ts",
+      "community": 178,
+      "community_name": "inventory.ts",
       "norm_label": "role_map"
     },
     {
@@ -15193,8 +15281,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "scripts_migrate_staff_memberships_migratelegacystaffroles",
-      "community": 159,
-      "community_name": "ticket-generator.ts",
+      "community": 178,
+      "community_name": "inventory.ts",
       "norm_label": "migratelegacystaffroles()"
     },
     {
@@ -15204,8 +15292,8 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "scripts_migrate_staff_memberships_migratevenuesfromevents",
-      "community": 159,
-      "community_name": "ticket-generator.ts",
+      "community": 178,
+      "community_name": "inventory.ts",
       "norm_label": "migratevenuesfromevents()"
     },
     {
@@ -15215,8 +15303,8 @@
       "source_location": "L114",
       "_origin": "ast",
       "id": "scripts_migrate_staff_memberships_main",
-      "community": 159,
-      "community_name": "ticket-generator.ts",
+      "community": 178,
+      "community_name": "inventory.ts",
       "norm_label": "main()"
     },
     {
@@ -15549,8 +15637,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_test_auth_logic",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "test-auth-logic.ts"
     },
     {
@@ -15560,8 +15648,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "scripts_test_auth_logic_assert",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "assert()"
     },
     {
@@ -15571,8 +15659,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "scripts_test_auth_logic_validregister",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "validregister"
     },
     {
@@ -15582,8 +15670,8 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "scripts_test_auth_logic_invalidphone",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "invalidphone"
     },
     {
@@ -15593,8 +15681,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "scripts_test_auth_logic_nophone",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "nophone"
     },
     {
@@ -15604,8 +15692,8 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "scripts_test_auth_logic_mismatchpassword",
-      "community": 52,
-      "community_name": "GalleryManager.tsx",
+      "community": 14,
+      "community_name": "event-access.ts",
       "norm_label": "mismatchpassword"
     },
     {
@@ -16284,8 +16372,8 @@
       "source_location": "L183",
       "_origin": "ast",
       "id": "types_index_ticketpdfdata",
-      "community": 5,
-      "community_name": "formatEventCalendarDate",
+      "community": 18,
+      "community_name": "index.ts",
       "norm_label": "ticketpdfdata"
     },
     {
@@ -21564,8 +21652,8 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "project_roadmap_api_endpoints_a_crear",
-      "community": 47,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 51,
+      "community_name": "route.ts",
       "norm_label": "api endpoints a crear"
     },
     {
@@ -21575,8 +21663,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "project_roadmap_api_events",
-      "community": 47,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 51,
+      "community_name": "route.ts",
       "norm_label": "`/api/events`"
     },
     {
@@ -21586,8 +21674,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "project_roadmap_api_sales",
-      "community": 47,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 51,
+      "community_name": "route.ts",
       "norm_label": "`/api/sales`"
     },
     {
@@ -21597,8 +21685,8 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "project_roadmap_api_tickets",
-      "community": 47,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 51,
+      "community_name": "route.ts",
       "norm_label": "`/api/tickets`"
     },
     {
@@ -21608,8 +21696,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "project_roadmap_api_inventory",
-      "community": 47,
-      "community_name": "resolvePostAuthRedirect",
+      "community": 51,
+      "community_name": "route.ts",
       "norm_label": "`/api/inventory`"
     },
     {
@@ -21652,8 +21740,8 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "project_roadmap_componentes_a_crear",
-      "community": 116,
-      "community_name": "_temp_deploy2.js",
+      "community": 47,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "componentes a crear"
     },
     {
@@ -21663,8 +21751,8 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "project_roadmap_eventos",
-      "community": 116,
-      "community_name": "_temp_deploy2.js",
+      "community": 47,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "eventos"
     },
     {
@@ -21674,8 +21762,8 @@
       "source_location": "L91",
       "_origin": "ast",
       "id": "project_roadmap_carrito_de_compra",
-      "community": 116,
-      "community_name": "_temp_deploy2.js",
+      "community": 47,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "carrito de compra"
     },
     {
@@ -21685,8 +21773,8 @@
       "source_location": "L97",
       "_origin": "ast",
       "id": "project_roadmap_boletos",
-      "community": 116,
-      "community_name": "_temp_deploy2.js",
+      "community": 47,
+      "community_name": "resolvePostAuthRedirect",
       "norm_label": "boletos"
     },
     {
@@ -46201,7 +46289,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/payments/NativeApplePayCheckout.tsx",
-      "source_location": "L237",
+      "source_location": "L240",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_payments_nativeapplepaycheckout",
@@ -46223,7 +46311,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/payments/NativeApplePayCheckout.tsx",
-      "source_location": "L31",
+      "source_location": "L34",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_payments_nativeapplepaycheckout",
@@ -46234,7 +46322,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/payments/NativeApplePayCheckout.tsx",
-      "source_location": "L13",
+      "source_location": "L16",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_payments_nativeapplepaycheckout",
@@ -46245,7 +46333,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/payments/NativeApplePayCheckout.tsx",
-      "source_location": "L207",
+      "source_location": "L210",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_payments_nativeapplepaycheckout",
@@ -46268,11 +46356,71 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/payments/NativeApplePayCheckout.tsx",
-      "source_location": "L8",
+      "source_location": "L7",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_payments_nativeapplepaycheckout",
       "target": "lib_native_apple_pay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/payments/NativeApplePayCheckout.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "components_payments_nativeapplepaycheckout",
+      "target": "lib_native_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/payments/NativeApplePayCheckout.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "components_payments_nativeapplepaycheckout",
+      "target": "lib_native_platform_isnativeios",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/payments/NativeApplePayCheckout.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "components_payments_nativeapplepaycheckout",
+      "target": "lib_native_stripe_plugin",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/payments/NativeApplePayCheckout.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "components_payments_nativeapplepaycheckout",
+      "target": "lib_native_stripe_plugin_applepayresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/payments/NativeApplePayCheckout.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "components_payments_nativeapplepaycheckout",
+      "target": "lib_native_stripe_plugin_nativestripe",
       "confidence_score": 1.0
     },
     {
@@ -49602,6 +49750,39 @@
       "_origin": "ast",
       "source": "lib_native_platform_isappledevice",
       "target": "lib_native_platform_isnativeios",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/native/stripe-plugin.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_native_stripe_plugin",
+      "target": "lib_native_stripe_plugin_applepayresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/native/stripe-plugin.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_native_stripe_plugin",
+      "target": "lib_native_stripe_plugin_nativestripe",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/native/stripe-plugin.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_native_stripe_plugin",
+      "target": "lib_native_stripe_plugin_nativestripeplugin",
       "confidence_score": 1.0
     },
     {
@@ -55760,6 +55941,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
+      "source_location": "L79",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_ios_patch_stripe_apple_pay_cjs_scripts_ios_patch_stripe_apple_pay",
+      "target": "scripts_ios_patch_stripe_apple_pay_extractfunction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
       "source_location": "L9",
       "weight": 1.0,
       "_origin": "ast",
@@ -55771,7 +55963,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
-      "source_location": "L99",
+      "source_location": "L167",
       "weight": 1.0,
       "_origin": "ast",
       "source": "scripts_ios_patch_stripe_apple_pay_cjs_scripts_ios_patch_stripe_apple_pay",
@@ -55793,11 +55985,33 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
-      "source_location": "L79",
+      "source_location": "L98",
       "weight": 1.0,
       "_origin": "ast",
       "source": "scripts_ios_patch_stripe_apple_pay_cjs_scripts_ios_patch_stripe_apple_pay",
-      "target": "scripts_ios_patch_stripe_apple_pay_patchapplepaynilroot",
+      "target": "scripts_ios_patch_stripe_apple_pay_patchemptyitems",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
+      "source_location": "L127",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_ios_patch_stripe_apple_pay_cjs_scripts_ios_patch_stripe_apple_pay",
+      "target": "scripts_ios_patch_stripe_apple_pay_patchpresentapplepay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
+      "source_location": "L114",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_ios_patch_stripe_apple_pay_cjs_scripts_ios_patch_stripe_apple_pay",
+      "target": "scripts_ios_patch_stripe_apple_pay_patchretaincontext",
       "confidence_score": 1.0
     },
     {
@@ -55845,11 +56059,22 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
+      "source_location": "L161",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_ios_patch_stripe_apple_pay_cjs_scripts_ios_patch_stripe_apple_pay",
+      "target": "scripts_ios_patch_stripe_apple_pay_stripkeywindowhelper",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
-      "source_location": "L106",
+      "source_location": "L174",
       "weight": 1.0,
       "_origin": "ast",
       "source": "scripts_ios_patch_stripe_apple_pay_main",
@@ -55861,7 +56086,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
-      "source_location": "L108",
+      "source_location": "L178",
       "weight": 1.0,
       "_origin": "ast",
       "source": "scripts_ios_patch_stripe_apple_pay_main",
@@ -55873,7 +56098,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
-      "source_location": "L107",
+      "source_location": "L175",
       "weight": 1.0,
       "_origin": "ast",
       "source": "scripts_ios_patch_stripe_apple_pay_main",
@@ -55885,11 +56110,59 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
-      "source_location": "L109",
+      "source_location": "L129",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_ios_patch_stripe_apple_pay_patchpresentapplepay",
+      "target": "scripts_ios_patch_stripe_apple_pay_extractfunction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
+      "source_location": "L176",
       "weight": 1.0,
       "_origin": "ast",
       "source": "scripts_ios_patch_stripe_apple_pay_main",
-      "target": "scripts_ios_patch_stripe_apple_pay_patchapplepaynilroot",
+      "target": "scripts_ios_patch_stripe_apple_pay_patchemptyitems",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
+      "source_location": "L177",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_ios_patch_stripe_apple_pay_main",
+      "target": "scripts_ios_patch_stripe_apple_pay_patchretaincontext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
+      "source_location": "L179",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_ios_patch_stripe_apple_pay_main",
+      "target": "scripts_ios_patch_stripe_apple_pay_patchpresentapplepay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/ios-patch-stripe-apple-pay.cjs",
+      "source_location": "L186",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_ios_patch_stripe_apple_pay_main",
+      "target": "scripts_ios_patch_stripe_apple_pay_stripkeywindowhelper",
       "confidence_score": 1.0
     },
     {
@@ -64823,5 +65096,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "b1e8cbdcf17d93a001874d9b2d88beddc765e656"
+  "built_at_commit": "b54aa92468723be7b3adab012d79c1bf0340117b"
 }

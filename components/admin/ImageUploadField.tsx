@@ -11,8 +11,10 @@ import {
   imageFramingStyle,
   type ImageFraming,
 } from "@/lib/utils/image-framing";
+import { uploadHttpErrorMessage } from "@/lib/storage/upload-image-validation";
 
-const ACCEPTED_TYPES = "image/jpeg,image/jpg,image/png,image/gif,image/webp";
+const ACCEPTED_TYPES =
+  "image/jpeg,image/jpg,image/png,image/gif,image/webp,image/heic,image/heif,.heic,.heif";
 const MAX_SIZE_MB = 5;
 
 interface ImageUploadFieldProps {
@@ -94,7 +96,7 @@ export function ImageUploadField({
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
-          throw new Error(data.error || "Upload failed");
+          throw new Error(uploadHttpErrorMessage(res.status, data.error));
         }
 
         if (data.data?.url) {

@@ -14,6 +14,8 @@ const MIME: Record<string, string> = {
   ".avif": "image/avif",
   ".svg": "image/svg+xml",
   ".bmp": "image/bmp",
+  ".heic": "image/heic",
+  ".heif": "image/heif",
 };
 
 /**

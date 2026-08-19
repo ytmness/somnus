@@ -280,8 +280,8 @@
     "semantic_hash": "0704a844cc14c39f250d67ef7a28e5e6"
   },
   "app/api/payments/stripe/create-intent/route.ts": {
-    "mtime": 1786261485.8441422,
-    "ast_hash": "2385e3d3ed495454cdeeed6a0486a568",
+    "mtime": 1787132693.5091228,
+    "ast_hash": "7918c8e77b80c0b4581136318e3f1fe5",
     "semantic_hash": ""
   },
   "app/api/payments/stripe/public-config/route.ts": {
@@ -535,7 +535,7 @@
     "semantic_hash": "4879b211783d448cb0a99181e45d19bd"
   },
   "components/ContactForm.tsx": {
-    "mtime": 1787122918.6947985,
+    "mtime": 1787183266.3043513,
     "ast_hash": "22e100eb33a7acf436df6d3030bbcfa0",
     "semantic_hash": ""
   },
@@ -640,7 +640,7 @@
     "semantic_hash": "983b7b7a9e51997b01eed026bbddc5ad"
   },
   "components/admin/TicketPricePhasesFields.tsx": {
-    "mtime": 1787122918.6977904,
+    "mtime": 1787183266.3053484,
     "ast_hash": "f180beb68fc29b9394f8135d2de89ebb",
     "semantic_hash": ""
   },
@@ -690,7 +690,7 @@
     "semantic_hash": "67104f42cc7b3200302a9b0948d7edfc"
   },
   "components/eventos/GalleryEventCardZamna.tsx": {
-    "mtime": 1787122918.704773,
+    "mtime": 1787183266.3053484,
     "ast_hash": "5d672061e1d742528425cabb52da8dd6",
     "semantic_hash": ""
   },
@@ -720,7 +720,7 @@
     "semantic_hash": "55061aae55df3d9a6278a79a9798e007"
   },
   "components/eventos/UpcomingEventsCarousel.tsx": {
-    "mtime": 1787122918.7007825,
+    "mtime": 1787183266.3053484,
     "ast_hash": "3dab28bf7d7a306c797c56687a69b77b",
     "semantic_hash": ""
   },
@@ -805,8 +805,8 @@
     "semantic_hash": ""
   },
   "components/payments/StripeCheckoutForm.tsx": {
-    "mtime": 1787050063.917034,
-    "ast_hash": "0f087c5944691c658acdcf29af7e9c83",
+    "mtime": 1787133429.9502037,
+    "ast_hash": "208ee5779eac5a9fb3e51c1fde912d8b",
     "semantic_hash": ""
   },
   "components/ui/button.tsx": {
@@ -1795,7 +1795,7 @@
     "semantic_hash": ""
   },
   "components/cart/CartContext.tsx": {
-    "mtime": 1787122918.704773,
+    "mtime": 1787183266.3228173,
     "ast_hash": "ef6d2bf63b0b0d6d1a8c8b556597cb36",
     "semantic_hash": ""
   },
@@ -1815,17 +1815,17 @@
     "semantic_hash": ""
   },
   "components/onboarding/ProductTour.tsx": {
-    "mtime": 1787122918.6598923,
+    "mtime": 1787183266.3003626,
     "ast_hash": "e215557a042502b8ae3ca4660540aed6",
     "semantic_hash": ""
   },
   "components/onboarding/tours.ts": {
-    "mtime": 1787122918.658896,
+    "mtime": 1787183266.2993648,
     "ast_hash": "c68e25de082c0083cb9218889a76c1b8",
     "semantic_hash": ""
   },
   "components/onboarding/useProductTour.ts": {
-    "mtime": 1787122918.6977904,
+    "mtime": 1787183266.3053484,
     "ast_hash": "b2eab1314ee9ad299c61330930b15d96",
     "semantic_hash": ""
   },
@@ -1920,8 +1920,8 @@
     "semantic_hash": ""
   },
   "app/api/sales/balance/[token]/route.ts": {
-    "mtime": 1786261503.2397807,
-    "ast_hash": "a2431cf177240370a84a071f55b08d01",
+    "mtime": 1787132706.980106,
+    "ast_hash": "c40d74efa668d3e35ddfeb7a42adc420",
     "semantic_hash": ""
   },
   "app/api/sales/pending-approvals/route.ts": {
@@ -2110,8 +2110,8 @@
     "semantic_hash": ""
   },
   "components/payments/NativeApplePayCheckout.tsx": {
-    "mtime": 1787123416.3936925,
-    "ast_hash": "daeec1f75040f7d108066206441df0a2",
+    "mtime": 1787131097.5429318,
+    "ast_hash": "939e8dc9daa60916497f8d943e58e028",
     "semantic_hash": ""
   },
   "components/tickets/AddToWalletButton.tsx": {
@@ -2130,8 +2130,8 @@
     "semantic_hash": ""
   },
   "codemagic.yaml": {
-    "mtime": 1787120080.4273462,
-    "ast_hash": "e8a72e89f501de435a9f9e68ed5cbc1c",
+    "mtime": 1787131914.0581782,
+    "ast_hash": "31a47bf1c2d7acef3f110816547d9f4f",
     "semantic_hash": ""
   },
   "docs/IOS_APP_SETUP.md": {
@@ -2167,6 +2167,11 @@
   "lib/native/stripe-plugin.ts": {
     "mtime": 1787123416.396685,
     "ast_hash": "55c66375b0305bd1517a7a74b71d3b08",
+    "semantic_hash": ""
+  },
+  "scripts/test-apple-pay-pi.js": {
+    "mtime": 1787131365.2571316,
+    "ast_hash": "e963a1d47a39ed88abf57f69f4ca854e",
     "semantic_hash": ""
   }
 }

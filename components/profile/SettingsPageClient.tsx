@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, Instagram, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { cn } from "@/lib/utils";
+import { uploadHttpErrorMessage } from "@/lib/storage/upload-image-validation";
 import type { PrivateProfile } from "@/lib/profile-types";
 
 export function SettingsPageClient() {
@@ -88,7 +89,9 @@ export function SettingsPageClient() {
         body: fd,
       });
       const upJson = await up.json();
-      if (!up.ok) throw new Error(upJson.error || "Upload failed");
+      if (!up.ok) {
+        throw new Error(uploadHttpErrorMessage(up.status, upJson.error));
+      }
       const field = kind === "avatar" ? "avatarUrl" : "backgroundUrl";
       await patch({ [field]: upJson.data.url });
     } catch (err: unknown) {
@@ -270,7 +273,7 @@ export function SettingsPageClient() {
         <input
           ref={avatarInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
+          accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif,.heic,.heif"
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
@@ -281,7 +284,7 @@ export function SettingsPageClient() {
         <input
           ref={bgInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
+          accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif,.heic,.heif"
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
