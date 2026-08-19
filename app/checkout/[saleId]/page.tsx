@@ -154,7 +154,7 @@ export default function CheckoutPage() {
           Completar pago
         </h1>
         <p className="text-white/60 mb-8">
-          Ingresa los datos de tu tarjeta para finalizar la compra
+          Usa Apple Pay o ingresa los datos de tu tarjeta para finalizar la compra
         </p>
 
         <div className="somnus-card p-6 sm:p-8">

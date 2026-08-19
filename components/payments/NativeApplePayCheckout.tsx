@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { PaymentSheetEventsEnum } from "@capacitor-community/stripe";
+import { ApplePayEventsEnum } from "@capacitor-community/stripe";
 import {
   APPLE_PAY_COUNTRY_CODE,
   APPLE_PAY_MERCHANT_ID,
@@ -33,6 +33,27 @@ export function NativeApplePayCheckout({
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [applePayReady, setApplePayReady] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function probeApplePay() {
+      try {
+        const { Stripe } = await import("@capacitor-community/stripe");
+        await Stripe.initialize({ publishableKey });
+        await Stripe.isApplePayAvailable();
+        if (!cancelled) setApplePayReady(true);
+      } catch {
+        if (!cancelled) setApplePayReady(false);
+      }
+    }
+
+    void probeApplePay();
+    return () => {
+      cancelled = true;
+    };
+  }, [publishableKey]);
 
   async function payWithApplePay() {
     setSubmitting(true);
@@ -42,22 +63,32 @@ export function NativeApplePayCheckout({
       const { Stripe } = await import("@capacitor-community/stripe");
 
       await Stripe.initialize({ publishableKey });
-      await Stripe.createPaymentSheet({
+      await Stripe.isApplePayAvailable();
+      await Stripe.createApplePay({
         paymentIntentClientSecret: clientSecret,
-        merchantDisplayName: "Somnus",
+        merchantIdentifier: APPLE_PAY_MERCHANT_ID,
         countryCode: APPLE_PAY_COUNTRY_CODE,
-        enableApplePay: true,
-        applePayMerchantId: APPLE_PAY_MERCHANT_ID,
+        currency: "MXN",
+        paymentSummaryItems: [
+          {
+            label: eventName || "Somnus",
+            amount: amountInPesos,
+          },
+        ],
       });
 
-      const { paymentResult } = await Stripe.presentPaymentSheet();
+      const { paymentResult } = await Stripe.presentApplePay();
 
-      if (paymentResult === PaymentSheetEventsEnum.Canceled) {
+      if (paymentResult === ApplePayEventsEnum.Canceled) {
         setSubmitting(false);
         return;
       }
 
-      if (paymentResult === PaymentSheetEventsEnum.Failed) {
+      if (paymentResult === ApplePayEventsEnum.Failed) {
+        throw new Error("No se pudo completar el pago con Apple Pay");
+      }
+
+      if (paymentResult !== ApplePayEventsEnum.Completed) {
         throw new Error("No se pudo completar el pago con Apple Pay");
       }
 
@@ -68,6 +99,33 @@ export function NativeApplePayCheckout({
       setError(message);
       setSubmitting(false);
     }
+  }
+
+  if (applePayReady === null) {
+    return (
+      <div className="p-6 text-center text-white/70">
+        <div className="w-10 h-10 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-3" />
+        <p>Comprobando Apple Pay…</p>
+      </div>
+    );
+  }
+
+  if (applePayReady === false) {
+    return (
+      <div className="space-y-4">
+        <p className="text-amber-300/90 text-sm">
+          Apple Pay no está disponible en este dispositivo. Usa tarjeta para
+          continuar.
+        </p>
+        <button
+          type="button"
+          onClick={onUseCard}
+          className="w-full py-4 rounded-lg bg-white text-black font-semibold hover:bg-white/90 transition-colors"
+        >
+          Pagar con tarjeta
+        </button>
+      </div>
+    );
   }
 
   return (
