@@ -118,7 +118,7 @@ export async function POST(
     const intentParams: Parameters<typeof stripe.paymentIntents.create>[0] = {
       amount: sale.balanceDueCents,
       currency: "mxn",
-      automatic_payment_methods: { enabled: true },
+      payment_method_types: ["card"],
       receipt_email: sale.buyerEmail,
       metadata: {
         saleId: sale.id,

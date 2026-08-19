@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
     const intentParams: Parameters<typeof stripe.paymentIntents.create>[0] = {
       amount: amounts.totalCents,
       currency: "mxn",
-      automatic_payment_methods: { enabled: true },
+      payment_method_types: ["card"],
       receipt_email: sale.buyerEmail,
       ...(requiresManualCapture ? { capture_method: "manual" as const } : {}),
       metadata: {
