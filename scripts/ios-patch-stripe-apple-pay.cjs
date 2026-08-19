@@ -96,6 +96,12 @@ function patchApplePayNilRoot(text) {
   return text.replace(pattern, repl);
 }
 
+function stripKeyWindowHelper(text) {
+  const pattern =
+    /\nextension UIApplication \{\n    var somnusKeyWindowRootViewController: UIViewController\? \{[\s\S]*?\n    \}\n\}\n/;
+  return pattern.test(text) ? text.replace(pattern, "\n") : text;
+}
+
 function main() {
   if (!fs.existsSync(APPLE)) {
     console.warn(`WARN: missing ${APPLE}`);
@@ -112,7 +118,8 @@ function main() {
 
   if (fs.existsSync(SHEET)) {
     let sheet = fs.readFileSync(SHEET, "utf8");
-    sheet = ensureHelper(sheet);
+    // Mismo target Swift: la extension solo puede vivir en un archivo.
+    sheet = stripKeyWindowHelper(sheet);
     sheet = replaceGetRootVc(sheet);
     fs.writeFileSync(SHEET, sheet);
     console.log(`OK: ${SHEET}`);
