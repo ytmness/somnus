@@ -45,14 +45,19 @@ export function NativeApplePayCheckout({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
+  const [debug, setDebug] = useState<string | null>(null);
 
   async function payWithApplePay() {
+    setDebug("tap detectado");
     setSubmitting(true);
     setError(null);
     setStatus("Abriendo Apple Pay…");
 
     try {
-      if (!isNativeIOS()) {
+      const native = isNativeIOS();
+      setDebug("isNativeIOS=" + String(native));
+
+      if (!native) {
         throw new Error(
           "Apple Pay nativo solo funciona dentro de la app Somnus."
         );
@@ -61,8 +66,10 @@ export function NativeApplePayCheckout({
       const amount = (Math.round(Number(amountInPesos) * 100) / 100).toFixed(2);
       const lineLabel = (eventName || "Somnus").slice(0, 64);
 
+      setDebug("inicializando Stripe...");
       setStatus("Preparando pago…");
       await NativeStripe.initialize({ publishableKey });
+      setDebug("Stripe.initialize OK");
 
       await withTimeout(
         NativeStripe.createApplePay({
@@ -78,6 +85,7 @@ export function NativeApplePayCheckout({
         CREATE_TIMEOUT_MS,
         "Apple Pay no respondió al preparar el pago. Actualiza la app desde TestFlight o paga con tarjeta."
       );
+      setDebug("createApplePay OK");
 
       setStatus("Confirma el pago en Wallet…");
       const result = await withTimeout(
@@ -85,6 +93,7 @@ export function NativeApplePayCheckout({
         PRESENT_TIMEOUT_MS,
         "Apple Pay no abrió el Wallet. Cierra la app por completo, instala el último build de TestFlight e inténtalo otra vez."
       );
+      setDebug("presentApplePay result=" + JSON.stringify(result));
 
       const paymentResult = result?.paymentResult;
       if (paymentResult === ApplePayResult.Canceled) {
@@ -101,7 +110,9 @@ export function NativeApplePayCheckout({
       await routeAfterNativePayment(saleId, buyerEmail, router);
     } catch (err: unknown) {
       const message = formatApplePayError(err);
+      const raw = err instanceof Error ? err.message : String(err);
       console.error("[NativeApplePayCheckout]", err);
+      setDebug("ERROR: " + raw);
       setError(message);
       setStatus(null);
       toast.error(message);
@@ -128,6 +139,7 @@ export function NativeApplePayCheckout({
 
       {status ? <p className="text-white/80 text-sm">{status}</p> : null}
       {error ? <p className="text-red-400 text-sm">{error}</p> : null}
+      {debug ? <p className="text-yellow-400 text-xs font-mono break-all">[DBG] {debug}</p> : null}
 
       <button
         type="button"
