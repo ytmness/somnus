@@ -18,8 +18,6 @@ type InviteLoaded = Prisma.TableSlotInviteGetPayload<{
   include: { event: true; ticketType: true };
 }>;
 
-export const dynamic = "force-dynamic";
-
 type InviteLine = {
   ticketTypeId: string;
   quantity: number;
