@@ -82,14 +82,14 @@ export function ProfileView({ profile, isOwn }: ProfileViewProps) {
               src={profile.backgroundUrl}
               alt=""
               fill
-              className="object-cover opacity-50"
+              className="object-cover"
               sizes="100vw"
               priority
             />
           ) : (
             <div className="h-full w-full bg-gradient-to-b from-[#1a2438] via-[#0c1018] to-[#050505]" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-[#050505]/40 to-[#050505]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-[#050505]/25 to-[#050505]" />
         </div>
 
         <SiteHeader eventsHref="/" />

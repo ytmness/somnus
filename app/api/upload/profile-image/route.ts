@@ -8,7 +8,9 @@ import {
 
 export const dynamic = "force-dynamic";
 
-const MAX_SIZE = 5 * 1024 * 1024;
+export const runtime = "nodejs";
+
+const MAX_SIZE = 15 * 1024 * 1024;
 
 /**
  * POST /api/upload/profile-image

@@ -88,12 +88,20 @@ export function SettingsPageClient() {
         credentials: "include",
         body: fd,
       });
-      const upJson = await up.json();
+      const raw = await up.text();
+      let upJson: { error?: string; data?: { url?: string } } = {};
+      try {
+        upJson = raw ? JSON.parse(raw) : {};
+      } catch {
+        upJson = {};
+      }
       if (!up.ok) {
         throw new Error(uploadHttpErrorMessage(up.status, upJson.error));
       }
+      const url = upJson.data?.url;
+      if (!url) throw new Error("No se recibió la URL de la imagen");
       const field = kind === "avatar" ? "avatarUrl" : "backgroundUrl";
-      await patch({ [field]: upJson.data.url });
+      await patch({ [field]: url });
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Error al subir");
       setSaving(false);
@@ -145,6 +153,19 @@ export function SettingsPageClient() {
               title="Background Image"
               description="Background image of your public profile"
               onClick={() => bgInputRef.current?.click()}
+              trailing={
+                profile.backgroundUrl ? (
+                  <span className="relative w-14 h-9 rounded-md overflow-hidden border border-white/20 bg-white/5">
+                    <Image
+                      src={profile.backgroundUrl}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="56px"
+                    />
+                  </span>
+                ) : undefined
+              }
             />
             <SettingsRow
               title="Name"
@@ -273,7 +294,7 @@ export function SettingsPageClient() {
         <input
           ref={avatarInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif,.heic,.heif"
+          accept="image/*"
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
@@ -284,7 +305,7 @@ export function SettingsPageClient() {
         <input
           ref={bgInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif,.heic,.heif"
+          accept="image/*"
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
