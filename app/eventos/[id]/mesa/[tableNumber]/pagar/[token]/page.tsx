@@ -83,6 +83,13 @@ export default function PagarInvitePage() {
   const [invite, setInvite] = useState<InviteData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sessionUser, setSessionUser] = useState<{
+    id: string;
+    email: string;
+    name: string;
+    phone?: string | null;
+  } | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const [formData, setFormData] = useState({
     buyerName: "",
     buyerEmail: "",
@@ -92,6 +99,29 @@ export default function PagarInvitePage() {
     Array<{ name: string; email: string; phone: string }>
   >([]);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/auth/session", { credentials: "include" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.user) {
+          setSessionUser({
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.name,
+            phone: data.user.phone,
+          });
+          setFormData((prev) => ({
+            ...prev,
+            buyerEmail: data.user.email || prev.buyerEmail,
+            buyerName: prev.buyerName || data.user.name || "",
+            buyerPhone: prev.buyerPhone || data.user.phone || "",
+          }));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setAuthChecked(true));
+  }, []);
 
   const loadInvite = useCallback(async () => {
     if (!token) return null;
@@ -146,6 +176,14 @@ export default function PagarInvitePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!sessionUser) {
+      const next = typeof window !== "undefined"
+        ? `${window.location.pathname}${window.location.search}`
+        : `/eventos/${params.eventId}/mesa/${params.tableNumber}/pagar/${token}`;
+      toast.error("Crea una cuenta o inicia sesión para pagar");
+      router.push(`/register?redirect=${encodeURIComponent(next)}`);
+      return;
+    }
     if (!formData.buyerName.trim() || !formData.buyerEmail.trim()) {
       toast.error("Nombre y email son requeridos");
       return;
@@ -407,6 +445,23 @@ export default function PagarInvitePage() {
 
           {!poolFull && invite.status !== "PAID" ? (
             <section className="rounded-xl bg-white/5 border border-white/10 p-5">
+              {authChecked && !sessionUser && (
+                <div className="mb-4 rounded-lg border border-white/15 bg-white/5 px-4 py-3">
+                  <p className="text-white/80 text-sm">
+                    Crea una cuenta o inicia sesión para pagar esta invitación.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = `${window.location.pathname}${window.location.search}`;
+                      router.push(`/register?redirect=${encodeURIComponent(next)}`);
+                    }}
+                    className="mt-2 somnus-btn px-4 py-2 text-xs"
+                  >
+                    Continuar
+                  </button>
+                </div>
+              )}
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-11 h-11 rounded-full bg-[#5B8DEF]/15 flex items-center justify-center border border-[#5B8DEF]/25">
                   <CreditCard className="w-5 h-5 text-[#7BA3E8]" />

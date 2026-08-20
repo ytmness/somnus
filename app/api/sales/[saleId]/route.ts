@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
+import { getSession } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,21 @@ export async function GET(
 
     if (!sale) {
       return NextResponse.json({ error: "Venta no encontrada" }, { status: 404 });
+    }
+
+    const user = await getSession();
+    if (!user) {
+      return NextResponse.json(
+        { error: "Debes iniciar sesión para continuar el pago", code: "AUTH_REQUIRED" },
+        { status: 401 }
+      );
+    }
+
+    const ownsSale =
+      sale.userId === user.id ||
+      sale.buyerEmail.toLowerCase() === user.email.toLowerCase();
+    if (!ownsSale && user.role !== "ADMIN") {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
     return NextResponse.json({ success: true, data: sale });

@@ -91,6 +91,12 @@ export default function EventBoletosPage() {
   );
 
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [sessionUser, setSessionUser] = useState<{
+    id: string;
+    email: string;
+    name: string;
+    phone?: string | null;
+  } | null>(null);
   const [checkoutData, setCheckoutData] = useState({
     buyerName: "",
     buyerEmail: "",
@@ -150,19 +156,36 @@ export default function EventBoletosPage() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/auth/session")
+    fetch("/api/auth/session", { credentials: "include" })
       .then((r) => r.json())
       .then((data) => {
-        if (data?.user?.email) {
+        if (data?.user) {
+          setSessionUser({
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.name,
+            phone: data.user.phone,
+          });
           setCheckoutData((prev) => ({
             ...prev,
             buyerEmail: data.user.email,
             buyerName: prev.buyerName || data.user.name || prev.buyerName,
+            buyerPhone: prev.buyerPhone || data.user.phone || "",
           }));
         }
       })
       .catch(() => {});
   }, []);
+
+  const requireAccount = (nextPath?: string) => {
+    const next =
+      nextPath ||
+      (typeof window !== "undefined"
+        ? `${window.location.pathname}${window.location.search}`
+        : `/eventos/${eventId}/boletos`);
+    toast.error("Crea una cuenta o inicia sesión para comprar boletos");
+    router.push(`/register?redirect=${encodeURIComponent(next)}`);
+  };
 
   const ticketTypes: TicketTypeRow[] = useMemo(
     () => (event?.ticketTypes || []).filter(isVisibleTicketType),
@@ -257,6 +280,10 @@ export default function EventBoletosPage() {
     Boolean(tt.hasPassword) && !passwordTokens[tt.id];
 
   const handleAddToCart = () => {
+    if (!sessionUser) {
+      requireAccount();
+      return;
+    }
     const selected = ticketTypes.filter((tt) => (quantities[tt.id] || 0) > 0);
 
     if (selected.length === 0) {
@@ -359,6 +386,10 @@ export default function EventBoletosPage() {
   }, [passwordTokens, cartItems, ticketTypes]);
 
   const handleCheckout = async () => {
+    if (!sessionUser) {
+      requireAccount();
+      return;
+    }
     if (cartItems.length === 0) {
       toast.error("Cart is empty");
       return;
@@ -548,6 +579,18 @@ export default function EventBoletosPage() {
             <h1 className="somnus-title-secondary text-2xl md:text-3xl uppercase tracking-wider font-bold">
               {event.artist}
             </h1>
+            {!sessionUser && (
+              <p className="mt-3 text-sm text-white/65">
+                Crea una cuenta o inicia sesión para comprar boletos.{" "}
+                <button
+                  type="button"
+                  onClick={() => requireAccount()}
+                  className="somnus-nav-link text-white underline underline-offset-2"
+                >
+                  Continuar
+                </button>
+              </p>
+            )}
           </div>
 
           <div className="mb-8">
@@ -901,6 +944,10 @@ export default function EventBoletosPage() {
                   <Button
                     type="button"
                     onClick={() => {
+                      if (!sessionUser) {
+                        requireAccount();
+                        return;
+                      }
                       setShowCart(false);
                       setShowCheckoutModal(true);
                     }}

@@ -19,11 +19,21 @@ export function HeaderCartDrawer() {
 
   const handleCheckout = () => {
     closeCart();
-    if (primaryEventId) {
-      router.push(`/eventos/${primaryEventId}/boletos?cart=1`);
-      return;
-    }
-    router.push("/#eventos");
+    const next = primaryEventId
+      ? `/eventos/${primaryEventId}/boletos?cart=1`
+      : "/#eventos";
+    fetch("/api/auth/session", { credentials: "include" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data?.user) {
+          router.push(`/register?redirect=${encodeURIComponent(next)}`);
+          return;
+        }
+        router.push(next);
+      })
+      .catch(() => {
+        router.push(`/register?redirect=${encodeURIComponent(next)}`);
+      });
   };
 
   return (

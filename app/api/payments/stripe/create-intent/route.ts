@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { getStripe } from "@/lib/payments/stripe";
+import { getSession } from "@/lib/auth/session";
 import { assertOrganizerCanReceivePayments } from "@/lib/payments/connect";
 import { calculateSaleAmounts } from "@/lib/payments/commissions";
 import { isStripeEnabled } from "@/lib/payments/config";
@@ -40,6 +41,20 @@ export async function POST(request: NextRequest) {
 
     if (!sale) {
       return NextResponse.json({ error: "Venta no encontrada" }, { status: 404 });
+    }
+
+    const user = await getSession();
+    if (!user) {
+      return NextResponse.json(
+        { error: "Debes iniciar sesión para pagar", code: "AUTH_REQUIRED" },
+        { status: 401 }
+      );
+    }
+    const ownsSale =
+      sale.userId === user.id ||
+      sale.buyerEmail.toLowerCase() === user.email.toLowerCase();
+    if (!ownsSale && user.role !== "ADMIN") {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
     if (sale.status !== "PENDING") {

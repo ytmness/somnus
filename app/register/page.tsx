@@ -89,6 +89,7 @@ function RegisterContent() {
           toast.error(data.error);
           const loginQs = new URLSearchParams({ email: formData.email });
           if (fromApp) loginQs.set("app", "1");
+          if (redirectParam) loginQs.set("redirect", redirectParam);
           router.push(`/login?${loginQs.toString()}`);
           return;
         }
@@ -101,6 +102,7 @@ function RegisterContent() {
             email: formData.email.trim().toLowerCase(),
           });
           if (fromApp) verifyQs.set("app", "1");
+          if (redirectParam) verifyQs.set("redirect", redirectParam);
           window.location.href = `/verificar-email?${verifyQs.toString()}`;
           return;
         }
@@ -113,6 +115,7 @@ function RegisterContent() {
           email: formData.email.trim().toLowerCase(),
         });
         if (fromApp) verifyQs.set("app", "1");
+        if (redirectParam) verifyQs.set("redirect", redirectParam);
         window.location.href = `/verificar-email?${verifyQs.toString()}`;
         return;
       }
@@ -120,7 +123,7 @@ function RegisterContent() {
       toast.success("Account created! Welcome to Somnus");
       const redirectPath = resolveAuthRedirectPath(
         data.user?.role || "ORGANIZER",
-        null,
+        redirectParam,
         undefined,
         authSurface
       );
@@ -219,7 +222,10 @@ function RegisterContent() {
                     </p>
                   </div>
 
-                  <SocialLoginButtons fromApp={fromApp} />
+                  <SocialLoginButtons
+                    fromApp={fromApp}
+                    redirectTo={redirectParam}
+                  />
 
                   <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
@@ -407,7 +413,15 @@ function RegisterContent() {
                     <p className="somnus-text-body text-center text-sm">
                       Already have an account?{" "}
                       <Link
-                        href="/login"
+                        href={`/login${
+                          redirectParam
+                            ? `?redirect=${encodeURIComponent(redirectParam)}${
+                                fromApp ? "&app=1" : ""
+                              }`
+                            : fromApp
+                              ? "?app=1"
+                              : ""
+                        }`}
                         className="somnus-nav-link text-white hover:underline font-medium"
                       >
                         Sign in

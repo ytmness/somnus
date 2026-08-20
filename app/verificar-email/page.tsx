@@ -7,13 +7,14 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { Mail, RefreshCw, CheckCircle, Lock } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
-import { resolvePostAuthRedirect } from "@/lib/auth/registration";
+import { resolveAuthRedirectPath } from "@/lib/auth/redirect-path";
 import { isNativePlatform } from "@/lib/native/platform";
 import { useNativeAuthSurface } from "@/lib/native/use-auth-surface";
 
 function VerificarEmailContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
+  const redirectParam = searchParams.get("redirect");
   const fromApp = useNativeAuthSurface(searchParams);
 
   const [formData, setFormData] = useState({
@@ -52,8 +53,9 @@ function VerificarEmailContent() {
 
       toast.success("Email verified!");
 
-      const redirectPath = resolvePostAuthRedirect(
+      const redirectPath = resolveAuthRedirectPath(
         data.user?.role || "ORGANIZER",
+        redirectParam,
         data.user?.staffRoles,
         fromApp || isNativePlatform() ? "app" : "web"
       );

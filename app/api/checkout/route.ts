@@ -87,6 +87,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const user = await getSession();
+    if (!user) {
+      return NextResponse.json(
+        { error: "Debes iniciar sesión para comprar boletos", code: "AUTH_REQUIRED" },
+        { status: 401 }
+      );
+    }
+
     if (!buyerName || !buyerEmail) {
       return NextResponse.json(
         { error: "Se requiere nombre y email del comprador" },
@@ -286,8 +294,7 @@ export async function POST(request: NextRequest) {
     const tax = useOnlinePayment ? amounts.serviceFeePesos : 0;
     const total = useOnlinePayment ? amounts.totalPesos : chargeSubtotal;
 
-    const user = await getSession();
-    const userId = user?.id || null;
+    const userId = user.id;
 
     const approvalStatus = needsApproval ? "PENDING" : "NOT_REQUIRED";
     const balancePayToken =

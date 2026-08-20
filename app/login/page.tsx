@@ -103,9 +103,10 @@ function LoginContent() {
       if (!response.ok) {
         if (data.code === "USER_NOT_FOUND") {
           toast.error(data.error);
-          const regQs = new URLSearchParams({ email });
-          if (fromApp) regQs.set("app", "1");
-          router.push(`/register?${regQs.toString()}`);
+          const loginQs = new URLSearchParams({ email });
+          if (fromApp) loginQs.set("app", "1");
+          if (redirectParam) loginQs.set("redirect", redirectParam);
+          router.push(`/register?${loginQs.toString()}`);
           return;
         }
         if (data.code === "EMAIL_NOT_VERIFIED") {
@@ -114,6 +115,7 @@ function LoginContent() {
             email: email.trim().toLowerCase(),
           });
           if (fromApp) verifyQs.set("app", "1");
+          if (redirectParam) verifyQs.set("redirect", redirectParam);
           window.location.href = `/verificar-email?${verifyQs.toString()}`;
           return;
         }
@@ -396,7 +398,15 @@ function LoginContent() {
                     <p className="somnus-text-body text-center text-sm">
                       New to Somnus?{" "}
                       <Link
-                        href="/register"
+                        href={`/register${
+                          redirectParam
+                            ? `?redirect=${encodeURIComponent(redirectParam)}${
+                                fromApp ? "&app=1" : ""
+                              }`
+                            : fromApp
+                              ? "?app=1"
+                              : ""
+                        }`}
                         className="somnus-nav-link text-white hover:underline transition-colors font-medium"
                       >
                         Create a free account

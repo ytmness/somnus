@@ -21,6 +21,26 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
+  const [sessionUser, setSessionUser] = useState<{
+    id: string;
+    email: string;
+    name: string;
+  } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/session", { credentials: "include" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.user) {
+          setSessionUser({
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.name,
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const loadEvent = async () => {
     try {
@@ -210,7 +230,16 @@ export default function EventDetailPage() {
 
               <button
                 type="button"
-                onClick={() => router.push(`/eventos/${eventId}/boletos`)}
+                onClick={() => {
+                  const next = `/eventos/${eventId}/boletos`;
+                  if (!sessionUser) {
+                    router.push(
+                      `/register?redirect=${encodeURIComponent(next)}`
+                    );
+                    return;
+                  }
+                  router.push(next);
+                }}
                 disabled={purchaseState.ctaDisabled}
                 className="w-full py-4 rounded-xl bg-white text-black font-semibold uppercase tracking-wider text-sm hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mb-8"
               >

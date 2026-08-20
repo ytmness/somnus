@@ -35,6 +35,14 @@ export async function POST(request: NextRequest) {
       extraPeople?: Array<{ name?: string; email?: string; phone?: string }>;
     };
 
+    const sessionUser = await getSession();
+    if (!sessionUser) {
+      return NextResponse.json(
+        { error: "Debes iniciar sesión para pagar esta invitación", code: "AUTH_REQUIRED" },
+        { status: 401 }
+      );
+    }
+
     if (!inviteToken || !buyerName || !buyerEmail) {
       return NextResponse.json(
         { error: "Se requiere inviteToken, buyerName y buyerEmail" },
@@ -191,13 +199,7 @@ export async function POST(request: NextRequest) {
     const tax = amounts.serviceFeePesos;
     const total = amounts.totalPesos;
 
-    let userId: string | null = null;
-    try {
-      const user = await getSession();
-      userId = user?.id || null;
-    } catch {
-      // Sin sesión: venta como invitado (userId null)
-    }
+    const userId = sessionUser.id;
 
     let saleId: string;
     try {

@@ -21,6 +21,12 @@ export default function CheckoutPage() {
         const data = await res.json();
 
         if (!res.ok) {
+          if (res.status === 401) {
+            router.replace(
+              `/register?redirect=${encodeURIComponent(`/checkout/${saleId}`)}`
+            );
+            return;
+          }
           setError(data.error || "Venta no encontrada");
           return;
         }
