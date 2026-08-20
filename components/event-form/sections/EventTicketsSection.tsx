@@ -141,7 +141,7 @@ export function EventTicketsSection({
         </div>
       </div>
       <p className="text-[11px] leading-relaxed text-white/40">
-        Las entradas salen en venta general. Las mesas se venden por link: precio de mesa ÷ cupos. Los cupos son el mínimo para confirmar, no un tope de pagos.
+        Entradas = venta general. Mesas = solo por link (no hay plano ni filas): defines precio y cupos aquí; en Admin creas cada mesa con nombre y URL de cobro.
       </p>
 
       <div className="space-y-3">
@@ -412,7 +412,7 @@ export function EventTicketsSection({
                           placeholder="10"
                         />
                         <p className="text-[10px] text-white/40 mt-1 leading-snug">
-                          Inventario de mesas. No es el split del precio.
+                          Cuántas mesas de este tipo puedes crear con link (inventario). No es un plano con filas.
                         </p>
                       </div>
 

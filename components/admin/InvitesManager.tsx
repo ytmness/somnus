@@ -408,9 +408,9 @@ export function InvitesManager() {
       {eventsWithTables.length === 0 && (
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 mb-6">
           <p className="text-amber-200 text-sm">
-            <strong>Ningún evento tiene mesas VIP configuradas.</strong> Edita un
-            evento en la pestaña Eventos y agrega un tipo de boleto con
-            &quot;Mesa&quot; / VIP.
+            <strong>Falta un tipo de mesa en el evento.</strong> En Eventos, agrega
+            &quot;Nueva mesa&quot; (precio + cupos) y guarda. Aquí no hay mapa ni filas:
+            cada mesa es un link con el nombre que tú elijas.
           </p>
         </div>
       )}
@@ -419,8 +419,9 @@ export function InvitesManager() {
       <div className="rounded-xl border border-white/10 bg-white/5 p-6">
         <h3 className="text-lg font-bold text-white mb-2">Links de mesa</h3>
         <p className="text-white/50 text-sm mb-4">
-          Cada link es una mesa concreta (ej. Mesa 1). El tipo de boleto define precio y cupos;
-          aquí solo eliges el nombre de la mesa y generas la URL para cobrar.
+          En Somnus no hay plano de mesas. Creas un link por mesa (ej. &quot;1&quot;,
+          &quot;Terraza A&quot;): ese nombre + la URL es la mesa. Precio y cupos vienen
+          del tipo de boleto Mesa del evento.
         </p>
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <label className="flex items-center gap-2 cursor-pointer">
@@ -442,12 +443,12 @@ export function InvitesManager() {
               }}
               className="rounded border-white/30 bg-white/10 text-white focus:ring-white/30"
             />
-            <span className="text-white/85 text-sm font-medium">Link compartido (recomendado)</span>
+            <span className="text-white/85 text-sm font-medium">Un link por mesa (recomendado)</span>
           </label>
           <span className="text-white/45 text-xs">
             {usePoolMode
-              ? "Una URL por mesa; cada quien paga su parte o toda la mesa."
-              : `Una URL por persona (hasta ${MAX_TRADITIONAL_SLOTS}).`}
+              ? "La gente entra al link y elige pagar cupos o toda la mesa."
+              : "Modo legacy: un link por persona (casi nunca hace falta)."}
           </span>
         </div>
         {!showGenerate ? (

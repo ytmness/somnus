@@ -1,18 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
-import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
-import { IndividualTable } from "@/lib/patriotas-individual-tables";
+import {
+  invitePoolMinToConfirm,
+  isMesaTicketType,
+  tableCupos,
+  tablePricePerCupo,
+  effectiveTicketPriceAt,
+} from "@/lib/ticket-pricing";
+
+export const dynamic = "force-dynamic";
 
 /**
  * GET /api/events/[id]/tables
- * Obtener las mesas de un evento con su estado real desde la BD
+ * Somnus: mesas = links con nombre (TableInvitePool), no plano con filas tipo Grupo Regia.
  */
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // Obtener el evento con TODOS sus ticketTypes (para poder mostrar mejor el error)
     const event = await prisma.event.findUnique({
       where: { id: params.id },
       include: {
@@ -23,272 +29,104 @@ export async function GET(
     });
 
     if (!event) {
-      return NextResponse.json(
-        { error: "Evento no encontrado" },
-        { status: 404 }
-      );
-    }
-
-    // Obtener el ticketType de mesas VIP (debe haber uno con isTable=true)
-    const tableTicketType = event.ticketTypes.find((tt) => tt.isTable === true);
-
-    if (!tableTicketType) {
-      console.error(`[Tables API] Evento ${params.id} no tiene TicketType con isTable=true`);
-      console.error(`[Tables API] TicketTypes disponibles:`, event.ticketTypes.map(tt => ({
-        id: tt.id,
-        name: tt.name,
-        isTable: tt.isTable,
-        category: tt.category
-      })));
-      return NextResponse.json(
-        { 
-          error: "Este evento no tiene mesas configuradas",
-          details: "No se encontró un TicketType con isTable=true para este evento",
-          availableTicketTypes: event.ticketTypes.map(tt => ({
-            id: tt.id,
-            name: tt.name,
-            isTable: tt.isTable,
-            category: tt.category
-          }))
-        },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Evento no encontrado" }, { status: 404 });
     }
 
     const now = new Date();
-    const effPrice = (tt: (typeof event.ticketTypes)[0]) =>
-      effectiveTicketPriceAt(Number(tt.price), tt.pricePhases, now);
-
-    console.log(`[Tables API] TicketType de mesas encontrado:`, {
-      id: tableTicketType.id,
-      name: tableTicketType.name,
-      price: tableTicketType.price,
-      maxQuantity: tableTicketType.maxQuantity,
-      soldQuantity: tableTicketType.soldQuantity,
-    });
-
-    // Obtener todos los tickets vendidos para este tipo de boleto
-    // Una mesa tiene 4 tickets (uno por asiento), así que necesitamos agrupar por tableNumber
-    const soldTickets = await prisma.ticket.findMany({
-      where: {
-        ticketTypeId: tableTicketType.id,
-        status: {
-          in: ["VALID", "USED"], // Solo boletos válidos o usados (no cancelados)
-        },
-        tableNumber: {
-          not: null,
-        },
-        sale: {
-          status: "COMPLETED", // Solo ventas completadas
-        },
-      },
-      select: {
-        tableNumber: true,
-      },
-    });
-
-    // Crear un Set de mesas vendidas
-    // Agrupar por tableNumber único (una mesa tiene múltiples tickets)
-    const soldTableNumbers = new Set<string>();
-    const tableNumberSet = new Set<string>();
-    
-    soldTickets.forEach((ticket) => {
-      if (ticket.tableNumber) {
-        // Agregar el tableNumber completo al set para evitar duplicados
-        tableNumberSet.add(ticket.tableNumber);
-      }
-    });
-
-    // Extraer números de mesa de cada tableNumber único
-    tableNumberSet.forEach((tableNumberStr) => {
-      // Extraer número de mesa (ej: "Mesa 100" -> "100", "Mesa 5" -> "5")
-      const match = tableNumberStr.match(/\d+/);
-      if (match) {
-        soldTableNumbers.add(match[0]);
-      }
-    });
-
-    console.log(`[Tables API] Evento ${params.id}: ${soldTableNumbers.size} mesas vendidas`, Array.from(soldTableNumbers));
-
-    // Mesas con invites PENDING (reservadas, pendientes de pago)
-    const pendingInvites = await prisma.tableSlotInvite.findMany({
-      where: {
-        eventId: params.id,
-        status: "PENDING",
-      },
-      select: { tableNumber: true },
-      distinct: ["tableNumber"],
-    });
-    const reservedTableNumbers = new Set(pendingInvites.map((i) => String(i.tableNumber)));
-
-    // Generar las 162 mesas base (estructura fija del plano: 9 filas × 18 columnas)
-    // Esto debería venir de la configuración del evento, pero por ahora usamos la estructura estándar
-    const ROWS = 9;
-    const COLS = 18;
-    const TABLE_WIDTH = 22;
-    const TABLE_HEIGHT = 22;
-    const SPACING_X = 6;
-    const SPACING_Y = 6;
-    const TOTAL_WIDTH = COLS * (TABLE_WIDTH + SPACING_X) - SPACING_X;
-    const START_X = 100 + (800 - TOTAL_WIDTH) / 2;
-    const START_Y = 490;
-
-    const tables: IndividualTable[] = [];
-    let tableNumber = 1;
-
-    for (let row = 0; row < ROWS; row++) {
-      for (let col = 0; col < COLS; col++) {
-        const x = START_X + col * (TABLE_WIDTH + SPACING_X);
-        const y = START_Y + row * (TABLE_HEIGHT + SPACING_Y);
-
-        const isSold = soldTableNumbers.has(String(tableNumber));
-        const isReserved = reservedTableNumbers.has(String(tableNumber));
-
-        let status: "available" | "reserved" | "sold" = "available";
-        if (isSold) status = "sold";
-        else if (isReserved) status = "reserved";
-
-        tables.push({
-          id: `mesa-${tableNumber}`,
-          number: tableNumber,
-          row: row + 1,
-          column: col + 1,
-          x,
-          y,
-          width: TABLE_WIDTH,
-          height: TABLE_HEIGHT,
-          price: effPrice(tableTicketType),
-          seatsPerTable: (tableTicketType.seatsPerTable || 4) as 4,
-          status,
-        });
-
-        tableNumber++;
-      }
-    }
-
-    // Obtener secciones (GENERAL, PREFERENTE) desde TicketTypes
-    const sectionTicketTypes = event.ticketTypes.filter(
-      (tt) => !tt.isTable && (tt.category === "GENERAL" || tt.category === "PREFERENTE")
+    const tableTypes = event.ticketTypes.filter(
+      (tt) => tt.isActive !== false && isMesaTicketType(tt)
     );
 
-    // Crear secciones con coordenadas fijas (siempre 3: GENERAL, PREFERENTE A, PREFERENTE B)
-    const sections: Array<{
-      id: string;
-      name: string;
-      type: "GENERAL" | "PREFERENTE" | "PROTECCION";
-      price: number;
-      capacity: number;
-      sold: number;
-      color: string;
-      description: string;
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-    }> = [];
-
-    // Buscar sección GENERAL en BD
-    const generalTicketType = sectionTicketTypes.find(tt => tt.category === "GENERAL");
-    if (generalTicketType) {
-      sections.push({
-        id: generalTicketType.id,
-        name: "GENERAL",
-        type: "GENERAL",
-        price: effPrice(generalTicketType),
-        capacity: generalTicketType.maxQuantity,
-        sold: generalTicketType.soldQuantity,
-        color: "#8B7355",
-        description: generalTicketType.description || "Zona general de pie",
-        x: 859,
-        y: 952,
-        width: 1000,
-        height: 534,
-      });
+    if (tableTypes.length === 0) {
+      return NextResponse.json(
+        {
+          error: "Este evento no tiene tipos de mesa",
+          details:
+            "Agrega un boleto tipo Mesa (precio + cupos) en el evento. Las mesas concretas se crean como links en Admin.",
+        },
+        { status: 404 }
+      );
     }
 
-    // Buscar secciones PREFERENTE A y B en BD (si existen por separado)
-    const preferenteA = sectionTicketTypes.find(tt => tt.category === "PREFERENTE" && tt.name.toLowerCase().includes("a"));
-    const preferenteB = sectionTicketTypes.find(tt => tt.category === "PREFERENTE" && tt.name.toLowerCase().includes("b"));
-    const preferenteGeneric = sectionTicketTypes.find(tt => tt.category === "PREFERENTE" && !tt.name.toLowerCase().includes("a") && !tt.name.toLowerCase().includes("b"));
+    const pools = await prisma.tableInvitePool.findMany({
+      where: { eventId: params.id },
+      orderBy: { tableNumber: "asc" },
+      include: {
+        ticketType: {
+          select: {
+            id: true,
+            name: true,
+            kind: true,
+            isTable: true,
+            tableCapacity: true,
+            price: true,
+          },
+        },
+      },
+    });
 
-    // Si existen Preferente A y B por separado, usarlos directamente
-    if (preferenteA && preferenteB) {
-      sections.push({
-        id: preferenteA.id,
-        name: "PREFERENTE A",
-        type: "PREFERENTE",
-        price: effPrice(preferenteA),
-        capacity: preferenteA.maxQuantity,
-        sold: preferenteA.soldQuantity,
-        color: "#C5A059",
-        description: "Zona preferente izquierda",
-        x: 859,
-        y: 754,
-        width: 483,
-        height: 151,
-      });
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-      sections.push({
-        id: preferenteB.id,
-        name: "PREFERENTE B",
-        type: "PREFERENTE",
-        price: effPrice(preferenteB),
-        capacity: preferenteB.maxQuantity,
-        sold: preferenteB.soldQuantity,
-        color: "#C5A059",
-        description: "Zona preferente derecha",
-        x: 1375,
-        y: 756,
-        width: 486,
-        height: 152,
-      });
-    } 
-    // Si solo existe un "Preferente" genérico, dividirlo en A y B
-    else if (preferenteGeneric) {
-      sections.push({
-        id: `${preferenteGeneric.id}-a`,
-        name: "PREFERENTE A",
-        type: "PREFERENTE",
-        price: effPrice(preferenteGeneric),
-        capacity: Math.floor(preferenteGeneric.maxQuantity / 2),
-        sold: Math.floor(preferenteGeneric.soldQuantity / 2),
-        color: "#C5A059",
-        description: "Zona preferente izquierda",
-        x: 859,
-        y: 754,
-        width: 483,
-        height: 151,
-      });
+    const tables = await Promise.all(
+      pools.map(async (p) => {
+        const paidCount = await prisma.tableSlotInvite.count({
+          where: { poolId: p.id, status: "PAID" },
+        });
+        const minToConfirm = invitePoolMinToConfirm(p) ?? p.minPaidToConfirm;
+        const cupos = tableCupos(p.ticketType?.tableCapacity ?? p.splitAmong);
+        const unit = Number(p.pricePerSeat);
+        const tablePrice =
+          Number.isFinite(unit) && cupos > 0
+            ? Math.round(unit * cupos * 100) / 100
+            : unit;
 
-      sections.push({
-        id: `${preferenteGeneric.id}-b`,
-        name: "PREFERENTE B",
-        type: "PREFERENTE",
-        price: effPrice(preferenteGeneric),
-        capacity: Math.ceil(preferenteGeneric.maxQuantity / 2),
-        sold: Math.ceil(preferenteGeneric.soldQuantity / 2),
-        color: "#C5A059",
-        description: "Zona preferente derecha",
-        x: 1375,
-        y: 756,
-        width: 486,
-        height: 152,
-      });
-    }
+        return {
+          id: p.id,
+          tableNumber: p.tableNumber,
+          name: p.tableNumber,
+          ticketTypeId: p.ticketTypeId,
+          ticketTypeName: p.ticketType?.name ?? null,
+          cupos,
+          pricePerCupo: unit,
+          tablePrice,
+          paidCount,
+          minPaidToConfirm: minToConfirm,
+          tableConfirmed: paidCount >= minToConfirm,
+          status:
+            paidCount >= minToConfirm
+              ? ("confirmed" as const)
+              : paidCount > 0
+                ? ("partial" as const)
+                : ("open" as const),
+          payUrl: `${baseUrl}/eventos/${params.id}/mesa/${encodeURIComponent(p.tableNumber)}/pagar/${p.inviteToken}`,
+          expiresAt: p.expiresAt?.toISOString() ?? null,
+          createdAt: p.createdAt.toISOString(),
+        };
+      })
+    );
 
     return NextResponse.json({
       success: true,
       data: {
+        model: "invite_links",
         tables,
-        sections,
-        ticketType: {
-          id: tableTicketType.id,
-          name: tableTicketType.name,
-          price: effPrice(tableTicketType),
-          maxQuantity: tableTicketType.maxQuantity,
-          soldQuantity: tableTicketType.soldQuantity,
-          seatsPerTable: tableTicketType.seatsPerTable,
-        },
+        ticketTypes: tableTypes.map((tt) => {
+          const price = effectiveTicketPriceAt(
+            Number(tt.price),
+            tt.pricePhases,
+            now
+          );
+          const cupos = tableCupos(tt.tableCapacity);
+          return {
+            id: tt.id,
+            name: tt.name,
+            tablePrice: price,
+            cupos,
+            pricePerCupo: tablePricePerCupo(price, cupos),
+            maxQuantity: tt.maxQuantity,
+            soldQuantity: tt.soldQuantity,
+          };
+        }),
       },
     });
   } catch (error) {
@@ -299,4 +137,3 @@ export async function GET(
     );
   }
 }
-

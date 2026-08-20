@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 /**
- * Las mesas VIP se gestionan por links desde Admin (Invites de mesas VIP).
- * Redirigimos al evento/boletos para no usar el mapa de mesas.
+ * Legacy: mapa de mesas con filas (Grupo Regia / Patriotas).
+ * Somnus vende mesas solo por link desde Admin.
  */
 export default function EventMesasRedirectPage() {
   const router = useRouter();
@@ -19,8 +19,11 @@ export default function EventMesasRedirectPage() {
   }, [eventId, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black/90">
-      <p className="text-white/70">Redirigiendo...</p>
+    <div className="min-h-screen flex items-center justify-center bg-black/90 px-4">
+      <p className="text-white/70 text-center text-sm max-w-sm">
+        No hay mapa de mesas. Las mesas se cobran con link desde Admin.
+        Redirigiendo a boletos…
+      </p>
     </div>
   );
 }
