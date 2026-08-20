@@ -400,8 +400,8 @@
     "semantic_hash": ""
   },
   "app/galeria/page.tsx": {
-    "mtime": 1786257435.3345337,
-    "ast_hash": "85ba58489b514bcea27131f821064878",
+    "mtime": 1787184112.2345822,
+    "ast_hash": "ea58ef0cb04c1361fa411d7b9aae038d",
     "semantic_hash": ""
   },
   "app/invitacion/[token]/page.tsx": {
@@ -470,8 +470,8 @@
     "semantic_hash": "6e7875cf2e26a28d67a186839ab32637"
   },
   "app/page.tsx": {
-    "mtime": 1787183575.372997,
-    "ast_hash": "58ee2cee1f3e1b78c2ce0a7f5cd5f1cc",
+    "mtime": 1787184106.386732,
+    "ast_hash": "72ecf91072457da13d01b93781d5d60e",
     "semantic_hash": ""
   },
   "app/pago-exitoso/page.tsx": {
@@ -910,14 +910,14 @@
     "semantic_hash": "e2789fd9382c472a02504e0a1fd73c9e"
   },
   "lib/gallery-events.ts": {
-    "mtime": 1785985393.9685247,
-    "ast_hash": "60da0f75be8dfb754cd86dad75900e37",
-    "semantic_hash": "60da0f75be8dfb754cd86dad75900e37"
+    "mtime": 1787184100.5495603,
+    "ast_hash": "6fce30af6ad739397d6d1afe52207f13",
+    "semantic_hash": ""
   },
   "lib/gallery-images.ts": {
-    "mtime": 1785985393.9715166,
-    "ast_hash": "1cd525cbf5c5c2a8f966da6a70ad989b",
-    "semantic_hash": "1cd525cbf5c5c2a8f966da6a70ad989b"
+    "mtime": 1787184100.5505564,
+    "ast_hash": "8635329f291192348156435a145914c9",
+    "semantic_hash": ""
   },
   "lib/patriotas-individual-tables.ts": {
     "mtime": 1785985393.97741,
@@ -2177,6 +2177,11 @@
   "lib/storage/upload-image-validation.ts": {
     "mtime": 1787183371.3765793,
     "ast_hash": "c129733b187c99130f8510ec205fe233",
+    "semantic_hash": ""
+  },
+  "scripts/clear-gallery.ts": {
+    "mtime": 1787184101.4397476,
+    "ast_hash": "5b233c4c45ace41914c8fac63014b7b2",
     "semantic_hash": ""
   }
 }

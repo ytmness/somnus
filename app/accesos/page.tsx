@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { QRScanner } from "@/components/accesos/QRScanner";
 import { ScanStats } from "@/components/accesos/ScanStats";
-import { Loader2, LogOut, Shield } from "lucide-react";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { Loader2, Shield, ScanLine } from "lucide-react";
 
 interface SessionUser {
   id: string;
@@ -73,21 +74,12 @@ export default function AccesosPage() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", { method: "POST" });
-      router.push("/login");
-    } catch (err) {
-      console.error("Error al cerrar sesión:", err);
-    }
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
-        <div className="text-center text-white">
-          <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4" />
-          <p className="text-lg font-medium">Verificando permisos...</p>
+      <div className="min-h-screen somnus-bg-main flex items-center justify-center px-4">
+        <div className="text-center text-white/70">
+          <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-white/50" />
+          <p className="text-sm uppercase tracking-wider">Verificando permisos…</p>
         </div>
       </div>
     );
@@ -95,52 +87,48 @@ export default function AccesosPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-900 via-red-800 to-gray-900 flex items-center justify-center">
-        <div className="text-center text-white">
-          <Shield className="h-16 w-16 mx-auto mb-4 text-red-300" />
-          <h1 className="text-2xl font-bold mb-2">Acceso Denegado</h1>
-          <p className="text-lg">{error}</p>
+      <div className="min-h-screen somnus-bg-main flex items-center justify-center px-4">
+        <div className="liquid-glass max-w-md w-full p-8 text-center">
+          <Shield className="h-12 w-12 mx-auto mb-4 text-red-400/80" aria-hidden />
+          <h1 className="text-xl font-semibold text-white mb-2">Acceso denegado</h1>
+          <p className="text-white/60 text-sm">{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pb-20">
-      <header className="bg-black bg-opacity-50 border-b border-gray-700 sticky top-0 z-10">
-        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
-          <div className="flex items-center justify-between gap-2">
-            <div className="min-w-0 flex-1">
-              <h1 className="text-lg sm:text-2xl font-bold text-white truncate">
-                Control de Accesos
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-300 truncate">
-                Bienvenido, <span className="font-semibold">{user?.name}</span>
-              </p>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium flex-shrink-0"
-            >
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Cerrar Sesión</span>
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen somnus-bg-main text-white">
+      <SiteHeader eventsHref="/" />
 
-      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
-        <div className="space-y-4 sm:space-y-8">
+      <main className="mx-auto max-w-2xl px-4 sm:px-6 pt-24 sm:pt-28 pb-12 somnus-safe-bottom">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full border border-white/15 bg-white/[0.04] mb-4">
+            <ScanLine className="w-6 h-6 text-[#7BA3E8]" aria-hidden />
+          </div>
+          <h1 className="somnus-display text-2xl sm:text-3xl mb-2">Control de accesos</h1>
+          <p className="text-white/55 text-sm">
+            Hola, <span className="text-white/90 font-medium">{user?.name}</span>
+          </p>
+        </div>
+
+        <div className="space-y-6">
           {events.length > 0 && (
-            <div className="max-w-md mx-auto">
-              <label className="block text-white text-sm mb-2">Evento activo</label>
+            <div className="liquid-glass p-4 sm:p-5">
+              <label
+                htmlFor="accesos-event-select"
+                className="block text-[11px] uppercase tracking-wider text-white/45 mb-2"
+              >
+                Evento activo
+              </label>
               <select
+                id="accesos-event-select"
                 value={selectedEventId}
                 onChange={(e) => setSelectedEventId(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 text-white"
+                className="somnus-input !py-2.5 text-sm"
               >
                 {events.map((ev) => (
-                  <option key={ev.id} value={ev.id}>
+                  <option key={ev.id} value={ev.id} className="bg-[#0A0A0A]">
                     {ev.name} — {new Date(ev.eventDate).toLocaleDateString("es-MX")}
                   </option>
                 ))}
@@ -148,34 +136,34 @@ export default function AccesosPage() {
             </div>
           )}
 
-          <div>
-            <ScanStats />
-          </div>
+          <ScanStats />
 
-          <div className="flex justify-center">
-            <QRScanner eventId={selectedEventId || undefined} />
-          </div>
+          <QRScanner eventId={selectedEventId || undefined} />
 
-          <div className="max-w-md mx-auto">
-            <div className="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-lg p-4 sm:p-6 text-white">
-              <h3 className="font-bold text-base sm:text-lg mb-3">Instrucciones</h3>
-              <ul className="space-y-2 text-xs sm:text-sm text-gray-300">
-                <li>1. Selecciona el evento si tienes varios asignados</li>
-                <li>2. Apunta la cámara al código QR del boleto</li>
-                <li>3. Verde = acceso concedido · Rojo = denegado</li>
-              </ul>
-            </div>
+          <div className="liquid-glass p-5 sm:p-6">
+            <h3 className="text-[11px] uppercase tracking-wider text-white/45 mb-3">
+              Instrucciones
+            </h3>
+            <ul className="space-y-2.5 text-sm text-white/70">
+              <li className="flex gap-2">
+                <span className="text-white/35 shrink-0">1.</span>
+                Selecciona el evento si tienes varios asignados
+              </li>
+              <li className="flex gap-2">
+                <span className="text-white/35 shrink-0">2.</span>
+                Apunta la cámara al código QR del boleto
+              </li>
+              <li className="flex gap-2">
+                <span className="text-white/35 shrink-0">3.</span>
+                <span>
+                  <span className="text-emerald-400/90">Verde</span> = acceso concedido ·{" "}
+                  <span className="text-red-400/90">Rojo</span> = denegado
+                </span>
+              </li>
+            </ul>
           </div>
         </div>
       </main>
-
-      <footer className="somnus-safe-bottom fixed bottom-0 left-0 right-0 bg-black bg-opacity-90 border-t border-gray-700 py-2">
-        <div className="container mx-auto px-3 text-center">
-          <p className="text-xs text-gray-400">
-            Somnus © {new Date().getFullYear()} · Control de Accesos
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }

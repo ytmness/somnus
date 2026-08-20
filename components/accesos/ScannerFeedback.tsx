@@ -1,8 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { CheckCircle2, XCircle, AlertTriangle, Ban } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export type ScanResult = "SUCCESS" | "ALREADY_USED" | "INVALID" | "CANCELLED";
 
@@ -30,24 +36,24 @@ export function ScannerFeedback({
 }: ScanFeedbackProps) {
   const audioContextRef = useRef<AudioContext | null>(null);
 
-  // Inicializar AudioContext
   useEffect(() => {
     if (typeof window !== "undefined") {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioContextRef.current = new (
+        window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext!
+      )();
     }
     return () => {
       audioContextRef.current?.close();
     };
   }, []);
 
-  // Reproducir sonido cuando cambia el resultado
   useEffect(() => {
     if (isOpen && result && audioContextRef.current) {
       playSound(result);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, result]);
 
-  // Auto-cerrar después de 3 segundos
   useEffect(() => {
     if (isOpen && result === "SUCCESS") {
       const timer = setTimeout(() => {
@@ -67,12 +73,10 @@ export function ScannerFeedback({
     oscillator.connect(gainNode);
     gainNode.connect(ctx.destination);
 
-    // Configurar sonido según resultado
     switch (scanResult) {
       case "SUCCESS":
-        // Sonido agradable - dos tonos ascendentes
-        oscillator.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
-        oscillator.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+        oscillator.frequency.setValueAtTime(523.25, ctx.currentTime);
+        oscillator.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
         gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
         oscillator.start(ctx.currentTime);
@@ -80,7 +84,6 @@ export function ScannerFeedback({
         break;
 
       case "ALREADY_USED":
-        // Sonido de error - tono grave prolongado
         oscillator.frequency.setValueAtTime(200, ctx.currentTime);
         gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
@@ -90,7 +93,6 @@ export function ScannerFeedback({
 
       case "INVALID":
       case "CANCELLED":
-        // Sonido de advertencia - tres tonos cortos
         for (let i = 0; i < 3; i++) {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
@@ -98,7 +100,10 @@ export function ScannerFeedback({
           gain.connect(ctx.destination);
           osc.frequency.setValueAtTime(400, ctx.currentTime);
           gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.15);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.15 + 0.1);
+          gain.gain.exponentialRampToValueAtTime(
+            0.01,
+            ctx.currentTime + i * 0.15 + 0.1
+          );
           osc.start(ctx.currentTime + i * 0.15);
           osc.stop(ctx.currentTime + i * 0.15 + 0.1);
         }
@@ -111,42 +116,37 @@ export function ScannerFeedback({
       case "SUCCESS":
         return {
           icon: CheckCircle2,
-          color: "text-green-500",
-          bgColor: "bg-green-50",
-          borderColor: "border-green-500",
-          title: "✓ Acceso Concedido",
+          accent: "text-emerald-400",
+          ring: "ring-emerald-500/40",
+          title: "Acceso concedido",
         };
       case "ALREADY_USED":
         return {
           icon: XCircle,
-          color: "text-red-500",
-          bgColor: "bg-red-50",
-          borderColor: "border-red-500",
-          title: "✗ Boleto Ya Usado",
+          accent: "text-red-400",
+          ring: "ring-red-500/40",
+          title: "Boleto ya usado",
         };
       case "CANCELLED":
         return {
           icon: Ban,
-          color: "text-red-500",
-          bgColor: "bg-red-50",
-          borderColor: "border-red-500",
-          title: "✗ Boleto Cancelado",
+          accent: "text-red-400",
+          ring: "ring-red-500/40",
+          title: "Boleto cancelado",
         };
       case "INVALID":
         return {
           icon: AlertTriangle,
-          color: "text-yellow-600",
-          bgColor: "bg-yellow-50",
-          borderColor: "border-yellow-500",
-          title: "⚠ QR Inválido",
+          accent: "text-amber-400",
+          ring: "ring-amber-500/40",
+          title: "QR inválido",
         };
       default:
         return {
           icon: AlertTriangle,
-          color: "text-gray-500",
-          bgColor: "bg-gray-50",
-          borderColor: "border-gray-500",
-          title: "Escaneando...",
+          accent: "text-white/50",
+          ring: "ring-white/20",
+          title: "Escaneando…",
         };
     }
   };
@@ -156,67 +156,51 @@ export function ScannerFeedback({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`sm:max-w-md ${config.bgColor} border-4 ${config.borderColor}`}>
+      <DialogContent
+        className={cn(
+          "sm:max-w-md bg-[#0c0c0c] border border-white/12 text-white ring-2",
+          config.ring
+        )}
+      >
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3 text-2xl">
-            <Icon className={`h-8 w-8 ${config.color}`} />
-            <span className={config.color}>{config.title}</span>
+          <DialogTitle className="flex items-center gap-3 text-lg sm:text-xl">
+            <Icon className={cn("h-7 w-7 shrink-0", config.accent)} aria-hidden />
+            <span className={config.accent}>{config.title}</span>
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <p className="text-lg font-medium text-gray-900">{message}</p>
+        <div className="space-y-4 py-2">
+          <p className="text-base text-white/85 leading-relaxed">{message}</p>
 
           {ticketInfo && (
-            <div className="space-y-2 border-t pt-4">
+            <div className="space-y-2.5 border-t border-white/10 pt-4 text-sm">
               {ticketInfo.ticketNumber && (
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Folio:</span>
-                  <span className="text-sm font-bold text-gray-900">{ticketInfo.ticketNumber}</span>
-                </div>
+                <Row label="Folio" value={ticketInfo.ticketNumber} bold />
               )}
-              {ticketInfo.event && (
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Evento:</span>
-                  <span className="text-sm font-semibold text-gray-900">{ticketInfo.event}</span>
-                </div>
-              )}
-              {ticketInfo.artist && (
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Artista:</span>
-                  <span className="text-sm font-semibold text-gray-900">{ticketInfo.artist}</span>
-                </div>
-              )}
+              {ticketInfo.event && <Row label="Evento" value={ticketInfo.event} />}
+              {ticketInfo.artist && <Row label="Artista" value={ticketInfo.artist} />}
               {ticketInfo.ticketType && (
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Zona:</span>
-                  <span className="text-sm font-semibold text-gray-900">{ticketInfo.ticketType}</span>
-                </div>
+                <Row label="Zona" value={ticketInfo.ticketType} />
               )}
-              {ticketInfo.buyer && (
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Comprador:</span>
-                  <span className="text-sm text-gray-900">{ticketInfo.buyer}</span>
-                </div>
-              )}
+              {ticketInfo.buyer && <Row label="Comprador" value={ticketInfo.buyer} />}
               {ticketInfo.scannedAt && result === "ALREADY_USED" && (
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Escaneado:</span>
-                  <span className="text-sm text-gray-900">
-                    {new Date(ticketInfo.scannedAt).toLocaleString("en-US")}
-                  </span>
-                </div>
+                <Row
+                  label="Escaneado"
+                  value={new Date(ticketInfo.scannedAt).toLocaleString("es-MX")}
+                />
               )}
             </div>
           )}
 
           <button
+            type="button"
             onClick={onClose}
-            className={`w-full py-3 px-4 rounded-lg font-bold text-white ${
+            className={cn(
+              "w-full py-3 px-4 rounded-lg font-semibold uppercase tracking-wider text-sm transition-colors",
               result === "SUCCESS"
-                ? "bg-green-600 hover:bg-green-700"
-                : "bg-red-600 hover:bg-red-700"
-            }`}
+                ? "bg-white text-black hover:bg-white/90"
+                : "border border-white/20 text-white hover:bg-white/10"
+            )}
           >
             {result === "SUCCESS" ? "Continuar" : "Cerrar"}
           </button>
@@ -226,4 +210,26 @@ export function ScannerFeedback({
   );
 }
 
-
+function Row({
+  label,
+  value,
+  bold,
+}: {
+  label: string;
+  value: string;
+  bold?: boolean;
+}) {
+  return (
+    <div className="flex justify-between gap-4">
+      <span className="text-white/45 shrink-0">{label}</span>
+      <span
+        className={cn(
+          "text-right text-white/90",
+          bold && "font-semibold tabular-nums"
+        )}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}

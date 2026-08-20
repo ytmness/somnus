@@ -155,8 +155,8 @@
     "semantic_hash": "f00d09442f2093a70be51e86f441869c"
   },
   "app/api/events/[id]/route.ts": {
-    "mtime": 1786262800.0745206,
-    "ast_hash": "57f94e91112f6a0b25e962f8cb5e3366",
+    "mtime": 1787183968.5356364,
+    "ast_hash": "b629ab510f16a4b23dc5993616457e58",
     "semantic_hash": ""
   },
   "app/api/events/[id]/table-staff/route.ts": {
@@ -1860,8 +1860,8 @@
     "semantic_hash": ""
   },
   "components/event-form/sections/EventDescription.tsx": {
-    "mtime": 1786257435.3102524,
-    "ast_hash": "2608f8644c7e4ebcbb07593597d3c87e",
+    "mtime": 1787183961.609086,
+    "ast_hash": "b3fe568a1dc599202b0990685cb7e7ed",
     "semantic_hash": ""
   },
   "components/event-form/sections/EventHeaderFields.tsx": {
@@ -1875,8 +1875,8 @@
     "semantic_hash": ""
   },
   "components/event-form/sections/EventTicketsSection.tsx": {
-    "mtime": 1786264691.5507753,
-    "ast_hash": "ba544c2171faae39f9b7510bdc0d5720",
+    "mtime": 1787183972.064499,
+    "ast_hash": "f86575459f0288fdac6483d3000901db",
     "semantic_hash": ""
   },
   "components/event-form/sections/EventWhenWhere.tsx": {
@@ -1885,8 +1885,8 @@
     "semantic_hash": ""
   },
   "app/eventos/[id]/page.tsx": {
-    "mtime": 1786257435.323032,
-    "ast_hash": "037ba10f700535674bc61b6f452ff916",
+    "mtime": 1787183961.7756402,
+    "ast_hash": "ae9d4af845126091f92a47ee09cfd7f8",
     "semantic_hash": ""
   },
   "lib/imageLoader.js": {

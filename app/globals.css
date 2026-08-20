@@ -990,6 +990,25 @@ video.hero-video-no-controls::-ms-media-controls {
   transform: scale(1.25);
 }
 
+/* ===== ESCÁNER QR (accesos) ===== */
+.somnus-qr-reader video {
+  border-radius: 0 !important;
+  object-fit: cover !important;
+}
+
+.somnus-qr-reader #qr-reader__dashboard_section_csr span,
+.somnus-qr-reader #qr-reader__dashboard_section_swaplink {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.somnus-qr-reader #qr-reader__scan_region {
+  border-color: rgba(123, 163, 232, 0.55) !important;
+}
+
+.somnus-qr-reader img[alt="Info icon"] {
+  opacity: 0.4;
+}
+
 /* Asegurar que el video no tenga apariencia nativa */
 video,
 video.hero-video-no-controls,

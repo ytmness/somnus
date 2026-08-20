@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Html5Qrcode, Html5QrcodeScanner } from "html5-qrcode";
+import { Html5Qrcode } from "html5-qrcode";
 import { ScannerFeedback, type ScanResult } from "./ScannerFeedback";
 import { Loader2, Camera, CameraOff } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ScanResponse {
   success: boolean;
@@ -33,6 +34,7 @@ export function QRScanner({ eventId }: { eventId?: string }) {
   const [showFeedback, setShowFeedback] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const lastScanTimeRef = useRef<number>(0);
+  const isProcessingRef = useRef(false);
   const qrCodeRegionId = "qr-reader";
 
   useEffect(() => {
@@ -40,20 +42,21 @@ export function QRScanner({ eventId }: { eventId?: string }) {
     return () => {
       stopScanner();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const startScanner = async () => {
     try {
       setCameraError(null);
-      
-      // Verificar si estamos en HTTPS o localhost
-      const isSecure = window.location.protocol === 'https:' || 
-                       window.location.hostname === 'localhost' ||
-                       window.location.hostname === '127.0.0.1';
-      
+
+      const isSecure =
+        window.location.protocol === "https:" ||
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
+
       if (!isSecure && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
         setCameraError(
-          "⚠️ La cámara requiere HTTPS en dispositivos móviles. Por favor, accede desde https:// o configura SSL en el servidor."
+          "La cámara requiere HTTPS en dispositivos móviles. Accede desde https://somnus.live"
         );
         setIsScanning(false);
         return;
@@ -62,14 +65,14 @@ export function QRScanner({ eventId }: { eventId?: string }) {
       const html5QrCode = new Html5Qrcode(qrCodeRegionId);
       scannerRef.current = html5QrCode;
 
-      // Detectar si es móvil para ajustar el tamaño del QR box
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const qrBoxSize = isMobile ? 
-        { width: Math.min(250, window.innerWidth - 60), height: Math.min(250, window.innerWidth - 60) } : 
-        { width: 250, height: 250 };
+      const size = Math.min(260, window.innerWidth - 80);
+      const qrBoxSize = isMobile
+        ? { width: size, height: size }
+        : { width: 250, height: 250 };
 
       await html5QrCode.start(
-        { facingMode: "environment" }, // Cámara trasera en móviles
+        { facingMode: "environment" },
         {
           fps: 10,
           qrbox: qrBoxSize,
@@ -80,21 +83,24 @@ export function QRScanner({ eventId }: { eventId?: string }) {
       );
 
       setIsScanning(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error al iniciar escáner:", err);
-      
+      const e = err as { name?: string; message?: string };
+
       let errorMessage = "No se pudo acceder a la cámara.";
-      
-      if (err.name === 'NotAllowedError' || err.message?.includes('Permission')) {
-        errorMessage = "📷 Permiso de cámara denegado. Por favor, permite el acceso a la cámara en la configuración de tu navegador.";
-      } else if (err.name === 'NotFoundError') {
-        errorMessage = "📷 No se encontró ninguna cámara en este dispositivo.";
-      } else if (err.name === 'NotReadableError') {
-        errorMessage = "📷 La cámara está siendo usada por otra aplicación. Cierra otras apps que usen la cámara.";
-      } else if (err.message) {
-        errorMessage = err.message;
+
+      if (e.name === "NotAllowedError" || e.message?.includes("Permission")) {
+        errorMessage =
+          "Permiso de cámara denegado. Actívalo en la configuración del navegador.";
+      } else if (e.name === "NotFoundError") {
+        errorMessage = "No se encontró ninguna cámara en este dispositivo.";
+      } else if (e.name === "NotReadableError") {
+        errorMessage =
+          "La cámara está en uso por otra app. Ciérrala e intenta de nuevo.";
+      } else if (e.message) {
+        errorMessage = e.message;
       }
-      
+
       setCameraError(errorMessage);
       setIsScanning(false);
     }
@@ -116,47 +122,36 @@ export function QRScanner({ eventId }: { eventId?: string }) {
   };
 
   const onScanSuccess = async (decodedText: string) => {
-    // Prevenir escaneos múltiples (rate limiting)
     const now = Date.now();
-    if (now - lastScanTimeRef.current < 1000) {
-      return; // Ignorar si pasó menos de 1 segundo
-    }
+    if (now - lastScanTimeRef.current < 1000) return;
     lastScanTimeRef.current = now;
+    if (isProcessingRef.current) return;
 
-    // Si ya está procesando, ignorar
-    if (isProcessing) {
-      return;
-    }
-
+    isProcessingRef.current = true;
     setIsProcessing(true);
 
     try {
-      // Detener el escáner temporalmente
       await stopScanner();
 
-      // Enviar QR al backend para validación
       const response = await fetch("/api/tickets/scan", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ qrData: decodedText, eventId }),
       });
 
       const data: ScanResponse = await response.json();
 
-      // Mostrar feedback
       setScanResult(data);
       setShowFeedback(true);
 
-      // Refrescar estadísticas
-      if (typeof (window as any).refreshScanStats === "function") {
-        (window as any).refreshScanStats();
+      const win = window as Window & { refreshScanStats?: () => void };
+      if (typeof win.refreshScanStats === "function") {
+        win.refreshScanStats();
       }
 
-      // Reiniciar escáner después de 3 segundos (para éxito) o 5 segundos (para error)
       const delay = data.result === "SUCCESS" ? 3000 : 5000;
       setTimeout(() => {
+        isProcessingRef.current = false;
         setIsProcessing(false);
         startScanner();
       }, delay);
@@ -168,9 +163,9 @@ export function QRScanner({ eventId }: { eventId?: string }) {
         message: "Error al procesar el código QR",
       });
       setShowFeedback(true);
+      isProcessingRef.current = false;
       setIsProcessing(false);
-      
-      // Reiniciar escáner
+
       setTimeout(() => {
         startScanner();
       }, 3000);
@@ -178,8 +173,6 @@ export function QRScanner({ eventId }: { eventId?: string }) {
   };
 
   const onScanFailure = (error: string) => {
-    // Ignorar errores de "no QR found" (son normales)
-    // Solo loguear errores importantes
     if (!error.includes("NotFoundException")) {
       console.warn("Error de escaneo:", error);
     }
@@ -187,7 +180,7 @@ export function QRScanner({ eventId }: { eventId?: string }) {
 
   const handleCloseFeedback = () => {
     setShowFeedback(false);
-    if (!isScanning && !isProcessing) {
+    if (!isScanning && !isProcessingRef.current) {
       startScanner();
     }
   };
@@ -197,51 +190,50 @@ export function QRScanner({ eventId }: { eventId?: string }) {
     await startScanner();
   };
 
+  const statusLabel = isProcessing
+    ? "Validando boleto…"
+    : isScanning
+      ? "Apunta al código QR"
+      : "Cámara detenida";
+
   return (
-    <div className="w-full max-w-md mx-auto px-4 sm:px-0">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden border-2 sm:border-4 border-gray-800">
-        {/* Header */}
-        <div className="bg-red-600 text-white p-3 sm:p-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-bold">Escáner de Boletos</h2>
-            {isScanning ? (
-              <Camera className="h-5 w-5 sm:h-6 sm:w-6 animate-pulse" />
-            ) : (
-              <CameraOff className="h-5 w-5 sm:h-6 sm:w-6" />
-            )}
+    <div className="w-full max-w-md mx-auto">
+      <div className="liquid-glass overflow-hidden ring-1 ring-white/10">
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-white/10 bg-white/[0.02]">
+          <div className="min-w-0">
+            <h2 className="text-sm font-semibold text-white truncate">
+              Escáner QR
+            </h2>
+            <p className="text-xs text-white/50 truncate">{statusLabel}</p>
           </div>
-          <p className="text-xs sm:text-sm opacity-90 mt-1">
-            {isProcessing
-              ? "Validando boleto..."
-              : isScanning
-              ? "Apunta la cámara al código QR"
-              : "Cámara detenida"}
-          </p>
+          {isScanning ? (
+            <Camera className="h-5 w-5 text-emerald-400 shrink-0 animate-pulse" aria-hidden />
+          ) : (
+            <CameraOff className="h-5 w-5 text-white/40 shrink-0" aria-hidden />
+          )}
         </div>
 
-        {/* Scanner Area */}
-        <div className="relative bg-black">
-          <div id={qrCodeRegionId} className="w-full min-h-[250px] sm:min-h-[300px]" />
+        <div className="relative bg-black somnus-qr-reader">
+          <div id={qrCodeRegionId} className="w-full min-h-[260px] sm:min-h-[300px]" />
 
           {isProcessing && (
-            <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/75 flex items-center justify-center backdrop-blur-sm">
               <div className="text-center text-white">
-                <Loader2 className="h-12 w-12 animate-spin mx-auto mb-2" />
-                <p className="font-medium">Validando...</p>
+                <Loader2 className="h-10 w-10 animate-spin mx-auto mb-2 text-white/80" />
+                <p className="text-sm font-medium text-white/80">Validando…</p>
               </div>
             </div>
           )}
 
           {cameraError && (
-            <div className="absolute inset-0 bg-red-900 bg-opacity-95 flex items-center justify-center p-4 sm:p-6">
-              <div className="text-center text-white max-w-sm">
-                <CameraOff className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-3 sm:mb-4" />
-                <p className="font-bold text-base sm:text-lg mb-2">Error de Cámara</p>
-                <p className="text-xs sm:text-sm mb-4 leading-relaxed whitespace-pre-line">{cameraError}</p>
-                <button
-                  onClick={handleRetry}
-                  className="bg-white text-red-900 px-4 py-2 sm:px-6 sm:py-2 rounded-lg text-sm sm:text-base font-bold hover:bg-gray-100 active:bg-gray-200 transition-colors"
-                >
+            <div className="absolute inset-0 bg-[#0A0A0A]/95 flex items-center justify-center p-6">
+              <div className="text-center max-w-xs">
+                <CameraOff className="h-12 w-12 mx-auto mb-3 text-red-400/80" aria-hidden />
+                <p className="font-semibold text-white mb-2">Error de cámara</p>
+                <p className="text-sm text-white/60 mb-5 leading-relaxed">
+                  {cameraError}
+                </p>
+                <button type="button" onClick={handleRetry} className="somnus-btn text-sm !py-2.5 !px-6">
                   Reintentar
                 </button>
               </div>
@@ -249,32 +241,26 @@ export function QRScanner({ eventId }: { eventId?: string }) {
           )}
         </div>
 
-        {/* Status Bar */}
-        <div className="bg-gray-100 p-3">
-          <div className="flex items-center justify-center gap-2 text-sm">
-            {isScanning && !isProcessing && (
-              <>
-                <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-gray-700 font-medium">Escáner activo</span>
-              </>
-            )}
-            {isProcessing && (
-              <>
-                <div className="h-2 w-2 bg-yellow-500 rounded-full animate-pulse"></div>
-                <span className="text-gray-700 font-medium">Procesando...</span>
-              </>
-            )}
-            {!isScanning && !isProcessing && (
-              <>
-                <div className="h-2 w-2 bg-red-500 rounded-full"></div>
-                <span className="text-gray-700 font-medium">Inactivo</span>
-              </>
-            )}
+        <div className="px-4 py-3 border-t border-white/10 bg-white/[0.02]">
+          <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-wider">
+            <span
+              className={cn(
+                "h-2 w-2 rounded-full",
+                isScanning && !isProcessing && "bg-emerald-400 animate-pulse",
+                isProcessing && "bg-amber-400 animate-pulse",
+                !isScanning && !isProcessing && "bg-red-400/80"
+              )}
+              aria-hidden
+            />
+            <span className="text-white/55">
+              {isScanning && !isProcessing && "Escáner activo"}
+              {isProcessing && "Procesando"}
+              {!isScanning && !isProcessing && "Inactivo"}
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Feedback Modal */}
       <ScannerFeedback
         isOpen={showFeedback}
         onClose={handleCloseFeedback}
@@ -285,5 +271,3 @@ export function QRScanner({ eventId }: { eventId?: string }) {
     </div>
   );
 }
-
-

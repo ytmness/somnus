@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
 import { CheckCircle2, XCircle, AlertTriangle, Activity } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ScanStats {
   total: number;
@@ -43,33 +43,33 @@ export function ScanStats() {
     }
   };
 
-  // Cargar estadísticas al montar y cada 5 segundos
   useEffect(() => {
     fetchStats();
     const interval = setInterval(fetchStats, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // Función pública para refrescar stats desde el componente padre
   const refresh = () => {
     fetchStats();
   };
 
-  // Exponer función refresh
   useEffect(() => {
-    (window as any).refreshScanStats = refresh;
+    (window as Window & { refreshScanStats?: () => void }).refreshScanStats =
+      refresh;
     return () => {
-      delete (window as any).refreshScanStats;
+      delete (window as Window & { refreshScanStats?: () => void })
+        .refreshScanStats;
     };
   }, []);
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
         {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className="p-4 animate-pulse">
-            <div className="h-12 bg-gray-200 rounded"></div>
-          </Card>
+          <div
+            key={i}
+            className="liquid-glass p-4 animate-pulse h-[88px] bg-white/[0.02]"
+          />
         ))}
       </div>
     );
@@ -77,81 +77,84 @@ export function ScanStats() {
 
   const statCards = [
     {
-      label: "Total Escaneos",
+      label: "Total",
       value: stats.total,
       icon: Activity,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      accent: "text-[#7BA3E8]",
     },
     {
-      label: "Accesos Válidos",
+      label: "Válidos",
       value: stats.successful,
       icon: CheckCircle2,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
+      accent: "text-emerald-400",
     },
     {
       label: "Duplicados",
       value: stats.duplicates,
       icon: XCircle,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
+      accent: "text-red-400",
     },
     {
       label: "Inválidos",
       value: stats.invalid + stats.cancelled,
       icon: AlertTriangle,
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-50",
+      accent: "text-amber-400",
     },
   ];
 
+  const successRate =
+    stats.total > 0 ? ((stats.successful / stats.total) * 100).toFixed(1) : null;
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium text-gray-600">
-          Estadísticas de Hoy - {new Date(stats.date).toLocaleDateString("en-US")}
-        </h2>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between px-0.5">
+        <p className="text-[11px] uppercase tracking-wider text-white/45">
+          Hoy · {new Date(stats.date).toLocaleDateString("es-MX")}
+        </p>
         <button
+          type="button"
           onClick={refresh}
-          className="text-xs text-gray-500 hover:text-gray-700 underline"
+          className="somnus-nav-link text-[11px] uppercase tracking-wider text-white/45 hover:text-white"
         >
           Actualizar
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
         {statCards.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Card
-              key={stat.label}
-              className={`p-4 ${stat.bgColor} border-2 border-gray-200 hover:border-gray-300 transition-colors`}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-gray-600">{stat.label}</p>
-                  <p className={`text-3xl font-bold ${stat.color} mt-1`}>{stat.value}</p>
+            <div key={stat.label} className="liquid-glass p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-wider text-white/45 truncate">
+                    {stat.label}
+                  </p>
+                  <p
+                    className={cn(
+                      "text-2xl sm:text-3xl font-bold tabular-nums mt-1",
+                      stat.accent
+                    )}
+                  >
+                    {stat.value}
+                  </p>
                 </div>
-                <Icon className={`h-8 w-8 ${stat.color} opacity-60`} />
+                <Icon
+                  className={cn("h-5 w-5 shrink-0 opacity-50", stat.accent)}
+                  aria-hidden
+                />
               </div>
-            </Card>
+            </div>
           );
         })}
       </div>
 
-      {stats.successful > 0 && (
-        <div className="text-center">
-          <p className="text-sm text-gray-600">
-            Tasa de éxito:{" "}
-            <span className="font-bold text-green-600">
-              {((stats.successful / stats.total) * 100).toFixed(1)}%
-            </span>
-          </p>
-        </div>
+      {successRate !== null && stats.successful > 0 && (
+        <p className="text-center text-xs text-white/50">
+          Tasa de éxito{" "}
+          <span className="font-semibold text-emerald-400">{successRate}%</span>
+        </p>
       )}
     </div>
   );
 }
-
-
