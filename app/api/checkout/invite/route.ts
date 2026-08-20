@@ -9,7 +9,14 @@ import {
   canBuyInviteTicket,
   toInviteTicketPayload,
 } from "@/lib/invite-tickets";
+import type { Prisma } from "@prisma/client";
 import crypto from "crypto";
+
+export const dynamic = "force-dynamic";
+
+type InviteLoaded = Prisma.TableSlotInviteGetPayload<{
+  include: { event: true; ticketType: true };
+}>;
 
 export const dynamic = "force-dynamic";
 
@@ -225,7 +232,7 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      let firstCreated: typeof invite = null;
+      const createdSlots: InviteLoaded[] = [];
       const startSeatNumber = paidCount + 1;
 
       for (let offset = 0; offset < peopleForSeats.length; offset++) {
@@ -247,15 +254,14 @@ export async function POST(request: NextRequest) {
           },
           include: { event: true, ticketType: true },
         });
-
-        if (!firstCreated) firstCreated = created;
+        createdSlots.push(created);
       }
 
-      if (!firstCreated) {
+      if (!createdSlots[0]) {
         return NextResponse.json({ error: "Error al crear asientos" }, { status: 500 });
       }
 
-      invite = firstCreated;
+      invite = createdSlots[0];
     } else {
       if (invite.status !== "PENDING") {
         return NextResponse.json(
