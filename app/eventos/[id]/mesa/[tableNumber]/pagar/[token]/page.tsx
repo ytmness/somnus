@@ -100,6 +100,8 @@ export default function PagarInvitePage() {
   >([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const inviteReturnPath = `/eventos/${params.eventId}/mesa/${params.tableNumber}/pagar/${token}`;
+
   useEffect(() => {
     fetch("/api/auth/session", { credentials: "include" })
       .then((r) => r.json())
@@ -117,11 +119,15 @@ export default function PagarInvitePage() {
             buyerName: prev.buyerName || data.user.name || "",
             buyerPhone: prev.buyerPhone || data.user.phone || "",
           }));
+        } else {
+          router.replace(`/register?redirect=${encodeURIComponent(inviteReturnPath)}`);
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        router.replace(`/register?redirect=${encodeURIComponent(inviteReturnPath)}`);
+      })
       .finally(() => setAuthChecked(true));
-  }, []);
+  }, [inviteReturnPath, router]);
 
   const loadInvite = useCallback(async () => {
     if (!token) return null;
@@ -137,6 +143,10 @@ export default function PagarInvitePage() {
   }, [token]);
 
   useEffect(() => {
+    if (!authChecked || !sessionUser) {
+      if (authChecked && !sessionUser) setIsLoading(false);
+      return;
+    }
     let cancelled = false;
     (async () => {
       const result = await loadInvite();
@@ -149,11 +159,11 @@ export default function PagarInvitePage() {
         setInvite(d);
         setError(null);
         if (d.status !== "PAID" && !d.tableReserved) {
-          setFormData({
-            buyerName: d.isPool ? "" : d.invitedName === "Pendiente" ? "" : d.invitedName || "",
-            buyerEmail: d.invitedEmail || "",
-            buyerPhone: d.invitedPhone || "",
-          });
+          setFormData((prev) => ({
+            buyerName: prev.buyerName || (d.isPool ? "" : d.invitedName === "Pendiente" ? "" : d.invitedName || ""),
+            buyerEmail: prev.buyerEmail || d.invitedEmail || "",
+            buyerPhone: prev.buyerPhone || d.invitedPhone || "",
+          }));
         }
       }
       setIsLoading(false);
@@ -161,7 +171,7 @@ export default function PagarInvitePage() {
     return () => {
       cancelled = true;
     };
-  }, [loadInvite]);
+  }, [loadInvite, authChecked, sessionUser]);
 
   useEffect(() => {
     if (!token || !invite?.isPool || invite.tableReserved) return;
@@ -177,11 +187,8 @@ export default function PagarInvitePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!sessionUser) {
-      const next = typeof window !== "undefined"
-        ? `${window.location.pathname}${window.location.search}`
-        : `/eventos/${params.eventId}/mesa/${params.tableNumber}/pagar/${token}`;
       toast.error("Crea una cuenta o inicia sesión para pagar");
-      router.push(`/register?redirect=${encodeURIComponent(next)}`);
+      router.replace(`/register?redirect=${encodeURIComponent(inviteReturnPath)}`);
       return;
     }
     if (!formData.buyerName.trim() || !formData.buyerEmail.trim()) {
@@ -236,12 +243,23 @@ export default function PagarInvitePage() {
     }
   };
 
-  if (isLoading) {
+  if (!authChecked || isLoading) {
     return (
       <div className="min-h-screen somnus-bg-main flex items-center justify-center relative z-0">
         <div className="text-center relative z-10">
           <div className="w-14 h-14 border-2 border-white/20 border-t-[#5B8DEF] rounded-full animate-spin mx-auto mb-4" />
           <p className="text-white/60 text-sm">Cargando…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (authChecked && !sessionUser) {
+    return (
+      <div className="min-h-screen somnus-bg-main flex items-center justify-center relative z-0">
+        <div className="text-center relative z-10">
+          <div className="w-14 h-14 border-2 border-white/20 border-t-[#5B8DEF] rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-white/60 text-sm">Redirigiendo a iniciar sesión…</p>
         </div>
       </div>
     );
@@ -453,8 +471,7 @@ export default function PagarInvitePage() {
                   <button
                     type="button"
                     onClick={() => {
-                      const next = `${window.location.pathname}${window.location.search}`;
-                      router.push(`/register?redirect=${encodeURIComponent(next)}`);
+                      router.replace(`/register?redirect=${encodeURIComponent(inviteReturnPath)}`);
                     }}
                     className="mt-2 somnus-btn px-4 py-2 text-xs"
                   >
