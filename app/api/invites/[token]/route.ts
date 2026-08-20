@@ -20,7 +20,7 @@ const eventInviteSelect = {
   salesEndDate: true,
 } as const;
 
-async function loadInviteTicketTypes(eventId: string) {
+async function loadInviteTicketTypes(eventId: string, ticketTypeId?: string | null) {
   const now = new Date();
   const rows = await prisma.ticketType.findMany({
     where: { eventId, isActive: true },
@@ -30,7 +30,8 @@ async function loadInviteTicketTypes(eventId: string) {
   return pickTicketsForInviteLink(
     rows
       .map((tt) => toInviteTicketPayload(tt, now))
-      .filter((tt): tt is NonNullable<typeof tt> => Boolean(tt))
+      .filter((tt): tt is NonNullable<typeof tt> => Boolean(tt)),
+    ticketTypeId
   );
 }
 
@@ -69,6 +70,7 @@ export async function GET(
       where: { inviteToken: token },
       include: {
         event: { select: eventInviteSelect },
+        ticketType: { select: { id: true, name: true } },
       },
     });
 
@@ -111,7 +113,7 @@ export async function GET(
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const payUrl = mesaPagarUrl(baseUrl, pool.eventId, pool.tableNumber, token);
-    const ticketTypes = await loadInviteTicketTypes(pool.eventId);
+    const ticketTypes = await loadInviteTicketTypes(pool.eventId, pool.ticketTypeId);
 
     return NextResponse.json({
       success: true,
@@ -122,6 +124,7 @@ export async function GET(
         tableNumber: pool.tableNumber,
         seatNumber: null,
         pricePerSeat: Number(pool.pricePerSeat),
+        ticketTypeName: pool.ticketType?.name ?? null,
         maxSlots: pool.maxSlots,
         splitAmong: pool.splitAmong,
         minPaidToConfirm: pool.minPaidToConfirm,

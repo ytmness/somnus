@@ -53,6 +53,7 @@ type InviteData = {
     salesStartDate?: string;
     salesEndDate?: string;
   };
+  ticketTypeName?: string | null;
   ticketTypes?: InviteTicketTypePayload[];
   invitedName?: string;
   invitedEmail?: string;
@@ -444,13 +445,18 @@ export default function PagarInvitePage() {
           <section className="rounded-xl bg-white/5 border border-white/10 p-6">
             <p className="text-[10px] font-semibold tracking-[0.2em] text-[#7BA3E8] uppercase mb-2">Mesa compartida</p>
             <h2 className="text-2xl font-bold text-white leading-tight mb-1">{invite.tableNumber}</h2>
+            {invite.ticketTypeName ? (
+              <p className="text-white/55 text-sm mb-1">{invite.ticketTypeName}</p>
+            ) : null}
             <p className="text-white/60 text-sm flex items-center gap-1.5 mb-5">
               <Users className="w-4 h-4 opacity-80" />
               {paidCount === 1 ? "1 participante" : `${paidCount} participantes`}
             </p>
             <p className="text-white/45 text-xs mb-1">
               {hasTicketPicker
-                ? "Elige cuántos boletos quieres de cada tipo"
+                ? pickerTypes.length === 1
+                  ? "Elige cuántos quieres de este tipo de mesa"
+                  : "Elige cuántos boletos quieres de cada tipo"
                 : "Cada pago usa el precio de mesa del evento"}
             </p>
             {!hasTicketPicker && (

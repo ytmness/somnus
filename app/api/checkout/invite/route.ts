@@ -148,7 +148,8 @@ export async function POST(request: NextRequest) {
         const allowed = pickTicketsForInviteLink(
           event.ticketTypes
             .map((tt) => toInviteTicketPayload(tt, now))
-            .filter((tt): tt is NonNullable<typeof tt> => Boolean(tt))
+            .filter((tt): tt is NonNullable<typeof tt> => Boolean(tt)),
+          pool.ticketTypeId
         );
         const allowedIds = new Set(allowed.map((tt) => tt.id));
 

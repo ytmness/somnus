@@ -11,13 +11,20 @@ export function isInviteTicketVisible(
   return false;
 }
 
-/** Mesa links sell TABLE tiers. If the event has none, fall back to general tickets (legacy pool). */
+/** One link sells one type. Prefer that id; otherwise TABLE tiers, or generals if none. */
 export function pickTicketsForInviteLink(
-  tickets: InviteTicketTypePayload[]
+  tickets: InviteTicketTypePayload[],
+  ticketTypeId?: string | null
 ): InviteTicketTypePayload[] {
   const tables = tickets.filter((tt) => tt.kind === "TABLE");
-  if (tables.length > 0) return tables;
-  return tickets.filter((tt) => tt.kind === "STANDARD");
+  const pool =
+    tables.length > 0 ? tables : tickets.filter((tt) => tt.kind === "STANDARD");
+  const wanted = (ticketTypeId || "").trim();
+  if (wanted) {
+    const match = pool.find((tt) => tt.id === wanted);
+    return match ? [match] : [];
+  }
+  return pool;
 }
 
 export type InviteTicketTypePayload = {

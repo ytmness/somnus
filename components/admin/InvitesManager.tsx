@@ -5,11 +5,18 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Copy, Check, Link2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { pickInvitePoolAnchor } from "@/lib/ticket-pricing";
+import { pickInvitePoolAnchor, listInvitePoolTicketTypes } from "@/lib/ticket-pricing";
+import { expandTableNumbers, MAX_TABLES_PER_BATCH } from "@/lib/table-invite";
 import { TableStaffManager } from "@/components/admin/TableStaffManager";
 
 const MAX_TRADITIONAL_SLOTS = 500;
 const DEFAULT_MIN_CONFIRM = 20;
+
+interface TableTypeOption {
+  id: string;
+  name: string;
+  unitPrice: number;
+}
 
 interface EventOption {
   id: string;
@@ -17,8 +24,9 @@ interface EventOption {
   hasTables: boolean;
   /** Asientos del tipo mesa (referencia) */
   defaultSeatsForPool: number;
-  /** Precio ancla del link: mesa si hay TABLE; si no, general (legado) */
+  /** Precio ancla del primer tipo (hint) */
   pricePerPersonHint: number;
+  tableTypes: TableTypeOption[];
 }
 
 interface InviteRow {
@@ -43,6 +51,7 @@ interface InviteRow {
   minPaidToConfirm?: number;
   paidCount?: number;
   tableConfirmed?: boolean;
+  ticketTypeName?: string | null;
 }
 
 export function InvitesManager() {
@@ -61,6 +70,8 @@ export function InvitesManager() {
   const [generateSlots, setGenerateSlots] = useState(5);
   const [generateMinConfirm, setGenerateMinConfirm] = useState(DEFAULT_MIN_CONFIRM);
   const [generateTotalPrice, setGenerateTotalPrice] = useState("");
+  const [generateTicketTypeId, setGenerateTicketTypeId] = useState("");
+  const [generateTableCount, setGenerateTableCount] = useState(1);
   const [isSubmittingGenerate, setIsSubmittingGenerate] = useState(false);
   const [generatedLinks, setGeneratedLinks] = useState<
     Array<{
@@ -69,15 +80,19 @@ export function InvitesManager() {
       url: string;
       pricePerSeat: number;
       seatNumber: number | null;
+      tableNumber?: string;
       maxSlots?: number | null;
       splitAmong?: number;
       minPaidToConfirm?: number;
       isPool?: boolean;
+      ticketTypeName?: string;
+      ticketTypeId?: string;
     }>
   >([]);
   const [usePoolMode, setUsePoolMode] = useState(true); // Money pool: un link para toda la mesa
 
   const mapApiEventToOption = useCallback((e: any): EventOption => {
+    const listed = listInvitePoolTicketTypes(e.ticketTypes || []);
     const anchor = pickInvitePoolAnchor(e.ticketTypes || []);
     const tableCapacity = Number(
       (anchor?.ticket as { tableCapacity?: number | null } | undefined)
@@ -86,12 +101,17 @@ export function InvitesManager() {
     return {
       id: e.id,
       name: e.name,
-      hasTables: Boolean(anchor && anchor.unitPrice > 0),
+      hasTables: listed.length > 0,
       defaultSeatsForPool:
         Number.isFinite(tableCapacity) && tableCapacity > 0
           ? tableCapacity
           : 4,
-      pricePerPersonHint: anchor?.unitPrice ?? 0,
+      pricePerPersonHint: listed[0]?.unitPrice ?? 0,
+      tableTypes: listed.map((row) => ({
+        id: String(row.ticket.id || ""),
+        name: String(row.ticket.name || "Mesa"),
+        unitPrice: row.unitPrice,
+      })).filter((tt) => tt.id),
     };
   }, []);
 
@@ -158,8 +178,13 @@ export function InvitesManager() {
   const seatsDefaultForEventId = (eventId: string) =>
     events.find((e) => e.id === eventId)?.defaultSeatsForPool ?? 4;
 
-  const pricePerPersonForEventId = (eventId: string) =>
-    events.find((e) => e.id === eventId)?.pricePerPersonHint ?? 0;
+  const pricePerPersonForEventId = (eventId: string) => {
+    const ev = events.find((e) => e.id === eventId);
+    const selected = ev?.tableTypes.find((tt) => tt.id === generateTicketTypeId);
+    return selected?.unitPrice ?? ev?.pricePerPersonHint ?? 0;
+  };
+
+  const tableTypesForGenerate = events.find((e) => e.id === generateEventId)?.tableTypes ?? [];
 
   const copyLink = async (url: string, id: string) => {
     try {
@@ -229,9 +254,14 @@ export function InvitesManager() {
       toast.error("Indica un nombre o número de mesa (1–120 caracteres).");
       return;
     }
-    const tableSegment = encodeURIComponent(tableKey);
+    const tableNames = expandTableNumbers(tableKey, generateTableCount);
+    if (tableNames.length === 0) {
+      toast.error("Indica al menos una mesa.");
+      return;
+    }
     const slots = Math.min(MAX_TRADITIONAL_SLOTS, Math.max(1, generateSlots));
     const totalPrice = parseFloat(generateTotalPrice.replace(/,/g, "."));
+    const ticketTypeId = generateTicketTypeId.trim();
 
     if (!usePoolMode) {
       if (isNaN(totalPrice) || totalPrice <= 0) {
@@ -249,19 +279,26 @@ export function InvitesManager() {
       });
       const freshJson = await freshRes.json();
       const ticketTypes = freshJson?.data?.ticketTypes;
-      const unit =
+      const listed =
         Array.isArray(ticketTypes) && ticketTypes.length > 0
-          ? pickInvitePoolAnchor(ticketTypes)?.unitPrice ?? null
-          : null;
-      if (unit == null || unit <= 0) {
+          ? listInvitePoolTicketTypes(ticketTypes)
+          : [];
+      const chosen = ticketTypeId
+        ? listed.find((row) => row.ticket.id === ticketTypeId)
+        : listed.length === 1
+        ? listed[0]
+        : null;
+      if (!chosen || chosen.unitPrice <= 0) {
         toast.error(
-          "No hay precio de mesa válido para el link. Agrega una mesa con precio mayor a 0, guarda el evento y vuelve a intentar."
+          listed.length > 1
+            ? "Elige un tipo de mesa para el link."
+            : "No hay precio de mesa válido para el link. Agrega una mesa con precio mayor a 0, guarda el evento y vuelve a intentar."
         );
         return;
       }
       setEvents((prev) =>
         prev.map((ev) =>
-          ev.id === eventId ? { ...ev, pricePerPersonHint: unit } : ev
+          ev.id === eventId ? { ...ev, pricePerPersonHint: chosen.unitPrice } : ev
         )
       );
     }
@@ -269,43 +306,68 @@ export function InvitesManager() {
     setIsSubmittingGenerate(true);
     setGeneratedLinks([]);
     try {
-      const body: Record<string, unknown> = usePoolMode
-        ? {
-            mode: "pool",
-            minPaidToConfirm: Math.floor(Number(generateMinConfirm)),
+      const allInvites: Array<{
+        token: string;
+        name: string;
+        url: string;
+        pricePerSeat: number;
+        seatNumber: number | null;
+        tableNumber?: string;
+        maxSlots?: number | null;
+        splitAmong?: number;
+        minPaidToConfirm?: number;
+        isPool?: boolean;
+        ticketTypeName?: string;
+        ticketTypeId?: string;
+      }> = [];
+      for (const name of tableNames) {
+        const body: Record<string, unknown> = usePoolMode
+          ? {
+              mode: "pool",
+              minPaidToConfirm: Math.floor(Number(generateMinConfirm)),
+              ticketTypeId: ticketTypeId || undefined,
+            }
+          : { slots, totalTablePrice: totalPrice, ticketTypeId: ticketTypeId || undefined };
+        const res = await fetch(
+          `/api/events/${eventId}/tables/${encodeURIComponent(name)}/invites`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(body),
           }
-        : { slots, totalTablePrice: totalPrice };
-      const res = await fetch(
-        `/api/events/${eventId}/tables/${tableSegment}/invites`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
+        );
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(
+            tableNames.length > 1
+              ? `${name}: ${data.error || "Error al generar invites"}`
+              : data.error || "Error al generar invites"
+          );
         }
-      );
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Error al generar invites");
+        if (data.success && Array.isArray(data.data?.invites)) {
+          allInvites.push(...data.data.invites);
+        } else {
+          throw new Error("No se recibieron los links");
+        }
       }
 
-      if (data.success && data.data?.invites) {
-        setGeneratedLinks(data.data.invites);
-        setSelectedEventId(eventId);
-        setShowGenerate(false);
-        setGenerateTableNumber("");
-        setGenerateTotalPrice("");
-        toast.success("Links generados. Cópialos y compártelos.");
-        // Refrescar lista de invites
-        const invRes = await fetch(`/api/admin/events/${eventId}/invites`, {
-          credentials: "include",
-        });
-        const invData = await invRes.json();
-        if (invData.success && invData.data?.invites) {
-          setInvites(invData.data.invites);
-        }
-      } else {
-        throw new Error("No se recibieron los links");
+      setGeneratedLinks(allInvites);
+      setSelectedEventId(eventId);
+      setShowGenerate(false);
+      setGenerateTableNumber("");
+      setGenerateTotalPrice("");
+      toast.success(
+        allInvites.length === 1
+          ? "Link generado. Cópialo y compártelo."
+          : `${allInvites.length} links generados. Cópialos y compártelos.`
+      );
+      const invRes = await fetch(`/api/admin/events/${eventId}/invites`, {
+        credentials: "include",
+      });
+      const invData = await invRes.json();
+      if (invData.success && invData.data?.invites) {
+        setInvites(invData.data.invites);
       }
     } catch (err: any) {
       toast.error(err.message || "Error al generar");
@@ -403,6 +465,8 @@ export function InvitesManager() {
               setGenerateSlots(Math.min(MAX_TRADITIONAL_SLOTS, Math.max(1, pick?.defaultSeatsForPool ?? 5)));
               setGenerateMinConfirm(DEFAULT_MIN_CONFIRM);
               setGenerateTotalPrice("");
+              setGenerateTicketTypeId(pick?.tableTypes[0]?.id ?? "");
+              setGenerateTableCount(1);
               setGeneratedLinks([]);
             }}
             className="bg-white/20 text-white hover:bg-white/30"
@@ -424,6 +488,7 @@ export function InvitesManager() {
                     const id = e.target.value;
                     setGenerateEventId(id);
                     const ev = events.find((x) => x.id === id);
+                    setGenerateTicketTypeId(ev?.tableTypes[0]?.id ?? "");
                     if (ev?.hasTables && !usePoolMode) {
                       setGenerateSlots(
                         Math.min(
@@ -446,30 +511,76 @@ export function InvitesManager() {
               </div>
               <div>
                 <label className="block text-white/80 text-sm font-medium mb-1">
+                  Tipo de mesa *
+                </label>
+                <select
+                  value={generateTicketTypeId}
+                  onChange={(e) => setGenerateTicketTypeId(e.target.value)}
+                  required={tableTypesForGenerate.length > 1}
+                  className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                >
+                  {tableTypesForGenerate.length === 0 ? (
+                    <option value="">Sin tipos de mesa</option>
+                  ) : (
+                    tableTypesForGenerate.map((tt) => (
+                      <option key={tt.id} value={tt.id}>
+                        {tt.name} · ${tt.unitPrice.toLocaleString("es-MX")}
+                      </option>
+                    ))
+                  )}
+                </select>
+                <p className="text-white/45 text-xs mt-1">
+                  Este link solo vende ese tipo. Para otro tipo, genera otro link.
+                </p>
+              </div>
+              <div>
+                <label className="block text-white/80 text-sm font-medium mb-1">
                   Nombre o número de mesa *
                 </label>
                 <input
                   type="text"
                   value={generateTableNumber}
                   onChange={(e) => setGenerateTableNumber(e.target.value)}
-                  placeholder="Ej: 42, Terraza A, VIP Norte…"
+                  placeholder="Ej: 1, Terraza A…"
                   required
                   maxLength={120}
                   className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
                 />
+              </div>
+              <div>
+                <label className="block text-white/80 text-sm font-medium mb-1">
+                  Cuántas mesas
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={MAX_TABLES_PER_BATCH}
+                  value={generateTableCount}
+                  onChange={(e) =>
+                    setGenerateTableCount(
+                      Math.min(
+                        MAX_TABLES_PER_BATCH,
+                        Math.max(1, parseInt(e.target.value, 10) || 1)
+                      )
+                    )
+                  }
+                  className="w-full max-w-[120px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                />
+                <p className="text-white/45 text-xs mt-1">
+                  Si pones 1 y cantidad 5, crea mesas 1–5. Cada una tiene su propio link.
+                </p>
               </div>
             </div>
 
             {usePoolMode ? (
               <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4 space-y-4">
                 <p className="text-white/55 text-xs leading-relaxed">
-                  <strong className="text-white/75">Cada pago</strong> usa el precio de la{" "}
-                  <strong className="text-white/80">mesa</strong> del evento (ahora{" "}
+                  <strong className="text-white/75">Un link = un tipo de mesa</strong> (precio{" "}
                   <strong className="text-white/90">
                     ${pricePerPersonForEventId(generateEventId).toLocaleString("es-MX")}
                   </strong>
-                  , con fases si las tiene). Si hay varias mesas, el link deja elegir cantidades y cobra cada una a su
-                  precio. Abajo defines cuántos pagos confirman la mesa.
+                  ). Puedes generar varias mesas a la vez; cada mesa tiene su URL. El comprador elige
+                  cantidad de ese tipo, no de otras mesas del evento.
                 </p>
                 <div>
                   <label className="block text-white/80 text-sm font-medium mb-1">
@@ -570,11 +681,13 @@ export function InvitesManager() {
                 >
                   <span className="text-white/80 text-sm">
                     {link.isPool
-                      ? `Mesa compartida ($${link.pricePerSeat?.toLocaleString("es-MX") ?? "—"} / pago${
+                      ? `${link.tableNumber ? `Mesa ${link.tableNumber} · ` : ""}${
+                          link.ticketTypeName ? `${link.ticketTypeName} · ` : ""
+                        }$${link.pricePerSeat?.toLocaleString("es-MX") ?? "—"} / pago${
                           link.minPaidToConfirm != null
                             ? ` · confirmar con ${link.minPaidToConfirm} pagos`
                             : ""
-                        }) ·`
+                        } ·`
                       : `Asiento ${link.seatNumber} ·`}
                   </span>
                   <button
@@ -666,7 +779,10 @@ export function InvitesManager() {
                   className="border-b border-white/5 hover:bg-white/5"
                 >
                   <td className="py-3 px-4 text-white/90">
-                    {inv.tableNumber}
+                    <p>{inv.tableNumber}</p>
+                    {inv.ticketTypeName ? (
+                      <p className="text-[11px] text-white/45 mt-0.5">{inv.ticketTypeName}</p>
+                    ) : null}
                   </td>
                   <td className="py-3 px-4 text-white/80">
                     {inv.isPool ? "Link compartido" : inv.seatNumber}

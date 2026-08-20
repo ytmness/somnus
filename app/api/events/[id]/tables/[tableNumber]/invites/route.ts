@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import crypto from "crypto";
 import { parseTableKeyFromPath, ticketTableLabel } from "@/lib/table-invite";
-import { pickInvitePoolAnchor } from "@/lib/ticket-pricing";
+import { listInvitePoolTicketTypes, resolveInvitePoolTicket } from "@/lib/ticket-pricing";
 
 const INVITE_EXPIRY_DAYS = 7;
 const MAX_TRADITIONAL_SLOTS = 500;
@@ -47,12 +47,14 @@ export async function POST(
       totalTablePrice,
       mode,
       minPaidToConfirm: minPaidRaw,
+      ticketTypeId: ticketTypeIdRaw,
     } = body as {
       invites?: Array<{ name: string; email?: string; phone?: string }>;
       slots?: number;
       totalTablePrice?: number;
       mode?: "pool";
       minPaidToConfirm?: number;
+      ticketTypeId?: string;
     };
 
     const isPoolMode = mode === "pool";
@@ -108,12 +110,22 @@ export async function POST(
     }
 
     const now = new Date();
-    const anchor = pickInvitePoolAnchor(event.ticketTypes, now);
+    const requestedId = typeof ticketTypeIdRaw === "string" ? ticketTypeIdRaw.trim() : "";
+    const listed = listInvitePoolTicketTypes(event.ticketTypes, now);
+    const anchor = resolveInvitePoolTicket(
+      event.ticketTypes,
+      requestedId || undefined,
+      now
+    );
     if (!anchor) {
       return NextResponse.json(
         {
           error:
-            "Agrega una mesa (o una entrada general, si el evento no usa mesas) con precio mayor a 0.",
+            listed.length > 1 && !requestedId
+              ? "Elige un tipo de mesa para este link."
+              : requestedId
+              ? "Ese tipo de mesa no está disponible para el link."
+              : "Agrega una mesa (o una entrada general, si el evento no usa mesas) con precio mayor a 0.",
         },
         { status: 400 }
       );
@@ -205,12 +217,15 @@ export async function POST(
               token: pool.inviteToken,
               name: "Mesa compartida",
               seatNumber: null,
+              tableNumber,
               url,
               pricePerSeat: Number(pool.pricePerSeat),
               maxSlots: pool.maxSlots,
               splitAmong: pool.splitAmong,
               minPaidToConfirm: pool.minPaidToConfirm,
               isPool: true,
+              ticketTypeName: generalTicketType.name,
+              ticketTypeId: generalTicketType.id,
             },
           ],
           tableNumber,

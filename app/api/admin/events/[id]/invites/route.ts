@@ -36,6 +36,7 @@ export async function GET(
     const pools = await prisma.tableInvitePool.findMany({
       where: { eventId },
       orderBy: { tableNumber: "asc" },
+      include: { ticketType: { select: { id: true, name: true } } },
     });
 
     const poolRows = await Promise.all(
@@ -66,6 +67,8 @@ export async function GET(
           paidCount,
           totalCollected,
           tableConfirmed,
+          ticketTypeName: p.ticketType?.name ?? null,
+          ticketTypeId: p.ticketTypeId,
         };
       })
     );

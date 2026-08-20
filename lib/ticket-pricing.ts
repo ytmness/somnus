@@ -47,6 +47,8 @@ export function isMesaTicketType(tt: {
 }
 
 export type TicketForInviteAnchor = {
+  id?: string;
+  name?: string | null;
   kind?: string | null;
   isTable: boolean;
   category: TicketCategory;
@@ -56,14 +58,16 @@ export type TicketForInviteAnchor = {
   pricePhases?: TicketPricePhaseRow[] | null;
 };
 
-/**
- * Precio ancla del link de mesa: tipos TABLE (o isTable legado).
- * Si el evento no tiene mesas, cae al general más barato (links viejos).
- */
-export function pickInvitePoolAnchor<T extends TicketForInviteAnchor>(
+export type InvitePoolTicketOption<T extends TicketForInviteAnchor> = {
+  ticket: T;
+  unitPrice: number;
+};
+
+/** Tipos que un link de mesa puede vender: TABLE, o generales si el evento no tiene mesas. */
+export function listInvitePoolTicketTypes<T extends TicketForInviteAnchor>(
   ticketTypes: T[],
   at: Date = new Date()
-): { ticket: T; unitPrice: number } | null {
+): InvitePoolTicketOption<T>[] {
   const rows = ticketTypes.filter(
     (tt) => tt.isActive !== false && !tt.isHidden
   );
@@ -80,7 +84,7 @@ export function pickInvitePoolAnchor<T extends TicketForInviteAnchor>(
             : rows.filter((tt) => !isMesaTicketType(tt));
         })();
 
-  let best: { ticket: T; unitPrice: number } | null = null;
+  const out: InvitePoolTicketOption<T>[] = [];
   for (const ticket of pool) {
     const unitPrice = effectiveTicketPriceAt(
       Number(ticket.price),
@@ -88,9 +92,39 @@ export function pickInvitePoolAnchor<T extends TicketForInviteAnchor>(
       at
     );
     if (!Number.isFinite(unitPrice) || unitPrice <= 0) continue;
-    if (!best || unitPrice < best.unitPrice) best = { ticket, unitPrice };
+    out.push({ ticket, unitPrice });
   }
-  return best;
+  return out;
+}
+
+export function resolveInvitePoolTicket<T extends TicketForInviteAnchor>(
+  ticketTypes: T[],
+  ticketTypeId: string | null | undefined,
+  at: Date = new Date()
+): InvitePoolTicketOption<T> | null {
+  const listed = listInvitePoolTicketTypes(ticketTypes, at);
+  if (listed.length === 0) return null;
+  const wanted = (ticketTypeId || "").trim();
+  if (wanted) {
+    return listed.find((row) => row.ticket.id === wanted) ?? null;
+  }
+  if (listed.length === 1) return listed[0];
+  return null;
+}
+
+/**
+ * Precio ancla del link de mesa: tipos TABLE (o isTable legado).
+ * Si el evento no tiene mesas, cae al general más barato (links viejos).
+ */
+export function pickInvitePoolAnchor<T extends TicketForInviteAnchor>(
+  ticketTypes: T[],
+  at: Date = new Date()
+): InvitePoolTicketOption<T> | null {
+  const listed = listInvitePoolTicketTypes(ticketTypes, at);
+  if (listed.length === 0) return null;
+  return listed.reduce((best, cur) =>
+    cur.unitPrice < best.unitPrice ? cur : best
+  );
 }
 
 export function invitePoolUnitPrice(
