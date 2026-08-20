@@ -581,7 +581,7 @@ export function InvitesManager() {
                   {(() => {
                     const tt = tableTypesForGenerate.find((t) => t.id === generateTicketTypeId);
                     if (!tt) return ".";
-                    return ` (${tt.cupos} cupos · mesa $${tt.tablePrice.toLocaleString("es-MX")}). La mesa se confirma al pagar todos los cupos.`;
+                    return ` (${tt.cupos} cupos · mesa $${tt.tablePrice.toLocaleString("es-MX")}). Con ${tt.cupos} pagos se confirma; pueden seguir pagando el mismo monto.`;
                   })()}
                 </p>
               </div>

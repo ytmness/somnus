@@ -62,19 +62,31 @@ export function tablePricePerCupo(
   return Math.round((total / seats) * 100) / 100;
 }
 
-export function effectiveInvitePoolCupos(pool: {
+export function invitePoolPaymentCap(pool: {
   maxSlots?: number | null;
+  ticketType?: {
+    kind?: string | null;
+    isTable?: boolean | null;
+  } | null;
+}): number | null {
+  if (pool.ticketType && isMesaTicketType(pool.ticketType)) return null;
+  if (pool.maxSlots != null && pool.maxSlots > 0) return pool.maxSlots;
+  return null;
+}
+
+export function invitePoolMinToConfirm(pool: {
+  minPaidToConfirm?: number;
   ticketType?: {
     kind?: string | null;
     isTable?: boolean | null;
     tableCapacity?: number | null;
   } | null;
 }): number | null {
-  if (pool.maxSlots != null && pool.maxSlots > 0) return pool.maxSlots;
   if (pool.ticketType && isMesaTicketType(pool.ticketType)) {
     return tableCupos(pool.ticketType.tableCapacity);
   }
-  return null;
+  const n = Math.floor(Number(pool.minPaidToConfirm) || 0);
+  return n > 0 ? n : null;
 }
 
 export type TicketForInviteAnchor = {

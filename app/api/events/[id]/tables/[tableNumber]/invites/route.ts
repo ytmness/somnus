@@ -195,7 +195,7 @@ export async function POST(
           ticketTypeId: generalTicketType.id,
           tableNumber,
           inviteToken: token,
-          maxSlots: cupos,
+          maxSlots: null,
           splitAmong: cupos ?? 1,
           minPaidToConfirm,
           pricePerSeat,

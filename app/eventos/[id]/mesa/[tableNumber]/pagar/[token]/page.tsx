@@ -467,19 +467,22 @@ export default function PagarInvitePage() {
               invite.pricePerSeat != null &&
               !invite.tableConfirmed && (
                 <p className="mt-2 text-[11px] text-white/40">
-                  Precio de mesa dividido entre {invite.minPaidToConfirm} cupos:{" "}
-                  {mxn.format(invite.pricePerSeat)} c/u (total{" "}
-                  {mxn.format(invite.minPaidToConfirm * invite.pricePerSeat)}).
+                  Precio de mesa ÷ {invite.minPaidToConfirm} cupos ={" "}
+                  {mxn.format(invite.pricePerSeat)} c/u. No hay tope de pagos: la
+                  siguiente persona paga lo mismo.
                 </p>
               )}
             {invite.minPaidToConfirm != null && (
               <p className="mt-4 text-xs text-white/50 border-t border-white/10 pt-4">
                 {invite.tableConfirmed ? (
-                  <span className="text-emerald-400/90 font-medium">Mesa confirmada</span>
+                  <span className="text-emerald-400/90 font-medium">
+                    Mesa confirmada · pueden seguir pagando
+                  </span>
                 ) : (
                   <>
-                    Se confirma al pagar los{" "}
-                    <span className="text-white/80 font-medium">{invite.minPaidToConfirm}</span> cupos:{" "}
+                    Mínimo para confirmar:{" "}
+                    <span className="text-white/80 font-medium">{invite.minPaidToConfirm}</span>{" "}
+                    pagos:{" "}
                     <span className="text-white/80">
                       {paidCount}/{invite.minPaidToConfirm}
                     </span>

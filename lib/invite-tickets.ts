@@ -93,7 +93,7 @@ export function toInviteTicketPayload(
     maxQuantity: tt.maxQuantity,
     soldQuantity: tt.soldQuantity,
     minPurchaseQty: isTableKind ? 1 : tt.minPurchaseQty ?? 1,
-    maxPurchaseQty: isTableKind ? cupos : tt.maxPurchaseQty ?? null,
+    maxPurchaseQty: isTableKind ? null : tt.maxPurchaseQty ?? null,
     manualSoldOut: Boolean(tt.manualSoldOut),
     salesStartDate: tt.salesStartDate
       ? new Date(tt.salesStartDate).toISOString()
@@ -104,21 +104,17 @@ export function toInviteTicketPayload(
   };
 }
 
-export function limitInviteTicketsToCupos(
-  tickets: InviteTicketTypePayload[],
-  remainingCupos: number | null | undefined
+export function openInviteTableTickets(
+  tickets: InviteTicketTypePayload[]
 ): InviteTicketTypePayload[] {
-  if (remainingCupos == null) return tickets;
-  const remaining = Math.max(0, Math.floor(remainingCupos));
   return tickets.map((tt) => {
     if (tt.kind !== "TABLE") return tt;
     return {
       ...tt,
-      minPurchaseQty: remaining > 0 ? 1 : 0,
-      maxPurchaseQty: remaining,
-      maxQuantity: remaining,
+      minPurchaseQty: 1,
+      maxPurchaseQty: null,
+      maxQuantity: 9999,
       soldQuantity: 0,
-      manualSoldOut: remaining <= 0 || tt.manualSoldOut,
     };
   });
 }

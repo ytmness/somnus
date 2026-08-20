@@ -5,13 +5,13 @@ import { calculateSaleAmounts } from "@/lib/payments/commissions";
 import { isStripeEnabled } from "@/lib/payments/config";
 import { ticketTableLabel } from "@/lib/table-invite";
 import { ticketTypeInclude } from "@/lib/ticket-type-persist";
+import { invitePoolPaymentCap } from "@/lib/ticket-pricing";
 import {
   canBuyInviteTicket,
   pickTicketsForInviteLink,
-  limitInviteTicketsToCupos,
+  openInviteTableTickets,
   toInviteTicketPayload,
 } from "@/lib/invite-tickets";
-import { effectiveInvitePoolCupos } from "@/lib/ticket-pricing";
 import type { Prisma } from "@prisma/client";
 import crypto from "crypto";
 
@@ -122,9 +122,6 @@ export async function POST(request: NextRequest) {
       const paidCount = await prisma.tableSlotInvite.count({
         where: { poolId: pool.id, status: "PAID" },
       });
-      const cupos = effectiveInvitePoolCupos(pool);
-      const remainingCupos =
-        cupos != null ? Math.max(0, cupos - paidCount) : null;
 
       const requestedItems = Array.isArray(items)
         ? items
@@ -150,21 +147,17 @@ export async function POST(request: NextRequest) {
           salesEndDate: event.salesEndDate,
         };
 
-        const allowed = limitInviteTicketsToCupos(
+        const allowed = openInviteTableTickets(
           pickTicketsForInviteLink(
             event.ticketTypes
               .map((tt) => toInviteTicketPayload(tt, now))
               .filter((tt): tt is NonNullable<typeof tt> => Boolean(tt)),
             pool.ticketTypeId
-          ),
-          remainingCupos
+          )
         );
-        const allowedIds = new Set(allowed.map((tt) => tt.id));
-
         for (const req of requestedItems) {
-          const raw = event.ticketTypes.find((tt) => tt.id === req.ticketTypeId);
-          const mapped = raw ? toInviteTicketPayload(raw, now) : null;
-          if (!mapped || !allowedIds.has(mapped.id)) {
+          const mapped = allowed.find((tt) => tt.id === req.ticketTypeId);
+          if (!mapped) {
             return NextResponse.json(
               { error: "Uno de los boletos seleccionados no está disponible en este link de mesa" },
               { status: 400 }
@@ -198,14 +191,10 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (cupos != null && paidCount + seatsToCharge > cupos) {
+      const paymentCap = invitePoolPaymentCap(pool);
+      if (paymentCap != null && paidCount + seatsToCharge > paymentCap) {
         return NextResponse.json(
-          {
-            error:
-              remainingCupos != null && remainingCupos > 0
-                ? `Esta mesa tiene ${cupos} cupos. Quedan ${remainingCupos}.`
-                : "Esta mesa ya está completa. Todos los cupos han sido pagados.",
-          },
+          { error: "Esta mesa ya está completa. Todos los espacios han sido pagados." },
           { status: 400 }
         );
       }
