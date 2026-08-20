@@ -8,6 +8,7 @@ import {
   isMesaTicketType,
   tableCupos,
   tablePricePerCupo,
+  effectiveTicketPriceAt,
 } from "@/lib/ticket-pricing";
 
 const INVITE_EXPIRY_DAYS = 7;
@@ -54,18 +55,20 @@ async function resolveOrCreateMesaTicketType(opts: {
 > {
   const totalRaw = opts.totalTablePrice;
   const cuposRaw = opts.cupos;
+  const cuposOk =
+    cuposRaw != null && Number.isFinite(cuposRaw) && cuposRaw >= 1
+      ? Math.min(MAX_CUPOS, Math.max(1, Math.floor(cuposRaw)))
+      : null;
 
+  // 1) Total manual → crea tipo TABLE oculto para este link
   if (
     totalRaw != null &&
     Number.isFinite(totalRaw) &&
     totalRaw > 0 &&
-    cuposRaw != null &&
-    Number.isFinite(cuposRaw) &&
-    cuposRaw >= 1
+    cuposOk != null
   ) {
-    const cupos = Math.min(MAX_CUPOS, Math.max(1, Math.floor(cuposRaw)));
     const tablePrice = Math.round(Number(totalRaw) * 100) / 100;
-    const unitPrice = tablePricePerCupo(tablePrice, cupos);
+    const unitPrice = tablePricePerCupo(tablePrice, cuposOk);
     if (unitPrice <= 0) {
       return { ok: false, error: "Precio total de mesa inválido", status: 400 };
     }
@@ -73,14 +76,14 @@ async function resolveOrCreateMesaTicketType(opts: {
       data: {
         eventId: opts.eventId,
         name: `Mesa ${opts.tableNumber}`,
-        description: `Link de mesa · ${cupos} cupos · total $${tablePrice.toLocaleString("es-MX")}`,
+        description: `Link de mesa · ${cuposOk} cupos · total $${tablePrice.toLocaleString("es-MX")}`,
         category: "VIP",
         kind: "TABLE",
         isTable: true,
         isHidden: true,
         price: tablePrice,
-        tableCapacity: cupos,
-        seatsPerTable: cupos,
+        tableCapacity: cuposOk,
+        seatsPerTable: cuposOk,
         maxQuantity: 9999,
         minPurchaseQty: 1,
         maxPurchaseQty: null,
@@ -90,12 +93,53 @@ async function resolveOrCreateMesaTicketType(opts: {
       ok: true,
       ticketTypeId: created.id,
       tablePrice,
-      cupos,
+      cupos: cuposOk,
       unitPrice,
       ticketTypeName: created.name,
     };
   }
 
+  // 2) Boleto del evento (entrada normal) + cupos
+  if (opts.requestedId && cuposOk != null) {
+    const tt = opts.ticketTypes.find(
+      (t) =>
+        t.id === opts.requestedId &&
+        t.isActive !== false &&
+        !t.isHidden
+    );
+    if (!tt) {
+      return {
+        ok: false,
+        error: "Ese boleto no está disponible en el evento.",
+        status: 400,
+      };
+    }
+    const base = effectiveTicketPriceAt(
+      Number(tt.price),
+      (tt.pricePhases as any) ?? null,
+      opts.now
+    );
+    if (!Number.isFinite(base) || base <= 0) {
+      return {
+        ok: false,
+        error: "Ese boleto no tiene un precio válido.",
+        status: 400,
+      };
+    }
+    const mesa = isMesaTicketType(tt);
+    const unitPrice = mesa ? tablePricePerCupo(base, tableCupos(tt.tableCapacity)) : base;
+    const tablePrice = Math.round(unitPrice * cuposOk * 100) / 100;
+    return {
+      ok: true,
+      ticketTypeId: tt.id,
+      tablePrice,
+      cupos: cuposOk,
+      unitPrice,
+      ticketTypeName: tt.name,
+    };
+  }
+
+  // 3) Legacy: ancla en tipos TABLE del evento
   const listed = listInvitePoolTicketTypes(opts.ticketTypes as any, opts.now);
   const anchor = resolveInvitePoolTicket(
     opts.ticketTypes as any,
@@ -106,18 +150,19 @@ async function resolveOrCreateMesaTicketType(opts: {
     return {
       ok: false,
       error:
-        listed.length > 1 && !opts.requestedId
-          ? "Elige un tipo de mesa o indica total + cupos."
-          : "Indica el total de la mesa y los cupos (ej. mesa de $8,000 / 8 personas).",
+        "Indica el total de la mesa + cupos, o elige un boleto del evento + cupos.",
       status: 400,
     };
   }
   const mesa = isMesaTicketType(anchor.ticket);
+  const cupos = cuposOk ?? (mesa ? tableCupos(anchor.ticket.tableCapacity) : 1);
   return {
     ok: true,
     ticketTypeId: String(anchor.ticket.id),
-    tablePrice: anchor.tablePrice,
-    cupos: mesa ? tableCupos(anchor.ticket.tableCapacity) : 1,
+    tablePrice: mesa
+      ? anchor.tablePrice
+      : Math.round(anchor.unitPrice * cupos * 100) / 100,
+    cupos,
     unitPrice: anchor.unitPrice,
     ticketTypeName: String(anchor.ticket.name || "Mesa"),
   };

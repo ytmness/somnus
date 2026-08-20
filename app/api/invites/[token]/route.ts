@@ -116,15 +116,32 @@ export async function GET(
       },
     });
 
-    const ticketTypes = await loadInviteTicketTypes(
+    const ticketTypesRaw = await loadInviteTicketTypes(
       pool.eventId,
       pool.ticketTypeId
     );
+    const liveCupos = pool.splitAmong || minToConfirm;
+    const tableTotalFromPool = invitePoolTableTotal(pool);
+    const ticketTypes = openInviteTableTickets(
+      ticketTypesRaw.map((tt) => {
+        if (tt.kind === "TABLE" && tt.tablePrice != null && tt.cupos != null) {
+          return tt;
+        }
+        // Boleto normal del evento usado como mesa: exponer total/cupos del pool
+        return {
+          ...tt,
+          kind: "TABLE" as const,
+          price: Number(pool.pricePerSeat) || tt.price,
+          tablePrice: tableTotalFromPool,
+          cupos: liveCupos,
+          minPurchaseQty: 1,
+          maxPurchaseQty: null,
+        };
+      })
+    );
     const livePrice = ticketTypes[0]?.price ?? Number(pool.pricePerSeat);
     const liveTablePrice =
-      ticketTypes[0]?.tablePrice ?? invitePoolTableTotal(pool);
-    const liveCupos =
-      ticketTypes[0]?.cupos ?? pool.splitAmong ?? minToConfirm;
+      ticketTypes[0]?.tablePrice ?? tableTotalFromPool;
     const totalCollected = paidSlots.reduce(
       (sum, s) => sum + Number(s.pricePerSeat),
       0
@@ -132,7 +149,7 @@ export async function GET(
     const tableTotal =
       liveTablePrice != null && liveTablePrice > 0
         ? liveTablePrice
-        : invitePoolTableTotal(pool);
+        : tableTotalFromPool;
     const remaining = Math.max(
       0,
       Math.round((tableTotal - totalCollected) * 100) / 100

@@ -11,19 +11,19 @@ export function isInviteTicketVisible(
   return false;
 }
 
-/** One link sells one type. Prefer that id; otherwise TABLE tiers, or generals if none. */
+/** One link sells one type. Prefer that id across all kinds; otherwise TABLE tiers, or generals. */
 export function pickTicketsForInviteLink(
   tickets: InviteTicketTypePayload[],
   ticketTypeId?: string | null
 ): InviteTicketTypePayload[] {
+  const wanted = (ticketTypeId || "").trim();
+  if (wanted) {
+    const match = tickets.find((tt) => tt.id === wanted);
+    return match ? [match] : [];
+  }
   const tables = tickets.filter((tt) => tt.kind === "TABLE");
   const pool =
     tables.length > 0 ? tables : tickets.filter((tt) => tt.kind === "STANDARD");
-  const wanted = (ticketTypeId || "").trim();
-  if (wanted) {
-    const match = pool.find((tt) => tt.id === wanted);
-    return match ? [match] : [];
-  }
   return pool;
 }
 

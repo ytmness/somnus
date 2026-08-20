@@ -71,11 +71,8 @@ export function invitePoolPaymentCap(pool: {
   } | null;
 }): number | null {
   if (pool.maxSlots != null && pool.maxSlots > 0) return pool.maxSlots;
-  if (pool.ticketType && isMesaTicketType(pool.ticketType)) {
-    const n = Math.floor(Number(pool.splitAmong) || 0);
-    return n > 0 ? n : null;
-  }
-  return null;
+  const n = Math.floor(Number(pool.splitAmong) || 0);
+  return n > 0 ? n : null;
 }
 
 export function invitePoolMinToConfirm(pool: {

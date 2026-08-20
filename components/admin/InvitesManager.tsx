@@ -5,12 +5,19 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Copy, Check, Link2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { expandTableNumbers, MAX_TABLES_PER_BATCH } from "@/lib/table-invite";
+import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
 import { TableStaffManager } from "@/components/admin/TableStaffManager";
+
+interface EventTicketOption {
+  id: string;
+  name: string;
+  price: number;
+}
 
 interface EventOption {
   id: string;
   name: string;
+  tickets: EventTicketOption[];
 }
 
 interface InviteRow {
@@ -39,6 +46,27 @@ interface InviteRow {
   ticketTypeName?: string | null;
 }
 
+type PriceMode = "total" | "ticket";
+
+function mapEventTickets(raw: unknown[]): EventTicketOption[] {
+  return (raw || [])
+    .map((tt: any) => {
+      if (!tt?.id || tt.isHidden || tt.kind === "TABLE" || tt.isTable) return null;
+      if (tt.isActive === false) return null;
+      const price = effectiveTicketPriceAt(
+        Number(tt.price),
+        tt.pricePhases ?? null
+      );
+      if (!Number.isFinite(price) || price <= 0) return null;
+      return {
+        id: String(tt.id),
+        name: String(tt.name || "Entrada"),
+        price,
+      };
+    })
+    .filter((t): t is EventTicketOption => Boolean(t));
+}
+
 export function InvitesManager() {
   const [events, setEvents] = useState<EventOption[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string>("");
@@ -51,8 +79,9 @@ export function InvitesManager() {
   const [generateEventId, setGenerateEventId] = useState("");
   const [generateTableNumber, setGenerateTableNumber] = useState("");
   const [generateCupos, setGenerateCupos] = useState(8);
+  const [priceMode, setPriceMode] = useState<PriceMode>("total");
   const [generateTotalPrice, setGenerateTotalPrice] = useState("");
-  const [generateTableCount, setGenerateTableCount] = useState(1);
+  const [generateTicketTypeId, setGenerateTicketTypeId] = useState("");
   const [isSubmittingGenerate, setIsSubmittingGenerate] = useState(false);
   const [generatedLinks, setGeneratedLinks] = useState<
     Array<{
@@ -75,12 +104,11 @@ export function InvitesManager() {
       const res = await fetch("/api/events", { credentials: "include" });
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
-        const allEvents: EventOption[] = data.data.map(
-          (e: { id: string; name: string }) => ({
-            id: e.id,
-            name: e.name,
-          })
-        );
+        const allEvents: EventOption[] = data.data.map((e: any) => ({
+          id: e.id,
+          name: e.name,
+          tickets: mapEventTickets(e.ticketTypes || []),
+        }));
         setEvents(allEvents);
         setSelectedEventId((prev) => {
           if (allEvents.length === 0) return "";
@@ -129,10 +157,28 @@ export function InvitesManager() {
     loadInvites();
   }, [selectedEventId]);
 
+  const ticketsForGenerate =
+    events.find((e) => e.id === generateEventId)?.tickets ?? [];
+  const selectedTicket = ticketsForGenerate.find(
+    (t) => t.id === generateTicketTypeId
+  );
+
   const unitFromForm = (() => {
+    if (priceMode === "ticket") {
+      return selectedTicket?.price ?? 0;
+    }
     const total = parseFloat(generateTotalPrice.replace(/,/g, "."));
     if (!Number.isFinite(total) || total <= 0 || generateCupos < 1) return 0;
     return Math.round((total / generateCupos) * 100) / 100;
+  })();
+
+  const tableTotalPreview = (() => {
+    if (priceMode === "ticket") {
+      if (!selectedTicket) return 0;
+      return Math.round(selectedTicket.price * generateCupos * 100) / 100;
+    }
+    const total = parseFloat(generateTotalPrice.replace(/,/g, "."));
+    return Number.isFinite(total) && total > 0 ? total : 0;
   })();
 
   const copyLink = async (url: string, id: string) => {
@@ -196,6 +242,18 @@ export function InvitesManager() {
     }
   };
 
+  const openGenerateForm = (eventId: string) => {
+    const ev = events.find((e) => e.id === eventId);
+    setShowGenerate(true);
+    setGenerateEventId(eventId);
+    setGenerateTableNumber("");
+    setGenerateCupos(8);
+    setPriceMode("total");
+    setGenerateTotalPrice("");
+    setGenerateTicketTypeId(ev?.tickets[0]?.id ?? "");
+    setGeneratedLinks([]);
+  };
+
   const handleGenerateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const eventId = generateEventId || selectedEventId;
@@ -208,62 +266,55 @@ export function InvitesManager() {
       toast.error("Indica un nombre o número de mesa (1–120 caracteres).");
       return;
     }
-    const tableNames = expandTableNumbers(tableKey, generateTableCount);
-    if (tableNames.length === 0) {
-      toast.error("Indica al menos una mesa.");
-      return;
-    }
-    const totalPrice = parseFloat(generateTotalPrice.replace(/,/g, "."));
-    if (!Number.isFinite(totalPrice) || totalPrice <= 0) {
-      toast.error("Indica el total de la mesa (mayor a 0).");
-      return;
-    }
     const cupos = Math.min(500, Math.max(1, generateCupos));
+
+    let body: Record<string, unknown> = {
+      mode: "pool",
+      cupos,
+      minPaidToConfirm: cupos,
+    };
+
+    if (priceMode === "total") {
+      const totalPrice = parseFloat(generateTotalPrice.replace(/,/g, "."));
+      if (!Number.isFinite(totalPrice) || totalPrice <= 0) {
+        toast.error("Indica el total de la mesa (mayor a 0).");
+        return;
+      }
+      body.totalTablePrice = totalPrice;
+    } else {
+      if (!generateTicketTypeId) {
+        toast.error("Elige un boleto del evento.");
+        return;
+      }
+      body.ticketTypeId = generateTicketTypeId;
+    }
 
     setIsSubmittingGenerate(true);
     setGeneratedLinks([]);
     try {
-      const allInvites: typeof generatedLinks = [];
-      for (const name of tableNames) {
-        const res = await fetch(
-          `/api/events/${eventId}/tables/${encodeURIComponent(name)}/invites`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({
-              mode: "pool",
-              totalTablePrice: totalPrice,
-              cupos,
-              minPaidToConfirm: cupos,
-            }),
-          }
-        );
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(
-            tableNames.length > 1
-              ? `${name}: ${data.error || "Error al generar invites"}`
-              : data.error || "Error al generar invites"
-          );
+      const res = await fetch(
+        `/api/events/${eventId}/tables/${encodeURIComponent(tableKey)}/invites`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(body),
         }
-        if (data.success && Array.isArray(data.data?.invites)) {
-          allInvites.push(...data.data.invites);
-        } else {
-          throw new Error("No se recibieron los links");
-        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Error al generar invites");
+      }
+      if (!data.success || !Array.isArray(data.data?.invites)) {
+        throw new Error("No se recibieron los links");
       }
 
-      setGeneratedLinks(allInvites);
+      setGeneratedLinks(data.data.invites);
       setSelectedEventId(eventId);
       setShowGenerate(false);
       setGenerateTableNumber("");
       setGenerateTotalPrice("");
-      toast.success(
-        allInvites.length === 1
-          ? "Link de mesa guardado. Cópialo y compártelo."
-          : `${allInvites.length} links de mesa guardados.`
-      );
+      toast.success("Link de mesa guardado. Cópialo y compártelo.");
       const invRes = await fetch(`/api/admin/events/${eventId}/invites`, {
         credentials: "include",
       });
@@ -291,8 +342,8 @@ export function InvitesManager() {
       <div className="text-center py-12 rounded-lg bg-white/5 border border-white/10 p-6">
         <p className="text-white/70 mb-4">No hay eventos</p>
         <p className="text-white/50 text-sm mb-4">
-          Crea un evento con entradas normales. Las mesas se arman aquí con
-          total + cupos.
+          Crea un evento con entradas. Luego aquí armas cada mesa con total o
+          con un boleto del evento.
         </p>
         <Link href="/admin">
           <Button
@@ -311,22 +362,15 @@ export function InvitesManager() {
       <div className="rounded-xl border border-white/10 bg-white/5 p-6">
         <h3 className="text-lg font-bold text-white mb-2">Links de mesa</h3>
         <p className="text-white/50 text-sm mb-4">
-          Cada mesa es un link: pones el total, de cuántos cupos es, y a medida
-          que pagan se resta el saldo. Con todos los cupos pagados queda
-          confirmada.
+          Una mesa = un link. Eliges total manual o un boleto del evento, más
+          cupos. Conforme pagan, baja el saldo.
         </p>
 
         {!showGenerate ? (
           <Button
-            onClick={() => {
-              setShowGenerate(true);
-              setGenerateEventId(selectedEventId || events[0]?.id || "");
-              setGenerateTableNumber("");
-              setGenerateCupos(8);
-              setGenerateTotalPrice("");
-              setGenerateTableCount(1);
-              setGeneratedLinks([]);
-            }}
+            onClick={() =>
+              openGenerateForm(selectedEventId || events[0]?.id || "")
+            }
             className="bg-white/20 text-white hover:bg-white/30"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -341,7 +385,12 @@ export function InvitesManager() {
                 </label>
                 <select
                   value={generateEventId}
-                  onChange={(e) => setGenerateEventId(e.target.value)}
+                  onChange={(e) => {
+                    const id = e.target.value;
+                    setGenerateEventId(id);
+                    const ev = events.find((x) => x.id === id);
+                    setGenerateTicketTypeId(ev?.tickets[0]?.id ?? "");
+                  }}
                   required
                   className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
                 >
@@ -366,10 +415,36 @@ export function InvitesManager() {
                   className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
                 />
               </div>
-              <div>
-                <label className="block text-white/80 text-sm font-medium mb-1">
-                  Total de la mesa (MXN) *
+            </div>
+
+            <div>
+              <p className="block text-white/80 text-sm font-medium mb-2">
+                Precio *
+              </p>
+              <div className="flex flex-wrap gap-4 mb-3">
+                <label className="inline-flex items-center gap-2 cursor-pointer text-sm text-white/85">
+                  <input
+                    type="radio"
+                    name="priceMode"
+                    checked={priceMode === "total"}
+                    onChange={() => setPriceMode("total")}
+                    className="accent-white"
+                  />
+                  Total de la mesa
                 </label>
+                <label className="inline-flex items-center gap-2 cursor-pointer text-sm text-white/85">
+                  <input
+                    type="radio"
+                    name="priceMode"
+                    checked={priceMode === "ticket"}
+                    onChange={() => setPriceMode("ticket")}
+                    className="accent-white"
+                  />
+                  Boleto del evento
+                </label>
+              </div>
+
+              {priceMode === "total" ? (
                 <input
                   type="text"
                   inputMode="decimal"
@@ -381,59 +456,65 @@ export function InvitesManager() {
                   }
                   placeholder="Ej: 8000"
                   required
-                  className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
+                  className="w-full max-w-xs px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
                 />
-              </div>
-              <div>
-                <label className="block text-white/80 text-sm font-medium mb-1">
-                  Cupos (personas) *
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  max={500}
-                  value={generateCupos}
-                  onChange={(e) =>
-                    setGenerateCupos(
-                      Math.min(
-                        500,
-                        Math.max(1, parseInt(e.target.value, 10) || 1)
-                      )
+              ) : (
+                <div>
+                  <select
+                    value={generateTicketTypeId}
+                    onChange={(e) => setGenerateTicketTypeId(e.target.value)}
+                    required
+                    className="w-full max-w-md px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                  >
+                    {ticketsForGenerate.length === 0 ? (
+                      <option value="">Sin boletos en este evento</option>
+                    ) : (
+                      ticketsForGenerate.map((tt) => (
+                        <option key={tt.id} value={tt.id}>
+                          {tt.name} · ${tt.price.toLocaleString("es-MX")} c/u
+                        </option>
+                      ))
+                    )}
+                  </select>
+                  <p className="text-white/45 text-xs mt-1">
+                    Cada cupo cobra el precio de ese boleto. El total de la mesa
+                    = precio × cupos.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-white/80 text-sm font-medium mb-1">
+                Cupos (personas) *
+              </label>
+              <input
+                type="number"
+                min={1}
+                max={500}
+                value={generateCupos}
+                onChange={(e) =>
+                  setGenerateCupos(
+                    Math.min(
+                      500,
+                      Math.max(1, parseInt(e.target.value, 10) || 1)
                     )
-                  }
-                  className="w-full max-w-[140px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
-                />
-                <p className="text-white/45 text-xs mt-1">
-                  Con {generateCupos} pagos se confirma. Cada cupo ≈ $
-                  {unitFromForm > 0
-                    ? unitFromForm.toLocaleString("es-MX")
-                    : "—"}
-                  .
-                </p>
-              </div>
-              <div>
-                <label className="block text-white/80 text-sm font-medium mb-1">
-                  ¿Cuántas mesas seguidas?
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  max={MAX_TABLES_PER_BATCH}
-                  value={generateTableCount}
-                  onChange={(e) =>
-                    setGenerateTableCount(
-                      Math.min(
-                        MAX_TABLES_PER_BATCH,
-                        Math.max(1, parseInt(e.target.value, 10) || 1)
-                      )
-                    )
-                  }
-                  className="w-full max-w-[120px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
-                />
-                <p className="text-white/45 text-xs mt-1">
-                  Con nombre 1 y cantidad 5 crea mesas 1–5 (mismo total/cupos).
-                </p>
-              </div>
+                  )
+                }
+                className="w-full max-w-[140px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+              />
+              <p className="text-white/45 text-xs mt-1">
+                Total ≈ $
+                {tableTotalPreview > 0
+                  ? tableTotalPreview.toLocaleString("es-MX")
+                  : "—"}
+                {" · "}
+                {generateCupos} cupos · $
+                {unitFromForm > 0
+                  ? unitFromForm.toLocaleString("es-MX")
+                  : "—"}{" "}
+                c/u. Con {generateCupos} pagos se confirma.
+              </p>
             </div>
 
             <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4">
@@ -446,7 +527,10 @@ export function InvitesManager() {
             <div className="flex gap-3">
               <Button
                 type="submit"
-                disabled={isSubmittingGenerate}
+                disabled={
+                  isSubmittingGenerate ||
+                  (priceMode === "ticket" && ticketsForGenerate.length === 0)
+                }
                 className="bg-white text-black hover:bg-white/90"
               >
                 {isSubmittingGenerate ? "Creando..." : "Crear y guardar link"}
@@ -538,7 +622,7 @@ export function InvitesManager() {
             Aún no hay links de mesa en este evento
           </p>
           <p className="text-white/50 text-sm">
-            Crea uno arriba: nombre, total y cupos.
+            Crea uno arriba: nombre, precio (total o boleto) y cupos.
           </p>
         </div>
       ) : (
@@ -597,9 +681,16 @@ export function InvitesManager() {
                   >
                     <td className="py-3 px-4 text-white/90">
                       <p>{inv.tableNumber}</p>
-                      {inv.splitAmong != null && (
+                      {(inv.ticketTypeName || inv.splitAmong != null) && (
                         <p className="text-[11px] text-white/45 mt-0.5">
-                          {inv.splitAmong} cupos
+                          {[
+                            inv.ticketTypeName,
+                            inv.splitAmong != null
+                              ? `${inv.splitAmong} cupos`
+                              : null,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
                         </p>
                       )}
                     </td>
