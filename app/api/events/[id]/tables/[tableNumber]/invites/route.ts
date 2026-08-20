@@ -200,6 +200,7 @@ export async function POST(
       mode,
       minPaidToConfirm: minPaidRaw,
       ticketTypeId: ticketTypeIdRaw,
+      coverTicketTypeId: coverTicketTypeIdRaw,
     } = body as {
       invites?: Array<{ name: string; email?: string; phone?: string }>;
       slots?: number;
@@ -208,6 +209,7 @@ export async function POST(
       mode?: "pool";
       minPaidToConfirm?: number;
       ticketTypeId?: string;
+      coverTicketTypeId?: string;
     };
 
     const isPoolMode = mode === "pool";
@@ -310,6 +312,34 @@ export async function POST(
         );
       }
 
+      const coverTicketTypeId =
+        typeof coverTicketTypeIdRaw === "string"
+          ? coverTicketTypeIdRaw.trim()
+          : "";
+      if (!coverTicketTypeId) {
+        return NextResponse.json(
+          {
+            error:
+              "Elige el boleto de cover (entrada) para quienes lleguen después de confirmar la mesa.",
+          },
+          { status: 400 }
+        );
+      }
+      const coverTt = event.ticketTypes.find(
+        (t) =>
+          t.id === coverTicketTypeId &&
+          t.isActive !== false &&
+          !t.isHidden &&
+          t.kind !== "TABLE" &&
+          !t.isTable
+      );
+      if (!coverTt) {
+        return NextResponse.json(
+          { error: "El boleto de cover no está disponible en este evento." },
+          { status: 400 }
+        );
+      }
+
       const existingPool = await prisma.tableInvitePool.findFirst({
         where: { eventId, tableNumber },
       });
@@ -344,6 +374,7 @@ export async function POST(
         data: {
           eventId,
           ticketTypeId,
+          coverTicketTypeId: coverTt.id,
           tableNumber,
           inviteToken: token,
           maxSlots: null,
@@ -377,6 +408,8 @@ export async function POST(
               isPool: true,
               ticketTypeName,
               ticketTypeId,
+              coverTicketTypeId: coverTt.id,
+              coverTicketName: coverTt.name,
             },
           ],
           tableNumber,

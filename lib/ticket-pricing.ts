@@ -65,14 +65,34 @@ export function tablePricePerCupo(
 export function invitePoolPaymentCap(pool: {
   maxSlots?: number | null;
   splitAmong?: number | null;
+  coverTicketTypeId?: string | null;
   ticketType?: {
     kind?: string | null;
     isTable?: boolean | null;
   } | null;
 }): number | null {
+  // Con cover: tras llenar cupos de mesa se siguen aceptando extras (cover).
+  if (pool.coverTicketTypeId) return null;
   if (pool.maxSlots != null && pool.maxSlots > 0) return pool.maxSlots;
   const n = Math.floor(Number(pool.splitAmong) || 0);
   return n > 0 ? n : null;
+}
+
+/** Cupos de mesa que faltan por pagar (antes del cover). */
+export function invitePoolSharesLeft(
+  pool: { splitAmong?: number | null },
+  paidShareCount: number
+): number {
+  const seats = Math.max(0, Math.floor(Number(pool.splitAmong) || 0));
+  return Math.max(0, seats - Math.max(0, Math.floor(paidShareCount)));
+}
+
+/** Mesa con monto/cupos cubiertos → extras pasan a cover. */
+export function invitePoolMesaFilled(
+  pool: { splitAmong?: number | null },
+  paidShareCount: number
+): boolean {
+  return invitePoolSharesLeft(pool, paidShareCount) <= 0;
 }
 
 export function invitePoolMinToConfirm(pool: {

@@ -37,24 +37,38 @@ export async function GET(
     const pools = await prisma.tableInvitePool.findMany({
       where: { eventId },
       orderBy: { tableNumber: "asc" },
-      include: { ticketType: { select: { id: true, name: true, kind: true, isTable: true, tableCapacity: true } } },
+      include: {
+        ticketType: {
+          select: { id: true, name: true, kind: true, isTable: true, tableCapacity: true },
+        },
+        coverTicketType: { select: { id: true, name: true } },
+      },
     });
 
     const poolRows = await Promise.all(
       pools.map(async (p) => {
         const paidSlots = await prisma.tableSlotInvite.findMany({
           where: { poolId: p.id, status: "PAID" },
-          select: { pricePerSeat: true },
+          select: { pricePerSeat: true, isCover: true },
         });
-        const paidCount = paidSlots.length;
+        const paidShareSlots = paidSlots.filter((s) => !s.isCover);
+        const paidCount = paidShareSlots.length;
+        const paidCoverCount = paidSlots.length - paidCount;
         const totalCollected = paidSlots.reduce(
+          (sum, s) => sum + Number(s.pricePerSeat),
+          0
+        );
+        const shareCollected = paidShareSlots.reduce(
           (sum, s) => sum + Number(s.pricePerSeat),
           0
         );
         const minToConfirm = invitePoolMinToConfirm(p) ?? p.minPaidToConfirm;
         const tableConfirmed = paidCount >= minToConfirm;
         const tableTotal = invitePoolTableTotal(p);
-        const remaining = Math.max(0, Math.round((tableTotal - totalCollected) * 100) / 100);
+        const remaining = Math.max(
+          0,
+          Math.round((tableTotal - shareCollected) * 100) / 100
+        );
         return {
           id: p.id,
           tableNumber: p.tableNumber,
@@ -74,12 +88,15 @@ export async function GET(
           splitAmong: p.splitAmong,
           minPaidToConfirm: minToConfirm,
           paidCount,
+          paidCoverCount,
           totalCollected,
           tableTotal,
           remaining,
           tableConfirmed,
           ticketTypeName: p.ticketType?.name ?? null,
           ticketTypeId: p.ticketTypeId,
+          coverTicketName: p.coverTicketType?.name ?? null,
+          coverTicketTypeId: p.coverTicketTypeId,
         };
       })
     );

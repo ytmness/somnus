@@ -82,6 +82,7 @@ export function InvitesManager() {
   const [priceMode, setPriceMode] = useState<PriceMode>("total");
   const [generateTotalPrice, setGenerateTotalPrice] = useState("");
   const [generateTicketTypeId, setGenerateTicketTypeId] = useState("");
+  const [generateCoverTicketTypeId, setGenerateCoverTicketTypeId] = useState("");
   const [isSubmittingGenerate, setIsSubmittingGenerate] = useState(false);
   const [generatedLinks, setGeneratedLinks] = useState<
     Array<{
@@ -161,6 +162,9 @@ export function InvitesManager() {
     events.find((e) => e.id === generateEventId)?.tickets ?? [];
   const selectedTicket = ticketsForGenerate.find(
     (t) => t.id === generateTicketTypeId
+  );
+  const selectedCover = ticketsForGenerate.find(
+    (t) => t.id === generateCoverTicketTypeId
   );
 
   const unitFromForm = (() => {
@@ -251,6 +255,7 @@ export function InvitesManager() {
     setPriceMode("total");
     setGenerateTotalPrice("");
     setGenerateTicketTypeId(ev?.tickets[0]?.id ?? "");
+    setGenerateCoverTicketTypeId(ev?.tickets[0]?.id ?? "");
     setGeneratedLinks([]);
   };
 
@@ -283,11 +288,19 @@ export function InvitesManager() {
       body.totalTablePrice = totalPrice;
     } else {
       if (!generateTicketTypeId) {
-        toast.error("Elige un boleto del evento.");
+        toast.error("Elige un boleto del evento para los cupos de mesa.");
         return;
       }
       body.ticketTypeId = generateTicketTypeId;
     }
+
+    if (!generateCoverTicketTypeId) {
+      toast.error(
+        "Elige el boleto de cover para quien entre después de confirmar la mesa."
+      );
+      return;
+    }
+    body.coverTicketTypeId = generateCoverTicketTypeId;
 
     setIsSubmittingGenerate(true);
     setGeneratedLinks([]);
@@ -390,6 +403,7 @@ export function InvitesManager() {
                     setGenerateEventId(id);
                     const ev = events.find((x) => x.id === id);
                     setGenerateTicketTypeId(ev?.tickets[0]?.id ?? "");
+                    setGenerateCoverTicketTypeId(ev?.tickets[0]?.id ?? "");
                   }}
                   required
                   className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
@@ -504,7 +518,7 @@ export function InvitesManager() {
                 className="w-full max-w-[140px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
               />
               <p className="text-white/45 text-xs mt-1">
-                Total ≈ $
+                Total mesa ≈ $
                 {tableTotalPreview > 0
                   ? tableTotalPreview.toLocaleString("es-MX")
                   : "—"}
@@ -513,14 +527,45 @@ export function InvitesManager() {
                 {unitFromForm > 0
                   ? unitFromForm.toLocaleString("es-MX")
                   : "—"}{" "}
-                c/u. Con {generateCupos} pagos se confirma.
+                c/u. Con {generateCupos} pagos de mesa se confirma.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-white/80 text-sm font-medium mb-1">
+                Cover (entrada extra) *
+              </label>
+              <select
+                value={generateCoverTicketTypeId}
+                onChange={(e) => setGenerateCoverTicketTypeId(e.target.value)}
+                required
+                className="w-full max-w-md px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+              >
+                {ticketsForGenerate.length === 0 ? (
+                  <option value="">Sin boletos en este evento</option>
+                ) : (
+                  ticketsForGenerate.map((tt) => (
+                    <option key={tt.id} value={tt.id}>
+                      {tt.name} · ${tt.price.toLocaleString("es-MX")}
+                    </option>
+                  ))
+                )}
+              </select>
+              <p className="text-white/45 text-xs mt-1">
+                Cuando la mesa ya está cubierta, el 11º en adelante paga este
+                cover
+                {selectedCover
+                  ? ` ($${selectedCover.price.toLocaleString("es-MX")})`
+                  : ""}
+                , no otro cupo de mesa.
               </p>
             </div>
 
             <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4">
               <p className="text-white/55 text-xs leading-relaxed">
-                Quien abre el link puede pagar su parte (cupos) o toda la mesa.
-                El saldo pendiente baja con cada pago.
+                Primero se juntan los cupos/monto de la mesa. Después de
+                confirmarla, quien quiera entrar de más paga el cover de
+                entrada.
               </p>
             </div>
 
@@ -681,12 +726,17 @@ export function InvitesManager() {
                   >
                     <td className="py-3 px-4 text-white/90">
                       <p>{inv.tableNumber}</p>
-                      {(inv.ticketTypeName || inv.splitAmong != null) && (
+                      {(inv.ticketTypeName ||
+                        inv.splitAmong != null ||
+                        (inv as { coverTicketName?: string }).coverTicketName) && (
                         <p className="text-[11px] text-white/45 mt-0.5">
                           {[
                             inv.ticketTypeName,
                             inv.splitAmong != null
                               ? `${inv.splitAmong} cupos`
+                              : null,
+                            (inv as { coverTicketName?: string }).coverTicketName
+                              ? `cover ${(inv as { coverTicketName?: string }).coverTicketName}`
                               : null,
                           ]
                             .filter(Boolean)

@@ -509,7 +509,8 @@ model TicketType {
   event            Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
   tickets          Ticket[]
   tableSlotInvites TableSlotInvite[]
-  tableInvitePools TableInvitePool[]
+  tableInvitePools TableInvitePool[] @relation("PoolTableTicket")
+  coverInvitePools TableInvitePool[] @relation("PoolCoverTicket")
   pricePhases      TicketPricePhase[]
   groupPriceRows   TableGroupPriceRow[]
   linkedTicketType TicketType?      @relation("LinkedTicket", fields: [linkedTicketTypeId], references: [id], onDelete: SetNull)
@@ -731,6 +732,8 @@ model TableInvitePool {
   id            String   @id @default(uuid())
   eventId       String
   ticketTypeId  String
+  /// Boleto de entrada (cover) para extras una vez confirmada la mesa / monto
+  coverTicketTypeId String?
   tableNumber   String   // Nombre o número de mesa (ej: "42", "Terraza A")
   inviteToken   String   @unique // Un solo token para toda la mesa
   maxSlots      Int?     // Tope de pagos en el link; null = sin límite
@@ -741,13 +744,15 @@ model TableInvitePool {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  event         Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  ticketType    TicketType    @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
-  slotInvites   TableSlotInvite[] // Slots creados al pagar (invitedName/email/phone al momento del pago)
+  event            Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ticketType       TicketType  @relation("PoolTableTicket", fields: [ticketTypeId], references: [id], onDelete: Cascade)
+  coverTicketType  TicketType? @relation("PoolCoverTicket", fields: [coverTicketTypeId], references: [id], onDelete: SetNull)
+  slotInvites      TableSlotInvite[] // Slots creados al pagar (invitedName/email/phone al momento del pago)
 
   @@index([eventId])
   @@index([inviteToken])
   @@index([eventId, tableNumber])
+  @@index([coverTicketTypeId])
 }
 
 model TableSlotInvite {
@@ -774,6 +779,9 @@ model TableSlotInvite {
   
   // Precio por asiento (precio mesa / seatsPerTable)
   pricePerSeat Decimal         @db.Decimal(10, 2)
+
+  /// true = pago cover (extra tras mesa confirmada); false = cupo de mesa
+  isCover      Boolean         @default(false)
   
   expiresAt    DateTime?       // Vence en X días si no paga (default: createdAt + 7)
   

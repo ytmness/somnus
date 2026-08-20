@@ -28,6 +28,7 @@ type PaymentTimelineEntry = {
   amount: number;
   paidAt: string | null;
   seatNumber: number;
+  isCover?: boolean;
 };
 
 type InviteData = {
@@ -36,14 +37,21 @@ type InviteData = {
   tableReserved?: boolean;
   status?: string;
   paidCount?: number;
+  paidCoverCount?: number;
   maxSlots?: number | null;
   cupos?: number | null;
+  sharesLeft?: number;
+  mesaFilled?: boolean;
+  phase?: "collecting" | "cover";
   minPaidToConfirm?: number;
   tableConfirmed?: boolean;
   pricePerSeat?: number;
   totalCollected?: number;
   remaining?: number;
   tablePrice?: number | null;
+  coverTicketTypeId?: string | null;
+  coverTicketName?: string | null;
+  coverTicket?: InviteTicketTypePayload | null;
   paymentTimeline?: PaymentTimelineEntry[];
   expiresAt?: string | null;
   event?: {
@@ -216,6 +224,12 @@ export default function PagarInvitePage() {
     }
   }, [invite?.paidCount, payMode]);
 
+  useEffect(() => {
+    if (invite?.phase === "cover" || invite?.mesaFilled) {
+      setPayMode("share");
+    }
+  }, [invite?.phase, invite?.mesaFilled]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!sessionUser) {
@@ -346,13 +360,23 @@ export default function PagarInvitePage() {
   const tableTicket = pickerTypes.find(
     (tt) => tt.kind === "TABLE" && tt.tablePrice != null && (tt.cupos ?? 0) > 0
   );
+  const isCoverPhase = invite.phase === "cover" || Boolean(invite.mesaFilled);
+  const coverTicket =
+    invite.coverTicket ||
+    (isCoverPhase ? pickerTypes[0] ?? null : null);
   const tableTotal =
     invite.tablePrice ?? tableTicket?.tablePrice ?? 0;
   const remaining =
     typeof invite.remaining === "number"
       ? invite.remaining
       : Math.max(0, Math.round((tableTotal - totalCollected) * 100) / 100);
-  const canPayFullTable = Boolean(tableTicket && paidCount === 0);
+  const sharesLeft =
+    typeof invite.sharesLeft === "number"
+      ? invite.sharesLeft
+      : Math.max(0, (invite.cupos ?? 0) - paidCount);
+  const canPayFullTable = Boolean(
+    tableTicket && paidCount === 0 && !isCoverPhase
+  );
   const eventWindow =
     invite.event?.salesStartDate && invite.event?.salesEndDate
       ? {
@@ -495,18 +519,42 @@ export default function PagarInvitePage() {
               {paidCount === 1 ? "1 participante" : `${paidCount} participantes`}
             </p>
             <p className="text-white/45 text-xs mb-1">
-              {hasTicketPicker
-                ? tableTicket
-                  ? "Elige: tu parte (cupos) o toda la mesa de un golpe"
-                  : pickerTypes.length === 1
-                    ? "Elige cuántos quieres de este tipo"
-                    : "Elige cuántos boletos quieres de cada tipo"
-                : "Cada pago usa el precio de mesa del evento"}
+              {isCoverPhase
+                ? "Mesa confirmada · extras pagan cover de entrada"
+                : hasTicketPicker
+                  ? tableTicket
+                    ? "Elige: tu parte (cupos) o toda la mesa de un golpe"
+                    : pickerTypes.length === 1
+                      ? "Elige cuántos quieres de este tipo"
+                      : "Elige cuántos boletos quieres de cada tipo"
+                  : "Cada pago usa el precio de mesa del evento"}
             </p>
             {!hasTicketPicker && (
               <p className="text-lg font-semibold text-[#7BA3E8] tabular-nums">{priceFormatted}</p>
             )}
-            {tableTicket && (
+            {isCoverPhase && coverTicket && (
+              <div className="mt-3 space-y-1 text-[11px] text-white/45">
+                <p>
+                  Cover{" "}
+                  <span className="text-white/80">
+                    {coverTicket.name}
+                  </span>
+                  {" · "}
+                  <span className="text-white/80 tabular-nums">
+                    {mxn.format(coverTicket.price)}
+                  </span>
+                </p>
+                {(invite.paidCoverCount ?? 0) > 0 && (
+                  <p>
+                    Covers pagados:{" "}
+                    <span className="text-white/80">
+                      {invite.paidCoverCount}
+                    </span>
+                  </p>
+                )}
+              </div>
+            )}
+            {!isCoverPhase && tableTicket && (
               <div className="mt-3 space-y-1 text-[11px] text-white/45">
                 <p>
                   Mesa{" "}
@@ -521,22 +569,24 @@ export default function PagarInvitePage() {
                   c/u
                 </p>
                 <p>
-                  Recaudado{" "}
+                  Recaudado mesa{" "}
                   <span className="text-white/80 tabular-nums">
-                    {mxn.format(totalCollected)}
+                    {mxn.format(Math.max(0, tableTotal - remaining))}
                   </span>
                   {" · "}
                   Resta{" "}
                   <span className="text-white/80 tabular-nums">
                     {mxn.format(remaining)}
                   </span>
+                  {sharesLeft > 0 ? ` · ${sharesLeft} cupos libres` : ""}
                 </p>
               </div>
             )}
             {invite.minPaidToConfirm != null &&
               invite.pricePerSeat != null &&
               !invite.tableConfirmed &&
-              !tableTicket && (
+              !tableTicket &&
+              !isCoverPhase && (
                 <p className="mt-2 text-[11px] text-white/40">
                   Precio de mesa ÷ {invite.minPaidToConfirm} cupos ={" "}
                   {mxn.format(invite.pricePerSeat)} c/u.
@@ -544,16 +594,13 @@ export default function PagarInvitePage() {
               )}
             {invite.minPaidToConfirm != null && (
               <p className="mt-4 text-xs text-white/50 border-t border-white/10 pt-4">
-                {invite.tableConfirmed ? (
-                  remaining > 0 ? (
-                    <span className="text-emerald-400/90 font-medium">
-                      Mesa confirmada · aún resta {mxn.format(remaining)}
-                    </span>
-                  ) : (
-                    <span className="text-emerald-400/90 font-medium">
-                      Mesa completa
-                    </span>
-                  )
+                {isCoverPhase || invite.tableConfirmed ? (
+                  <span className="text-emerald-400/90 font-medium">
+                    Mesa confirmada
+                    {invite.coverTicketName
+                      ? ` · extras: cover ${invite.coverTicketName}`
+                      : ""}
+                  </span>
                 ) : (
                   <>
                     Para confirmar:{" "}
@@ -706,7 +753,13 @@ export default function PagarInvitePage() {
 
                 {hasTicketPicker ? (
                   <div className="pt-2 space-y-3">
-                    {tableTicket && (
+                    {isCoverPhase ? (
+                      <p className="text-xs text-white/50">
+                        Elige cuántos covers de entrada pagar (
+                        {coverTicket?.name || "entrada"}).
+                      </p>
+                    ) : (
+                      tableTicket && (
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
@@ -746,6 +799,7 @@ export default function PagarInvitePage() {
                           </p>
                         </button>
                       </div>
+                      )
                     )}
 
                     {payMode === "full" && canPayFullTable && tableTicket ? (
