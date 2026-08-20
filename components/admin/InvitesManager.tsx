@@ -203,14 +203,15 @@ export function InvitesManager() {
 
   const cancelInvite = async (inviteToken: string, isPool: boolean, status: string) => {
     try {
-      // No tocar pagos ya realizados
       if (status === "PAID") {
-        toast.error("No se puede cancelar una invitación ya pagada");
+        toast.error("No se puede eliminar un link con pagos ya hechos en modo asiento");
         return;
       }
 
       const ok = window.confirm(
-        isPool ? "¿Cancelar esta mesa? El link compartido ya no será usable." : "¿Cancelar este link?"
+        isPool
+          ? "¿Eliminar este link de mesa? Quienes ya pagaron mantienen su boleto; el link deja de funcionar para nuevos pagos."
+          : "¿Eliminar este link de asiento?"
       );
       if (!ok) return;
 
@@ -357,8 +358,8 @@ export function InvitesManager() {
       setGenerateTotalPrice("");
       toast.success(
         allInvites.length === 1
-          ? "Link generado. Cópialo y compártelo."
-          : `${allInvites.length} links generados. Cópialos y compártelos.`
+          ? "Link de mesa guardado. Cópialo y compártelo."
+          : `${allInvites.length} links de mesa guardados.`
       );
       const invRes = await fetch(`/api/admin/events/${eventId}/invites`, {
         credentials: "include",
@@ -416,9 +417,10 @@ export function InvitesManager() {
 
       {/* Generar nuevos invites */}
       <div className="rounded-xl border border-white/10 bg-white/5 p-6">
-        <h3 className="text-lg font-bold text-white mb-2">Generar links de pago</h3>
+        <h3 className="text-lg font-bold text-white mb-2">Links de mesa</h3>
         <p className="text-white/50 text-sm mb-4">
-          Links para cobrar mesas VIP del evento. Elige si quieres una sola URL para el grupo o un link por asiento.
+          Cada link es una mesa concreta (ej. Mesa 1). El tipo de boleto define precio y cupos;
+          aquí solo eliges el nombre de la mesa y generas la URL para cobrar.
         </p>
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <label className="flex items-center gap-2 cursor-pointer">
@@ -444,7 +446,7 @@ export function InvitesManager() {
           </label>
           <span className="text-white/45 text-xs">
             {usePoolMode
-              ? "Una URL; cada quien paga y deja su nombre."
+              ? "Una URL por mesa; cada quien paga su parte o toda la mesa."
               : `Una URL por persona (hasta ${MAX_TRADITIONAL_SLOTS}).`}
           </span>
         </div>
@@ -471,7 +473,7 @@ export function InvitesManager() {
             title={eventsWithTables.length === 0 ? "Necesitas un evento con mesas VIP" : ""}
           >
             <Plus className="w-4 h-4 mr-2" />
-            Generar links
+            Crear link de mesa
           </Button>
         ) : (
           <form onSubmit={handleGenerateSubmit} className="space-y-4">
@@ -534,7 +536,7 @@ export function InvitesManager() {
               </div>
               <div>
                 <label className="block text-white/80 text-sm font-medium mb-1">
-                  Nombre o número de mesa *
+                  Nombre de esta mesa *
                 </label>
                 <input
                   type="text"
@@ -545,10 +547,13 @@ export function InvitesManager() {
                   maxLength={120}
                   className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
                 />
+                <p className="text-white/45 text-xs mt-1">
+                  Queda guardado con el link. Si lo eliminas, desaparece de la lista.
+                </p>
               </div>
               <div>
                 <label className="block text-white/80 text-sm font-medium mb-1">
-                  Cuántas mesas
+                  ¿Cuántas mesas seguidas?
                 </label>
                 <input
                   type="number"
@@ -566,7 +571,7 @@ export function InvitesManager() {
                   className="w-full max-w-[120px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
                 />
                 <p className="text-white/45 text-xs mt-1">
-                  Si pones 1 y cantidad 5, crea mesas 1–5. Cada una tiene su propio link.
+                  Con nombre 1 y cantidad 5 crea links para mesas 1–5 (uno por mesa).
                 </p>
               </div>
             </div>
@@ -632,7 +637,7 @@ export function InvitesManager() {
                 disabled={isSubmittingGenerate}
                 className="bg-white text-black hover:bg-white/90"
               >
-                {isSubmittingGenerate ? "Generando..." : "Generar links"}
+                {isSubmittingGenerate ? "Creando..." : "Crear y guardar link"}
               </Button>
               <Button
                 type="button"
@@ -651,8 +656,11 @@ export function InvitesManager() {
 
         {generatedLinks.length > 0 && (
           <div className="mt-6 pt-6 border-t border-white/10">
-            <p className="text-white/80 font-medium mb-3">
-              {generatedLinks[0]?.isPool ? "Link compartido:" : "Links generados:"}
+            <p className="text-white/80 font-medium mb-1">
+              Guardado. Copia el link:
+            </p>
+            <p className="text-white/45 text-xs mb-3">
+              También aparece abajo en la lista del evento.
             </p>
             <div className="space-y-2">
               {generatedLinks.map((link, i) => (
@@ -693,7 +701,7 @@ export function InvitesManager() {
       {/* Ver invites existentes */}
       <div>
         <h3 className="text-lg font-bold text-white mb-4">
-          Ver y copiar links existentes
+          Mesas con link (guardadas)
         </h3>
         <div className="flex flex-wrap items-center gap-4 mb-4">
           <label className="text-white/80 text-sm font-medium">Evento:</label>
@@ -719,8 +727,8 @@ export function InvitesManager() {
       ) : invites.length === 0 ? (
         <div className="text-center py-8 rounded-lg bg-white/5 border border-white/10">
           <Link2 className="w-12 h-12 text-white/30 mx-auto mb-3" />
-          <p className="text-white/70 mb-2">No hay invites para este evento</p>
-          <p className="text-white/50 text-sm">Genera links arriba.</p>
+          <p className="text-white/70 mb-2">Aún no hay links de mesa en este evento</p>
+          <p className="text-white/50 text-sm">Crea uno arriba: elige tipo, nombre de mesa y guarda.</p>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-white/10">
@@ -855,7 +863,9 @@ export function InvitesManager() {
                         aria-label="Cancelar mesa o link"
                       >
                         <Trash2 className="w-4 h-4" />
-                        <span className="ml-1 text-xs">Eliminar</span>
+                        <span className="ml-1 text-xs">
+                          {inv.isPool ? "Eliminar link" : "Eliminar"}
+                        </span>
                       </Button>
                     </div>
                   </td>

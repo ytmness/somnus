@@ -42,10 +42,15 @@ export async function GET(
 
     const poolRows = await Promise.all(
       pools.map(async (p) => {
-        const paidCount = await prisma.tableSlotInvite.count({
+        const paidSlots = await prisma.tableSlotInvite.findMany({
           where: { poolId: p.id, status: "PAID" },
+          select: { pricePerSeat: true },
         });
-        const totalCollected = paidCount * Number(p.pricePerSeat);
+        const paidCount = paidSlots.length;
+        const totalCollected = paidSlots.reduce(
+          (sum, s) => sum + Number(s.pricePerSeat),
+          0
+        );
         const minToConfirm = invitePoolMinToConfirm(p) ?? p.minPaidToConfirm;
         const tableConfirmed = paidCount >= minToConfirm;
         return {
@@ -140,12 +145,11 @@ export async function GET(
       }
     }
 
-    const poolById = new Map(pools.map((p) => [p.id, p]));
-    const data = invites.map((inv) => {
-      const url =
-        inv.poolId && poolById.has(inv.poolId)
-          ? `${baseUrl}/eventos/${eventId}/mesa/${encodeURIComponent(inv.tableNumber)}/pagar/${poolById.get(inv.poolId)!.inviteToken}`
-          : `${baseUrl}/eventos/${eventId}/mesa/${encodeURIComponent(inv.tableNumber)}/pagar/${inv.inviteToken}`;
+    // Solo slots sueltos (link por asiento). Los del pool ya viven en poolRows;
+    // si los listamos otra vez parece que la mesa no se “guardó” bien.
+    const standalone = invites.filter((inv) => !inv.poolId);
+    const data = standalone.map((inv) => {
+      const url = `${baseUrl}/eventos/${eventId}/mesa/${encodeURIComponent(inv.tableNumber)}/pagar/${inv.inviteToken}`;
       return {
         id: inv.id,
         tableNumber: inv.tableNumber,
@@ -171,6 +175,7 @@ export async function GET(
         sensitivity: "base",
       });
       if (cmp !== 0) return cmp;
+      if (a.isPool !== b.isPool) return a.isPool ? -1 : 1;
       return (a.seatNumber ?? 0) - (b.seatNumber ?? 0);
     });
 

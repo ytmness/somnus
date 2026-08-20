@@ -413,7 +413,7 @@ function ticketPayloadFields(
     category: tt.kind === "TABLE" ? ("VIP" as const) : ("GENERAL" as const),
     price: Number(tt.price) || 0,
     maxQuantity: Number(tt.maxQuantity) || 0,
-    isTable: false,
+    isTable: tt.kind === "TABLE",
     isHidden: Boolean(tt.isHidden),
     manualSoldOut: Boolean(tt.manualSoldOut),
     salesStartDate: startRaw ? new Date(startRaw).toISOString() : null,

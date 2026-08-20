@@ -222,7 +222,13 @@ export async function PATCH(
           if (tt.price !== undefined) ttData.price = tt.price;
           if (tt.isTable !== undefined) ttData.isTable = tt.isTable;
           if (tt.seatsPerTable !== undefined) ttData.seatsPerTable = tt.seatsPerTable;
-          if (tt.kind !== undefined) ttData.kind = tt.kind;
+          if (tt.kind !== undefined) {
+            ttData.kind = tt.kind;
+            // Mantener isTable alineado con kind=TABLE (legacy maps + invites)
+            if (tt.isTable === undefined) {
+              ttData.isTable = tt.kind === "TABLE";
+            }
+          }
           if (tt.isHidden !== undefined) ttData.isHidden = tt.isHidden;
           if (tt.manualSoldOut !== undefined)
             ttData.manualSoldOut = tt.manualSoldOut;

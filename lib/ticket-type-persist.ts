@@ -16,7 +16,7 @@ export async function mapTicketTypeCreateData(tt: TicketInput) {
     category: tt.category,
     price: Number(tt.price),
     maxQuantity: Number(tt.maxQuantity),
-    isTable: tt.isTable || false,
+    isTable: (tt.kind || "STANDARD") === "TABLE" || Boolean(tt.isTable),
     seatsPerTable: tt.seatsPerTable,
     kind: tt.kind || "STANDARD",
     isActive: true,
