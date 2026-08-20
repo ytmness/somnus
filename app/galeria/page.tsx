@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { SomnusHeader } from "@/components/SomnusHeader";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 import { X, ChevronLeft, ChevronRight, ImageIcon, Plus } from "lucide-react";
 
 /** Miniaturas visibles en la fila; la 6ª celda muestra +N si hay más */
@@ -137,7 +137,7 @@ function GaleriaContent() {
 
   return (
     <div className="min-h-screen somnus-bg-main overflow-x-hidden">
-      <SomnusHeader showNav />
+      <SiteHeader eventsHref="/" />
 
       <main className="pt-24 sm:pt-32 pb-24 px-4 sm:px-6 lg:px-8">
         <h1 className="somnus-title-secondary text-center text-4xl md:text-5xl mb-3 uppercase tracking-wider">

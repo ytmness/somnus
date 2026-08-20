@@ -783,6 +783,10 @@ html[data-native] .somnus-safe-header {
   padding-top: calc(0.75rem + var(--safe-top));
 }
 
+html[data-native] .somnus-mobile-nav-sheet {
+  top: calc(4.75rem + var(--safe-top));
+}
+
 html[data-native] .somnus-safe-bottom {
   padding-bottom: calc(0.75rem + var(--safe-bottom));
 }

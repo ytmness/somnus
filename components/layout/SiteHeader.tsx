@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ShoppingBag } from "lucide-react";
+import { ChevronDown, Menu, ShoppingBag, X } from "lucide-react";
 import { toast } from "sonner";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useCartOptional } from "@/components/cart/CartContext";
@@ -24,8 +24,62 @@ interface SiteHeaderProps {
   eventsHref?: string;
 }
 
+type NavItem = {
+  href: string;
+  label: string;
+  desktopClass?: string;
+};
+
 const navLinkClass =
   "somnus-nav-link text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white";
+
+function buildNavItems(
+  user: SessionUser | null,
+  eventsHref: string
+): NavItem[] {
+  const items: NavItem[] = [
+    { href: eventsHref, label: "Events" },
+    { href: "/galeria", label: "Gallery" },
+  ];
+
+  if (user) {
+    items.push(
+      { href: "/organizaciones", label: "Orgs" },
+      { href: "/feed", label: "Feed" },
+      { href: "/mensajes", label: "Messages" }
+    );
+  }
+
+  if (user?.role === "ADMIN") {
+    items.push({ href: "/admin", label: "Admin" });
+  }
+
+  if (
+    user?.role === "ACCESOS" ||
+    user?.role === "ADMIN" ||
+    user?.staffRoles?.includes("ACCESOS")
+  ) {
+    items.push({ href: "/accesos", label: "Access" });
+  }
+
+  if (user?.staffRoles?.includes("VENDEDOR")) {
+    items.push({ href: "/vendedor", label: "Seller" });
+  }
+
+  if (user?.staffRoles?.includes("SUPERVISOR")) {
+    items.push({ href: "/supervisor", label: "Supervisor" });
+  }
+
+  if (user?.staffRoles?.includes("MESA_HOST")) {
+    items.push({ href: "/accesos", label: "My tables" });
+  }
+
+  if (user) {
+    items.push({ href: "/organizador", label: "Publish events" });
+  }
+
+  return items;
+}
 
 export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeaderProps) {
   const router = useRouter();
@@ -33,6 +87,7 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
   const [user, setUser] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const onUserChangeRef = useRef(onUserChange);
   onUserChangeRef.current = onUserChange;
@@ -73,8 +128,23 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
     };
   }, [profileOpen]);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [menuOpen]);
+
   const handleLogout = async () => {
     setProfileOpen(false);
+    setMenuOpen(false);
     try {
       await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
       setUser(null);
@@ -86,9 +156,29 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
     }
   };
 
-  const eventsIsAnchor = eventsHref.startsWith("#");
   const displayName = user?.name?.trim() || user?.email || "Account";
   const cartCount = cart?.itemCount ?? 0;
+  const navItems = buildNavItems(user, eventsHref);
+
+  const renderNavLink = (item: NavItem, onClick?: () => void) => {
+    if (item.href.startsWith("#")) {
+      return (
+        <a key={item.label} href={item.href} className={navLinkClass} onClick={onClick}>
+          {item.label}
+        </a>
+      );
+    }
+    return (
+      <Link
+        key={`${item.href}-${item.label}`}
+        href={item.href}
+        className={navLinkClass}
+        onClick={onClick}
+      >
+        {item.label}
+      </Link>
+    );
+  };
 
   return (
     <>
@@ -103,103 +193,12 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
           SOMNUS
         </button>
 
-        <nav
-          className="flex items-center gap-2 sm:gap-3 lg:gap-5 min-w-0"
-          aria-label="Main"
-        >
-          <div className="flex items-center gap-2 sm:gap-3 lg:gap-5 min-w-0 overflow-x-auto scrollbar-none">
-            {eventsIsAnchor ? (
-              <a href={eventsHref} className={navLinkClass}>
-                Events
-              </a>
-            ) : (
-              <button
-                type="button"
-                onClick={() => router.push(eventsHref)}
-                className={navLinkClass}
-              >
-                Events
-              </button>
-            )}
-
-            <Link href="/galeria" className={`${navLinkClass} hidden sm:inline`}>
-              Gallery
-            </Link>
-
-            {!loading && user && (
-              <>
-                <Link
-                  href="/organizaciones"
-                  className={`${navLinkClass} hidden sm:inline`}
-                >
-                  Orgs
-                </Link>
-                <Link href="/feed" className={`${navLinkClass} hidden md:inline`}>
-                  Feed
-                </Link>
-                <Link
-                  href="/mensajes"
-                  className={`${navLinkClass} hidden md:inline`}
-                >
-                  Messages
-                </Link>
-              </>
-            )}
-
-            {!loading && user?.role === "ADMIN" && (
-              <Link href="/admin" className={navLinkClass}>
-                Admin
-              </Link>
-            )}
-
-            {!loading &&
-              (user?.role === "ACCESOS" ||
-                user?.role === "ADMIN" ||
-                user?.staffRoles?.includes("ACCESOS")) && (
-                <Link href="/accesos" className={navLinkClass}>
-                  Access
-                </Link>
-              )}
-
-            {!loading && user?.staffRoles?.includes("VENDEDOR") && (
-              <Link
-                href="/vendedor"
-                className={`${navLinkClass} hidden sm:inline`}
-              >
-                Seller
-              </Link>
-            )}
-
-            {!loading && user?.staffRoles?.includes("SUPERVISOR") && (
-              <Link
-                href="/supervisor"
-                className={`${navLinkClass} hidden sm:inline`}
-              >
-                Supervisor
-              </Link>
-            )}
-
-            {!loading && user?.staffRoles?.includes("MESA_HOST") && (
-              <Link
-                href="/accesos"
-                className={`${navLinkClass} hidden md:inline`}
-              >
-                My tables
-              </Link>
-            )}
-
-            {!loading && user && (
-              <Link
-                href="/organizador"
-                className={`${navLinkClass} hidden md:inline text-white/60`}
-              >
-                Publish events
-              </Link>
-            )}
+        <nav className="flex items-center gap-1.5 sm:gap-3 lg:gap-5 min-w-0" aria-label="Main">
+          <div className="hidden lg:flex items-center gap-5 min-w-0">
+            {navItems.map((item) => renderNavLink(item))}
           </div>
 
-          {/* Trailing cluster — cart, bell, profile at the edge */}
-          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 pl-2 sm:pl-3 ml-1 border-l border-white/15">
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 lg:pl-3 lg:ml-1 lg:border-l lg:border-white/15">
             {cart && (
               <button
                 type="button"
@@ -227,7 +226,7 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
 
             {!loading &&
               (user ? (
-                <div className="relative" ref={profileRef}>
+                <div className="relative hidden sm:block" ref={profileRef}>
                   <button
                     type="button"
                     onClick={() => setProfileOpen((v) => !v)}
@@ -286,26 +285,130 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
                   )}
                 </div>
               ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => router.push("/register")}
-                    className="somnus-nav-link text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white border border-white/30 px-3 py-1.5 rounded-full hidden sm:inline"
-                  >
-                    Create account
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => router.push("/login")}
-                    className="somnus-nav-link text-white/90 text-xs sm:text-sm font-medium px-2 py-1 uppercase tracking-wider hover:text-white"
-                  >
-                    Sign in
-                  </button>
-                </>
+                <button
+                  type="button"
+                  onClick={() => router.push("/login")}
+                  className="somnus-nav-link hidden sm:inline text-white/90 text-xs sm:text-sm font-medium px-2 py-1 uppercase tracking-wider hover:text-white"
+                >
+                  Sign in
+                </button>
               ))}
+
+            <button
+              type="button"
+              onClick={() => {
+                setProfileOpen(false);
+                setMenuOpen((v) => !v);
+              }}
+              className="somnus-nav-link lg:hidden p-2 text-white/85 hover:text-white"
+              aria-expanded={menuOpen}
+              aria-controls="somnus-mobile-nav"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+            >
+              {menuOpen ? (
+                <X className="w-5 h-5" aria-hidden />
+              ) : (
+                <Menu className="w-5 h-5" aria-hidden />
+              )}
+            </button>
           </div>
         </nav>
       </header>
+
+      {menuOpen && (
+        <div
+          id="somnus-mobile-nav"
+          className="fixed inset-0 z-40 lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation"
+        >
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/55 backdrop-blur-[2px]"
+            aria-label="Close menu"
+            onClick={() => setMenuOpen(false)}
+          />
+          <div className="somnus-mobile-nav-sheet absolute top-[4.75rem] left-4 right-4 max-h-[min(78vh,calc(100dvh-5.5rem))] overflow-y-auto rounded-2xl border border-white/12 bg-[#0A0A0A]/92 backdrop-blur-xl shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+            <nav className="flex flex-col p-2" aria-label="Mobile">
+              {navItems.map((item) => (
+                <div key={`${item.href}-${item.label}`}>
+                  {item.href.startsWith("#") ? (
+                    <a
+                      href={item.href}
+                      className="block rounded-xl px-4 py-3.5 text-sm uppercase tracking-wider text-white/85 hover:text-white hover:bg-white/5"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className="block rounded-xl px-4 py-3.5 text-sm uppercase tracking-wider text-white/85 hover:text-white hover:bg-white/5"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
+                </div>
+              ))}
+
+              <div className="my-2 mx-4 border-t border-white/10" />
+
+              {user ? (
+                <>
+                  <Link
+                    href="/perfil"
+                    className="block rounded-xl px-4 py-3.5 text-sm uppercase tracking-wider text-white/85 hover:text-white hover:bg-white/5"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    href="/configuracion"
+                    className="block rounded-xl px-4 py-3.5 text-sm uppercase tracking-wider text-white/85 hover:text-white hover:bg-white/5"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Settings
+                  </Link>
+                  <Link
+                    href="/mis-boletos"
+                    className="block rounded-xl px-4 py-3.5 text-sm uppercase tracking-wider text-white/85 hover:text-white hover:bg-white/5"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    My tickets
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full text-left rounded-xl px-4 py-3.5 text-sm uppercase tracking-wider text-white/85 hover:text-white hover:bg-white/5"
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="block rounded-xl px-4 py-3.5 text-sm uppercase tracking-wider text-white/85 hover:text-white hover:bg-white/5"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="block rounded-xl px-4 py-3.5 text-sm uppercase tracking-wider text-white hover:bg-white/5"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Create account
+                  </Link>
+                </>
+              )}
+            </nav>
+          </div>
+        </div>
+      )}
+
       {cart && <HeaderCartDrawer />}
     </>
   );
