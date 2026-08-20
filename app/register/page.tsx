@@ -427,15 +427,6 @@ function RegisterContent() {
                         Sign in
                       </Link>
                     </p>
-                    <p className="text-center text-xs text-white/40">
-                      Want to publish events? You can set that up later from{" "}
-                      <Link
-                        href="/organizador"
-                        className="somnus-nav-link text-white/60 hover:text-white underline"
-                      >
-                        Publish events
-                      </Link>
-                    </p>
                   </div>
                 </div>
               </div>

@@ -273,26 +273,21 @@ body::-webkit-scrollbar {
 
   /* ===== BOTONES SOMNUS ===== */
   .somnus-btn {
-    @apply font-bold uppercase tracking-wider px-8 py-3.5 rounded-none;
-    transition: background-color 200ms ease-out, border-color 200ms ease-out, transform 200ms ease-out, opacity 200ms ease-out;
-    background: #FFFFFF;
-    color: #0A0A0A;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white text-black font-medium text-sm;
+    transition: background-color 200ms ease-out, opacity 200ms ease-out;
   }
   
   .somnus-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.95);
-    border-color: rgba(255, 255, 255, 0.6);
-    transform: translateY(-2px);
+    @apply bg-white/90;
   }
 
   .somnus-btn:focus-visible {
-    outline: 2px solid rgba(123, 163, 232, 0.9);
+    outline: 2px solid rgba(255, 255, 255, 0.45);
     outline-offset: 3px;
   }
 
   .somnus-btn:active:not(:disabled) {
-    transform: translateY(0) scale(0.98);
+    @apply bg-white/85;
   }
 
   .somnus-btn:disabled {

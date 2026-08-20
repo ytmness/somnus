@@ -42,16 +42,14 @@ function buildNavItems(
     { href: "/galeria", label: "Gallery" },
   ];
 
-  if (user) {
+  if (user?.role === "ADMIN") {
     items.push(
       { href: "/organizaciones", label: "Orgs" },
       { href: "/feed", label: "Feed" },
-      { href: "/mensajes", label: "Messages" }
+      { href: "/mensajes", label: "Messages" },
+      { href: "/organizador", label: "Publish events" },
+      { href: "/admin", label: "Admin" }
     );
-  }
-
-  if (user?.role === "ADMIN") {
-    items.push({ href: "/admin", label: "Admin" });
   }
 
   if (
@@ -72,10 +70,6 @@ function buildNavItems(
 
   if (user?.staffRoles?.includes("MESA_HOST")) {
     items.push({ href: "/accesos", label: "My tables" });
-  }
-
-  if (user) {
-    items.push({ href: "/organizador", label: "Publish events" });
   }
 
   return items;

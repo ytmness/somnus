@@ -190,10 +190,9 @@ export function AdminOverview({
         <div className="flex flex-wrap gap-3">
           <Button
             onClick={onCreateEvent}
-            className="somnus-btn"
             data-tour="admin-new-event"
           >
-            <Plus className="w-4 h-4 mr-2" aria-hidden />
+            <Plus className="w-4 h-4" aria-hidden />
             New event
           </Button>
           <Button

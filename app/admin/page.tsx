@@ -223,10 +223,9 @@ export default function AdminPage() {
               <div className="flex items-center gap-4 shrink-0">
                 <Button
                   onClick={() => setShowCreateModal(true)}
-                  className="somnus-btn"
                   data-tour="admin-new-event"
                 >
-                  <Plus className="w-4 h-4 mr-2" aria-hidden />
+                  <Plus className="w-4 h-4" aria-hidden />
                   <span className="hidden sm:inline">New event</span>
                   <span className="sm:hidden">New</span>
                 </Button>

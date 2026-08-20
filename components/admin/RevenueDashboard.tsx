@@ -262,7 +262,6 @@ export function RevenueDashboard() {
           type="button"
           onClick={() => void handleVerifyStripe()}
           disabled={verifying}
-          className="somnus-btn"
         >
           {verifying ? "Verificando..." : "Verificar con Stripe"}
         </Button>
