@@ -153,6 +153,13 @@ export async function PATCH(
           return current;
         }
 
+        // IDs from the payload plus any tiers we create in this transaction.
+        // New tiers have no id yet; if we omit them here, the cleanup below
+        // deletes them immediately after insert.
+        const keptIds = new Set(
+          ticketTypes.map((tt) => tt.id).filter((id): id is string => Boolean(id))
+        );
+
         for (const tt of ticketTypes) {
           if (!tt.id) {
             const name = (tt.name || "").trim();
@@ -169,7 +176,7 @@ export async function PATCH(
                 "Cada entrada nueva necesita nombre, precio mayor a 0 y cantidad mayor a 0"
               );
             }
-            await tx.ticketType.create({
+            const created = await tx.ticketType.create({
               data: {
                 eventId: params.id,
                 ...(await mapTicketTypeCreateData({
@@ -201,6 +208,7 @@ export async function PATCH(
                 })),
               },
             });
+            keptIds.add(created.id);
             continue;
           }
 
@@ -292,9 +300,6 @@ export async function PATCH(
           }
         }
 
-        const keptIds = new Set(
-          ticketTypes.map((tt) => tt.id).filter((id): id is string => Boolean(id))
-        );
         const existingTiers = await tx.ticketType.findMany({
           where: { eventId: params.id },
         });
