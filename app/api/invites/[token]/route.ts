@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { ticketTypeInclude } from "@/lib/ticket-type-persist";
 import { toInviteTicketPayload, pickTicketsForInviteLink, openInviteTableTickets } from "@/lib/invite-tickets";
-import { invitePoolMinToConfirm, invitePoolPaymentCap } from "@/lib/ticket-pricing";
+import { invitePoolMinToConfirm, invitePoolPaymentCap, invitePoolTableTotal } from "@/lib/ticket-pricing";
 
 function mesaPagarUrl(baseUrl: string, eventId: string, tableKey: string, token: string) {
   return `${baseUrl}/eventos/${eventId}/mesa/${encodeURIComponent(tableKey)}/pagar/${token}`;
@@ -31,10 +31,15 @@ async function loadInviteTicketTypes(
     include: ticketTypeInclude,
     orderBy: { price: "asc" },
   });
+  const includeHidden = Boolean(ticketTypeId);
   return openInviteTableTickets(
     pickTicketsForInviteLink(
       rows
-        .map((tt) => toInviteTicketPayload(tt, now))
+        .map((tt) =>
+          toInviteTicketPayload(tt, now, {
+            includeHidden: includeHidden && tt.id === ticketTypeId,
+          })
+        )
         .filter((tt): tt is NonNullable<typeof tt> => Boolean(tt)),
       ticketTypeId
     )
@@ -111,7 +116,27 @@ export async function GET(
       },
     });
 
-    const totalCollected = paidSlots.reduce((sum, s) => sum + Number(s.pricePerSeat), 0);
+    const ticketTypes = await loadInviteTicketTypes(
+      pool.eventId,
+      pool.ticketTypeId
+    );
+    const livePrice = ticketTypes[0]?.price ?? Number(pool.pricePerSeat);
+    const liveTablePrice =
+      ticketTypes[0]?.tablePrice ?? invitePoolTableTotal(pool);
+    const liveCupos =
+      ticketTypes[0]?.cupos ?? pool.splitAmong ?? minToConfirm;
+    const totalCollected = paidSlots.reduce(
+      (sum, s) => sum + Number(s.pricePerSeat),
+      0
+    );
+    const tableTotal =
+      liveTablePrice != null && liveTablePrice > 0
+        ? liveTablePrice
+        : invitePoolTableTotal(pool);
+    const remaining = Math.max(
+      0,
+      Math.round((tableTotal - totalCollected) * 100) / 100
+    );
     const paymentTimeline = paidSlots.map((s, index) => ({
       order: index + 1,
       name: s.invitedName,
@@ -122,13 +147,6 @@ export async function GET(
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const payUrl = mesaPagarUrl(baseUrl, pool.eventId, pool.tableNumber, token);
-    const ticketTypes = await loadInviteTicketTypes(
-      pool.eventId,
-      pool.ticketTypeId
-    );
-    const livePrice = ticketTypes[0]?.price ?? Number(pool.pricePerSeat);
-    const liveTablePrice = ticketTypes[0]?.tablePrice ?? null;
-    const liveCupos = ticketTypes[0]?.cupos ?? minToConfirm;
 
     return NextResponse.json({
       success: true,
@@ -139,7 +157,7 @@ export async function GET(
         tableNumber: pool.tableNumber,
         seatNumber: null,
         pricePerSeat: livePrice,
-        tablePrice: liveTablePrice,
+        tablePrice: tableTotal,
         ticketTypeName: pool.ticketType?.name ?? null,
         maxSlots: invitePoolPaymentCap(pool),
         cupos: liveCupos,
@@ -147,6 +165,7 @@ export async function GET(
         minPaidToConfirm: minToConfirm,
         paidCount,
         totalCollected,
+        remaining,
         paymentTimeline,
         tableConfirmed,
         expiresAt: pool.expiresAt?.toISOString() ?? null,

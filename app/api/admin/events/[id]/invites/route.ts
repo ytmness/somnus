@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { getSession, hasRole } from "@/lib/auth/session";
-import { invitePoolMinToConfirm } from "@/lib/ticket-pricing";
+import { invitePoolMinToConfirm, invitePoolTableTotal } from "@/lib/ticket-pricing";
 
 export const dynamic = "force-dynamic";
 
@@ -53,6 +53,8 @@ export async function GET(
         );
         const minToConfirm = invitePoolMinToConfirm(p) ?? p.minPaidToConfirm;
         const tableConfirmed = paidCount >= minToConfirm;
+        const tableTotal = invitePoolTableTotal(p);
+        const remaining = Math.max(0, Math.round((tableTotal - totalCollected) * 100) / 100);
         return {
           id: p.id,
           tableNumber: p.tableNumber,
@@ -69,10 +71,12 @@ export async function GET(
           createdAt: p.createdAt.toISOString(),
           isPool: true,
           maxSlots: p.maxSlots,
-          splitAmong: minToConfirm,
+          splitAmong: p.splitAmong,
           minPaidToConfirm: minToConfirm,
           paidCount,
           totalCollected,
+          tableTotal,
+          remaining,
           tableConfirmed,
           ticketTypeName: p.ticketType?.name ?? null,
           ticketTypeId: p.ticketTypeId,

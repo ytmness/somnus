@@ -72,9 +72,9 @@ export function EventTicketsSection({
     onChange({ ticketTypes: next });
   };
 
-  const addTicket = (kind: "STANDARD" | "TABLE") => {
+  const addTicket = () => {
     onChange({
-      ticketTypes: [...data.ticketTypes, createEmptyTicketType(kind)],
+      ticketTypes: [...data.ticketTypes, createEmptyTicketType("STANDARD")],
     });
     requestAnimationFrame(() => {
       document
@@ -86,7 +86,7 @@ export function EventTicketsSection({
   const removeTicket = (index: number) => {
     const target = data.ticketTypes[index];
     if (data.ticketTypes.length <= 1) {
-      toast.error("Debe quedar al menos una entrada o mesa");
+      toast.error("Debe quedar al menos una entrada");
       return;
     }
     if ((target.soldQuantity ?? 0) > 0) {
@@ -96,7 +96,7 @@ export function EventTicketsSection({
       return;
     }
     if (isEdit && target.id) {
-      const label = target.name.trim() || (target.kind === "TABLE" ? "Mesa" : "Entrada");
+      const label = target.name.trim() || "Entrada";
       const ok = window.confirm(
         `¿Eliminar "${label}"?\n\nSe quitará al guardar el evento.`
       );
@@ -124,24 +124,16 @@ export function EventTicketsSection({
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
-            onClick={() => addTicket("STANDARD")}
+            onClick={() => addTicket()}
             className="somnus-nav-link inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-[#7BA3E8] hover:text-white shrink-0"
           >
             <Plus className="w-4 h-4" aria-hidden />
             Nueva entrada
           </button>
-          <button
-            type="button"
-            onClick={() => addTicket("TABLE")}
-            className="somnus-nav-link inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-[#7BA3E8] hover:text-white shrink-0"
-          >
-            <Plus className="w-4 h-4" aria-hidden />
-            Nueva mesa
-          </button>
         </div>
       </div>
       <p className="text-[11px] leading-relaxed text-white/40">
-        Entradas = venta general. Mesas = solo por link (no hay plano ni filas): defines precio y cupos aquí; en Admin creas cada mesa con nombre y URL de cobro.
+        Aquí solo defines entradas de venta general. Las mesas se crean aparte en Admin → Table Invites (nombre, total y cupos por link).
       </p>
 
       <div className="space-y-3">

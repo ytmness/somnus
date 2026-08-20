@@ -64,29 +64,48 @@ export function tablePricePerCupo(
 
 export function invitePoolPaymentCap(pool: {
   maxSlots?: number | null;
+  splitAmong?: number | null;
   ticketType?: {
     kind?: string | null;
     isTable?: boolean | null;
   } | null;
 }): number | null {
-  if (pool.ticketType && isMesaTicketType(pool.ticketType)) return null;
   if (pool.maxSlots != null && pool.maxSlots > 0) return pool.maxSlots;
+  if (pool.ticketType && isMesaTicketType(pool.ticketType)) {
+    const n = Math.floor(Number(pool.splitAmong) || 0);
+    return n > 0 ? n : null;
+  }
   return null;
 }
 
 export function invitePoolMinToConfirm(pool: {
   minPaidToConfirm?: number;
+  splitAmong?: number | null;
   ticketType?: {
     kind?: string | null;
     isTable?: boolean | null;
     tableCapacity?: number | null;
   } | null;
 }): number | null {
+  const explicit = Math.floor(Number(pool.minPaidToConfirm) || 0);
+  if (explicit > 0) return explicit;
   if (pool.ticketType && isMesaTicketType(pool.ticketType)) {
-    return tableCupos(pool.ticketType.tableCapacity);
+    return tableCupos(
+      pool.ticketType.tableCapacity ?? pool.splitAmong ?? undefined
+    );
   }
-  const n = Math.floor(Number(pool.minPaidToConfirm) || 0);
-  return n > 0 ? n : null;
+  return null;
+}
+
+/** Total de la mesa = precio por cupo × cupos. */
+export function invitePoolTableTotal(pool: {
+  pricePerSeat: unknown;
+  splitAmong?: number | null;
+}): number {
+  const unit = Math.round(Number(pool.pricePerSeat) * 100) / 100;
+  const seats = Math.max(1, Math.floor(Number(pool.splitAmong) || 1));
+  if (!Number.isFinite(unit) || unit <= 0) return 0;
+  return Math.round(unit * seats * 100) / 100;
 }
 
 export type TicketForInviteAnchor = {

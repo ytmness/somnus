@@ -203,9 +203,9 @@ export function mapApiEventToFormData(event: {
     }>;
   }>;
 }): EventFormData {
-  // Hide legacy VIP map tables (isTable=true without kind=TABLE)
+  // Solo entradas en el creador. Mesas (TABLE / links) se gestionan en Table Invites.
   const tickets = (event.ticketTypes || []).filter(
-    (tt) => !(tt.isTable && tt.kind !== "TABLE")
+    (tt) => tt.kind !== "TABLE" && !tt.isTable
   );
   return {
     name: event.name || "",

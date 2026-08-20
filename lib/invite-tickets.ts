@@ -70,11 +70,12 @@ type TicketRow = {
 
 export function toInviteTicketPayload(
   tt: TicketRow,
-  now: Date = new Date()
+  now: Date = new Date(),
+  opts?: { includeHidden?: boolean }
 ): InviteTicketTypePayload | null {
   if (tt.isActive === false) return null;
-  if (tt.isHidden) return null;
-  if (tt.passwordHash) return null;
+  if (tt.isHidden && !opts?.includeHidden) return null;
+  if (tt.passwordHash && !opts?.includeHidden) return null;
   if (!isInviteTicketVisible(tt.kind, tt.isTable)) return null;
 
   const tablePrice = effectiveTicketPriceAt(

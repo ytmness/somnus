@@ -42,6 +42,8 @@ type InviteData = {
   tableConfirmed?: boolean;
   pricePerSeat?: number;
   totalCollected?: number;
+  remaining?: number;
+  tablePrice?: number | null;
   paymentTimeline?: PaymentTimelineEntry[];
   expiresAt?: string | null;
   event?: {
@@ -344,6 +346,12 @@ export default function PagarInvitePage() {
   const tableTicket = pickerTypes.find(
     (tt) => tt.kind === "TABLE" && tt.tablePrice != null && (tt.cupos ?? 0) > 0
   );
+  const tableTotal =
+    invite.tablePrice ?? tableTicket?.tablePrice ?? 0;
+  const remaining =
+    typeof invite.remaining === "number"
+      ? invite.remaining
+      : Math.max(0, Math.round((tableTotal - totalCollected) * 100) / 100);
   const canPayFullTable = Boolean(tableTicket && paidCount === 0);
   const eventWindow =
     invite.event?.salesStartDate && invite.event?.salesEndDate
@@ -512,6 +520,17 @@ export default function PagarInvitePage() {
                   </span>{" "}
                   c/u
                 </p>
+                <p>
+                  Recaudado{" "}
+                  <span className="text-white/80 tabular-nums">
+                    {mxn.format(totalCollected)}
+                  </span>
+                  {" · "}
+                  Resta{" "}
+                  <span className="text-white/80 tabular-nums">
+                    {mxn.format(remaining)}
+                  </span>
+                </p>
               </div>
             )}
             {invite.minPaidToConfirm != null &&
@@ -520,24 +539,40 @@ export default function PagarInvitePage() {
               !tableTicket && (
                 <p className="mt-2 text-[11px] text-white/40">
                   Precio de mesa ÷ {invite.minPaidToConfirm} cupos ={" "}
-                  {mxn.format(invite.pricePerSeat)} c/u. No hay tope de pagos: la
-                  siguiente persona paga lo mismo.
+                  {mxn.format(invite.pricePerSeat)} c/u.
                 </p>
               )}
             {invite.minPaidToConfirm != null && (
               <p className="mt-4 text-xs text-white/50 border-t border-white/10 pt-4">
                 {invite.tableConfirmed ? (
-                  <span className="text-emerald-400/90 font-medium">
-                    Mesa confirmada · pueden seguir pagando
-                  </span>
+                  remaining > 0 ? (
+                    <span className="text-emerald-400/90 font-medium">
+                      Mesa confirmada · aún resta {mxn.format(remaining)}
+                    </span>
+                  ) : (
+                    <span className="text-emerald-400/90 font-medium">
+                      Mesa completa
+                    </span>
+                  )
                 ) : (
                   <>
-                    Mínimo para confirmar:{" "}
-                    <span className="text-white/80 font-medium">{invite.minPaidToConfirm}</span>{" "}
-                    pagos:{" "}
+                    Para confirmar:{" "}
+                    <span className="text-white/80 font-medium">
+                      {invite.minPaidToConfirm}
+                    </span>{" "}
+                    cupos ·{" "}
                     <span className="text-white/80">
                       {paidCount}/{invite.minPaidToConfirm}
                     </span>
+                    {remaining > 0 && (
+                      <>
+                        {" · "}
+                        resta{" "}
+                        <span className="text-white/80 tabular-nums">
+                          {mxn.format(remaining)}
+                        </span>
+                      </>
+                    )}
                   </>
                 )}
               </p>

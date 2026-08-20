@@ -313,6 +313,8 @@ export async function PATCH(
 
         for (const existing of existingTiers) {
           if (keptIds.has(existing.id)) continue;
+          // Mesas / links: no viven en el formulario de entradas; no borrarlas al guardar.
+          if (existing.kind === "TABLE" || existing.isTable) continue;
           if (existing.soldQuantity > 0) {
             throw new TicketSyncError(
               `"${existing.name}" tiene ventas registradas y no se puede eliminar`
