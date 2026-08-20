@@ -91,10 +91,12 @@ export function EventTicketsSection({
 
   const addTicket = (kind: "STANDARD" | "TABLE") => {
     onChange({
-      ticketTypes: [
-        ...data.ticketTypes,
-        { ...createEmptyTicketType(kind), name: "", description: "" },
-      ],
+      ticketTypes: [...data.ticketTypes, createEmptyTicketType(kind)],
+    });
+    requestAnimationFrame(() => {
+      document
+        .getElementById("ticket-tier-new")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
     });
   };
 
@@ -184,6 +186,7 @@ export function EventTicketsSection({
           return (
             <div
               key={tt.id || `new-${index}`}
+              id={!tt.id && index === data.ticketTypes.length - 1 ? "ticket-tier-new" : undefined}
               className="rounded-xl border border-white/12 bg-white/[0.02] p-3.5 space-y-3"
             >
               <div className="flex items-center justify-between gap-2">

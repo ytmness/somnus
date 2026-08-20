@@ -55,6 +55,11 @@ export const tableGroupPriceRowSchema = z.object({
   sortOrder: z.number().int().optional(),
 });
 
+const optionalTicketId = z.preprocess(
+  (v) => (v === "" || v == null ? null : v),
+  z.string().min(1).nullable().optional()
+);
+
 const ticketTypeBaseSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
@@ -62,8 +67,8 @@ const ticketTypeBaseSchema = z.object({
     .enum(["GENERAL", "PREFERENTE", "VIP"])
     .optional()
     .default("GENERAL"),
-  price: z.number().positive("Price must be greater than 0"),
-  maxQuantity: z.number().int().positive("Quantity must be greater than 0"),
+  price: z.coerce.number().positive("Price must be greater than 0"),
+  maxQuantity: z.coerce.number().int().positive("Quantity must be greater than 0"),
   isTable: z.boolean().optional().default(false),
   seatsPerTable: z.number().int().positive().optional(),
   pricePhases: z.array(ticketPricePhaseSchema).optional(),
@@ -73,13 +78,13 @@ const ticketTypeBaseSchema = z.object({
   salesStartDate: z.string().or(z.date()).optional().nullable(),
   salesEndDate: z.string().or(z.date()).optional().nullable(),
   validUntil: z.string().or(z.date()).optional().nullable(),
-  minPurchaseQty: z.number().int().positive().optional().default(1),
-  maxPurchaseQty: z.number().int().positive().optional().nullable(),
+  minPurchaseQty: z.coerce.number().int().positive().optional().default(1),
+  maxPurchaseQty: z.coerce.number().int().positive().optional().nullable(),
   requiresApproval: z.boolean().optional().default(false),
   /** Plaintext password from the form; server hashes to passwordHash. */
   password: z.string().optional().nullable(),
   clearPassword: z.boolean().optional(),
-  linkedTicketTypeId: z.string().uuid().optional().nullable(),
+  linkedTicketTypeId: optionalTicketId,
   tableCapacity: z.number().int().positive().optional().nullable(),
   depositEnabled: z.boolean().optional().default(false),
   depositPercent: z.number().int().min(1).max(99).optional().nullable(),
@@ -197,7 +202,14 @@ export const createConversationSchema = z.object({
 export const updateTicketTypeSchema = ticketTypeBaseSchema
   .partial()
   .extend({
-    id: z.string().uuid("Invalid ticket type ID").optional(),
+    id: z.string().min(1).optional(),
+    price: z.coerce.number().positive("Price must be greater than 0").optional(),
+    maxQuantity: z.coerce
+      .number()
+      .int()
+      .positive("Quantity must be greater than 0")
+      .optional(),
+    linkedTicketTypeId: optionalTicketId,
   })
   .superRefine((val, ctx) => {
     if (

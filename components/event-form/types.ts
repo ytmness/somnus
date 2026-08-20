@@ -79,7 +79,7 @@ export function createEmptyTicketType(
     description: kind === "TABLE" ? "Table reservation" : "General admission",
     category: kind === "TABLE" ? "VIP" : "GENERAL",
     price: 0,
-    maxQuantity: kind === "TABLE" ? 1 : 0,
+    maxQuantity: kind === "TABLE" ? 10 : 100,
     soldQuantity: 0,
     isTable: false,
     pricePhases: [],
@@ -405,8 +405,8 @@ function ticketPayloadFields(
     // Category UI removed from the wizard; keep Prisma enum compatible.
     // TABLE kind historically used VIP; STANDARD always GENERAL.
     category: tt.kind === "TABLE" ? ("VIP" as const) : ("GENERAL" as const),
-    price: tt.price,
-    maxQuantity: tt.maxQuantity,
+    price: Number(tt.price) || 0,
+    maxQuantity: Number(tt.maxQuantity) || 0,
     isTable: false,
     salesStartDate: startRaw ? new Date(startRaw).toISOString() : null,
     salesEndDate: endRaw ? new Date(endRaw).toISOString() : null,
@@ -419,7 +419,7 @@ function ticketPayloadFields(
       : tt.password
         ? { password: tt.password }
         : {}),
-    linkedTicketTypeId: tt.linkedTicketTypeId,
+    linkedTicketTypeId: tt.linkedTicketTypeId || null,
     tableCapacity: tt.kind === "TABLE" ? tt.tableCapacity : null,
     depositEnabled: tt.kind === "TABLE" ? tt.depositEnabled : false,
     depositPercent:

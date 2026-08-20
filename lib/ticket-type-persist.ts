@@ -11,14 +11,15 @@ export async function mapTicketTypeCreateData(tt: TicketInput) {
   }
 
   return {
-    name: tt.name,
+    name: tt.name.trim(),
     description: tt.description,
     category: tt.category,
-    price: tt.price,
-    maxQuantity: tt.maxQuantity,
+    price: Number(tt.price),
+    maxQuantity: Number(tt.maxQuantity),
     isTable: tt.isTable || false,
     seatsPerTable: tt.seatsPerTable,
     kind: tt.kind || "STANDARD",
+    isActive: true,
     isHidden: false,
     manualSoldOut: false,
     salesStartDate: optionalDate(tt.salesStartDate ?? null),
@@ -28,8 +29,11 @@ export async function mapTicketTypeCreateData(tt: TicketInput) {
     maxPurchaseQty: tt.maxPurchaseQty ?? null,
     requiresApproval: tt.requiresApproval ?? false,
     passwordHash,
-    linkedTicketTypeId: tt.linkedTicketTypeId ?? null,
-    tableCapacity: tt.tableCapacity ?? null,
+    linkedTicketTypeId: tt.linkedTicketTypeId || null,
+    tableCapacity:
+      (tt.kind || "STANDARD") === "TABLE"
+        ? tt.tableCapacity ?? 4
+        : tt.tableCapacity ?? null,
     depositEnabled: tt.depositEnabled ?? false,
     depositPercent: tt.depositPercent ?? null,
     variablePricingEnabled: tt.variablePricingEnabled ?? false,
