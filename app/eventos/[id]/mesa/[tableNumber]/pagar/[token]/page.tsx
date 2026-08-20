@@ -42,7 +42,8 @@ type InviteData = {
   cupos?: number | null;
   sharesLeft?: number;
   mesaFilled?: boolean;
-  phase?: "collecting" | "cover";
+  phase?: "collecting" | "cover" | "full_table";
+  poolMode?: "MONEY_POOL" | "FULL_TABLE";
   minPaidToConfirm?: number;
   tableConfirmed?: boolean;
   pricePerSeat?: number;
@@ -243,21 +244,24 @@ export default function PagarInvitePage() {
     }
 
     const pickerTypes = invite?.ticketTypes || [];
+    const isFullTablePay =
+      invite?.poolMode === "FULL_TABLE" || invite?.phase === "full_table";
     const tableTicket = pickerTypes.find(
       (tt) => tt.kind === "TABLE" && tt.tablePrice != null && tt.cupos != null
     );
-    const selectedItems =
-      payMode === "full" && tableTicket
-        ? [{ ticketTypeId: tableTicket.id, quantity: tableTicket.cupos || 1 }]
-        : pickerTypes
-            .filter((tt) => (quantities[tt.id] || 0) > 0)
-            .map((tt) => ({ ticketTypeId: tt.id, quantity: quantities[tt.id] }));
+    const selectedItems = isFullTablePay
+      ? pickerTypes[0]
+        ? [{ ticketTypeId: pickerTypes[0].id, quantity: 1 }]
+        : []
+      : pickerTypes
+          .filter((tt) => (quantities[tt.id] || 0) > 0)
+          .map((tt) => ({ ticketTypeId: tt.id, quantity: quantities[tt.id] }));
 
     if (invite?.isPool && pickerTypes.length > 0 && selectedItems.length === 0) {
       toast.error(
-        payMode === "full"
-          ? "No hay mesa disponible para pagar completa"
-          : "Selecciona al menos un cupo"
+        isFullTablePay
+          ? "No hay mesa disponible para pagar"
+          : "Selecciona al menos un cover"
       );
       return;
     }
@@ -362,8 +366,10 @@ export default function PagarInvitePage() {
   );
   const coverTicket =
     invite.coverTicket || pickerTypes[0] || null;
-  const canPayFullTable = false;
-  const isCoverPhase = true;
+  const isFullTable =
+    invite.poolMode === "FULL_TABLE" || invite.phase === "full_table";
+  const canPayFullTable = isFullTable && paidCount === 0;
+  const isCoverPhase = !isFullTable;
   const eventWindow =
     invite.event?.salesStartDate && invite.event?.salesEndDate
       ? {
@@ -380,16 +386,17 @@ export default function PagarInvitePage() {
     (sum, tt) => sum + tt.price * (quantities[tt.id] || 0),
     0
   );
-  const fullTableTotal = tableTicket?.tablePrice ?? 0;
-  const checkoutTotal = hasTicketPicker
-    ? payMode === "full" && canPayFullTable
-      ? fullTableTotal
-      : selectionTotal
-    : (invite.pricePerSeat ?? 0) * (1 + extraPeople.length);
-  const canSubmit =
-    !hasTicketPicker ||
-    (payMode === "full" && canPayFullTable) ||
-    selectionCount > 0;
+  const fullTableTotal = isFullTable
+    ? invite.tablePrice ?? invite.pricePerSeat ?? 0
+    : tableTicket?.tablePrice ?? 0;
+  const checkoutTotal = isFullTable
+    ? fullTableTotal
+    : hasTicketPicker
+      ? selectionTotal
+      : (invite.pricePerSeat ?? 0) * (1 + extraPeople.length);
+  const canSubmit = isFullTable
+    ? canPayFullTable
+    : !hasTicketPicker || selectionCount > 0;
 
   const bumpQty = (tt: InviteTicketTypePayload, delta: number) => {
     if (!eventWindow) return;
@@ -496,7 +503,9 @@ export default function PagarInvitePage() {
           )}
 
           <section className="rounded-xl bg-white/5 border border-white/10 p-6">
-            <p className="text-[10px] font-semibold tracking-[0.2em] text-[#7BA3E8] uppercase mb-2">Mesa compartida</p>
+            <p className="text-[10px] font-semibold tracking-[0.2em] text-[#7BA3E8] uppercase mb-2">
+              {isFullTable ? "Mesa completa" : "Money pool"}
+            </p>
             <h2 className="text-2xl font-bold text-white leading-tight mb-1">{invite.tableNumber}</h2>
             {invite.ticketTypeName ? (
               <p className="text-white/55 text-sm mb-1">{invite.ticketTypeName}</p>
@@ -506,9 +515,21 @@ export default function PagarInvitePage() {
               {paidCount === 1 ? "1 participante" : `${paidCount} participantes`}
             </p>
             <p className="text-white/45 text-xs mb-1">
-              Todos pagan el mismo cover. No se divide la mesa.
+              {isFullTable
+                ? "Un solo pago reserva toda la mesa."
+                : "Todos pagan el mismo cover. No se divide la mesa."}
             </p>
-            {coverTicket && (
+            {isFullTable ? (
+              <div className="mt-3 space-y-1 text-[11px] text-white/45">
+                <p>
+                  Total{" "}
+                  <span className="text-white/80 tabular-nums text-base font-semibold">
+                    {mxn.format(fullTableTotal)}
+                  </span>
+                </p>
+              </div>
+            ) : (
+              coverTicket && (
               <div className="mt-3 space-y-1 text-[11px] text-white/45">
                 <p>
                   Cover{" "}
@@ -526,8 +547,9 @@ export default function PagarInvitePage() {
                   </span>
                 </p>
               </div>
+              )
             )}
-            {invite.minPaidToConfirm != null && (
+            {!isFullTable && invite.minPaidToConfirm != null && (
               <p className="mt-4 text-xs text-white/50 border-t border-white/10 pt-4">
                 {invite.tableConfirmed ? (
                   <span className="text-emerald-400/90 font-medium">
@@ -544,6 +566,17 @@ export default function PagarInvitePage() {
                       {paidCount}/{invite.minPaidToConfirm}
                     </span>
                   </>
+                )}
+              </p>
+            )}
+            {isFullTable && (
+              <p className="mt-4 text-xs text-white/50 border-t border-white/10 pt-4">
+                {invite.tableReserved || invite.tableConfirmed ? (
+                  <span className="text-emerald-400/90 font-medium">
+                    Mesa pagada / reservada
+                  </span>
+                ) : (
+                  <span>Pendiente de un pago único</span>
                 )}
               </p>
             )}
@@ -629,15 +662,17 @@ export default function PagarInvitePage() {
                   <p className="text-lg font-bold text-white tabular-nums">
                     {mxn.format(checkoutTotal)}
                   </p>
-                  {hasTicketPicker && (
+                  {isFullTable ? (
                     <p className="text-[11px] text-white/40 mt-1">
-                      {payMode === "full" && canPayFullTable
-                        ? `Mesa completa · ${tableTicket?.cupos ?? ""} cupos`
-                        : selectionCount === 0
-                          ? "Elige cupos o mesa completa abajo"
-                          : `${selectionCount} cupo${selectionCount === 1 ? "" : "s"}`}
+                      Pago único de mesa completa
                     </p>
-                  )}
+                  ) : hasTicketPicker ? (
+                    <p className="text-[11px] text-white/40 mt-1">
+                      {selectionCount === 0
+                        ? "Elige cuántos covers"
+                        : `${selectionCount} cover${selectionCount === 1 ? "" : "s"}`}
+                    </p>
+                  ) : null}
                 </div>
               </div>
               <form id="pool-pay-form" onSubmit={handleSubmit} className="space-y-3">
@@ -674,7 +709,16 @@ export default function PagarInvitePage() {
                   />
                 </div>
 
-                {hasTicketPicker ? (
+                {isFullTable ? (
+                  <div className="pt-2 rounded-lg border border-white/10 bg-white/5 p-3">
+                    <p className="text-white text-sm font-medium">
+                      Pagar mesa completa
+                    </p>
+                    <p className="text-[#7BA3E8] font-semibold tabular-nums mt-2">
+                      {mxn.format(fullTableTotal)}
+                    </p>
+                  </div>
+                ) : hasTicketPicker ? (
                   <div className="pt-2 space-y-3">
                     <p className="text-xs text-white/50">
                       ¿Cuántos covers pagas? (
@@ -682,95 +726,70 @@ export default function PagarInvitePage() {
                       {mxn.format(coverTicket?.price || invite.pricePerSeat || 0)}{" "}
                       c/u)
                     </p>
-
-                    {payMode === "full" && canPayFullTable && tableTicket ? (
-                      <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-                        <p className="text-white text-sm font-medium">{tableTicket.name}</p>
-                        <p className="text-white/55 text-xs mt-1">
-                          Pagas la mesa completa ({tableTicket.cupos} cupos) y queda
-                          confirmada.
-                        </p>
-                        <p className="text-[#7BA3E8] font-semibold tabular-nums mt-2">
-                          {mxn.format(tableTicket.tablePrice || 0)}
-                        </p>
-                      </div>
-                    ) : (
-                      <>
-                        <p className="text-white/50 text-xs">
-                          {tableTicket ? "¿Cuántos cupos pagas?" : "Boletos"}
-                        </p>
-                        {pickerTypes.map((tt) => {
-                          const soldOut = isInviteTicketSoldOut(tt);
-                          const salesOpen = eventWindow
-                            ? isSalesOpen(eventWindow, tt, now)
-                            : true;
-                          const disabled = soldOut || !salesOpen;
-                          const qty = quantities[tt.id] || 0;
-                          const available = inviteTicketAvailable(tt);
-                          const maxQ = tt.maxPurchaseQty ?? available;
-                          return (
-                            <div
-                              key={tt.id}
-                              className={`rounded-lg border border-white/10 bg-white/5 p-3 ${
-                                disabled ? "opacity-60" : ""
-                              }`}
-                            >
-                              <div className="flex items-center justify-between gap-3">
-                                <div className="min-w-0">
-                                  <p className="text-white text-sm font-medium truncate">
-                                    {tt.name}
-                                  </p>
-                                  <p className="text-white/55 text-xs tabular-nums mt-0.5">
-                                    {mxn.format(tt.price)}
-                                    {tt.kind === "TABLE" ? " / cupo" : ""}
-                                  </p>
-                                  {tt.kind === "TABLE" && tt.tablePrice != null && (
-                                    <p className="text-[10px] text-white/40 mt-1">
-                                      Mesa {mxn.format(tt.tablePrice)} · {tt.cupos} cupos
-                                    </p>
-                                  )}
-                                  {soldOut && (
-                                    <p className="text-[10px] uppercase tracking-wider text-white/45 mt-1">
-                                      Agotado
-                                    </p>
-                                  )}
-                                  {!soldOut && !salesOpen && (
-                                    <p className="text-[10px] uppercase tracking-wider text-amber-200/80 mt-1">
-                                      Fuera de venta
-                                    </p>
-                                  )}
-                                </div>
-                                {!disabled && (
-                                  <div className="flex items-center gap-1 border border-white/20 rounded-lg shrink-0">
-                                    <button
-                                      type="button"
-                                      onClick={() => bumpQty(tt, -1)}
-                                      disabled={qty === 0}
-                                      aria-label={`Quitar ${tt.name}`}
-                                      className="p-2 text-white/80 hover:text-white disabled:opacity-40"
-                                    >
-                                      <Minus className="w-4 h-4" aria-hidden />
-                                    </button>
-                                    <span className="px-3 py-1.5 text-white text-sm tabular-nums min-w-[2rem] text-center">
-                                      {qty}
-                                    </span>
-                                    <button
-                                      type="button"
-                                      onClick={() => bumpQty(tt, 1)}
-                                      disabled={qty >= maxQ || qty >= available}
-                                      aria-label={`Agregar ${tt.name}`}
-                                      className="p-2 text-white/80 hover:text-white disabled:opacity-40"
-                                    >
-                                      <Plus className="w-4 h-4" aria-hidden />
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
+                    {pickerTypes.map((tt) => {
+                      const soldOut = isInviteTicketSoldOut(tt);
+                      const salesOpen = eventWindow
+                        ? isSalesOpen(eventWindow, tt, now)
+                        : true;
+                      const disabled = soldOut || !salesOpen;
+                      const qty = quantities[tt.id] || 0;
+                      const available = inviteTicketAvailable(tt);
+                      const maxQ = tt.maxPurchaseQty ?? available;
+                      return (
+                        <div
+                          key={tt.id}
+                          className={`rounded-lg border border-white/10 bg-white/5 p-3 ${
+                            disabled ? "opacity-60" : ""
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-white text-sm font-medium truncate">
+                                {tt.name}
+                              </p>
+                              <p className="text-white/55 text-xs tabular-nums mt-0.5">
+                                {mxn.format(tt.price)}
+                              </p>
+                              {soldOut && (
+                                <p className="text-[10px] uppercase tracking-wider text-white/45 mt-1">
+                                  Agotado
+                                </p>
+                              )}
+                              {!soldOut && !salesOpen && (
+                                <p className="text-[10px] uppercase tracking-wider text-amber-200/80 mt-1">
+                                  Fuera de venta
+                                </p>
+                              )}
                             </div>
-                          );
-                        })}
-                      </>
-                    )}
+                            {!disabled && (
+                              <div className="flex items-center gap-1 border border-white/20 rounded-lg shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() => bumpQty(tt, -1)}
+                                  disabled={qty === 0}
+                                  aria-label={`Quitar ${tt.name}`}
+                                  className="p-2 text-white/80 hover:text-white disabled:opacity-40"
+                                >
+                                  <Minus className="w-4 h-4" aria-hidden />
+                                </button>
+                                <span className="px-3 py-1.5 text-white text-sm tabular-nums min-w-[2rem] text-center">
+                                  {qty}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => bumpQty(tt, 1)}
+                                  disabled={qty >= maxQ || qty >= available}
+                                  aria-label={`Agregar ${tt.name}`}
+                                  className="p-2 text-white/80 hover:text-white disabled:opacity-40"
+                                >
+                                  <Plus className="w-4 h-4" aria-hidden />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 ) : (
                 <div className="pt-2">
@@ -863,8 +882,14 @@ export default function PagarInvitePage() {
               <div className="w-14 h-14 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-3">
                 <span className="text-2xl">✓</span>
               </div>
-              <h2 className="text-lg font-bold text-white mb-1">Mesa completa</h2>
-              <p className="text-white/55 text-sm">Todos los lugares de este link ya fueron pagados.</p>
+              <h2 className="text-lg font-bold text-white mb-1">
+                {isFullTable ? "Mesa reservada" : "Link cerrado"}
+              </h2>
+              <p className="text-white/55 text-sm">
+                {isFullTable
+                  ? "Esta mesa completa ya fue pagada."
+                  : "Todos los lugares de este link ya fueron pagados."}
+              </p>
             </section>
           )}
         </main>
@@ -886,8 +911,8 @@ export default function PagarInvitePage() {
                 {isProcessing
                   ? "Procesando…"
                   : !canSubmit
-                    ? "Elige cómo pagar"
-                    : payMode === "full" && canPayFullTable
+                    ? "Elige covers"
+                    : isFullTable
                       ? `Pagar mesa ${mxn.format(checkoutTotal)}`
                       : `Pagar ${mxn.format(checkoutTotal)}`}
               </button>

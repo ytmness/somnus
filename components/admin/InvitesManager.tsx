@@ -40,6 +40,7 @@ interface InviteRow {
   minPaidToConfirm?: number;
   paidCount?: number;
   tableConfirmed?: boolean;
+  poolMode?: "MONEY_POOL" | "FULL_TABLE";
   ticketTypeName?: string | null;
   coverTicketName?: string | null;
 }
@@ -76,6 +77,10 @@ export function InvitesManager() {
   const [generateTableNumber, setGenerateTableNumber] = useState("");
   const [generateMinConfirm, setGenerateMinConfirm] = useState(4);
   const [generateCoverTicketTypeId, setGenerateCoverTicketTypeId] = useState("");
+  const [poolMode, setPoolMode] = useState<"MONEY_POOL" | "FULL_TABLE">(
+    "MONEY_POOL"
+  );
+  const [generateTotalPrice, setGenerateTotalPrice] = useState("");
   const [isSubmittingGenerate, setIsSubmittingGenerate] = useState(false);
   const [generatedLinks, setGeneratedLinks] = useState<
     Array<{
@@ -224,6 +229,8 @@ export function InvitesManager() {
     setGenerateTableNumber("");
     setGenerateMinConfirm(4);
     setGenerateCoverTicketTypeId(ev?.tickets[0]?.id ?? "");
+    setPoolMode("MONEY_POOL");
+    setGenerateTotalPrice("");
     setGeneratedLinks([]);
   };
 
@@ -239,11 +246,27 @@ export function InvitesManager() {
       toast.error("Indica un nombre o número de mesa (1–120 caracteres).");
       return;
     }
-    if (!generateCoverTicketTypeId) {
-      toast.error("Elige el boleto / cover que paga cada persona.");
-      return;
+
+    const body: Record<string, unknown> = {
+      mode: "pool",
+      poolMode,
+    };
+
+    if (poolMode === "FULL_TABLE") {
+      const total = parseFloat(generateTotalPrice.replace(/,/g, "."));
+      if (!Number.isFinite(total) || total <= 0) {
+        toast.error("Indica el total de la mesa completa.");
+        return;
+      }
+      body.totalTablePrice = total;
+    } else {
+      if (!generateCoverTicketTypeId) {
+        toast.error("Elige el boleto / cover que paga cada persona.");
+        return;
+      }
+      body.coverTicketTypeId = generateCoverTicketTypeId;
+      body.minPaidToConfirm = Math.min(500, Math.max(1, generateMinConfirm));
     }
-    const minConfirm = Math.min(500, Math.max(1, generateMinConfirm));
 
     setIsSubmittingGenerate(true);
     setGeneratedLinks([]);
@@ -254,11 +277,7 @@ export function InvitesManager() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({
-            mode: "pool",
-            coverTicketTypeId: generateCoverTicketTypeId,
-            minPaidToConfirm: minConfirm,
-          }),
+          body: JSON.stringify(body),
         }
       );
       const data = await res.json();
@@ -273,6 +292,7 @@ export function InvitesManager() {
       setSelectedEventId(eventId);
       setShowGenerate(false);
       setGenerateTableNumber("");
+      setGenerateTotalPrice("");
       toast.success("Link de mesa guardado. Cópialo y compártelo.");
       const invRes = await fetch(`/api/admin/events/${eventId}/invites`, {
         credentials: "include",
@@ -321,8 +341,10 @@ export function InvitesManager() {
       <div className="rounded-xl border border-white/10 bg-white/5 p-6">
         <h3 className="text-lg font-bold text-white mb-2">Links de mesa</h3>
         <p className="text-white/50 text-sm mb-4">
-          Todos pagan el mismo cover (boleto). Con N pagos la mesa se confirma;
-          quien llegue después también paga ese cover. No se divide nada.
+          Elige el tipo: <strong className="text-white/70">Money pool</strong>{" "}
+          (todos pagan cover) o{" "}
+          <strong className="text-white/70">Mesa completa</strong> (un solo pago
+          del total).
         </p>
 
         {!showGenerate ? (
@@ -337,6 +359,34 @@ export function InvitesManager() {
           </Button>
         ) : (
           <form onSubmit={handleGenerateSubmit} className="space-y-4">
+            <div className="flex flex-wrap gap-4">
+              <label className="inline-flex items-center gap-2 cursor-pointer text-sm text-white/85">
+                <input
+                  type="radio"
+                  name="poolMode"
+                  checked={poolMode === "MONEY_POOL"}
+                  onChange={() => setPoolMode("MONEY_POOL")}
+                  className="accent-white"
+                />
+                Money pool
+              </label>
+              <label className="inline-flex items-center gap-2 cursor-pointer text-sm text-white/85">
+                <input
+                  type="radio"
+                  name="poolMode"
+                  checked={poolMode === "FULL_TABLE"}
+                  onChange={() => setPoolMode("FULL_TABLE")}
+                  className="accent-white"
+                />
+                Mesa completa
+              </label>
+            </div>
+            <p className="text-white/45 text-xs -mt-2">
+              {poolMode === "MONEY_POOL"
+                ? "Todos pagan el mismo cover. Con N pagos se confirma; los demás también pagan cover."
+                : "Una persona paga el total de la mesa de un golpe y queda reservada."}
+            </p>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-white/80 text-sm font-medium mb-1">
@@ -374,69 +424,95 @@ export function InvitesManager() {
                   className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
                 />
               </div>
-              <div>
-                <label className="block text-white/80 text-sm font-medium mb-1">
-                  Cover / boleto *
-                </label>
-                <select
-                  value={generateCoverTicketTypeId}
-                  onChange={(e) => setGenerateCoverTicketTypeId(e.target.value)}
-                  required
-                  className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
-                >
-                  {ticketsForGenerate.length === 0 ? (
-                    <option value="">Sin boletos en este evento</option>
-                  ) : (
-                    ticketsForGenerate.map((tt) => (
-                      <option key={tt.id} value={tt.id}>
-                        {tt.name} · ${tt.price.toLocaleString("es-MX")}
-                      </option>
-                    ))
-                  )}
-                </select>
-                <p className="text-white/45 text-xs mt-1">
-                  Cada persona paga exactamente eso
-                  {selectedCover
-                    ? ` ($${selectedCover.price.toLocaleString("es-MX")})`
-                    : ""}
-                  .
-                </p>
-              </div>
-              <div>
-                <label className="block text-white/80 text-sm font-medium mb-1">
-                  Pagos para confirmar *
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  max={500}
-                  value={generateMinConfirm}
-                  onChange={(e) =>
-                    setGenerateMinConfirm(
-                      Math.min(
-                        500,
-                        Math.max(1, parseInt(e.target.value, 10) || 1)
+
+              {poolMode === "FULL_TABLE" ? (
+                <div className="sm:col-span-2">
+                  <label className="block text-white/80 text-sm font-medium mb-1">
+                    Total mesa completa (MXN) *
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={generateTotalPrice}
+                    onChange={(e) =>
+                      setGenerateTotalPrice(
+                        e.target.value.replace(/[^0-9.,]/g, "")
                       )
-                    )
-                  }
-                  className="w-full max-w-[140px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
-                />
-                <p className="text-white/45 text-xs mt-1">
-                  Ej. 4 personas × $
-                  {selectedCover
-                    ? selectedCover.price.toLocaleString("es-MX")
-                    : "300"}{" "}
-                  = mesa confirmada. Los siguientes también pagan el mismo
-                  cover.
-                </p>
-              </div>
+                    }
+                    placeholder="Ej: 8000"
+                    required
+                    className="w-full max-w-xs px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
+                  />
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <label className="block text-white/80 text-sm font-medium mb-1">
+                      Cover / boleto *
+                    </label>
+                    <select
+                      value={generateCoverTicketTypeId}
+                      onChange={(e) =>
+                        setGenerateCoverTicketTypeId(e.target.value)
+                      }
+                      required
+                      className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                    >
+                      {ticketsForGenerate.length === 0 ? (
+                        <option value="">Sin boletos en este evento</option>
+                      ) : (
+                        ticketsForGenerate.map((tt) => (
+                          <option key={tt.id} value={tt.id}>
+                            {tt.name} · ${tt.price.toLocaleString("es-MX")}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                    <p className="text-white/45 text-xs mt-1">
+                      Cada persona paga exactamente eso
+                      {selectedCover
+                        ? ` ($${selectedCover.price.toLocaleString("es-MX")})`
+                        : ""}
+                      .
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-white/80 text-sm font-medium mb-1">
+                      Pagos para confirmar *
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={500}
+                      value={generateMinConfirm}
+                      onChange={(e) =>
+                        setGenerateMinConfirm(
+                          Math.min(
+                            500,
+                            Math.max(1, parseInt(e.target.value, 10) || 1)
+                          )
+                        )
+                      }
+                      className="w-full max-w-[140px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                    />
+                    <p className="text-white/45 text-xs mt-1">
+                      Ej. 4 × $
+                      {selectedCover
+                        ? selectedCover.price.toLocaleString("es-MX")
+                        : "300"}{" "}
+                      confirman. Los siguientes también pagan cover.
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="flex gap-3">
               <Button
                 type="submit"
                 disabled={
-                  isSubmittingGenerate || ticketsForGenerate.length === 0
+                  isSubmittingGenerate ||
+                  (poolMode === "MONEY_POOL" && ticketsForGenerate.length === 0)
                 }
                 className="bg-white text-black hover:bg-white/90"
               >
@@ -559,8 +635,6 @@ export function InvitesManager() {
                     : inv.status === "PAID"
                       ? inv.pricePerSeat
                       : 0;
-                const coverLabel =
-                  inv.coverTicketName || inv.ticketTypeName || null;
 
                 return (
                   <tr
@@ -569,11 +643,16 @@ export function InvitesManager() {
                   >
                     <td className="py-3 px-4 text-white/90">
                       <p>{inv.tableNumber}</p>
-                      {coverLabel && (
-                        <p className="text-[11px] text-white/45 mt-0.5">
-                          {coverLabel}
-                        </p>
-                      )}
+                      <p className="text-[11px] text-white/45 mt-0.5">
+                        {[
+                          inv.poolMode === "FULL_TABLE"
+                            ? "Mesa completa"
+                            : "Money pool",
+                          inv.coverTicketName || inv.ticketTypeName,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </p>
                     </td>
                     <td className="py-3 px-4">
                       <span
@@ -590,9 +669,13 @@ export function InvitesManager() {
                         }`}
                       >
                         {inv.status === "POOL" && inv.paidCount != null
-                          ? inv.tableConfirmed
-                            ? `Confirmada · ${inv.paidCount} pagos`
-                            : `${inv.paidCount}/${inv.minPaidToConfirm ?? "—"} para confirmar`
+                          ? inv.poolMode === "FULL_TABLE"
+                            ? inv.tableConfirmed
+                              ? "Pagada / reservada"
+                              : "Pendiente de pago"
+                            : inv.tableConfirmed
+                              ? `Confirmada · ${inv.paidCount} pagos`
+                              : `${inv.paidCount}/${inv.minPaidToConfirm ?? "—"} para confirmar`
                           : inv.status === "PAID"
                             ? "Pagado"
                             : inv.status === "PENDING"

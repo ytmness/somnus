@@ -79,6 +79,10 @@ export async function GET(
           paidCount,
           totalCollected,
           tableConfirmed,
+          poolMode:
+            p.mode === "FULL_TABLE" || p.maxSlots === 1
+              ? "FULL_TABLE"
+              : "MONEY_POOL",
           ticketTypeName: p.ticketType?.name ?? null,
           ticketTypeId: p.ticketTypeId,
           coverTicketName: p.coverTicketType?.name ?? null,

@@ -727,19 +727,25 @@ enum SlotInviteStatus {
   CANCELLED  // Cancelado por anfitrión
 }
 
+enum InvitePoolMode {
+  MONEY_POOL  // Todos pagan cover; N pagos confirman; extras siguen pagando cover
+  FULL_TABLE  // Un solo pago del total de la mesa
+}
+
 // Pool tipo "money pool": un solo link para toda la mesa, cada quien paga y se registra
 model TableInvitePool {
   id            String   @id @default(uuid())
   eventId       String
   ticketTypeId  String
-  /// Boleto de entrada (cover) para extras una vez confirmada la mesa / monto
+  /// Boleto de entrada (cover) — money pool
   coverTicketTypeId String?
+  mode          InvitePoolMode @default(MONEY_POOL)
   tableNumber   String   // Nombre o número de mesa (ej: "42", "Terraza A")
   inviteToken   String   @unique // Un solo token para toda la mesa
-  maxSlots      Int?     // Tope de pagos en el link; null = sin límite
-  splitAmong    Int      // Entre cuántas personas se divide el precio total (ej: 34)
-  minPaidToConfirm Int @default(20) // Pagos necesarios para considerar la mesa "confirmada"
-  pricePerSeat  Decimal  @db.Decimal(10, 2)
+  maxSlots      Int?     // Tope de pagos; FULL_TABLE = 1; MONEY_POOL = null
+  splitAmong    Int      // Referencia / min confirm
+  minPaidToConfirm Int @default(20) // Pagos necesarios para "confirmada"
+  pricePerSeat  Decimal  @db.Decimal(10, 2) // Cover (money pool) o total (full table)
   expiresAt     DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -747,7 +753,7 @@ model TableInvitePool {
   event            Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
   ticketType       TicketType  @relation("PoolTableTicket", fields: [ticketTypeId], references: [id], onDelete: Cascade)
   coverTicketType  TicketType? @relation("PoolCoverTicket", fields: [coverTicketTypeId], references: [id], onDelete: SetNull)
-  slotInvites      TableSlotInvite[] // Slots creados al pagar (invitedName/email/phone al momento del pago)
+  slotInvites      TableSlotInvite[]
 
   @@index([eventId])
   @@index([inviteToken])

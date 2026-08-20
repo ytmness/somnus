@@ -122,7 +122,10 @@ export async function GET(
       where: { poolId: pool.id, status: "PAID" },
     });
     const minToConfirm = invitePoolMinToConfirm(pool) ?? pool.minPaidToConfirm;
+    const isFullTable =
+      pool.mode === "FULL_TABLE" || pool.maxSlots === 1;
     const tableConfirmed = paidCount >= minToConfirm;
+    const tableReserved = isFullTable && paidCount >= 1;
 
     const paidSlots = await prisma.tableSlotInvite.findMany({
       where: { poolId: pool.id, status: "PAID" },
@@ -136,32 +139,6 @@ export async function GET(
       },
     });
 
-    const coverSource = pool.coverTicketType || null;
-    let coverTicket = coverSource
-      ? toInviteTicketPayload(coverSource as any, new Date())
-      : null;
-    if (!coverTicket) {
-      const fallback = await loadInviteTicketTypes(
-        pool.eventId,
-        pool.coverTicketTypeId || pool.ticketTypeId
-      );
-      coverTicket = fallback[0] ?? null;
-    }
-
-    const ticketTypes = coverTicket
-      ? [
-          {
-            ...coverTicket,
-            minPurchaseQty: 1,
-            maxPurchaseQty: null,
-            maxQuantity: 9999,
-            soldQuantity: 0,
-          },
-        ]
-      : [];
-
-    const livePrice =
-      coverTicket?.price ?? Number(pool.pricePerSeat);
     const totalCollected = paidSlots.reduce(
       (sum, s) => sum + Number(s.pricePerSeat),
       0
@@ -172,8 +149,58 @@ export async function GET(
       amount: Number(s.pricePerSeat),
       paidAt: s.paidAt?.toISOString() ?? null,
       seatNumber: s.seatNumber,
-      isCover: true,
+      isCover: s.isCover,
     }));
+
+    let ticketTypes: any[] = [];
+    let coverTicket = null as ReturnType<typeof toInviteTicketPayload> | null;
+    let livePrice = Number(pool.pricePerSeat);
+
+    if (isFullTable) {
+      livePrice = Number(pool.pricePerSeat);
+      ticketTypes = [
+        {
+          id: pool.ticketTypeId,
+          name: pool.ticketType?.name || `Mesa ${pool.tableNumber}`,
+          description: null,
+          kind: "TABLE" as const,
+          price: livePrice,
+          tablePrice: livePrice,
+          cupos: 1,
+          maxQuantity: 1,
+          soldQuantity: paidCount > 0 ? 1 : 0,
+          minPurchaseQty: 1,
+          maxPurchaseQty: 1,
+          manualSoldOut: paidCount > 0,
+          salesStartDate: null,
+          salesEndDate: null,
+        },
+      ];
+    } else {
+      const coverSource = pool.coverTicketType || null;
+      coverTicket = coverSource
+        ? toInviteTicketPayload(coverSource as any, new Date())
+        : null;
+      if (!coverTicket) {
+        const fallback = await loadInviteTicketTypes(
+          pool.eventId,
+          pool.coverTicketTypeId || pool.ticketTypeId
+        );
+        coverTicket = fallback[0] ?? null;
+      }
+      livePrice = coverTicket?.price ?? Number(pool.pricePerSeat);
+      ticketTypes = coverTicket
+        ? [
+            {
+              ...coverTicket,
+              minPurchaseQty: 1,
+              maxPurchaseQty: null,
+              maxQuantity: 9999,
+              soldQuantity: 0,
+            },
+          ]
+        : [];
+    }
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const payUrl = mesaPagarUrl(baseUrl, pool.eventId, pool.tableNumber, token);
@@ -184,15 +211,17 @@ export async function GET(
         id: pool.id,
         token: pool.inviteToken,
         isPool: true,
+        poolMode: isFullTable ? "FULL_TABLE" : "MONEY_POOL",
         tableNumber: pool.tableNumber,
         seatNumber: null,
         pricePerSeat: livePrice,
-        ticketTypeName: coverTicket?.name ?? pool.ticketType?.name ?? null,
-        coverTicketTypeId: pool.coverTicketTypeId || pool.ticketTypeId,
+        tablePrice: isFullTable ? livePrice : null,
+        ticketTypeName: pool.ticketType?.name ?? coverTicket?.name ?? null,
+        coverTicketTypeId: pool.coverTicketTypeId,
         coverTicketName: coverTicket?.name ?? null,
         coverTicket,
-        phase: "cover",
-        maxSlots: null,
+        phase: isFullTable ? "full_table" : "cover",
+        maxSlots: pool.maxSlots,
         cupos: minToConfirm,
         splitAmong: minToConfirm,
         minPaidToConfirm: minToConfirm,
@@ -205,8 +234,8 @@ export async function GET(
         event: pool.event,
         ticketTypes,
         payUrl,
-        status: "PENDING",
-        tableReserved: false,
+        status: tableReserved ? "PAID" : "PENDING",
+        tableReserved,
       },
     });
   } catch (error) {

@@ -123,15 +123,15 @@ export async function POST(request: NextRequest) {
         where: { poolId: pool.id, status: "PAID" },
       });
 
-      const coverTypeId = pool.coverTicketTypeId || pool.ticketTypeId;
-      const requestedItems = Array.isArray(items)
-        ? items
-            .map((it) => ({
-              ticketTypeId: String(it?.ticketTypeId || ""),
-              quantity: Math.floor(Number(it?.quantity) || 0),
-            }))
-            .filter((it) => it.ticketTypeId && it.quantity > 0)
-        : [];
+      const isFullTable =
+        pool.mode === "FULL_TABLE" || pool.maxSlots === 1;
+
+      if (isFullTable && paidCount >= 1) {
+        return NextResponse.json(
+          { error: "Esta mesa completa ya fue pagada." },
+          { status: 400 }
+        );
+      }
 
       const now = new Date();
       const event = await prisma.event.findUnique({
@@ -147,53 +147,81 @@ export async function POST(request: NextRequest) {
         salesEndDate: event.salesEndDate,
       };
 
-      const coverRow = event.ticketTypes.find((t) => t.id === coverTypeId);
-      const coverPayload = coverRow ? toInviteTicketPayload(coverRow, now) : null;
-      if (!coverPayload) {
-        return NextResponse.json(
-          { error: "El boleto / cover de esta mesa ya no está disponible." },
-          { status: 400 }
-        );
-      }
+      const requestedItems = Array.isArray(items)
+        ? items
+            .map((it) => ({
+              ticketTypeId: String(it?.ticketTypeId || ""),
+              quantity: Math.floor(Number(it?.quantity) || 0),
+            }))
+            .filter((it) => it.ticketTypeId && it.quantity > 0)
+        : [];
 
-      // Todos pagan el mismo cover. Sin dividir mesa ni "mesa completa".
-      const qty =
-        requestedItems.length > 0
-          ? requestedItems.reduce((s, r) => {
-              if (r.ticketTypeId !== coverPayload.id) return s;
-              return s + r.quantity;
-            }, 0)
-          : 1 + extras.length;
+      if (isFullTable) {
+        const unit = Number(pool.pricePerSeat);
+        if (!Number.isFinite(unit) || unit <= 0) {
+          return NextResponse.json(
+            { error: "Precio de mesa completa inválido" },
+            { status: 400 }
+          );
+        }
+        lineItems = [
+          {
+            ticketTypeId: pool.ticketTypeId,
+            quantity: 1,
+            unitPrice: unit,
+          },
+        ];
+      } else {
+        const coverTypeId = pool.coverTicketTypeId || pool.ticketTypeId;
+        const coverRow = event.ticketTypes.find((t) => t.id === coverTypeId);
+        const coverPayload = coverRow
+          ? toInviteTicketPayload(coverRow, now)
+          : null;
+        if (!coverPayload) {
+          return NextResponse.json(
+            { error: "El boleto / cover de esta mesa ya no está disponible." },
+            { status: 400 }
+          );
+        }
 
-      if (qty < 1) {
-        return NextResponse.json(
-          { error: "Selecciona al menos un cover" },
-          { status: 400 }
-        );
-      }
-      if (
-        requestedItems.some(
-          (r) => r.ticketTypeId && r.ticketTypeId !== coverPayload.id
-        )
-      ) {
-        return NextResponse.json(
-          { error: "Este link solo cobra el cover de la mesa." },
-          { status: 400 }
-        );
-      }
+        const qty =
+          requestedItems.length > 0
+            ? requestedItems.reduce((s, r) => {
+                if (r.ticketTypeId !== coverPayload.id) return s;
+                return s + r.quantity;
+              }, 0)
+            : 1 + extras.length;
 
-      const check = canBuyInviteTicket(eventWindow, coverPayload, qty, now);
-      if (!check.ok) {
-        return NextResponse.json({ error: check.error }, { status: 400 });
-      }
+        if (qty < 1) {
+          return NextResponse.json(
+            { error: "Selecciona al menos un cover" },
+            { status: 400 }
+          );
+        }
+        if (
+          requestedItems.some(
+            (r) => r.ticketTypeId && r.ticketTypeId !== coverPayload.id
+          )
+        ) {
+          return NextResponse.json(
+            { error: "Este link solo cobra el cover de la mesa." },
+            { status: 400 }
+          );
+        }
 
-      lineItems = [
-        {
-          ticketTypeId: coverPayload.id,
-          quantity: qty,
-          unitPrice: coverPayload.price,
-        },
-      ];
+        const check = canBuyInviteTicket(eventWindow, coverPayload, qty, now);
+        if (!check.ok) {
+          return NextResponse.json({ error: check.error }, { status: 400 });
+        }
+
+        lineItems = [
+          {
+            ticketTypeId: coverPayload.id,
+            quantity: qty,
+            unitPrice: coverPayload.price,
+          },
+        ];
+      }
 
       const peopleForSeats: Array<{
         invitedName: string;
@@ -212,7 +240,7 @@ export async function POST(request: NextRequest) {
             invitedPhone: buyerPhone?.trim() || null,
             ticketTypeId: line.ticketTypeId,
             unitPrice: line.unitPrice,
-            isCover: true,
+            isCover: !isFullTable,
           });
         }
       }
