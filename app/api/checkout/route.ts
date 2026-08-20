@@ -453,6 +453,7 @@ function validateTicketTypeForPurchase(
     maxQuantity: number;
     soldQuantity: number;
     isActive: boolean;
+    isHidden?: boolean;
     manualSoldOut: boolean;
   },
   quantity: number,
@@ -460,6 +461,10 @@ function validateTicketTypeForPurchase(
   now: Date
 ): { ok: true } | { ok: false; error: string } {
   if (!tt.isActive) {
+    return { ok: false, error: `${tt.name} no está disponible` };
+  }
+
+  if (tt.isHidden) {
     return { ok: false, error: `${tt.name} no está disponible` };
   }
 

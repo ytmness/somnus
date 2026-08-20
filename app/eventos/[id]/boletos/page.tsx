@@ -27,6 +27,7 @@ interface TicketTypeRow {
   maxQuantity: number;
   soldQuantity: number;
   manualSoldOut?: boolean;
+  isHidden?: boolean;
   price: number;
   pricePhases?: Parameters<typeof effectiveTicketPriceAt>[1];
   groupPriceRows?: Parameters<typeof priceForGuestCount>[1];
@@ -46,6 +47,7 @@ interface CartItem {
 }
 
 function isVisibleTicketType(tt: TicketTypeRow): boolean {
+  if (tt.isHidden) return false;
   // Legacy VIP map tables stay off the regular boletos list
   if (tt.isTable && tt.kind !== "TABLE") return false;
   return tt.kind === "STANDARD" || tt.kind === "TABLE";

@@ -63,30 +63,12 @@ export function EventTicketsSection({
   isEdit = false,
 }: EventTicketsSectionProps) {
   const [advancedOpen, setAdvancedOpen] = useState<Record<number, boolean>>({});
-  /** Local-only preview — never persisted */
-  const [previewByIndex, setPreviewByIndex] = useState<
-    Record<number, { soldOut: boolean; hidden: boolean }>
-  >({});
 
   const updateTicket = (index: number, patch: Partial<TicketTypeForm>) => {
     const next = data.ticketTypes.map((tt, i) =>
       i === index ? { ...tt, ...patch } : tt
     );
     onChange({ ticketTypes: next });
-  };
-
-  const setPreview = (
-    index: number,
-    patch: Partial<{ soldOut: boolean; hidden: boolean }>
-  ) => {
-    setPreviewByIndex((prev) => ({
-      ...prev,
-      [index]: {
-        soldOut: prev[index]?.soldOut ?? false,
-        hidden: prev[index]?.hidden ?? false,
-        ...patch,
-      },
-    }));
   };
 
   const addTicket = (kind: "STANDARD" | "TABLE") => {
@@ -125,15 +107,6 @@ export function EventTicketsSection({
     setAdvancedOpen((prev) => {
       const next = { ...prev };
       delete next[index];
-      return next;
-    });
-    setPreviewByIndex((prev) => {
-      const next: typeof prev = {};
-      Object.keys(prev).forEach((k) => {
-        const i = Number(k);
-        if (i < index) next[i] = prev[i];
-        else if (i > index) next[i - 1] = prev[i];
-      });
       return next;
     });
   };
@@ -178,10 +151,8 @@ export function EventTicketsSection({
           const otherTiers = data.ticketTypes.filter(
             (_, i) => i !== index && Boolean(data.ticketTypes[i].id || data.ticketTypes[i].name)
           );
-          const preview = previewByIndex[index] ?? {
-            soldOut: false,
-            hidden: false,
-          };
+          const soldOut = Boolean(tt.manualSoldOut);
+          const hidden = Boolean(tt.isHidden);
 
           return (
             <div
@@ -264,22 +235,24 @@ export function EventTicketsSection({
 
               <div className="space-y-2 rounded-lg border border-dashed border-white/15 bg-black/20 p-3">
                 <p className="text-[10px] uppercase tracking-wider text-white/40">
-                  Vista previa (no se guarda)
+                  Visibilidad (se guarda con el evento)
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   <ToggleRow
                     label="Agotado"
-                    checked={preview.soldOut}
-                    onChange={(soldOut) => setPreview(index, { soldOut })}
+                    checked={soldOut}
+                    onChange={(manualSoldOut) =>
+                      updateTicket(index, { manualSoldOut })
+                    }
                   />
                   <ToggleRow
                     label="Oculto"
-                    checked={preview.hidden}
-                    onChange={(hidden) => setPreview(index, { hidden })}
+                    checked={hidden}
+                    onChange={(isHidden) => updateTicket(index, { isHidden })}
                   />
                 </div>
 
-                {preview.hidden ? (
+                {hidden ? (
                   <div className="rounded-xl border border-white/10 border-dashed px-4 py-6 text-center">
                     <p className="text-xs text-white/45">
                       Oculto — no aparece en la lista de boletos
@@ -289,7 +262,7 @@ export function EventTicketsSection({
                   <div
                     className={cn(
                       "rounded-xl border border-white/12 bg-white/[0.04] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3",
-                      preview.soldOut && "opacity-70"
+                      soldOut && "opacity-70"
                     )}
                   >
                     <div className="min-w-0">
@@ -297,7 +270,7 @@ export function EventTicketsSection({
                         <span className="text-white font-medium text-sm truncate">
                           {tt.name.trim() || (isTable ? "Mesa VIP" : "General")}
                         </span>
-                        {preview.soldOut && (
+                        {soldOut && (
                           <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/15 text-white/80">
                             Sold out
                           </span>
@@ -318,7 +291,7 @@ export function EventTicketsSection({
                         {isTable ? " / table" : ""}
                       </p>
                     </div>
-                    {!preview.soldOut && (
+                    {!soldOut && (
                       <div className="flex items-center gap-1 border border-white/20 rounded-lg opacity-80 pointer-events-none select-none">
                         <span className="p-2 text-white/50 text-xs">−</span>
                         <span className="px-3 py-1.5 text-white/70 text-sm tabular-nums">

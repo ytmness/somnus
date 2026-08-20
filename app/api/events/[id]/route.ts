@@ -189,8 +189,8 @@ export async function PATCH(
                   seatsPerTable: tt.seatsPerTable,
                   pricePhases: tt.pricePhases,
                   kind: tt.kind ?? "STANDARD",
-                  isHidden: false,
-                  manualSoldOut: false,
+                  isHidden: tt.isHidden ?? false,
+                  manualSoldOut: tt.manualSoldOut ?? false,
                   salesStartDate: tt.salesStartDate,
                   salesEndDate: tt.salesEndDate,
                   validUntil: tt.validUntil,
@@ -223,8 +223,9 @@ export async function PATCH(
           if (tt.isTable !== undefined) ttData.isTable = tt.isTable;
           if (tt.seatsPerTable !== undefined) ttData.seatsPerTable = tt.seatsPerTable;
           if (tt.kind !== undefined) ttData.kind = tt.kind;
-          ttData.isHidden = false;
-          ttData.manualSoldOut = false;
+          if (tt.isHidden !== undefined) ttData.isHidden = tt.isHidden;
+          if (tt.manualSoldOut !== undefined)
+            ttData.manualSoldOut = tt.manualSoldOut;
           if (tt.salesStartDate !== undefined)
             ttData.salesStartDate = optionalDate(tt.salesStartDate);
           if (tt.salesEndDate !== undefined)

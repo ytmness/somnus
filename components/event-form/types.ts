@@ -25,6 +25,8 @@ export interface TicketTypeForm {
   price: number;
   maxQuantity: number;
   soldQuantity?: number;
+  isHidden: boolean;
+  manualSoldOut: boolean;
   /** Legacy VIP map tables — always false for wizard-managed tiers */
   isTable: boolean;
   pricePhases: PricePhaseFormRow[];
@@ -81,6 +83,8 @@ export function createEmptyTicketType(
     price: 0,
     maxQuantity: kind === "TABLE" ? 10 : 100,
     soldQuantity: 0,
+    isHidden: false,
+    manualSoldOut: false,
     isTable: false,
     pricePhases: [],
     salesStartDate: "",
@@ -243,6 +247,8 @@ export function mapApiEventToFormData(event: {
               price: typeof tt.price === "number" ? tt.price : Number(tt.price),
               maxQuantity: tt.maxQuantity,
               soldQuantity: tt.soldQuantity ?? 0,
+              isHidden: Boolean(tt.isHidden),
+              manualSoldOut: Boolean(tt.manualSoldOut),
               isTable: false,
               pricePhases: (tt.pricePhases || []).map((p) => ({
                 price: Number(p.price),
@@ -408,6 +414,8 @@ function ticketPayloadFields(
     price: Number(tt.price) || 0,
     maxQuantity: Number(tt.maxQuantity) || 0,
     isTable: false,
+    isHidden: Boolean(tt.isHidden),
+    manualSoldOut: Boolean(tt.manualSoldOut),
     salesStartDate: startRaw ? new Date(startRaw).toISOString() : null,
     salesEndDate: endRaw ? new Date(endRaw).toISOString() : null,
     validUntil: tt.validUntil ? new Date(tt.validUntil).toISOString() : null,

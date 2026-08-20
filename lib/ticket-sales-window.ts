@@ -57,6 +57,7 @@ export function eventTicketPurchaseState(
         maxQuantity: number;
         soldQuantity?: number;
         manualSoldOut?: boolean;
+        isHidden?: boolean;
       }
     >;
   },
@@ -69,7 +70,7 @@ export function eventTicketPurchaseState(
   ctaLabel: string;
   ctaDisabled: boolean;
 } {
-  const types = event.ticketTypes;
+  const types = event.ticketTypes.filter((tt) => !tt.isHidden);
   const hasAnyTickets = types.length > 0;
   if (!hasAnyTickets) {
     return {

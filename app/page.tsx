@@ -65,6 +65,7 @@ function convertEventToConcert(event: any): Concert {
     salesEndDate: event.salesEndDate,
   };
   const tierAvailable = (tt: any) => {
+    if (tt.isHidden) return 0;
     if (tt.manualSoldOut) return 0;
     if (!isSalesOpen(eventWindow, tt, at)) return 0;
     return Math.max(0, tt.maxQuantity - (tt.soldQuantity || 0));
@@ -72,30 +73,34 @@ function convertEventToConcert(event: any): Concert {
   const eff = (tt: any) =>
     effectiveTicketPriceAt(Number(tt.price), tt.pricePhases, at);
 
-  const purchasableTypes = event.ticketTypes.filter(
+  const publicTypes = (event.ticketTypes || []).filter(
+    (tt: any) => !tt.isHidden
+  );
+
+  const purchasableTypes = publicTypes.filter(
     (tt: any) => tierAvailable(tt) > 0
   );
 
   const minPrice =
     purchasableTypes.length > 0
       ? Math.min(...purchasableTypes.map((tt: any) => eff(tt)))
-      : event.ticketTypes.length > 0
-        ? Math.min(...event.ticketTypes.map((tt: any) => eff(tt)))
+      : publicTypes.length > 0
+        ? Math.min(...publicTypes.map((tt: any) => eff(tt)))
         : 0;
 
-  const generalTypes = event.ticketTypes.filter(
+  const generalTypes = publicTypes.filter(
     (tt: any) => tt.category === "GENERAL"
   );
-  const preferenteTypes = event.ticketTypes.filter(
+  const preferenteTypes = publicTypes.filter(
     (tt: any) =>
       tt.category === "PREFERENTE" &&
       (tt.name.toLowerCase().includes("a") ||
         tt.name.toLowerCase().includes("b"))
   );
-  const vipTypes = event.ticketTypes.filter(
+  const vipTypes = publicTypes.filter(
     (tt: any) => tt.category === "VIP"
   );
-  const otherTypes = event.ticketTypes.filter(
+  const otherTypes = publicTypes.filter(
     (tt: any) =>
       tt.category !== "GENERAL" &&
       tt.category !== "VIP" &&
