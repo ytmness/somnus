@@ -32,7 +32,12 @@ export type InviteTicketTypePayload = {
   name: string;
   description: string | null;
   kind: "STANDARD" | "TABLE";
+  /** Precio por cupo (mesa ÷ cupos) o precio del boleto. */
   price: number;
+  /** Precio total de la mesa; null si no es TABLE. */
+  tablePrice: number | null;
+  /** Cupos para confirmar; null si no es TABLE. */
+  cupos: number | null;
   maxQuantity: number;
   soldQuantity: number;
   minPurchaseQty: number;
@@ -90,6 +95,8 @@ export function toInviteTicketPayload(
     description: tt.description ?? null,
     kind: tt.kind === "TABLE" ? "TABLE" : "STANDARD",
     price,
+    tablePrice: isTableKind ? tablePrice : null,
+    cupos: isTableKind ? cupos : null,
     maxQuantity: tt.maxQuantity,
     soldQuantity: tt.soldQuantity,
     minPurchaseQty: isTableKind ? 1 : tt.minPurchaseQty ?? 1,

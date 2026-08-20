@@ -127,6 +127,8 @@ export async function GET(
       pool.ticketTypeId
     );
     const livePrice = ticketTypes[0]?.price ?? Number(pool.pricePerSeat);
+    const liveTablePrice = ticketTypes[0]?.tablePrice ?? null;
+    const liveCupos = ticketTypes[0]?.cupos ?? minToConfirm;
 
     return NextResponse.json({
       success: true,
@@ -137,10 +139,11 @@ export async function GET(
         tableNumber: pool.tableNumber,
         seatNumber: null,
         pricePerSeat: livePrice,
+        tablePrice: liveTablePrice,
         ticketTypeName: pool.ticketType?.name ?? null,
         maxSlots: invitePoolPaymentCap(pool),
-        cupos: minToConfirm,
-        splitAmong: minToConfirm,
+        cupos: liveCupos,
+        splitAmong: liveCupos,
         minPaidToConfirm: minToConfirm,
         paidCount,
         totalCollected,

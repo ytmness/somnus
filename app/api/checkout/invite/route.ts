@@ -60,14 +60,17 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { inviteToken, buyerName, buyerEmail, buyerPhone, extraPeople, items } = body as {
+    const { inviteToken, buyerName, buyerEmail, buyerPhone, extraPeople, items, payMode } = body as {
       inviteToken?: string;
       buyerName?: string;
       buyerEmail?: string;
       buyerPhone?: string;
       extraPeople?: Array<{ name?: string; email?: string; phone?: string }>;
       items?: Array<{ ticketTypeId?: string; quantity?: number }>;
+      /** share = cupos a unitPrice; full = toda la mesa de un golpe */
+      payMode?: "share" | "full";
     };
+    const mode = payMode === "full" ? "full" : "share";
 
     const sessionUser = await getSession();
     if (!sessionUser) {
@@ -155,23 +158,69 @@ export async function POST(request: NextRequest) {
             pool.ticketTypeId
           )
         );
-        for (const req of requestedItems) {
-          const mapped = allowed.find((tt) => tt.id === req.ticketTypeId);
-          if (!mapped) {
+
+        if (mode === "full") {
+          if (paidCount > 0) {
             return NextResponse.json(
-              { error: "Uno de los boletos seleccionados no está disponible en este link de mesa" },
+              {
+                error:
+                  "Ya hay pagos en esta mesa. Elige cupos para pagar tu parte o el resto.",
+              },
               { status: 400 }
             );
           }
-          const check = canBuyInviteTicket(eventWindow, mapped, req.quantity, now);
+          if (requestedItems.length !== 1) {
+            return NextResponse.json(
+              { error: "Para pagar toda la mesa elige un solo tipo" },
+              { status: 400 }
+            );
+          }
+          const mapped = allowed.find((tt) => tt.id === requestedItems[0].ticketTypeId);
+          if (!mapped || mapped.kind !== "TABLE" || !mapped.tablePrice || !mapped.cupos) {
+            return NextResponse.json(
+              { error: "Este tipo no permite pagar la mesa completa" },
+              { status: 400 }
+            );
+          }
+          const check = canBuyInviteTicket(eventWindow, mapped, mapped.cupos, now);
           if (!check.ok) {
             return NextResponse.json({ error: check.error }, { status: 400 });
           }
-          lineItems.push({
-            ticketTypeId: mapped.id,
-            quantity: req.quantity,
-            unitPrice: mapped.price,
-          });
+          // Un asiento por cupo. Ajustamos el último para que la suma = precio mesa exacto.
+          const seats = mapped.cupos;
+          const per = mapped.price;
+          const exact = mapped.tablePrice;
+          for (let i = 0; i < seats; i++) {
+            const isLast = i === seats - 1;
+            const unit =
+              isLast && seats > 1
+                ? Math.round((exact - per * (seats - 1)) * 100) / 100
+                : per;
+            lineItems.push({
+              ticketTypeId: mapped.id,
+              quantity: 1,
+              unitPrice: unit > 0 ? unit : per,
+            });
+          }
+        } else {
+          for (const req of requestedItems) {
+            const mapped = allowed.find((tt) => tt.id === req.ticketTypeId);
+            if (!mapped) {
+              return NextResponse.json(
+                { error: "Uno de los boletos seleccionados no está disponible en este link de mesa" },
+                { status: 400 }
+              );
+            }
+            const check = canBuyInviteTicket(eventWindow, mapped, req.quantity, now);
+            if (!check.ok) {
+              return NextResponse.json({ error: check.error }, { status: 400 });
+            }
+            lineItems.push({
+              ticketTypeId: mapped.id,
+              quantity: req.quantity,
+              unitPrice: mapped.price,
+            });
+          }
         }
       } else {
         lineItems = [
