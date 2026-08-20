@@ -1,7 +1,7 @@
 # Graph Report - somnus-master  (2026-08-19)
 
 ## Corpus Check
-- 375 files · ~977,723 words
+- 375 files · ~977,961 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `32fb647c`
+- Built from commit: `a79e7175`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -132,6 +132,7 @@
 - tailwindcss
 - route.ts
 - @types/nodemailer
+- date-fns
 - @types/uuid
 - typescript
 - postcss.config.mjs
@@ -174,7 +175,6 @@
 - 🚀 Inicio Rápido - Reutilización para Nuevo Cliente
 - Guía de Queries para Supabase
 - ✅ Verificación Final - Todo Está Funcionando
-- @types/node
 - 🔍 Comparación de Schemas: Boletera-Regia vs Somnus
 - 🔧 Corregir Error de Sintaxis en Nginx
 - test-apple-pay-pi.js
@@ -441,8 +441,8 @@ Cohesion: 0.38
 Nodes (6): eventFlyerSrc(), formatPaidAt(), InviteData, mxn, PagarInvitePage(), PaymentTimelineEntry
 
 ### Community 47 - "resolvePostAuthRedirect"
-Cohesion: 0.20
-Nodes (10): API Endpoints a Crear, `/api/events`, `/api/inventory`, `/api/sales`, `/api/tickets`, Autenticación, 🚧 FASE 2: SISTEMA DE VENTA - **EN DESARROLLO**, Páginas a Crear (+2 more)
+Cohesion: 0.22
+Nodes (9): Autenticación, Boletos, Carrito de Compra, Componentes a Crear, Eventos, 🚧 FASE 2: SISTEMA DE VENTA - **EN DESARROLLO**, Páginas a Crear, Público (+1 more)
 
 ### Community 48 - "NavbarFooter.tsx"
 Cohesion: 0.29
@@ -482,7 +482,7 @@ Nodes (3): main(), prisma, slugify()
 
 ### Community 78 - "autoprefixer"
 Cohesion: 0.13
-Nodes (15): autoprefixer, @capacitor/assets, eslint-config-next, devDependencies, autoprefixer, @capacitor/assets, eslint-config-next, postcss (+7 more)
+Nodes (15): autoprefixer, @capacitor/assets, devDependencies, autoprefixer, @capacitor/assets, postcss, prisma, tsx (+7 more)
 
 ### Community 79 - "bcryptjs"
 Cohesion: 0.19
@@ -490,7 +490,7 @@ Nodes (10): PostLoginContent(), LoginContent(), RegisterContent(), VerificarEmai
 
 ### Community 80 - "dependencies"
 Cohesion: 0.15
-Nodes (13): @capacitor/app, class-variance-authority, date-fns, lucide-react, nodemailer, dependencies, @capacitor/app, class-variance-authority (+5 more)
+Nodes (13): bcryptjs, @capacitor/app, class-variance-authority, lucide-react, nodemailer, dependencies, bcryptjs, @capacitor/app (+5 more)
 
 ### Community 85 - "🔧 Configuración en el Servidor"
 Cohesion: 0.07
@@ -552,6 +552,10 @@ Nodes (5): CommissionRule, CommissionsManager(), CommissionsManagerProps, EventO
 Cohesion: 0.47
 Nodes (5): LEGACY_STAFF_ROLES, main(), migrateLegacyStaffRoles(), migrateVenuesFromEvents(), ROLE_MAP
 
+### Community 115 - "commissions.ts"
+Cohesion: 0.40
+Nodes (5): API Endpoints a Crear, `/api/events`, `/api/inventory`, `/api/sales`, `/api/tickets`
+
 ### Community 121 - "route.ts"
 Cohesion: 0.12
 Nodes (26): GET(), PATCH(), POST(), GET(), POST(), GET(), GET(), isValidEmail() (+18 more)
@@ -583,10 +587,6 @@ Nodes (17): ✅ Checklist Final, ✅ Comandos Completos en Orden, ✅ Estado Act
 ### Community 158 - "PendingApprovalsManager.tsx"
 Cohesion: 0.47
 Nodes (5): initials(), PendingApprovalsManager(), PendingSale, PendingSaleItem, BuyerProfileCard
-
-### Community 159 - "Componentes a Crear"
-Cohesion: 0.50
-Nodes (4): Boletos, Carrito de Compra, Componentes a Crear, Eventos
 
 ### Community 160 - "🗄️ Crear Base de Datos en Supabase"
 Cohesion: 0.12
@@ -748,7 +748,7 @@ Nodes (13): Certificados, Contenido, Plantilla de pase de Apple Wallet, 1. App I
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `dependencies` connect `dependencies` to `cn`, `index.ts`, `devDependencies`, `EditEventModal.tsx`, `@radix-ui/react-label`, `effectiveTicketPriceAt`, `package.json`, `clsx`, `@radix-ui/react-tabs`, `next`, `qrcode.react`, `@radix-ui/react-avatar`, `clsx`, `embla-carousel-react`, `eslint-config-next`, `@hookform/resolvers`, `@radix-ui/react-dialog`, `jose`, `resend`, `sonner`, `stripe`, `swiper`, `uuid`, `@prisma/client`, `tailwindcss-animate`, `@radix-ui/react-accordion`, `@radix-ui/react-alert-dialog`, `zustand`, `@radix-ui/react-checkbox`, `@capacitor-community/stripe`, `@capacitor/core`, `@capacitor/ios`, `@capacitor/splash-screen`, `@capacitor/status-bar`, `@radix-ui/react-popover`, `@radix-ui/react-separator`, `@radix-ui/react-select`, `@radix-ui/react-slot`, `react-dom`, `@stripe/react-stripe-js`, `@stripe/stripe-js`, `@stripe/stripe-js`, `tailwind-merge`, `session.ts`, `commissions.ts`, `stripe`, `zod`?**
+- **Why does `dependencies` connect `dependencies` to `cn`, `index.ts`, `devDependencies`, `EditEventModal.tsx`, `@radix-ui/react-label`, `effectiveTicketPriceAt`, `package.json`, `clsx`, `@radix-ui/react-tabs`, `next`, `qrcode.react`, `@radix-ui/react-avatar`, `clsx`, `embla-carousel-react`, `eslint-config-next`, `@hookform/resolvers`, `@radix-ui/react-dialog`, `jose`, `resend`, `sonner`, `stripe`, `swiper`, `uuid`, `@prisma/client`, `tailwindcss-animate`, `@radix-ui/react-accordion`, `@radix-ui/react-alert-dialog`, `zustand`, `@radix-ui/react-checkbox`, `@capacitor-community/stripe`, `@capacitor/core`, `@capacitor/ios`, `@capacitor/splash-screen`, `@capacitor/status-bar`, `@radix-ui/react-popover`, `@radix-ui/react-separator`, `@radix-ui/react-select`, `@radix-ui/react-slot`, `react-dom`, `@stripe/react-stripe-js`, `@stripe/stripe-js`, `@stripe/stripe-js`, `tailwind-merge`, `session.ts`, `stripe`, `zod`, `date-fns`?**
   _High betweenness centrality (0.062) - this node is a cross-community bridge._
 - **Why does `getSession()` connect `route.ts` to `session.ts`, `otp.ts`, `permissions.ts`, `@radix-ui/react-dropdown-menu`, `OrganizationProfileClient.tsx`, `SqlEditorManager.tsx`, `prisma.ts`, `route.ts`, `route.ts`, `schemas.ts`, `route.ts`, `registration.ts`, `local.ts`, `UpcomingEventsCarousel.tsx`, `patriotas-individual-tables.ts`, `EventCardZamna.tsx`?**
   _High betweenness centrality (0.038) - this node is a cross-community bridge._

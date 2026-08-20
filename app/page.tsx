@@ -454,7 +454,7 @@ export default function HomePage() {
                     />
                   ))}
                 </UpcomingEventsCarousel>
-              ) : concerts.length === 0 ? (
+              ) : concerts.length === 0 && GALLERY_EVENTS.length > 0 ? (
                 <UpcomingEventsCarousel
                   standaloneSettingsProvider={false}
                   showPosterTuner={

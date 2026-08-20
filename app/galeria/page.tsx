@@ -4,11 +4,7 @@ import { useState, useCallback, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { SomnusHeader } from "@/components/SomnusHeader";
-import { gallerySections as staticSections } from "@/lib/gallery-images";
 import { X, ChevronLeft, ChevronRight, ImageIcon, Plus } from "lucide-react";
-
-/** Fallback estático: más reciente arriba (orden inverso al definido en gallery-images) */
-const staticSectionsNewestFirst = [...staticSections].reverse();
 
 /** Miniaturas visibles en la fila; la 6ª celda muestra +N si hay más */
 const PREVIEW_THUMB_COUNT = 5;
@@ -30,7 +26,7 @@ function GaleriaContent() {
         const res = await fetch("/api/gallery", { cache: "no-store" });
         const data = await res.json();
         if (cancelled) return;
-        if (data.success && data.data?.length > 0) {
+        if (data.success && Array.isArray(data.data)) {
           next = data.data.map(
             (s: { id: string; title: string; images: string[] }) => ({
               id: s.id,
@@ -39,11 +35,11 @@ function GaleriaContent() {
             })
           );
         } else {
-          next = staticSectionsNewestFirst;
+          next = [];
         }
       } catch {
         if (cancelled) return;
-        next = staticSectionsNewestFirst;
+        next = [];
       }
       if (cancelled) return;
       setSections(next);
@@ -181,6 +177,14 @@ function GaleriaContent() {
                   </div>
                 </div>
               ))
+            : sections.length === 0 ? (
+                <div className="liquid-glass rounded-2xl ring-1 ring-white/10 py-16 px-6 flex flex-col items-center justify-center gap-3 text-center">
+                  <ImageIcon className="w-12 h-12 text-white/30" aria-hidden />
+                  <p className="somnus-text-body text-white/60">
+                    La galería está vacía por ahora.
+                  </p>
+                </div>
+              )
             : sections.map((section) => {
                 const isActive = activeSection === section.id;
                 const count = section.images.length;

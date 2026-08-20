@@ -1,7 +1,7 @@
 # Graph Report - somnus-master  (2026-08-19)
 
 ## Corpus Check
-- 375 files · ~977,653 words
+- 375 files · ~977,723 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `805e3b9f`
+- Built from commit: `32fb647c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -482,7 +482,7 @@ Nodes (3): main(), prisma, slugify()
 
 ### Community 78 - "autoprefixer"
 Cohesion: 0.13
-Nodes (15): autoprefixer, @capacitor/assets, dotenv, devDependencies, autoprefixer, @capacitor/assets, dotenv, postcss (+7 more)
+Nodes (15): autoprefixer, @capacitor/assets, eslint-config-next, devDependencies, autoprefixer, @capacitor/assets, eslint-config-next, postcss (+7 more)
 
 ### Community 79 - "bcryptjs"
 Cohesion: 0.19
@@ -490,7 +490,7 @@ Nodes (10): PostLoginContent(), LoginContent(), RegisterContent(), VerificarEmai
 
 ### Community 80 - "dependencies"
 Cohesion: 0.15
-Nodes (13): @capacitor/app, class-variance-authority, embla-carousel-react, lucide-react, nodemailer, dependencies, @capacitor/app, class-variance-authority (+5 more)
+Nodes (13): @capacitor/app, class-variance-authority, date-fns, lucide-react, nodemailer, dependencies, @capacitor/app, class-variance-authority (+5 more)
 
 ### Community 85 - "🔧 Configuración en el Servidor"
 Cohesion: 0.07
@@ -748,7 +748,7 @@ Nodes (13): Certificados, Contenido, Plantilla de pase de Apple Wallet, 1. App I
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `dependencies` connect `dependencies` to `cn`, `index.ts`, `devDependencies`, `EditEventModal.tsx`, `@radix-ui/react-label`, `effectiveTicketPriceAt`, `package.json`, `clsx`, `@radix-ui/react-tabs`, `next`, `qrcode.react`, `@radix-ui/react-avatar`, `clsx`, `date-fns`, `embla-carousel-react`, `@hookform/resolvers`, `sonner`, `@radix-ui/react-dialog`, `jose`, `resend`, `stripe`, `swiper`, `uuid`, `zustand`, `@prisma/client`, `tailwindcss-animate`, `@radix-ui/react-accordion`, `@radix-ui/react-alert-dialog`, `@radix-ui/react-checkbox`, `@capacitor-community/stripe`, `@capacitor/core`, `@capacitor/ios`, `@capacitor/splash-screen`, `@capacitor/status-bar`, `@radix-ui/react-popover`, `@radix-ui/react-separator`, `@radix-ui/react-select`, `@radix-ui/react-slot`, `react-dom`, `@stripe/react-stripe-js`, `@stripe/stripe-js`, `@stripe/stripe-js`, `tailwind-merge`, `session.ts`, `commissions.ts`, `stripe`, `zod`?**
+- **Why does `dependencies` connect `dependencies` to `cn`, `index.ts`, `devDependencies`, `EditEventModal.tsx`, `@radix-ui/react-label`, `effectiveTicketPriceAt`, `package.json`, `clsx`, `@radix-ui/react-tabs`, `next`, `qrcode.react`, `@radix-ui/react-avatar`, `clsx`, `embla-carousel-react`, `eslint-config-next`, `@hookform/resolvers`, `@radix-ui/react-dialog`, `jose`, `resend`, `sonner`, `stripe`, `swiper`, `uuid`, `@prisma/client`, `tailwindcss-animate`, `@radix-ui/react-accordion`, `@radix-ui/react-alert-dialog`, `zustand`, `@radix-ui/react-checkbox`, `@capacitor-community/stripe`, `@capacitor/core`, `@capacitor/ios`, `@capacitor/splash-screen`, `@capacitor/status-bar`, `@radix-ui/react-popover`, `@radix-ui/react-separator`, `@radix-ui/react-select`, `@radix-ui/react-slot`, `react-dom`, `@stripe/react-stripe-js`, `@stripe/stripe-js`, `@stripe/stripe-js`, `tailwind-merge`, `session.ts`, `commissions.ts`, `stripe`, `zod`?**
   _High betweenness centrality (0.062) - this node is a cross-community bridge._
 - **Why does `getSession()` connect `route.ts` to `session.ts`, `otp.ts`, `permissions.ts`, `@radix-ui/react-dropdown-menu`, `OrganizationProfileClient.tsx`, `SqlEditorManager.tsx`, `prisma.ts`, `route.ts`, `route.ts`, `schemas.ts`, `route.ts`, `registration.ts`, `local.ts`, `UpcomingEventsCarousel.tsx`, `patriotas-individual-tables.ts`, `EventCardZamna.tsx`?**
   _High betweenness centrality (0.038) - this node is a cross-community bridge._

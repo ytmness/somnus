@@ -470,8 +470,8 @@
     "semantic_hash": "6e7875cf2e26a28d67a186839ab32637"
   },
   "app/page.tsx": {
-    "mtime": 1787048387.393841,
-    "ast_hash": "1e1c446f316fb66dfc47f74d52efcdb0",
+    "mtime": 1787183575.372997,
+    "ast_hash": "58ee2cee1f3e1b78c2ce0a7f5cd5f1cc",
     "semantic_hash": ""
   },
   "app/pago-exitoso/page.tsx": {
@@ -680,8 +680,8 @@
     "semantic_hash": "bfb15624448bba768b85192ef0d9e903"
   },
   "components/eventos/EventCardZamna.tsx": {
-    "mtime": 1786259249.561387,
-    "ast_hash": "056e31e0a855385d3dc74207c498d27e",
+    "mtime": 1787183577.7316928,
+    "ast_hash": "b99b2a8f044225b7eb56b9b07a2ee62e",
     "semantic_hash": ""
   },
   "components/eventos/EventMap.tsx": {
@@ -690,8 +690,8 @@
     "semantic_hash": "67104f42cc7b3200302a9b0948d7edfc"
   },
   "components/eventos/GalleryEventCardZamna.tsx": {
-    "mtime": 1787183266.3053484,
-    "ast_hash": "5d672061e1d742528425cabb52da8dd6",
+    "mtime": 1787183577.7316928,
+    "ast_hash": "c85a327b3bc072dbfa1c06d1d1c19fbd",
     "semantic_hash": ""
   },
   "components/eventos/Header.tsx": {
@@ -720,13 +720,13 @@
     "semantic_hash": "55061aae55df3d9a6278a79a9798e007"
   },
   "components/eventos/UpcomingEventsCarousel.tsx": {
-    "mtime": 1787183266.3053484,
-    "ast_hash": "3dab28bf7d7a306c797c56687a69b77b",
+    "mtime": 1787183574.8334417,
+    "ast_hash": "9f539ea07b4eb3fd7ace104b9ed249f8",
     "semantic_hash": ""
   },
   "components/eventos/carousel-poster-settings.tsx": {
-    "mtime": 1786259249.561387,
-    "ast_hash": "548954b4bdf3a655c0e87ce30ee1b2f7",
+    "mtime": 1787183558.4412541,
+    "ast_hash": "e66b65d7aa49895c9aa5f9efeed8143f",
     "semantic_hash": ""
   },
   "components/eventos/types.ts": {
