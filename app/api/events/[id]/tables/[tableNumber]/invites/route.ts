@@ -295,29 +295,104 @@ export async function POST(
           (await prisma.tableInvitePool.findUnique({ where: { inviteToken: token } }));
       }
 
+      const resolveCoverTicket = (rawId: string) => {
+        const coverTt = event.ticketTypes.find(
+          (t) =>
+            t.id === rawId &&
+            t.isActive !== false &&
+            !t.isHidden &&
+            t.kind !== "TABLE" &&
+            !t.isTable
+        );
+        if (!coverTt) return null;
+        const coverPrice = effectiveTicketPriceAt(
+          Number(coverTt.price),
+          coverTt.pricePhases ?? null,
+          now
+        );
+        if (!Number.isFinite(coverPrice) || coverPrice <= 0) return null;
+        return { coverTt, coverPrice };
+      };
+
       if (poolModeKind === "FULL_TABLE") {
         const total = Math.round(Number(totalTablePrice) * 100) / 100;
+        const cupos = Math.floor(Number(cuposBody));
         if (!Number.isFinite(total) || total <= 0) {
           return NextResponse.json(
-            { error: "Indica el total de la mesa completa (mayor a 0)." },
+            { error: "Indica el total de la mesa (mayor a 0)." },
             { status: 400 }
           );
         }
+        if (!Number.isFinite(cupos) || cupos < 1 || cupos > MAX_CUPOS) {
+          return NextResponse.json(
+            { error: `Cupos debe ser un entero entre 1 y ${MAX_CUPOS}.` },
+            { status: 400 }
+          );
+        }
+
+        const coverId =
+          typeof coverTicketTypeIdRaw === "string"
+            ? coverTicketTypeIdRaw.trim()
+            : typeof ticketTypeIdRaw === "string"
+              ? ticketTypeIdRaw.trim()
+              : "";
+        if (!coverId) {
+          return NextResponse.json(
+            {
+              error:
+                "Elige el boleto normal que pagarán los extras cuando la mesa esté llena.",
+            },
+            { status: 400 }
+          );
+        }
+        const cover = resolveCoverTicket(coverId);
+        if (!cover) {
+          return NextResponse.json(
+            { error: "Ese boleto de cover no está disponible en este evento." },
+            { status: 400 }
+          );
+        }
+
+        const minPaidToConfirm =
+          minPaidRaw === undefined || minPaidRaw === null
+            ? cupos
+            : Math.floor(Number(minPaidRaw));
+        if (
+          !Number.isFinite(minPaidToConfirm) ||
+          minPaidToConfirm < 1 ||
+          minPaidToConfirm > cupos
+        ) {
+          return NextResponse.json(
+            {
+              error: `"Pagos para confirmar" debe ser un entero entre 1 y ${cupos} (cupos de la mesa).`,
+            },
+            { status: 400 }
+          );
+        }
+
+        const unitPrice = tablePricePerCupo(total, cupos);
+        if (unitPrice <= 0) {
+          return NextResponse.json(
+            { error: "Precio por persona inválido." },
+            { status: 400 }
+          );
+        }
+
         const hidden = await prisma.ticketType.create({
           data: {
             eventId,
-            name: `Mesa completa ${tableNumber}`,
-            description: `Pago único de mesa · $${total.toLocaleString("es-MX")}`,
+            name: `Mesa ${tableNumber}`,
+            description: `Link de mesa · ${cupos} cupos · total $${total.toLocaleString("es-MX")}`,
             category: "VIP",
             kind: "TABLE",
             isTable: true,
             isHidden: true,
             price: total,
-            tableCapacity: 1,
-            seatsPerTable: 1,
-            maxQuantity: 1,
+            tableCapacity: cupos,
+            seatsPerTable: cupos,
+            maxQuantity: 9999,
             minPurchaseQty: 1,
-            maxPurchaseQty: 1,
+            maxPurchaseQty: null,
           },
         });
 
@@ -325,14 +400,14 @@ export async function POST(
           data: {
             eventId,
             ticketTypeId: hidden.id,
-            coverTicketTypeId: null,
+            coverTicketTypeId: cover.coverTt.id,
             mode: "FULL_TABLE",
             tableNumber,
             inviteToken: token,
-            maxSlots: 1,
-            splitAmong: 1,
-            minPaidToConfirm: 1,
-            pricePerSeat: total,
+            maxSlots: null,
+            splitAmong: cupos,
+            minPaidToConfirm,
+            pricePerSeat: unitPrice,
             expiresAt,
           },
         });
@@ -346,19 +421,22 @@ export async function POST(
               {
                 id: pool.id,
                 token: pool.inviteToken,
-                name: "Mesa completa",
+                name: "Mesa",
                 seatNumber: null,
                 tableNumber,
                 url,
                 pricePerSeat: Number(pool.pricePerSeat),
                 tableTotal: total,
-                maxSlots: 1,
-                splitAmong: 1,
-                minPaidToConfirm: 1,
+                maxSlots: null,
+                splitAmong: cupos,
+                cupos,
+                minPaidToConfirm,
                 isPool: true,
                 poolMode: "FULL_TABLE",
                 ticketTypeName: hidden.name,
                 ticketTypeId: hidden.id,
+                coverTicketTypeId: cover.coverTt.id,
+                coverTicketName: cover.coverTt.name,
               },
             ],
             tableNumber,
@@ -368,7 +446,7 @@ export async function POST(
         });
       }
 
-      // MONEY_POOL
+      // MONEY_POOL — entrada del evento, sin tope
       const coverTicketTypeId =
         typeof coverTicketTypeIdRaw === "string"
           ? coverTicketTypeIdRaw.trim()
@@ -377,52 +455,14 @@ export async function POST(
             : "";
       if (!coverTicketTypeId) {
         return NextResponse.json(
-          { error: "Elige el boleto / cover que paga cada persona." },
+          { error: "Elige la entrada del evento que paga cada persona." },
           { status: 400 }
         );
       }
-      const coverTt = event.ticketTypes.find(
-        (t) =>
-          t.id === coverTicketTypeId &&
-          t.isActive !== false &&
-          !t.isHidden &&
-          t.kind !== "TABLE" &&
-          !t.isTable
-      );
-      if (!coverTt) {
+      const cover = resolveCoverTicket(coverTicketTypeId);
+      if (!cover) {
         return NextResponse.json(
-          { error: "Ese boleto de cover no está disponible en este evento." },
-          { status: 400 }
-        );
-      }
-
-      const coverPrice = effectiveTicketPriceAt(
-        Number(coverTt.price),
-        coverTt.pricePhases ?? null,
-        now
-      );
-      if (!Number.isFinite(coverPrice) || coverPrice <= 0) {
-        return NextResponse.json(
-          { error: "Ese boleto no tiene un precio válido." },
-          { status: 400 }
-        );
-      }
-
-      const minPaidToConfirm =
-        minPaidRaw === undefined || minPaidRaw === null
-          ? cuposBody != null
-            ? Math.floor(Number(cuposBody))
-            : 4
-          : Math.floor(Number(minPaidRaw));
-      if (
-        !Number.isFinite(minPaidToConfirm) ||
-        minPaidToConfirm < 1 ||
-        minPaidToConfirm > MAX_MIN_PAID_CONFIRM
-      ) {
-        return NextResponse.json(
-          {
-            error: `"minPaidToConfirm" debe ser un entero entre 1 y ${MAX_MIN_PAID_CONFIRM}.`,
-          },
+          { error: "Esa entrada no está disponible en este evento." },
           { status: 400 }
         );
       }
@@ -430,15 +470,15 @@ export async function POST(
       const pool = await prisma.tableInvitePool.create({
         data: {
           eventId,
-          ticketTypeId: coverTt.id,
-          coverTicketTypeId: coverTt.id,
+          ticketTypeId: cover.coverTt.id,
+          coverTicketTypeId: cover.coverTt.id,
           mode: "MONEY_POOL",
           tableNumber,
           inviteToken: token,
           maxSlots: null,
-          splitAmong: minPaidToConfirm,
-          minPaidToConfirm,
-          pricePerSeat: coverPrice,
+          splitAmong: 1,
+          minPaidToConfirm: 1,
+          pricePerSeat: cover.coverPrice,
           expiresAt,
         },
       });
@@ -458,15 +498,15 @@ export async function POST(
               tableNumber,
               url,
               pricePerSeat: Number(pool.pricePerSeat),
-              maxSlots: pool.maxSlots,
-              splitAmong: pool.splitAmong,
-              minPaidToConfirm: pool.minPaidToConfirm,
+              maxSlots: null,
+              splitAmong: 1,
+              minPaidToConfirm: 1,
               isPool: true,
               poolMode: "MONEY_POOL",
-              ticketTypeName: coverTt.name,
-              ticketTypeId: coverTt.id,
-              coverTicketTypeId: coverTt.id,
-              coverTicketName: coverTt.name,
+              ticketTypeName: cover.coverTt.name,
+              ticketTypeId: cover.coverTt.id,
+              coverTicketTypeId: cover.coverTt.id,
+              coverTicketName: cover.coverTt.name,
             },
           ],
           tableNumber,

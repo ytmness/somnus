@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { getSession, hasRole } from "@/lib/auth/session";
-import { invitePoolMinToConfirm } from "@/lib/ticket-pricing";
+import { invitePoolMinToConfirm, invitePoolMesaFilled } from "@/lib/ticket-pricing";
 
 export const dynamic = "force-dynamic";
 
@@ -49,15 +49,22 @@ export async function GET(
       pools.map(async (p) => {
         const paidSlots = await prisma.tableSlotInvite.findMany({
           where: { poolId: p.id, status: "PAID" },
-          select: { pricePerSeat: true },
+          select: { pricePerSeat: true, isCover: true },
         });
+        const paidShareCount = paidSlots.filter((s) => !s.isCover).length;
         const paidCount = paidSlots.length;
         const totalCollected = paidSlots.reduce(
           (sum, s) => sum + Number(s.pricePerSeat),
           0
         );
+        const isMesa = p.mode === "FULL_TABLE";
         const minToConfirm = invitePoolMinToConfirm(p) ?? p.minPaidToConfirm;
-        const tableConfirmed = paidCount >= minToConfirm;
+        const tableConfirmed = isMesa
+          ? paidShareCount >= minToConfirm
+          : false;
+        const mesaFilled = isMesa
+          ? invitePoolMesaFilled(p, paidShareCount)
+          : false;
         return {
           id: p.id,
           tableNumber: p.tableNumber,
@@ -75,14 +82,12 @@ export async function GET(
           isPool: true,
           maxSlots: p.maxSlots,
           splitAmong: p.splitAmong,
-          minPaidToConfirm: minToConfirm,
-          paidCount,
+          minPaidToConfirm: isMesa ? minToConfirm : null,
+          paidCount: isMesa ? paidShareCount : paidCount,
           totalCollected,
           tableConfirmed,
-          poolMode:
-            p.mode === "FULL_TABLE" || p.maxSlots === 1
-              ? "FULL_TABLE"
-              : "MONEY_POOL",
+          mesaFilled,
+          poolMode: isMesa ? "FULL_TABLE" : "MONEY_POOL",
           ticketTypeName: p.ticketType?.name ?? null,
           ticketTypeId: p.ticketTypeId,
           coverTicketName: p.coverTicketType?.name ?? null,

@@ -728,24 +728,24 @@ enum SlotInviteStatus {
 }
 
 enum InvitePoolMode {
-  MONEY_POOL  // Todos pagan cover; N pagos confirman; extras siguen pagando cover
-  FULL_TABLE  // Un solo pago del total de la mesa
+  MONEY_POOL  // Entrada del evento; sin tope de pagos
+  FULL_TABLE  // Total ÷ cupos; al llenar, extras pagan cover/boleto normal
 }
 
-// Pool tipo "money pool": un solo link para toda la mesa, cada quien paga y se registra
+// Pool: un solo link compartido (money pool o mesa dividida)
 model TableInvitePool {
   id            String   @id @default(uuid())
   eventId       String
   ticketTypeId  String
-  /// Boleto de entrada (cover) — money pool
+  /// Boleto de entrada (cover): money pool siempre; mesa = extras tras llenar
   coverTicketTypeId String?
   mode          InvitePoolMode @default(MONEY_POOL)
   tableNumber   String   // Nombre o número de mesa (ej: "42", "Terraza A")
   inviteToken   String   @unique // Un solo token para toda la mesa
-  maxSlots      Int?     // Tope de pagos; FULL_TABLE = 1; MONEY_POOL = null
-  splitAmong    Int      // Referencia / min confirm
-  minPaidToConfirm Int @default(20) // Pagos necesarios para "confirmada"
-  pricePerSeat  Decimal  @db.Decimal(10, 2) // Cover (money pool) o total (full table)
+  maxSlots      Int?     // null = sin tope (money pool y mesa con cover)
+  splitAmong    Int      // Cupos de división (mesa); money pool = 1
+  minPaidToConfirm Int @default(20) // Pagos de cupo para "confirmada" (modo mesa)
+  pricePerSeat  Decimal  @db.Decimal(10, 2) // Cover o (total mesa ÷ cupos)
   expiresAt     DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
