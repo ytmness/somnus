@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { getSession, hasRole } from "@/lib/auth/session";
-import { invitePoolMinToConfirm, invitePoolTableTotal } from "@/lib/ticket-pricing";
+import { invitePoolMinToConfirm } from "@/lib/ticket-pricing";
 
 export const dynamic = "force-dynamic";
 
@@ -49,26 +49,15 @@ export async function GET(
       pools.map(async (p) => {
         const paidSlots = await prisma.tableSlotInvite.findMany({
           where: { poolId: p.id, status: "PAID" },
-          select: { pricePerSeat: true, isCover: true },
+          select: { pricePerSeat: true },
         });
-        const paidShareSlots = paidSlots.filter((s) => !s.isCover);
-        const paidCount = paidShareSlots.length;
-        const paidCoverCount = paidSlots.length - paidCount;
+        const paidCount = paidSlots.length;
         const totalCollected = paidSlots.reduce(
-          (sum, s) => sum + Number(s.pricePerSeat),
-          0
-        );
-        const shareCollected = paidShareSlots.reduce(
           (sum, s) => sum + Number(s.pricePerSeat),
           0
         );
         const minToConfirm = invitePoolMinToConfirm(p) ?? p.minPaidToConfirm;
         const tableConfirmed = paidCount >= minToConfirm;
-        const tableTotal = invitePoolTableTotal(p);
-        const remaining = Math.max(
-          0,
-          Math.round((tableTotal - shareCollected) * 100) / 100
-        );
         return {
           id: p.id,
           tableNumber: p.tableNumber,
@@ -88,10 +77,7 @@ export async function GET(
           splitAmong: p.splitAmong,
           minPaidToConfirm: minToConfirm,
           paidCount,
-          paidCoverCount,
           totalCollected,
-          tableTotal,
-          remaining,
           tableConfirmed,
           ticketTypeName: p.ticketType?.name ?? null,
           ticketTypeId: p.ticketTypeId,

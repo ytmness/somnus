@@ -360,23 +360,10 @@ export default function PagarInvitePage() {
   const tableTicket = pickerTypes.find(
     (tt) => tt.kind === "TABLE" && tt.tablePrice != null && (tt.cupos ?? 0) > 0
   );
-  const isCoverPhase = invite.phase === "cover" || Boolean(invite.mesaFilled);
   const coverTicket =
-    invite.coverTicket ||
-    (isCoverPhase ? pickerTypes[0] ?? null : null);
-  const tableTotal =
-    invite.tablePrice ?? tableTicket?.tablePrice ?? 0;
-  const remaining =
-    typeof invite.remaining === "number"
-      ? invite.remaining
-      : Math.max(0, Math.round((tableTotal - totalCollected) * 100) / 100);
-  const sharesLeft =
-    typeof invite.sharesLeft === "number"
-      ? invite.sharesLeft
-      : Math.max(0, (invite.cupos ?? 0) - paidCount);
-  const canPayFullTable = Boolean(
-    tableTicket && paidCount === 0 && !isCoverPhase
-  );
+    invite.coverTicket || pickerTypes[0] || null;
+  const canPayFullTable = false;
+  const isCoverPhase = true;
   const eventWindow =
     invite.event?.salesStartDate && invite.event?.salesEndDate
       ? {
@@ -519,87 +506,32 @@ export default function PagarInvitePage() {
               {paidCount === 1 ? "1 participante" : `${paidCount} participantes`}
             </p>
             <p className="text-white/45 text-xs mb-1">
-              {isCoverPhase
-                ? "Mesa confirmada · extras pagan cover de entrada"
-                : hasTicketPicker
-                  ? tableTicket
-                    ? "Elige: tu parte (cupos) o toda la mesa de un golpe"
-                    : pickerTypes.length === 1
-                      ? "Elige cuántos quieres de este tipo"
-                      : "Elige cuántos boletos quieres de cada tipo"
-                  : "Cada pago usa el precio de mesa del evento"}
+              Todos pagan el mismo cover. No se divide la mesa.
             </p>
-            {!hasTicketPicker && (
-              <p className="text-lg font-semibold text-[#7BA3E8] tabular-nums">{priceFormatted}</p>
-            )}
-            {isCoverPhase && coverTicket && (
+            {coverTicket && (
               <div className="mt-3 space-y-1 text-[11px] text-white/45">
                 <p>
                   Cover{" "}
-                  <span className="text-white/80">
-                    {coverTicket.name}
-                  </span>
+                  <span className="text-white/80">{coverTicket.name}</span>
                   {" · "}
                   <span className="text-white/80 tabular-nums">
                     {mxn.format(coverTicket.price)}
-                  </span>
-                </p>
-                {(invite.paidCoverCount ?? 0) > 0 && (
-                  <p>
-                    Covers pagados:{" "}
-                    <span className="text-white/80">
-                      {invite.paidCoverCount}
-                    </span>
-                  </p>
-                )}
-              </div>
-            )}
-            {!isCoverPhase && tableTicket && (
-              <div className="mt-3 space-y-1 text-[11px] text-white/45">
-                <p>
-                  Mesa{" "}
-                  <span className="text-white/80 tabular-nums">
-                    {mxn.format(tableTicket.tablePrice || 0)}
-                  </span>
-                  {" · "}
-                  {tableTicket.cupos} cupos ·{" "}
-                  <span className="text-white/80 tabular-nums">
-                    {mxn.format(tableTicket.price)}
                   </span>{" "}
                   c/u
                 </p>
                 <p>
-                  Recaudado mesa{" "}
+                  Recaudado{" "}
                   <span className="text-white/80 tabular-nums">
-                    {mxn.format(Math.max(0, tableTotal - remaining))}
+                    {mxn.format(totalCollected)}
                   </span>
-                  {" · "}
-                  Resta{" "}
-                  <span className="text-white/80 tabular-nums">
-                    {mxn.format(remaining)}
-                  </span>
-                  {sharesLeft > 0 ? ` · ${sharesLeft} cupos libres` : ""}
                 </p>
               </div>
             )}
-            {invite.minPaidToConfirm != null &&
-              invite.pricePerSeat != null &&
-              !invite.tableConfirmed &&
-              !tableTicket &&
-              !isCoverPhase && (
-                <p className="mt-2 text-[11px] text-white/40">
-                  Precio de mesa ÷ {invite.minPaidToConfirm} cupos ={" "}
-                  {mxn.format(invite.pricePerSeat)} c/u.
-                </p>
-              )}
             {invite.minPaidToConfirm != null && (
               <p className="mt-4 text-xs text-white/50 border-t border-white/10 pt-4">
-                {isCoverPhase || invite.tableConfirmed ? (
+                {invite.tableConfirmed ? (
                   <span className="text-emerald-400/90 font-medium">
-                    Mesa confirmada
-                    {invite.coverTicketName
-                      ? ` · extras: cover ${invite.coverTicketName}`
-                      : ""}
+                    Mesa confirmada · pueden seguir pagando cover
                   </span>
                 ) : (
                   <>
@@ -607,19 +539,10 @@ export default function PagarInvitePage() {
                     <span className="text-white/80 font-medium">
                       {invite.minPaidToConfirm}
                     </span>{" "}
-                    cupos ·{" "}
+                    covers ·{" "}
                     <span className="text-white/80">
                       {paidCount}/{invite.minPaidToConfirm}
                     </span>
-                    {remaining > 0 && (
-                      <>
-                        {" · "}
-                        resta{" "}
-                        <span className="text-white/80 tabular-nums">
-                          {mxn.format(remaining)}
-                        </span>
-                      </>
-                    )}
                   </>
                 )}
               </p>
@@ -753,54 +676,12 @@ export default function PagarInvitePage() {
 
                 {hasTicketPicker ? (
                   <div className="pt-2 space-y-3">
-                    {isCoverPhase ? (
-                      <p className="text-xs text-white/50">
-                        Elige cuántos covers de entrada pagar (
-                        {coverTicket?.name || "entrada"}).
-                      </p>
-                    ) : (
-                      tableTicket && (
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setPayMode("share")}
-                          className={`rounded-lg border px-3 py-3 text-left transition-colors ${
-                            payMode === "share"
-                              ? "border-[#5B8DEF] bg-[#5B8DEF]/15"
-                              : "border-white/15 bg-white/5 hover:border-white/30"
-                          }`}
-                        >
-                          <p className="text-white text-sm font-medium">Mi parte</p>
-                          <p className="text-[11px] text-white/50 mt-1">
-                            {mxn.format(tableTicket.price)} / cupo
-                          </p>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (!canPayFullTable) {
-                              toast.error(
-                                "Ya hay pagos en esta mesa. Solo puedes pagar cupos."
-                              );
-                              return;
-                            }
-                            setPayMode("full");
-                          }}
-                          disabled={!canPayFullTable}
-                          className={`rounded-lg border px-3 py-3 text-left transition-colors disabled:opacity-45 ${
-                            payMode === "full" && canPayFullTable
-                              ? "border-[#5B8DEF] bg-[#5B8DEF]/15"
-                              : "border-white/15 bg-white/5 hover:border-white/30"
-                          }`}
-                        >
-                          <p className="text-white text-sm font-medium">Toda la mesa</p>
-                          <p className="text-[11px] text-white/50 mt-1">
-                            {mxn.format(tableTicket.tablePrice || 0)} de un golpe
-                          </p>
-                        </button>
-                      </div>
-                      )
-                    )}
+                    <p className="text-xs text-white/50">
+                      ¿Cuántos covers pagas? (
+                      {coverTicket?.name || "entrada"} ·{" "}
+                      {mxn.format(coverTicket?.price || invite.pricePerSeat || 0)}{" "}
+                      c/u)
+                    </p>
 
                     {payMode === "full" && canPayFullTable && tableTicket ? (
                       <div className="rounded-lg border border-white/10 bg-white/5 p-3">

@@ -254,6 +254,149 @@ export async function POST(
     }
 
     const now = new Date();
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + INVITE_EXPIRY_DAYS);
+
+    if (isPoolMode) {
+      const coverTicketTypeId =
+        typeof coverTicketTypeIdRaw === "string"
+          ? coverTicketTypeIdRaw.trim()
+          : typeof ticketTypeIdRaw === "string"
+            ? ticketTypeIdRaw.trim()
+            : "";
+      if (!coverTicketTypeId) {
+        return NextResponse.json(
+          { error: "Elige el boleto / cover que paga cada persona." },
+          { status: 400 }
+        );
+      }
+      const coverTt = event.ticketTypes.find(
+        (t) =>
+          t.id === coverTicketTypeId &&
+          t.isActive !== false &&
+          !t.isHidden &&
+          t.kind !== "TABLE" &&
+          !t.isTable
+      );
+      if (!coverTt) {
+        return NextResponse.json(
+          { error: "Ese boleto de cover no está disponible en este evento." },
+          { status: 400 }
+        );
+      }
+
+      const coverPrice = effectiveTicketPriceAt(
+        Number(coverTt.price),
+        coverTt.pricePhases ?? null,
+        now
+      );
+      if (!Number.isFinite(coverPrice) || coverPrice <= 0) {
+        return NextResponse.json(
+          { error: "Ese boleto no tiene un precio válido." },
+          { status: 400 }
+        );
+      }
+
+      const minPaidToConfirm =
+        minPaidRaw === undefined || minPaidRaw === null
+          ? cuposBody != null
+            ? Math.floor(Number(cuposBody))
+            : 4
+          : Math.floor(Number(minPaidRaw));
+      if (
+        !Number.isFinite(minPaidToConfirm) ||
+        minPaidToConfirm < 1 ||
+        minPaidToConfirm > MAX_MIN_PAID_CONFIRM
+      ) {
+        return NextResponse.json(
+          {
+            error: `"minPaidToConfirm" debe ser un entero entre 1 y ${MAX_MIN_PAID_CONFIRM}.`,
+          },
+          { status: 400 }
+        );
+      }
+
+      const existingPool = await prisma.tableInvitePool.findFirst({
+        where: { eventId, tableNumber },
+      });
+      if (existingPool) {
+        return NextResponse.json(
+          { error: `La mesa "${tableNumber}" ya tiene un link compartido activo.` },
+          { status: 400 }
+        );
+      }
+      const existingInvites = await prisma.tableSlotInvite.count({
+        where: { eventId, tableNumber, status: { in: ["PENDING", "PAID"] } },
+      });
+      if (existingInvites > 0) {
+        return NextResponse.json(
+          {
+            error: `La mesa "${tableNumber}" ya tiene invitaciones. No se pueden crear más.`,
+          },
+          { status: 400 }
+        );
+      }
+
+      let token = generateInviteToken();
+      let exists =
+        (await prisma.tableSlotInvite.findUnique({ where: { inviteToken: token } })) ||
+        (await prisma.tableInvitePool.findUnique({ where: { inviteToken: token } }));
+      while (exists) {
+        token = generateInviteToken();
+        exists =
+          (await prisma.tableSlotInvite.findUnique({ where: { inviteToken: token } })) ||
+          (await prisma.tableInvitePool.findUnique({ where: { inviteToken: token } }));
+      }
+
+      const pool = await prisma.tableInvitePool.create({
+        data: {
+          eventId,
+          ticketTypeId: coverTt.id,
+          coverTicketTypeId: coverTt.id,
+          tableNumber,
+          inviteToken: token,
+          maxSlots: null,
+          splitAmong: minPaidToConfirm,
+          minPaidToConfirm,
+          pricePerSeat: coverPrice,
+          expiresAt,
+        },
+      });
+
+      const url = poolPaymentUrl(baseUrl, eventId, tableNumber, token);
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          isPool: true,
+          invites: [
+            {
+              id: pool.id,
+              token: pool.inviteToken,
+              name: "Mesa compartida",
+              seatNumber: null,
+              tableNumber,
+              url,
+              pricePerSeat: Number(pool.pricePerSeat),
+              maxSlots: pool.maxSlots,
+              splitAmong: pool.splitAmong,
+              minPaidToConfirm: pool.minPaidToConfirm,
+              isPool: true,
+              ticketTypeName: coverTt.name,
+              ticketTypeId: coverTt.id,
+              coverTicketTypeId: coverTt.id,
+              coverTicketName: coverTt.name,
+            },
+          ],
+          tableNumber,
+          eventName: event.name,
+          expiresAt: expiresAt.toISOString(),
+        },
+      });
+    }
+
+    // Legacy: links individuales por asiento
     const requestedId = typeof ticketTypeIdRaw === "string" ? ticketTypeIdRaw.trim() : "";
     const resolved = await resolveOrCreateMesaTicketType({
       eventId,
@@ -274,151 +417,7 @@ export async function POST(
       return NextResponse.json({ error: resolved.error }, { status: resolved.status });
     }
 
-    const { ticketTypeId, cupos, unitPrice: pricePerSeat, ticketTypeName } = resolved;
-    const mesaTicketLabel = ticketTableLabel(tableNumber);
-
-    const existingTickets = await prisma.ticket.count({
-      where: {
-        tableNumber: mesaTicketLabel,
-        status: { in: ["VALID", "USED"] },
-        sale: { status: "COMPLETED" },
-      },
-    });
-
-    if (existingTickets > 0) {
-      return NextResponse.json(
-        { error: `La mesa "${tableNumber}" ya está vendida` },
-        { status: 400 }
-      );
-    }
-
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + INVITE_EXPIRY_DAYS);
-
-    if (isPoolMode) {
-      const minPaidToConfirm =
-        minPaidRaw === undefined || minPaidRaw === null
-          ? cupos
-          : Math.floor(Number(minPaidRaw));
-      if (
-        !Number.isFinite(minPaidToConfirm) ||
-        minPaidToConfirm < 1 ||
-        minPaidToConfirm > MAX_MIN_PAID_CONFIRM
-      ) {
-        return NextResponse.json(
-          { error: `"minPaidToConfirm" debe ser un entero entre 1 y ${MAX_MIN_PAID_CONFIRM}.` },
-          { status: 400 }
-        );
-      }
-
-      const coverTicketTypeId =
-        typeof coverTicketTypeIdRaw === "string"
-          ? coverTicketTypeIdRaw.trim()
-          : "";
-      if (!coverTicketTypeId) {
-        return NextResponse.json(
-          {
-            error:
-              "Elige el boleto de cover (entrada) para quienes lleguen después de confirmar la mesa.",
-          },
-          { status: 400 }
-        );
-      }
-      const coverTt = event.ticketTypes.find(
-        (t) =>
-          t.id === coverTicketTypeId &&
-          t.isActive !== false &&
-          !t.isHidden &&
-          t.kind !== "TABLE" &&
-          !t.isTable
-      );
-      if (!coverTt) {
-        return NextResponse.json(
-          { error: "El boleto de cover no está disponible en este evento." },
-          { status: 400 }
-        );
-      }
-
-      const existingPool = await prisma.tableInvitePool.findFirst({
-        where: { eventId, tableNumber },
-      });
-      if (existingPool) {
-        return NextResponse.json(
-          { error: `La mesa "${tableNumber}" ya tiene un link compartido activo.` },
-          { status: 400 }
-        );
-      }
-      const existingInvites = await prisma.tableSlotInvite.count({
-        where: { eventId, tableNumber, status: { in: ["PENDING", "PAID"] } },
-      });
-      if (existingInvites > 0) {
-        return NextResponse.json(
-          { error: `La mesa "${tableNumber}" ya tiene invitaciones. No se pueden crear más.` },
-          { status: 400 }
-        );
-      }
-
-      let token = generateInviteToken();
-      let exists =
-        (await prisma.tableSlotInvite.findUnique({ where: { inviteToken: token } })) ||
-        (await prisma.tableInvitePool.findUnique({ where: { inviteToken: token } }));
-      while (exists) {
-        token = generateInviteToken();
-        exists =
-          (await prisma.tableSlotInvite.findUnique({ where: { inviteToken: token } })) ||
-          (await prisma.tableInvitePool.findUnique({ where: { inviteToken: token } }));
-      }
-
-      const pool = await prisma.tableInvitePool.create({
-        data: {
-          eventId,
-          ticketTypeId,
-          coverTicketTypeId: coverTt.id,
-          tableNumber,
-          inviteToken: token,
-          maxSlots: null,
-          splitAmong: cupos,
-          minPaidToConfirm,
-          pricePerSeat,
-          expiresAt,
-        },
-      });
-
-      const url = poolPaymentUrl(baseUrl, eventId, tableNumber, token);
-      const tableTotal = Math.round(pricePerSeat * cupos * 100) / 100;
-
-      return NextResponse.json({
-        success: true,
-        data: {
-          isPool: true,
-          invites: [
-            {
-              id: pool.id,
-              token: pool.inviteToken,
-              name: "Mesa compartida",
-              seatNumber: null,
-              tableNumber,
-              url,
-              pricePerSeat: Number(pool.pricePerSeat),
-              tableTotal,
-              maxSlots: pool.maxSlots,
-              splitAmong: pool.splitAmong,
-              minPaidToConfirm: pool.minPaidToConfirm,
-              isPool: true,
-              ticketTypeName,
-              ticketTypeId,
-              coverTicketTypeId: coverTt.id,
-              coverTicketName: coverTt.name,
-            },
-          ],
-          tableNumber,
-          eventName: event.name,
-          expiresAt: expiresAt.toISOString(),
-        },
-      });
-    }
-
+    const { ticketTypeId, unitPrice: pricePerSeat } = resolved;
     let invites: Array<{ name: string; email?: string; phone?: string }>;
     if (typeof slotsCount === "number" && slotsCount >= 1 && slotsCount <= MAX_TRADITIONAL_SLOTS) {
       invites = Array.from({ length: slotsCount }, () => ({ name: "Pendiente" }));
