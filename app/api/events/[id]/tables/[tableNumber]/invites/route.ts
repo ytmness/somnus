@@ -353,22 +353,8 @@ export async function POST(
           );
         }
 
-        const minPaidToConfirm =
-          minPaidRaw === undefined || minPaidRaw === null
-            ? cupos
-            : Math.floor(Number(minPaidRaw));
-        if (
-          !Number.isFinite(minPaidToConfirm) ||
-          minPaidToConfirm < 1 ||
-          minPaidToConfirm > cupos
-        ) {
-          return NextResponse.json(
-            {
-              error: `"Pagos para confirmar" debe ser un entero entre 1 y ${cupos} (cupos de la mesa).`,
-            },
-            { status: 400 }
-          );
-        }
+        // Mesa se confirma al cubrir todos los cupos (total pagado)
+        const confirmAt = cupos;
 
         const unitPrice = tablePricePerCupo(total, cupos);
         if (unitPrice <= 0) {
@@ -406,7 +392,7 @@ export async function POST(
             inviteToken: token,
             maxSlots: null,
             splitAmong: cupos,
-            minPaidToConfirm,
+            minPaidToConfirm: confirmAt,
             pricePerSeat: unitPrice,
             expiresAt,
           },
@@ -430,7 +416,7 @@ export async function POST(
                 maxSlots: null,
                 splitAmong: cupos,
                 cupos,
-                minPaidToConfirm,
+                minPaidToConfirm: confirmAt,
                 isPool: true,
                 poolMode: "FULL_TABLE",
                 ticketTypeName: hidden.name,
@@ -467,6 +453,23 @@ export async function POST(
         );
       }
 
+      const minPaidToConfirm =
+        minPaidRaw === undefined || minPaidRaw === null
+          ? 4
+          : Math.floor(Number(minPaidRaw));
+      if (
+        !Number.isFinite(minPaidToConfirm) ||
+        minPaidToConfirm < 1 ||
+        minPaidToConfirm > MAX_MIN_PAID_CONFIRM
+      ) {
+        return NextResponse.json(
+          {
+            error: `"Pagos para confirmar" debe ser un entero entre 1 y ${MAX_MIN_PAID_CONFIRM}.`,
+          },
+          { status: 400 }
+        );
+      }
+
       const pool = await prisma.tableInvitePool.create({
         data: {
           eventId,
@@ -476,8 +479,8 @@ export async function POST(
           tableNumber,
           inviteToken: token,
           maxSlots: null,
-          splitAmong: 1,
-          minPaidToConfirm: 1,
+          splitAmong: minPaidToConfirm,
+          minPaidToConfirm,
           pricePerSeat: cover.coverPrice,
           expiresAt,
         },
@@ -499,8 +502,8 @@ export async function POST(
               url,
               pricePerSeat: Number(pool.pricePerSeat),
               maxSlots: null,
-              splitAmong: 1,
-              minPaidToConfirm: 1,
+              splitAmong: minPaidToConfirm,
+              minPaidToConfirm,
               isPool: true,
               poolMode: "MONEY_POOL",
               ticketTypeName: cover.coverTt.name,

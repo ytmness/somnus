@@ -601,10 +601,23 @@ export default function PagarInvitePage() {
                   <span className="text-emerald-400/90 font-medium">
                     Mesa llena · extras con boleto normal
                   </span>
-                ) : invite.tableConfirmed ? (
+                ) : (
+                  <>
+                    Cupos pagados{" "}
+                    <span className="text-white/80">
+                      {paidCount}/{invite.cupos ?? invite.minPaidToConfirm}
+                    </span>
+                    {" · "}
+                    se confirma al cubrir toda la mesa
+                  </>
+                )}
+              </p>
+            )}
+            {!isMesaMode && invite.minPaidToConfirm != null && (
+              <p className="mt-4 text-xs text-white/50 border-t border-white/10 pt-4">
+                {invite.tableConfirmed ? (
                   <span className="text-emerald-400/90 font-medium">
-                    Confirmada · faltan{" "}
-                    {invite.sharesLeft ?? 0} cupos de la división
+                    Mesa confirmada · pueden seguir pagando la entrada
                   </span>
                 ) : (
                   <>
@@ -612,7 +625,7 @@ export default function PagarInvitePage() {
                     <span className="text-white/80 font-medium">
                       {invite.minPaidToConfirm}
                     </span>{" "}
-                    cupos ·{" "}
+                    pagos ·{" "}
                     <span className="text-white/80">
                       {paidCount}/{invite.minPaidToConfirm}
                     </span>

@@ -266,10 +266,8 @@ export function InvitesManager() {
         return;
       }
       const cupos = Math.min(500, Math.max(1, generateCupos));
-      const minConfirm = Math.min(cupos, Math.max(1, generateMinConfirm));
       body.totalTablePrice = total;
       body.cupos = cupos;
-      body.minPaidToConfirm = minConfirm;
       body.coverTicketTypeId = generateCoverTicketTypeId;
     } else {
       if (!generateCoverTicketTypeId) {
@@ -277,6 +275,7 @@ export function InvitesManager() {
         return;
       }
       body.coverTicketTypeId = generateCoverTicketTypeId;
+      body.minPaidToConfirm = Math.min(500, Math.max(1, generateMinConfirm));
     }
 
     setIsSubmittingGenerate(true);
@@ -353,9 +352,9 @@ export function InvitesManager() {
         <h3 className="text-lg font-bold text-white mb-2">Links de mesa</h3>
         <p className="text-white/50 text-sm mb-4">
           <strong className="text-white/70">Money pool</strong>: entrada del
-          evento, sin límite de pagos.{" "}
+          evento, sin límite; N pagos confirman.{" "}
           <strong className="text-white/70">Mesa</strong>: total dividido entre
-          cupos; al llenarse, extras pagan boleto normal.
+          cupos; se confirma al pagar toda la mesa; extras con boleto normal.
         </p>
 
         {!showGenerate ? (
@@ -394,8 +393,8 @@ export function InvitesManager() {
             </div>
             <p className="text-white/45 text-xs -mt-2">
               {poolMode === "MONEY_POOL"
-                ? "Todos pagan la entrada del evento. Sin tope de participantes."
-                : "Se divide el total entre cupos. Pueden pagar la mesa entera o por partes. Al llenar cupos, extras pagan boleto normal."}
+                ? "Todos pagan la entrada del evento, sin tope. Con N pagos se confirma la mesa."
+                : "Se divide el total entre cupos. Se confirma al pagar toda la mesa. Al llenar cupos, extras pagan boleto normal."}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -471,7 +470,6 @@ export function InvitesManager() {
                           Math.max(1, parseInt(e.target.value, 10) || 1)
                         );
                         setGenerateCupos(n);
-                        setGenerateMinConfirm((prev) => Math.min(prev, n));
                       }}
                       className="w-full max-w-[140px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
                     />
@@ -481,39 +479,46 @@ export function InvitesManager() {
                           generateTotalPrice.replace(/,/g, ".")
                         );
                         if (!Number.isFinite(total) || total <= 0) {
-                          return "Cada cupo = total ÷ cupos";
+                          return "Cada cupo = total ÷ cupos. Se confirma al cubrir la mesa.";
                         }
                         const per = Math.round((total / generateCupos) * 100) / 100;
-                        return `≈ $${per.toLocaleString("es-MX")} por cupo`;
+                        return `≈ $${per.toLocaleString("es-MX")} por cupo · se confirma al pagar toda la mesa`;
                       })()}
                     </p>
                   </div>
-                  <div>
-                    <label className="block text-white/80 text-sm font-medium mb-1">
-                      Pagos para confirmar *
-                    </label>
-                    <input
-                      type="number"
-                      min={1}
-                      max={generateCupos}
-                      value={generateMinConfirm}
-                      onChange={(e) =>
-                        setGenerateMinConfirm(
-                          Math.min(
-                            generateCupos,
-                            Math.max(1, parseInt(e.target.value, 10) || 1)
-                          )
-                        )
-                      }
-                      className="w-full max-w-[140px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
-                    />
-                    <p className="text-white/45 text-xs mt-1">
-                      Entre 1 y {generateCupos} cupos pagados.
-                    </p>
-                  </div>
-                  <div>
+                  <div className="sm:col-span-2">
                     <label className="block text-white/80 text-sm font-medium mb-1">
                       Boleto extras (al llenar) *
+                    </label>
+                    <select
+                      value={generateCoverTicketTypeId}
+                      onChange={(e) =>
+                        setGenerateCoverTicketTypeId(e.target.value)
+                      }
+                      required
+                      className="w-full max-w-md px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                    >
+                      {ticketsForGenerate.length === 0 ? (
+                        <option value="">Sin boletos en este evento</option>
+                      ) : (
+                        ticketsForGenerate.map((tt) => (
+                          <option key={tt.id} value={tt.id}>
+                            {tt.name} · ${tt.price.toLocaleString("es-MX")}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                    <p className="text-white/45 text-xs mt-1">
+                      Cuando se llenen los cupos, extras pagan este boleto (ya
+                      no la división).
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <label className="block text-white/80 text-sm font-medium mb-1">
+                      Entrada del evento *
                     </label>
                     <select
                       value={generateCoverTicketTypeId}
@@ -534,43 +539,39 @@ export function InvitesManager() {
                       )}
                     </select>
                     <p className="text-white/45 text-xs mt-1">
-                      Cuando se llenen los cupos, extras pagan este boleto (ya
-                      no la división).
+                      Sin límite de pagos
+                      {selectedCover
+                        ? ` · $${selectedCover.price.toLocaleString("es-MX")} c/u`
+                        : ""}
+                      .
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-white/80 text-sm font-medium mb-1">
+                      Pagos para confirmar *
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={500}
+                      value={generateMinConfirm}
+                      onChange={(e) =>
+                        setGenerateMinConfirm(
+                          Math.min(
+                            500,
+                            Math.max(1, parseInt(e.target.value, 10) || 1)
+                          )
+                        )
+                      }
+                      className="w-full max-w-[140px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                    />
+                    <p className="text-white/45 text-xs mt-1">
+                      Con {generateMinConfirm} pago
+                      {generateMinConfirm === 1 ? "" : "s"} se confirma la mesa.
+                      Los siguientes también pagan la misma entrada.
                     </p>
                   </div>
                 </>
-              ) : (
-                <div className="sm:col-span-2">
-                  <label className="block text-white/80 text-sm font-medium mb-1">
-                    Entrada del evento *
-                  </label>
-                  <select
-                    value={generateCoverTicketTypeId}
-                    onChange={(e) =>
-                      setGenerateCoverTicketTypeId(e.target.value)
-                    }
-                    required
-                    className="w-full max-w-md px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
-                  >
-                    {ticketsForGenerate.length === 0 ? (
-                      <option value="">Sin boletos en este evento</option>
-                    ) : (
-                      ticketsForGenerate.map((tt) => (
-                        <option key={tt.id} value={tt.id}>
-                          {tt.name} · ${tt.price.toLocaleString("es-MX")}
-                        </option>
-                      ))
-                    )}
-                  </select>
-                  <p className="text-white/45 text-xs mt-1">
-                    Sin límite: cualquier cantidad de personas puede pagar esta
-                    entrada
-                    {selectedCover
-                      ? ` ($${selectedCover.price.toLocaleString("es-MX")})`
-                      : ""}
-                    .
-                  </p>
-                </div>
               )}
             </div>
 
@@ -738,8 +739,10 @@ export function InvitesManager() {
                           ? inv.poolMode === "FULL_TABLE"
                             ? inv.mesaFilled || inv.tableConfirmed
                               ? `Llena · ${inv.paidCount} cupos`
-                              : `${inv.paidCount}/${inv.splitAmong ?? inv.minPaidToConfirm ?? "—"} cupos`
-                            : `${inv.paidCount} pagos · sin límite`
+                              : `${inv.paidCount}/${inv.splitAmong ?? "—"} cupos`
+                            : inv.tableConfirmed
+                              ? `Confirmada · ${inv.paidCount} pagos`
+                              : `${inv.paidCount}/${inv.minPaidToConfirm ?? "—"} para confirmar`
                           : inv.status === "PAID"
                             ? "Pagado"
                             : inv.status === "PENDING"

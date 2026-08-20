@@ -59,12 +59,12 @@ export async function GET(
         );
         const isMesa = p.mode === "FULL_TABLE";
         const minToConfirm = invitePoolMinToConfirm(p) ?? p.minPaidToConfirm;
-        const tableConfirmed = isMesa
-          ? paidShareCount >= minToConfirm
-          : false;
         const mesaFilled = isMesa
           ? invitePoolMesaFilled(p, paidShareCount)
           : false;
+        const tableConfirmed = isMesa
+          ? mesaFilled
+          : paidCount >= minToConfirm;
         return {
           id: p.id,
           tableNumber: p.tableNumber,
@@ -82,7 +82,7 @@ export async function GET(
           isPool: true,
           maxSlots: p.maxSlots,
           splitAmong: p.splitAmong,
-          minPaidToConfirm: isMesa ? minToConfirm : null,
+          minPaidToConfirm: isMesa ? p.splitAmong : minToConfirm,
           paidCount: isMesa ? paidShareCount : paidCount,
           totalCollected,
           tableConfirmed,

@@ -171,7 +171,7 @@ export async function GET(
     let cupos: number | null = null;
 
     if (!isMesaMode) {
-      // Money pool: entrada sin tope
+      // Money pool: entrada sin tope + N pagos para confirmar
       const coverSource = pool.coverTicketType || null;
       coverTicket = coverSource
         ? toInviteTicketPayload(coverSource as any, new Date())
@@ -185,6 +185,7 @@ export async function GET(
       }
       livePrice = coverTicket?.price ?? Number(pool.pricePerSeat);
       phase = "cover";
+      tableConfirmed = paidCount >= minToConfirm;
       ticketTypes = coverTicket
         ? [
             {
@@ -199,7 +200,7 @@ export async function GET(
     } else {
       sharesLeft = invitePoolSharesLeft(pool, paidShareCount);
       mesaFilled = invitePoolMesaFilled(pool, paidShareCount);
-      tableConfirmed = paidShareCount >= minToConfirm;
+      tableConfirmed = mesaFilled;
       cupos = pool.splitAmong || minToConfirm;
       tablePrice = invitePoolTableTotal(pool);
       const shareCollected = paidSlots
@@ -310,12 +311,12 @@ export async function GET(
         splitAmong: cupos ?? pool.splitAmong,
         sharesLeft: isMesaMode ? sharesLeft : null,
         mesaFilled: isMesaMode ? mesaFilled : false,
-        minPaidToConfirm: isMesaMode ? minToConfirm : null,
+        minPaidToConfirm: isMesaMode ? cupos : minToConfirm,
         paidCount: isMesaMode ? paidShareCount : paidCount,
         paidCoverCount,
         totalCollected,
         paymentTimeline,
-        tableConfirmed: isMesaMode ? tableConfirmed : false,
+        tableConfirmed,
         expiresAt: pool.expiresAt?.toISOString() ?? null,
         eventId: pool.eventId,
         event: pool.event,

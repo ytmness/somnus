@@ -744,7 +744,7 @@ model TableInvitePool {
   inviteToken   String   @unique // Un solo token para toda la mesa
   maxSlots      Int?     // null = sin tope (money pool y mesa con cover)
   splitAmong    Int      // Cupos de división (mesa); money pool = 1
-  minPaidToConfirm Int @default(20) // Pagos de cupo para "confirmada" (modo mesa)
+  minPaidToConfirm Int @default(20) // Money pool: pagos para confirmar; Mesa = cupos
   pricePerSeat  Decimal  @db.Decimal(10, 2) // Cover o (total mesa ÷ cupos)
   expiresAt     DateTime?
   createdAt     DateTime @default(now())
