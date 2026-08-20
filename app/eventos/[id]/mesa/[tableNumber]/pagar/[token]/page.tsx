@@ -12,7 +12,15 @@ import {
   Clock,
   HelpCircle,
   Users,
+  Plus,
+  Minus,
 } from "lucide-react";
+import { isSalesOpen } from "@/lib/ticket-sales-window";
+import {
+  inviteTicketAvailable,
+  isInviteTicketSoldOut,
+  type InviteTicketTypePayload,
+} from "@/lib/invite-tickets";
 
 type PaymentTimelineEntry = {
   order: number;
@@ -42,7 +50,10 @@ type InviteData = {
     eventDate?: string;
     eventTime?: string;
     venue?: string;
+    salesStartDate?: string;
+    salesEndDate?: string;
   };
+  ticketTypes?: InviteTicketTypePayload[];
   invitedName?: string;
   invitedEmail?: string;
   invitedPhone?: string;
@@ -98,6 +109,7 @@ export default function PagarInvitePage() {
   const [extraPeople, setExtraPeople] = useState<
     Array<{ name: string; email: string; phone: string }>
   >([]);
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [isProcessing, setIsProcessing] = useState(false);
 
   const inviteReturnPath = `/eventos/${params.eventId}/mesa/${params.tableNumber}/pagar/${token}`;
@@ -157,6 +169,11 @@ export default function PagarInvitePage() {
       } else if (result && "data" in result) {
         const d = result.data;
         setInvite(d);
+        const initial: Record<string, number> = {};
+        (d.ticketTypes || []).forEach((tt) => {
+          initial[tt.id] = 0;
+        });
+        setQuantities(initial);
         setError(null);
         if (d.status !== "PAID" && !d.tableReserved) {
           setFormData((prev) => ({
@@ -196,11 +213,22 @@ export default function PagarInvitePage() {
       return;
     }
 
+    const pickerTypes = invite?.ticketTypes || [];
+    const selectedItems = pickerTypes
+      .filter((tt) => (quantities[tt.id] || 0) > 0)
+      .map((tt) => ({ ticketTypeId: tt.id, quantity: quantities[tt.id] }));
+
+    if (invite?.isPool && pickerTypes.length > 0 && selectedItems.length === 0) {
+      toast.error("Selecciona al menos un boleto");
+      return;
+    }
+
     setIsProcessing(true);
     try {
       for (const p of extraPeople) {
         if (!p.name.trim()) {
           toast.error("Para agregar una persona extra, el nombre es requerido");
+          setIsProcessing(false);
           return;
         }
       }
@@ -219,7 +247,9 @@ export default function PagarInvitePage() {
           buyerName: formData.buyerName.trim(),
           buyerEmail: formData.buyerEmail.trim(),
           buyerPhone: formData.buyerPhone?.trim() || undefined,
-          extraPeople: extraPayload,
+          ...(selectedItems.length > 0
+            ? { items: selectedItems }
+            : { extraPeople: extraPayload }),
         }),
       });
 
@@ -285,6 +315,43 @@ export default function PagarInvitePage() {
   const totalCollected = invite.totalCollected ?? 0;
   const timeline = invite.paymentTimeline ?? [];
   const paidCount = invite.paidCount ?? 0;
+  const pickerTypes = invite.ticketTypes || [];
+  const hasTicketPicker = Boolean(invite.isPool && pickerTypes.length > 0);
+  const eventWindow =
+    invite.event?.salesStartDate && invite.event?.salesEndDate
+      ? {
+          salesStartDate: invite.event.salesStartDate,
+          salesEndDate: invite.event.salesEndDate,
+        }
+      : null;
+  const now = new Date();
+  const selectionCount = pickerTypes.reduce(
+    (sum, tt) => sum + (quantities[tt.id] || 0),
+    0
+  );
+  const selectionTotal = pickerTypes.reduce(
+    (sum, tt) => sum + tt.price * (quantities[tt.id] || 0),
+    0
+  );
+  const checkoutTotal = hasTicketPicker
+    ? selectionTotal
+    : (invite.pricePerSeat ?? 0) * (1 + extraPeople.length);
+
+  const bumpQty = (tt: InviteTicketTypePayload, delta: number) => {
+    if (!eventWindow) return;
+    if (isInviteTicketSoldOut(tt) || !isSalesOpen(eventWindow, tt, now)) return;
+    const available = inviteTicketAvailable(tt);
+    const min = tt.minPurchaseQty || 1;
+    const max = tt.maxPurchaseQty ?? available;
+    setQuantities((prev) => {
+      const current = prev[tt.id] || 0;
+      let next = current + delta;
+      if (next <= 0) next = 0;
+      else if (current === 0 && next > 0) next = Math.min(min, available);
+      else next = Math.max(0, Math.min(max, available, next));
+      return { ...prev, [tt.id]: next };
+    });
+  };
 
   const eventDate = invite.event?.eventDate
     ? new Intl.DateTimeFormat("es-MX", {
@@ -381,8 +448,14 @@ export default function PagarInvitePage() {
               <Users className="w-4 h-4 opacity-80" />
               {paidCount === 1 ? "1 participante" : `${paidCount} participantes`}
             </p>
-            <p className="text-white/45 text-xs mb-1">Cada pago (precio General del evento)</p>
-            <p className="text-lg font-semibold text-[#7BA3E8] tabular-nums">{priceFormatted}</p>
+            <p className="text-white/45 text-xs mb-1">
+              {hasTicketPicker
+                ? "Elige cuántos boletos quieres de cada tipo"
+                : "Cada pago (precio General del evento)"}
+            </p>
+            {!hasTicketPicker && (
+              <p className="text-lg font-semibold text-[#7BA3E8] tabular-nums">{priceFormatted}</p>
+            )}
             {invite.minPaidToConfirm != null &&
               invite.pricePerSeat != null &&
               !invite.tableConfirmed && (
@@ -484,12 +557,17 @@ export default function PagarInvitePage() {
                   <CreditCard className="w-5 h-5 text-[#7BA3E8]" />
                 </div>
                 <div>
-                  <p className="text-white/50 text-xs">Siguiente pago</p>
-                  <p className="text-lg font-bold text-white tabular-nums">{priceFormatted}</p>
-                  <p className="text-[11px] text-white/40 mt-1">
-                    Total este checkout:{" "}
-                    {mxn.format((invite.pricePerSeat ?? 0) * (1 + extraPeople.length))}
+                  <p className="text-white/50 text-xs">Total este checkout</p>
+                  <p className="text-lg font-bold text-white tabular-nums">
+                    {mxn.format(checkoutTotal)}
                   </p>
+                  {hasTicketPicker && (
+                    <p className="text-[11px] text-white/40 mt-1">
+                      {selectionCount === 0
+                        ? "Selecciona boletos abajo"
+                        : `${selectionCount} boleto${selectionCount === 1 ? "" : "s"}`}
+                    </p>
+                  )}
                 </div>
               </div>
               <form id="pool-pay-form" onSubmit={handleSubmit} className="space-y-3">
@@ -526,6 +604,76 @@ export default function PagarInvitePage() {
                   />
                 </div>
 
+                {hasTicketPicker ? (
+                  <div className="pt-2 space-y-3">
+                    <p className="text-white/50 text-xs">Boletos</p>
+                    {pickerTypes.map((tt) => {
+                      const soldOut = isInviteTicketSoldOut(tt);
+                      const salesOpen = eventWindow
+                        ? isSalesOpen(eventWindow, tt, now)
+                        : true;
+                      const disabled = soldOut || !salesOpen;
+                      const qty = quantities[tt.id] || 0;
+                      const available = inviteTicketAvailable(tt);
+                      const maxQ = tt.maxPurchaseQty ?? available;
+                      return (
+                        <div
+                          key={tt.id}
+                          className={`rounded-lg border border-white/10 bg-white/5 p-3 ${
+                            disabled ? "opacity-60" : ""
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-white text-sm font-medium truncate">
+                                {tt.name}
+                              </p>
+                              <p className="text-white/55 text-xs tabular-nums mt-0.5">
+                                {mxn.format(tt.price)}
+                                {tt.kind === "TABLE" ? " / mesa" : ""}
+                              </p>
+                              {soldOut && (
+                                <p className="text-[10px] uppercase tracking-wider text-white/45 mt-1">
+                                  Agotado
+                                </p>
+                              )}
+                              {!soldOut && !salesOpen && (
+                                <p className="text-[10px] uppercase tracking-wider text-amber-200/80 mt-1">
+                                  Fuera de venta
+                                </p>
+                              )}
+                            </div>
+                            {!disabled && (
+                              <div className="flex items-center gap-1 border border-white/20 rounded-lg shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() => bumpQty(tt, -1)}
+                                  disabled={qty === 0}
+                                  aria-label={`Quitar ${tt.name}`}
+                                  className="p-2 text-white/80 hover:text-white disabled:opacity-40"
+                                >
+                                  <Minus className="w-4 h-4" aria-hidden />
+                                </button>
+                                <span className="px-3 py-1.5 text-white text-sm tabular-nums min-w-[2rem] text-center">
+                                  {qty}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => bumpQty(tt, 1)}
+                                  disabled={qty >= maxQ || qty >= available}
+                                  aria-label={`Agregar ${tt.name}`}
+                                  className="p-2 text-white/80 hover:text-white disabled:opacity-40"
+                                >
+                                  <Plus className="w-4 h-4" aria-hidden />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
                 <div className="pt-2">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-white/50 text-xs">Agregar personas extra (opcional)</p>
@@ -608,6 +756,7 @@ export default function PagarInvitePage() {
                     </div>
                   )}
                 </div>
+                )}
               </form>
             </section>
           ) : (
@@ -632,10 +781,14 @@ export default function PagarInvitePage() {
               <button
                 type="submit"
                 form="pool-pay-form"
-                disabled={isProcessing}
+                disabled={isProcessing || (hasTicketPicker && selectionCount === 0)}
                 className="w-full py-4 rounded-xl bg-white text-black font-bold uppercase tracking-wider text-sm hover:bg-white/95 disabled:opacity-50 disabled:cursor-not-allowed border border-white/30 transition-colors"
               >
-                {isProcessing ? "Procesando…" : "Pagar"}
+                {isProcessing
+                  ? "Procesando…"
+                  : hasTicketPicker && selectionCount === 0
+                    ? "Selecciona boletos"
+                    : `Pagar ${mxn.format(checkoutTotal)}`}
               </button>
               <p className="text-center text-[10px] text-white/40">Pago seguro con Stripe</p>
             </div>

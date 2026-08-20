@@ -4,12 +4,37 @@ import { getSession } from "@/lib/auth/session";
 import { calculateSaleAmounts } from "@/lib/payments/commissions";
 import { isStripeEnabled } from "@/lib/payments/config";
 import { ticketTableLabel } from "@/lib/table-invite";
+import { ticketTypeInclude } from "@/lib/ticket-type-persist";
+import {
+  canBuyInviteTicket,
+  toInviteTicketPayload,
+} from "@/lib/invite-tickets";
 import crypto from "crypto";
 
 export const dynamic = "force-dynamic";
 
+type InviteLine = {
+  ticketTypeId: string;
+  quantity: number;
+  unitPrice: number;
+};
+
 function generateInviteToken(): string {
   return crypto.randomBytes(6).toString("base64url").slice(0, 8);
+}
+
+async function uniqueInviteToken(): Promise<string> {
+  let slotToken = generateInviteToken();
+  let exists =
+    (await prisma.tableSlotInvite.findUnique({ where: { inviteToken: slotToken } })) ||
+    (await prisma.tableInvitePool.findUnique({ where: { inviteToken: slotToken } }));
+  while (exists) {
+    slotToken = generateInviteToken();
+    exists =
+      (await prisma.tableSlotInvite.findUnique({ where: { inviteToken: slotToken } })) ||
+      (await prisma.tableInvitePool.findUnique({ where: { inviteToken: slotToken } }));
+  }
+  return slotToken;
 }
 
 /**
@@ -27,12 +52,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { inviteToken, buyerName, buyerEmail, buyerPhone, extraPeople } = body as {
+    const { inviteToken, buyerName, buyerEmail, buyerPhone, extraPeople, items } = body as {
       inviteToken?: string;
       buyerName?: string;
       buyerEmail?: string;
       buyerPhone?: string;
       extraPeople?: Array<{ name?: string; email?: string; phone?: string }>;
+      items?: Array<{ ticketTypeId?: string; quantity?: number }>;
     };
 
     const sessionUser = await getSession();
@@ -50,14 +76,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 1. Buscar TableSlotInvite (link individual)
     let invite = await prisma.tableSlotInvite.findUnique({
       where: { inviteToken },
       include: { event: true, ticketType: true },
     });
 
-    // Se asume 1 asiento (el del comprador). En modo pool podemos agregar extraPeople para pagar varios asientos en un solo checkout.
-    let seatsToCharge = 1;
     const extras =
       Array.isArray(extraPeople) && extraPeople.length > 0
         ? extraPeople
@@ -69,7 +92,8 @@ export async function POST(request: NextRequest) {
             .filter((p) => p.name.length > 0)
         : [];
 
-    // 2. Si no existe, buscar TableInvitePool (money pool)
+    let lineItems: InviteLine[] = [];
+
     if (!invite) {
       const pool = await prisma.tableInvitePool.findUnique({
         where: { inviteToken },
@@ -90,8 +114,67 @@ export async function POST(request: NextRequest) {
       const paidCount = await prisma.tableSlotInvite.count({
         where: { poolId: pool.id, status: "PAID" },
       });
-      // En pool, el comprador siempre toma 1 asiento + (extras.length) adicionales
-      seatsToCharge = 1 + extras.length;
+
+      const requestedItems = Array.isArray(items)
+        ? items
+            .map((it) => ({
+              ticketTypeId: String(it?.ticketTypeId || ""),
+              quantity: Math.floor(Number(it?.quantity) || 0),
+            }))
+            .filter((it) => it.ticketTypeId && it.quantity > 0)
+        : [];
+
+      if (requestedItems.length > 0) {
+        const now = new Date();
+        const event = await prisma.event.findUnique({
+          where: { id: pool.eventId },
+          include: { ticketTypes: { include: ticketTypeInclude } },
+        });
+        if (!event) {
+          return NextResponse.json({ error: "Evento no encontrado" }, { status: 404 });
+        }
+
+        const eventWindow = {
+          salesStartDate: event.salesStartDate,
+          salesEndDate: event.salesEndDate,
+        };
+
+        for (const req of requestedItems) {
+          const raw = event.ticketTypes.find((tt) => tt.id === req.ticketTypeId);
+          const mapped = raw ? toInviteTicketPayload(raw, now) : null;
+          if (!mapped) {
+            return NextResponse.json(
+              { error: "Uno de los boletos seleccionados no está disponible" },
+              { status: 400 }
+            );
+          }
+          const check = canBuyInviteTicket(eventWindow, mapped, req.quantity, now);
+          if (!check.ok) {
+            return NextResponse.json({ error: check.error }, { status: 400 });
+          }
+          lineItems.push({
+            ticketTypeId: mapped.id,
+            quantity: req.quantity,
+            unitPrice: mapped.price,
+          });
+        }
+      } else {
+        lineItems = [
+          {
+            ticketTypeId: pool.ticketTypeId,
+            quantity: 1 + extras.length,
+            unitPrice: Number(pool.pricePerSeat),
+          },
+        ];
+      }
+
+      const seatsToCharge = lineItems.reduce((sum, l) => sum + l.quantity, 0);
+      if (seatsToCharge < 1) {
+        return NextResponse.json(
+          { error: "Selecciona al menos un boleto" },
+          { status: 400 }
+        );
+      }
 
       if (pool.maxSlots != null && paidCount + seatsToCharge > pool.maxSlots) {
         return NextResponse.json(
@@ -100,49 +183,66 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Crear los seats pendientes en el mismo checkout
-      const peopleForSeats = [
-        {
-          invitedName: buyerName.trim(),
-          invitedEmail: buyerEmail.trim(),
-          invitedPhone: buyerPhone?.trim() || null,
-        },
-        ...extras.map((p) => ({
-          invitedName: p.name,
-          invitedEmail: p.email ?? null,
-          invitedPhone: p.phone ?? null,
-        })),
-      ];
+      const peopleForSeats: Array<{
+        invitedName: string;
+        invitedEmail: string | null;
+        invitedPhone: string | null;
+        ticketTypeId: string;
+        unitPrice: number;
+      }> = [];
 
-      let firstCreated: any = null;
+      if (requestedItems.length > 0) {
+        for (const line of lineItems) {
+          for (let i = 0; i < line.quantity; i++) {
+            peopleForSeats.push({
+              invitedName: buyerName.trim(),
+              invitedEmail: buyerEmail.trim(),
+              invitedPhone: buyerPhone?.trim() || null,
+              ticketTypeId: line.ticketTypeId,
+              unitPrice: line.unitPrice,
+            });
+          }
+        }
+      } else {
+        const extraRows = [
+          {
+            invitedName: buyerName.trim(),
+            invitedEmail: buyerEmail.trim(),
+            invitedPhone: buyerPhone?.trim() || null,
+          },
+          ...extras.map((p) => ({
+            invitedName: p.name,
+            invitedEmail: p.email ?? null,
+            invitedPhone: p.phone ?? null,
+          })),
+        ];
+        for (const row of extraRows) {
+          peopleForSeats.push({
+            ...row,
+            ticketTypeId: pool.ticketTypeId,
+            unitPrice: Number(pool.pricePerSeat),
+          });
+        }
+      }
+
+      let firstCreated: typeof invite = null;
       const startSeatNumber = paidCount + 1;
 
       for (let offset = 0; offset < peopleForSeats.length; offset++) {
-        const nextSeatNumber = startSeatNumber + offset;
-
-        let slotToken = generateInviteToken();
-        let exists =
-          (await prisma.tableSlotInvite.findUnique({ where: { inviteToken: slotToken } })) ||
-          (await prisma.tableInvitePool.findUnique({ where: { inviteToken: slotToken } }));
-        while (exists) {
-          slotToken = generateInviteToken();
-          exists =
-            (await prisma.tableSlotInvite.findUnique({ where: { inviteToken: slotToken } })) ||
-            (await prisma.tableInvitePool.findUnique({ where: { inviteToken: slotToken } }));
-        }
-
+        const slotToken = await uniqueInviteToken();
+        const person = peopleForSeats[offset];
         const created = await prisma.tableSlotInvite.create({
           data: {
             eventId: pool.eventId,
-            ticketTypeId: pool.ticketTypeId,
+            ticketTypeId: person.ticketTypeId,
             tableNumber: pool.tableNumber,
-            seatNumber: nextSeatNumber,
+            seatNumber: startSeatNumber + offset,
             poolId: pool.id,
             inviteToken: slotToken,
-            invitedName: peopleForSeats[offset].invitedName,
-            invitedEmail: peopleForSeats[offset].invitedEmail,
-            invitedPhone: peopleForSeats[offset].invitedPhone,
-            pricePerSeat: pool.pricePerSeat,
+            invitedName: person.invitedName,
+            invitedEmail: person.invitedEmail,
+            invitedPhone: person.invitedPhone,
+            pricePerSeat: person.unitPrice,
             expiresAt: pool.expiresAt,
           },
           include: { event: true, ticketType: true },
@@ -157,7 +257,6 @@ export async function POST(request: NextRequest) {
 
       invite = firstCreated;
     } else {
-      // Flujo TableSlotInvite existente
       if (invite.status !== "PENDING") {
         return NextResponse.json(
           {
@@ -182,13 +281,24 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+
+      lineItems = [
+        {
+          ticketTypeId: invite.ticketTypeId,
+          quantity: 1,
+          unitPrice: Number(invite.pricePerSeat),
+        },
+      ];
     }
 
     if (!invite) {
       return NextResponse.json({ error: "Invitación no encontrada" }, { status: 404 });
     }
 
-    const subtotal = Number(invite.pricePerSeat) * seatsToCharge;
+    const subtotal = lineItems.reduce(
+      (sum, l) => sum + l.unitPrice * l.quantity,
+      0
+    );
     if (subtotal <= 0 || !Number.isFinite(subtotal)) {
       return NextResponse.json(
         { error: "Precio del asiento inválido" },
@@ -200,6 +310,7 @@ export async function POST(request: NextRequest) {
     const total = amounts.totalPesos;
 
     const userId = sessionUser.id;
+    const tableLabel = ticketTableLabel(String(invite.tableNumber));
 
     let saleId: string;
     try {
@@ -223,21 +334,24 @@ export async function POST(request: NextRequest) {
             paymentMethod: null,
           },
         });
-        await tx.saleItem.create({
-          data: {
-            saleId: sale.id,
-            ticketTypeId: invite.ticketTypeId,
-            quantity: seatsToCharge,
-            isTable: true,
-            tableNumber: ticketTableLabel(String(invite.tableNumber)),
-          },
-        });
+        for (const line of lineItems) {
+          await tx.saleItem.create({
+            data: {
+              saleId: sale.id,
+              ticketTypeId: line.ticketTypeId,
+              quantity: line.quantity,
+              isTable: true,
+              tableNumber: tableLabel,
+            },
+          });
+        }
         return sale.id;
       });
       saleId = result;
-    } catch (txError: any) {
-      const code = txError?.code || "";
-      const msg = txError?.message || String(txError);
+    } catch (txError: unknown) {
+      const err = txError as { code?: string; message?: string };
+      const code = err?.code || "";
+      const msg = err?.message || String(txError);
       if (code === "P2002" || msg.includes("Unique constraint") || msg.includes("tableSlotInviteId")) {
         return NextResponse.json(
           { error: "Esta invitación ya tiene una orden. Revisa tu correo o intenta de nuevo." },

@@ -1,8 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
+import { ticketTypeInclude } from "@/lib/ticket-type-persist";
+import { toInviteTicketPayload } from "@/lib/invite-tickets";
 
 function mesaPagarUrl(baseUrl: string, eventId: string, tableKey: string, token: string) {
   return `${baseUrl}/eventos/${eventId}/mesa/${encodeURIComponent(tableKey)}/pagar/${token}`;
+}
+
+const eventInviteSelect = {
+  id: true,
+  name: true,
+  eventDate: true,
+  eventTime: true,
+  venue: true,
+  address: true,
+  imageUrl: true,
+  artist: true,
+  salesStartDate: true,
+  salesEndDate: true,
+} as const;
+
+async function loadInviteTicketTypes(eventId: string) {
+  const now = new Date();
+  const rows = await prisma.ticketType.findMany({
+    where: { eventId, isActive: true },
+    include: ticketTypeInclude,
+    orderBy: { price: "asc" },
+  });
+  return rows
+    .map((tt) => toInviteTicketPayload(tt, now))
+    .filter((tt): tt is NonNullable<typeof tt> => Boolean(tt));
 }
 
 /**
@@ -26,18 +53,7 @@ export async function GET(
     const invite = await prisma.tableSlotInvite.findUnique({
       where: { inviteToken: token },
       include: {
-        event: {
-          select: {
-            id: true,
-            name: true,
-            eventDate: true,
-            eventTime: true,
-            venue: true,
-            address: true,
-            imageUrl: true,
-            artist: true,
-          },
-        },
+        event: { select: eventInviteSelect },
       },
     });
 
@@ -50,18 +66,7 @@ export async function GET(
     const pool = await prisma.tableInvitePool.findUnique({
       where: { inviteToken: token },
       include: {
-        event: {
-          select: {
-            id: true,
-            name: true,
-            eventDate: true,
-            eventTime: true,
-            venue: true,
-            address: true,
-            imageUrl: true,
-            artist: true,
-          },
-        },
+        event: { select: eventInviteSelect },
       },
     });
 
@@ -104,6 +109,7 @@ export async function GET(
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const payUrl = mesaPagarUrl(baseUrl, pool.eventId, pool.tableNumber, token);
+    const ticketTypes = await loadInviteTicketTypes(pool.eventId);
 
     return NextResponse.json({
       success: true,
@@ -124,6 +130,7 @@ export async function GET(
         expiresAt: pool.expiresAt?.toISOString() ?? null,
         eventId: pool.eventId,
         event: pool.event,
+        ticketTypes,
         payUrl,
         status: poolFull ? "PAID" : "PENDING",
         tableReserved: poolFull,
