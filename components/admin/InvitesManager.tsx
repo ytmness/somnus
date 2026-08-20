@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Copy, Check, Link2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { effectiveTicketPriceAt, generalAdmissionUnitPrice } from "@/lib/ticket-pricing";
+import { pickInvitePoolAnchor } from "@/lib/ticket-pricing";
 import { TableStaffManager } from "@/components/admin/TableStaffManager";
 
 const MAX_TRADITIONAL_SLOTS = 500;
@@ -17,7 +17,7 @@ interface EventOption {
   hasTables: boolean;
   /** Asientos del tipo mesa (referencia) */
   defaultSeatsForPool: number;
-  /** Precio por cupo en link compartido = boleto General del evento */
+  /** Precio ancla del link: mesa si hay TABLE; si no, general (legado) */
   pricePerPersonHint: number;
 }
 
@@ -78,25 +78,20 @@ export function InvitesManager() {
   const [usePoolMode, setUsePoolMode] = useState(true); // Money pool: un link para toda la mesa
 
   const mapApiEventToOption = useCallback((e: any): EventOption => {
-    const nonTable = (e.ticketTypes || []).filter((tt: any) => !tt.isTable);
-    const generalRows = nonTable.filter((tt: any) => tt.category === "GENERAL");
-    const pricePool = generalRows.length > 0 ? generalRows : nonTable;
-    const at = new Date();
-    const prices = pricePool
-      .map((tt: any) =>
-        effectiveTicketPriceAt(Number(tt.price), tt.pricePhases, at)
-      )
-      .filter((p: number) => p > 0);
-    const pricePerPerson =
-      prices.length > 0 ? Math.round(Math.min(...prices) * 100) / 100 : 0;
+    const anchor = pickInvitePoolAnchor(e.ticketTypes || []);
+    const tableCapacity = Number(
+      (anchor?.ticket as { tableCapacity?: number | null } | undefined)
+        ?.tableCapacity
+    );
     return {
       id: e.id,
       name: e.name,
-      // Ya no dependemos de `isTable=true` para generar links:
-      // si hay precio válido de un boleto no-mesa, habilitamos generación.
-      hasTables: pricePerPerson > 0,
-      defaultSeatsForPool: 4,
-      pricePerPersonHint: pricePerPerson,
+      hasTables: Boolean(anchor && anchor.unitPrice > 0),
+      defaultSeatsForPool:
+        Number.isFinite(tableCapacity) && tableCapacity > 0
+          ? tableCapacity
+          : 4,
+      pricePerPersonHint: anchor?.unitPrice ?? 0,
     };
   }, []);
 
@@ -256,11 +251,11 @@ export function InvitesManager() {
       const ticketTypes = freshJson?.data?.ticketTypes;
       const unit =
         Array.isArray(ticketTypes) && ticketTypes.length > 0
-          ? generalAdmissionUnitPrice(ticketTypes)
+          ? pickInvitePoolAnchor(ticketTypes)?.unitPrice ?? null
           : null;
       if (unit == null || unit <= 0) {
         toast.error(
-          "No hay precio válido para el link (se usa el boleto General del evento). Edita el evento: un tipo sin «Mesa VIP», precio mayor a 0 y guarda; luego vuelve a intentar o recarga esta página."
+          "No hay precio de mesa válido para el link. Agrega una mesa con precio mayor a 0, guarda el evento y vuelve a intentar."
         );
         return;
       }
@@ -468,13 +463,13 @@ export function InvitesManager() {
             {usePoolMode ? (
               <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4 space-y-4">
                 <p className="text-white/55 text-xs leading-relaxed">
-                  <strong className="text-white/75">Cada pago</strong> es el precio del boleto{" "}
-                  <strong className="text-white/80">General</strong> del evento (ahora{" "}
+                  <strong className="text-white/75">Cada pago</strong> usa el precio de la{" "}
+                  <strong className="text-white/80">mesa</strong> del evento (ahora{" "}
                   <strong className="text-white/90">
                     ${pricePerPersonForEventId(generateEventId).toLocaleString("es-MX")}
                   </strong>
-                  ). No usa el precio de la fila “mesa”. Abajo defines cuántos pagos confirman la mesa; pueden seguir
-                  pagando más después.
+                  , con fases si las tiene). Si hay varias mesas, el link deja elegir cantidades y cobra cada una a su
+                  precio. Abajo defines cuántos pagos confirman la mesa.
                 </p>
                 <div>
                   <label className="block text-white/80 text-sm font-medium mb-1">
@@ -575,7 +570,7 @@ export function InvitesManager() {
                 >
                   <span className="text-white/80 text-sm">
                     {link.isPool
-                      ? `Mesa compartida (General $${link.pricePerSeat?.toLocaleString("es-MX") ?? "—"} / pago${
+                      ? `Mesa compartida ($${link.pricePerSeat?.toLocaleString("es-MX") ?? "—"} / pago${
                           link.minPaidToConfirm != null
                             ? ` · confirmar con ${link.minPaidToConfirm} pagos`
                             : ""

@@ -39,35 +39,73 @@ export function effectiveTicketPriceAt(
   return base;
 }
 
-/** Mínimo para calcular el importe por cupo en links de mesa (igual que venta general). */
-export type TicketForGeneralPrice = {
+export function isMesaTicketType(tt: {
+  kind?: string | null;
+  isTable?: boolean | null;
+}): boolean {
+  return tt.kind === "TABLE" || tt.isTable === true;
+}
+
+export type TicketForInviteAnchor = {
+  kind?: string | null;
   isTable: boolean;
   category: TicketCategory;
   price: unknown;
   isActive?: boolean;
+  isHidden?: boolean;
   pricePhases?: TicketPricePhaseRow[] | null;
 };
 
 /**
- * Precio unitario del “general” del evento: tipos no-mesa categoría GENERAL;
- * si no hay, el más barato entre tipos no-mesa activos.
- * Respeta fases de precio a la fecha `at`.
+ * Precio ancla del link de mesa: tipos TABLE (o isTable legado).
+ * Si el evento no tiene mesas, cae al general más barato (links viejos).
  */
-export function generalAdmissionUnitPrice(
-  ticketTypes: TicketForGeneralPrice[],
+export function pickInvitePoolAnchor<T extends TicketForInviteAnchor>(
+  ticketTypes: T[],
+  at: Date = new Date()
+): { ticket: T; unitPrice: number } | null {
+  const rows = ticketTypes.filter(
+    (tt) => tt.isActive !== false && !tt.isHidden
+  );
+  const tables = rows.filter(isMesaTicketType);
+  const pool =
+    tables.length > 0
+      ? tables
+      : (() => {
+          const general = rows.filter(
+            (tt) => !isMesaTicketType(tt) && tt.category === "GENERAL"
+          );
+          return general.length > 0
+            ? general
+            : rows.filter((tt) => !isMesaTicketType(tt));
+        })();
+
+  let best: { ticket: T; unitPrice: number } | null = null;
+  for (const ticket of pool) {
+    const unitPrice = effectiveTicketPriceAt(
+      Number(ticket.price),
+      ticket.pricePhases ?? null,
+      at
+    );
+    if (!Number.isFinite(unitPrice) || unitPrice <= 0) continue;
+    if (!best || unitPrice < best.unitPrice) best = { ticket, unitPrice };
+  }
+  return best;
+}
+
+export function invitePoolUnitPrice(
+  ticketTypes: TicketForInviteAnchor[],
   at: Date = new Date()
 ): number | null {
-  const rows = ticketTypes.filter((tt) => tt.isActive !== false);
-  const general = rows.filter((tt) => !tt.isTable && tt.category === "GENERAL");
-  const pool = general.length > 0 ? general : rows.filter((tt) => !tt.isTable);
-  if (pool.length === 0) return null;
+  return pickInvitePoolAnchor(ticketTypes, at)?.unitPrice ?? null;
+}
 
-  const effectivePrices = pool.map((t) =>
-    effectiveTicketPriceAt(Number(t.price), t.pricePhases ?? null, at)
-  );
-  const ok = effectivePrices.filter((n) => Number.isFinite(n) && n > 0);
-  if (ok.length === 0) return null;
-  return Math.round(Math.min(...ok) * 100) / 100;
+/** @deprecated Usa invitePoolUnitPrice: el link de mesa ancla en TABLE, no en General. */
+export function generalAdmissionUnitPrice(
+  ticketTypes: TicketForInviteAnchor[],
+  at: Date = new Date()
+): number | null {
+  return invitePoolUnitPrice(ticketTypes, at);
 }
 
 export type GroupPriceRow = {

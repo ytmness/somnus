@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import crypto from "crypto";
 import { parseTableKeyFromPath, ticketTableLabel } from "@/lib/table-invite";
-import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
+import { pickInvitePoolAnchor } from "@/lib/ticket-pricing";
 
 const INVITE_EXPIRY_DAYS = 7;
 const MAX_TRADITIONAL_SLOTS = 500;
@@ -108,40 +108,19 @@ export async function POST(
     }
 
     const now = new Date();
-    const activeNonTable = event.ticketTypes.filter((tt) => !tt.isTable && tt.isActive !== false);
-    if (!activeNonTable.length) {
+    const anchor = pickInvitePoolAnchor(event.ticketTypes, now);
+    if (!anchor) {
       return NextResponse.json(
         {
           error:
-            "Agrega al menos un tipo de boleto no-mesa (por ejemplo General) con precio mayor a 0.",
+            "Agrega una mesa (o una entrada general, si el evento no usa mesas) con precio mayor a 0.",
         },
         { status: 400 }
       );
     }
 
-    const candidates = activeNonTable.filter((tt) => tt.category === "GENERAL");
-    const poolCandidates = candidates.length > 0 ? candidates : activeNonTable;
-
-    let generalTicketType: (typeof poolCandidates)[number] | null = null;
-    let pricePerSeat: number | null = null;
-    for (const tt of poolCandidates) {
-      const unit = effectiveTicketPriceAt(Number(tt.price), tt.pricePhases ?? null, now);
-      if (!Number.isFinite(unit) || unit <= 0) continue;
-      if (pricePerSeat == null || unit < pricePerSeat) {
-        pricePerSeat = unit;
-        generalTicketType = tt;
-      }
-    }
-
-    if (!generalTicketType || pricePerSeat == null || pricePerSeat <= 0) {
-      return NextResponse.json(
-        {
-          error:
-            "No hay un precio vigente de boleto General para calcular el link (considera fases).",
-        },
-        { status: 400 }
-      );
-    }
+    const generalTicketType = anchor.ticket;
+    const pricePerSeat = anchor.unitPrice;
 
     const mesaTicketLabel = ticketTableLabel(tableNumber);
 

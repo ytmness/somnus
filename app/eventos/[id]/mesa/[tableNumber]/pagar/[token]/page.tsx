@@ -451,7 +451,7 @@ export default function PagarInvitePage() {
             <p className="text-white/45 text-xs mb-1">
               {hasTicketPicker
                 ? "Elige cuántos boletos quieres de cada tipo"
-                : "Cada pago (precio General del evento)"}
+                : "Cada pago usa el precio de mesa del evento"}
             </p>
             {!hasTicketPicker && (
               <p className="text-lg font-semibold text-[#7BA3E8] tabular-nums">{priceFormatted}</p>
