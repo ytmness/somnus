@@ -7,6 +7,7 @@ import { ticketTableLabel } from "@/lib/table-invite";
 import { ticketTypeInclude } from "@/lib/ticket-type-persist";
 import {
   canBuyInviteTicket,
+  pickTicketsForInviteLink,
   toInviteTicketPayload,
 } from "@/lib/invite-tickets";
 import type { Prisma } from "@prisma/client";
@@ -144,12 +145,19 @@ export async function POST(request: NextRequest) {
           salesEndDate: event.salesEndDate,
         };
 
+        const allowed = pickTicketsForInviteLink(
+          event.ticketTypes
+            .map((tt) => toInviteTicketPayload(tt, now))
+            .filter((tt): tt is NonNullable<typeof tt> => Boolean(tt))
+        );
+        const allowedIds = new Set(allowed.map((tt) => tt.id));
+
         for (const req of requestedItems) {
           const raw = event.ticketTypes.find((tt) => tt.id === req.ticketTypeId);
           const mapped = raw ? toInviteTicketPayload(raw, now) : null;
-          if (!mapped) {
+          if (!mapped || !allowedIds.has(mapped.id)) {
             return NextResponse.json(
-              { error: "Uno de los boletos seleccionados no está disponible" },
+              { error: "Uno de los boletos seleccionados no está disponible en este link de mesa" },
               { status: 400 }
             );
           }

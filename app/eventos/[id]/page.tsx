@@ -159,7 +159,8 @@ export default function EventDetailPage() {
     event.organization?.name || event.organizer?.businessName || null;
 
   const ticketTypes = (event.ticketTypes || []).filter(
-    (tt: any) => !tt.isTable && !tt.isHidden,
+    (tt: any) =>
+      !tt.isTable && tt.kind !== "TABLE" && !tt.isHidden,
   );
   const purchaseState = eventTicketPurchaseState(
     {

@@ -44,9 +44,8 @@ type TicketDetail = {
 };
 
 function isTicketTypeVisible(kind: TicketKind, isTable: boolean): boolean {
-  if (kind === "TABLE") return true;
-  if (kind === "STANDARD" && !isTable) return true;
-  return false;
+  if (kind === "TABLE" || isTable) return false;
+  return kind === "STANDARD";
 }
 
 function resolveTicketTypeId(item: CheckoutLineItem): string | null {
@@ -124,55 +123,12 @@ export async function POST(request: NextRequest) {
 
     for (const item of items) {
       if (item.table) {
-        const want = Number(item.table.price);
-        const ticketType = event.ticketTypes.find((tt) => {
-          if (!tt.isTable || tt.kind !== "TABLE") return false;
-          const unit = effectiveTicketPriceAt(
-            Number(tt.price),
-            tt.pricePhases,
-            now
-          );
-          return Math.abs(unit - want) < 0.02;
-        });
-
-        if (!ticketType) {
-          return NextResponse.json(
-            {
-              error: `Tipo de boleto no encontrado para mesa ${item.table.number}`,
-            },
-            { status: 400 }
-          );
-        }
-
-        cartTicketTypeIds.add(ticketType.id);
-        const validation = validateTicketTypeForPurchase(
-          event,
-          ticketType,
-          1,
-          passwordTokens[ticketType.id],
-          now
+        return NextResponse.json(
+          {
+            error: "Las mesas se venden por link de mesa, no en venta general",
+          },
+          { status: 400 }
         );
-        if (!validation.ok) {
-          return NextResponse.json({ error: validation.error }, { status: 400 });
-        }
-
-        const guestCount = item.guestCount ?? ticketType.tableCapacity ?? 1;
-        const unit = unitPriceForTicketType(ticketType, guestCount, now);
-        const lineTotal = unit;
-
-        ticketDetails.push({
-          ticketTypeId: ticketType.id,
-          quantity: 1,
-          isTable: true,
-          tableNumber: `Mesa ${item.table.number}`,
-          guestCount,
-          lineTotal,
-          fullLineTotal: lineTotal,
-          depositEnabled: ticketType.depositEnabled,
-          depositPercent: ticketType.depositPercent,
-          requiresApproval: ticketType.requiresApproval,
-        });
-        continue;
       }
 
       const ticketTypeId = resolveTicketTypeId(item);
@@ -469,7 +425,13 @@ function validateTicketTypeForPurchase(
   }
 
   if (!isTicketTypeVisible(tt.kind, tt.isTable)) {
-    return { ok: false, error: `${tt.name} no está disponible para compra` };
+    return {
+      ok: false,
+      error:
+        tt.kind === "TABLE" || tt.isTable
+          ? `${tt.name} se vende por link de mesa, no en venta general`
+          : `${tt.name} no está disponible para compra`,
+    };
   }
 
   if (tt.manualSoldOut) {

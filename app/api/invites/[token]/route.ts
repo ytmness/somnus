@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { ticketTypeInclude } from "@/lib/ticket-type-persist";
-import { toInviteTicketPayload } from "@/lib/invite-tickets";
+import { toInviteTicketPayload, pickTicketsForInviteLink } from "@/lib/invite-tickets";
 
 function mesaPagarUrl(baseUrl: string, eventId: string, tableKey: string, token: string) {
   return `${baseUrl}/eventos/${eventId}/mesa/${encodeURIComponent(tableKey)}/pagar/${token}`;
@@ -27,9 +27,11 @@ async function loadInviteTicketTypes(eventId: string) {
     include: ticketTypeInclude,
     orderBy: { price: "asc" },
   });
-  return rows
-    .map((tt) => toInviteTicketPayload(tt, now))
-    .filter((tt): tt is NonNullable<typeof tt> => Boolean(tt));
+  return pickTicketsForInviteLink(
+    rows
+      .map((tt) => toInviteTicketPayload(tt, now))
+      .filter((tt): tt is NonNullable<typeof tt> => Boolean(tt))
+  );
 }
 
 /**

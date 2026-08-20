@@ -74,7 +74,7 @@ function convertEventToConcert(event: any): Concert {
     effectiveTicketPriceAt(Number(tt.price), tt.pricePhases, at);
 
   const publicTypes = (event.ticketTypes || []).filter(
-    (tt: any) => !tt.isHidden
+    (tt: any) => !tt.isHidden && tt.kind !== "TABLE" && !tt.isTable
   );
 
   const purchasableTypes = publicTypes.filter(

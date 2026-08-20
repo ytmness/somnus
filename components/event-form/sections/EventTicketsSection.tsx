@@ -139,6 +139,9 @@ export function EventTicketsSection({
           </button>
         </div>
       </div>
+      <p className="text-[11px] leading-relaxed text-white/40">
+        Las entradas salen en venta general. Las mesas solo se venden con el link de mesa.
+      </p>
 
       <div className="space-y-3">
         {data.ticketTypes.map((tt, index) => {

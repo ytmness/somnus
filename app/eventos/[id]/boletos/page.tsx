@@ -48,9 +48,8 @@ interface CartItem {
 
 function isVisibleTicketType(tt: TicketTypeRow): boolean {
   if (tt.isHidden) return false;
-  // Legacy VIP map tables stay off the regular boletos list
-  if (tt.isTable && tt.kind !== "TABLE") return false;
-  return tt.kind === "STANDARD" || tt.kind === "TABLE";
+  if (tt.isTable) return false;
+  return tt.kind === "STANDARD";
 }
 
 function isSoldOut(tt: TicketTypeRow): boolean {
