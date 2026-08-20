@@ -17,6 +17,7 @@ import {
   type TicketTypeForm,
 } from "../types";
 import { cn } from "@/lib/utils";
+import { tableCupos, tablePricePerCupo } from "@/lib/ticket-pricing";
 
 interface EventTicketsSectionProps {
   data: EventFormData;
@@ -140,7 +141,7 @@ export function EventTicketsSection({
         </div>
       </div>
       <p className="text-[11px] leading-relaxed text-white/40">
-        Las entradas salen en venta general. Las mesas solo se venden con el link de mesa.
+        Las entradas salen en venta general. Las mesas se venden por link: precio de mesa ÷ cupos. Los cupos son el mínimo para confirmar, no un tope de pagos.
       </p>
 
       <div className="space-y-3">
@@ -156,6 +157,10 @@ export function EventTicketsSection({
           );
           const soldOut = Boolean(tt.manualSoldOut);
           const hidden = Boolean(tt.isHidden);
+          const cupos = isTable ? tableCupos(tt.tableCapacity) : 1;
+          const pricePerCupo = isTable
+            ? tablePricePerCupo(tt.price || 0, cupos)
+            : tt.price || 0;
 
           return (
             <div
@@ -184,7 +189,7 @@ export function EventTicketsSection({
                 </div>
                 <div className="w-24">
                   <label className="block text-[10px] uppercase tracking-wider text-white/40 mb-1">
-                    {isTable ? "Table price" : "Price"}
+                    {isTable ? "Precio mesa" : "Price"}
                   </label>
                   <input
                     type="number"
@@ -195,26 +200,46 @@ export function EventTicketsSection({
                       updateTicket(index, { price: parseFloat(e.target.value) || 0 })
                     }
                     className="somnus-input !py-2 text-sm"
-                    placeholder="850"
+                    placeholder={isTable ? "1000" : "850"}
                   />
                 </div>
-                <div className="w-20">
-                  <label className="block text-[10px] uppercase tracking-wider text-white/40 mb-1">
-                    Qty
-                  </label>
-                  <input
-                    type="number"
-                    min={sold > 0 ? sold : 1}
-                    value={tt.maxQuantity || ""}
-                    onChange={(e) =>
-                      updateTicket(index, {
-                        maxQuantity: parseInt(e.target.value, 10) || 0,
-                      })
-                    }
-                    className="somnus-input !py-2 text-sm"
-                    placeholder={isTable ? "10" : "200"}
-                  />
-                </div>
+                {isTable ? (
+                  <div className="w-24">
+                    <label className="block text-[10px] uppercase tracking-wider text-white/40 mb-1">
+                      Cupos
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      value={tt.tableCapacity ?? ""}
+                      onChange={(e) =>
+                        updateTicket(index, {
+                          tableCapacity: parseInt(e.target.value, 10) || 1,
+                        })
+                      }
+                      className="somnus-input !py-2 text-sm"
+                      placeholder="4"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-20">
+                    <label className="block text-[10px] uppercase tracking-wider text-white/40 mb-1">
+                      Qty
+                    </label>
+                    <input
+                      type="number"
+                      min={sold > 0 ? sold : 1}
+                      value={tt.maxQuantity || ""}
+                      onChange={(e) =>
+                        updateTicket(index, {
+                          maxQuantity: parseInt(e.target.value, 10) || 0,
+                        })
+                      }
+                      className="somnus-input !py-2 text-sm"
+                      placeholder="200"
+                    />
+                  </div>
+                )}
                 {canRemove && (
                   <button
                     type="button"
@@ -229,6 +254,16 @@ export function EventTicketsSection({
                   </button>
                 )}
               </div>
+
+              {isTable && tt.price > 0 && (
+                <p className="text-[11px] text-white/45 leading-relaxed">
+                  Cada quien paga{" "}
+                  <span className="text-white/80 tabular-nums">
+                    ${pricePerCupo.toLocaleString("es-MX")}
+                  </span>
+                  . Con {cupos} pagos se confirma; pueden seguir pagando el mismo monto.
+                </p>
+              )}
 
               {isEdit && sold > 0 && (
                 <p className="text-[11px] text-white/40">
@@ -290,8 +325,17 @@ export function EventTicketsSection({
                         </p>
                       ) : null}
                       <p className="text-white/80 text-sm mt-1.5 tabular-nums">
-                        ${(tt.price || 0).toLocaleString("en-US")} MXN
-                        {isTable ? " / table" : ""}
+                        {isTable ? (
+                          <>
+                            ${(tt.price || 0).toLocaleString("es-MX")} mesa
+                            <span className="text-white/45">
+                              {" "}
+                              · {cupos} cupos · ${pricePerCupo.toLocaleString("es-MX")} c/u
+                            </span>
+                          </>
+                        ) : (
+                          <>${(tt.price || 0).toLocaleString("en-US")} MXN</>
+                        )}
                       </p>
                     </div>
                     {!soldOut && (
@@ -351,27 +395,25 @@ export function EventTicketsSection({
 
                   {isTable && (
                     <>
-                      <div className="w-28">
+                      <div className="w-36">
                         <label className="block text-[10px] uppercase tracking-wider text-white/40 mb-1">
-                          Cupos
+                          Mesas de este tipo
                         </label>
                         <input
                           type="number"
-                          min={1}
-                          value={tt.tableCapacity ?? ""}
+                          min={sold > 0 ? sold : 1}
+                          value={tt.maxQuantity || ""}
                           onChange={(e) =>
                             updateTicket(index, {
-                              tableCapacity:
-                                parseInt(e.target.value, 10) || null,
+                              maxQuantity: parseInt(e.target.value, 10) || 0,
                             })
                           }
                           className="somnus-input !py-2 text-sm"
+                          placeholder="10"
                         />
-                        {tt.tableCapacity && tt.tableCapacity > 0 && tt.price > 0 ? (
-                          <p className="text-[10px] text-white/40 mt-1 leading-snug">
-                            ${(tt.price / tt.tableCapacity).toLocaleString("es-MX", { maximumFractionDigits: 2 })} / cupo
-                          </p>
-                        ) : null}
+                        <p className="text-[10px] text-white/40 mt-1 leading-snug">
+                          Inventario de mesas. No es el split del precio.
+                        </p>
                       </div>
 
                       <div>
@@ -495,6 +537,7 @@ export function EventTicketsSection({
                     </div>
                   </div>
 
+                  {!isTable && (
                   <div className="grid grid-cols-2 gap-2 max-w-xs">
                     <div>
                       <label className="block text-[10px] uppercase tracking-wider text-white/40 mb-1">
@@ -532,6 +575,7 @@ export function EventTicketsSection({
                       />
                     </div>
                   </div>
+                  )}
 
                   <ToggleRow
                     label="Requires approval"
