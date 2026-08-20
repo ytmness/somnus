@@ -8,8 +8,10 @@ import { ticketTypeInclude } from "@/lib/ticket-type-persist";
 import {
   canBuyInviteTicket,
   pickTicketsForInviteLink,
+  limitInviteTicketsToCupos,
   toInviteTicketPayload,
 } from "@/lib/invite-tickets";
+import { effectiveInvitePoolCupos } from "@/lib/ticket-pricing";
 import type { Prisma } from "@prisma/client";
 import crypto from "crypto";
 
@@ -120,6 +122,9 @@ export async function POST(request: NextRequest) {
       const paidCount = await prisma.tableSlotInvite.count({
         where: { poolId: pool.id, status: "PAID" },
       });
+      const cupos = effectiveInvitePoolCupos(pool);
+      const remainingCupos =
+        cupos != null ? Math.max(0, cupos - paidCount) : null;
 
       const requestedItems = Array.isArray(items)
         ? items
@@ -145,11 +150,14 @@ export async function POST(request: NextRequest) {
           salesEndDate: event.salesEndDate,
         };
 
-        const allowed = pickTicketsForInviteLink(
-          event.ticketTypes
-            .map((tt) => toInviteTicketPayload(tt, now))
-            .filter((tt): tt is NonNullable<typeof tt> => Boolean(tt)),
-          pool.ticketTypeId
+        const allowed = limitInviteTicketsToCupos(
+          pickTicketsForInviteLink(
+            event.ticketTypes
+              .map((tt) => toInviteTicketPayload(tt, now))
+              .filter((tt): tt is NonNullable<typeof tt> => Boolean(tt)),
+            pool.ticketTypeId
+          ),
+          remainingCupos
         );
         const allowedIds = new Set(allowed.map((tt) => tt.id));
 
@@ -190,9 +198,14 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (pool.maxSlots != null && paidCount + seatsToCharge > pool.maxSlots) {
+      if (cupos != null && paidCount + seatsToCharge > cupos) {
         return NextResponse.json(
-          { error: "Esta mesa ya está completa. Todos los espacios han sido pagados." },
+          {
+            error:
+              remainingCupos != null && remainingCupos > 0
+                ? `Esta mesa tiene ${cupos} cupos. Quedan ${remainingCupos}.`
+                : "Esta mesa ya está completa. Todos los cupos han sido pagados.",
+          },
           { status: 400 }
         );
       }

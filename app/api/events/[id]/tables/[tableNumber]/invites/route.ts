@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import crypto from "crypto";
 import { parseTableKeyFromPath, ticketTableLabel } from "@/lib/table-invite";
-import { listInvitePoolTicketTypes, resolveInvitePoolTicket } from "@/lib/ticket-pricing";
+import { listInvitePoolTicketTypes, resolveInvitePoolTicket, isMesaTicketType, tableCupos } from "@/lib/ticket-pricing";
 
 const INVITE_EXPIRY_DAYS = 7;
 const MAX_TRADITIONAL_SLOTS = 500;
@@ -59,18 +59,7 @@ export async function POST(
 
     const isPoolMode = mode === "pool";
 
-    if (isPoolMode) {
-      const minPaid =
-        minPaidRaw === undefined || minPaidRaw === null
-          ? DEFAULT_MIN_PAID_TO_CONFIRM
-          : Math.floor(Number(minPaidRaw));
-      if (!Number.isFinite(minPaid) || minPaid < 1 || minPaid > MAX_MIN_PAID_CONFIRM) {
-        return NextResponse.json(
-          { error: `"minPaidToConfirm" debe ser un entero entre 1 y ${MAX_MIN_PAID_CONFIRM}.` },
-          { status: 400 }
-        );
-      }
-    } else {
+    if (!isPoolMode) {
       let invites: Array<{ name: string; email?: string; phone?: string }>;
       if (typeof slotsCount === "number" && slotsCount >= 1 && slotsCount <= MAX_TRADITIONAL_SLOTS) {
         invites = Array.from({ length: slotsCount }, () => ({ name: "Pendiente" }));
@@ -83,7 +72,7 @@ export async function POST(
       } else {
         return NextResponse.json(
           {
-            error: `Envía "slots" (número del 1 al ${MAX_TRADITIONAL_SLOTS}), "invites" (array), o "mode":"pool" con minPaidToConfirm`,
+            error: `Envía "slots" (número del 1 al ${MAX_TRADITIONAL_SLOTS}), "invites" (array), o "mode":"pool"`,
           },
           { status: 400 }
         );
@@ -132,6 +121,8 @@ export async function POST(
     }
 
     const generalTicketType = anchor.ticket;
+    const mesa = isMesaTicketType(generalTicketType);
+    const cupos = mesa ? tableCupos(generalTicketType.tableCapacity) : null;
     const pricePerSeat = anchor.unitPrice;
 
     const mesaTicketLabel = ticketTableLabel(tableNumber);
@@ -156,10 +147,17 @@ export async function POST(
     expiresAt.setDate(expiresAt.getDate() + INVITE_EXPIRY_DAYS);
 
     if (isPoolMode) {
-      const minPaidToConfirm =
-        minPaidRaw === undefined || minPaidRaw === null
+      const minPaidToConfirm = cupos
+        ? cupos
+        : minPaidRaw === undefined || minPaidRaw === null
           ? DEFAULT_MIN_PAID_TO_CONFIRM
           : Math.floor(Number(minPaidRaw));
+      if (!Number.isFinite(minPaidToConfirm) || minPaidToConfirm < 1 || minPaidToConfirm > MAX_MIN_PAID_CONFIRM) {
+        return NextResponse.json(
+          { error: `"minPaidToConfirm" debe ser un entero entre 1 y ${MAX_MIN_PAID_CONFIRM}.` },
+          { status: 400 }
+        );
+      }
 
       const existingPool = await prisma.tableInvitePool.findFirst({
         where: { eventId, tableNumber },
@@ -197,8 +195,8 @@ export async function POST(
           ticketTypeId: generalTicketType.id,
           tableNumber,
           inviteToken: token,
-          maxSlots: null,
-          splitAmong: 1,
+          maxSlots: cupos,
+          splitAmong: cupos ?? 1,
           minPaidToConfirm,
           pricePerSeat,
           expiresAt,

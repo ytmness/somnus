@@ -46,6 +46,37 @@ export function isMesaTicketType(tt: {
   return tt.kind === "TABLE" || tt.isTable === true;
 }
 
+export function tableCupos(capacity: number | null | undefined): number {
+  const n = Math.floor(Number(capacity) || 0);
+  return n > 0 ? n : 1;
+}
+
+/** Precio de mesa ÷ cupos (lo que paga cada asiento en el link). */
+export function tablePricePerCupo(
+  tablePrice: number,
+  capacity: number | null | undefined
+): number {
+  const seats = tableCupos(capacity);
+  const total = Math.round(Number(tablePrice) * 100) / 100;
+  if (!Number.isFinite(total) || total <= 0) return 0;
+  return Math.round((total / seats) * 100) / 100;
+}
+
+export function effectiveInvitePoolCupos(pool: {
+  maxSlots?: number | null;
+  ticketType?: {
+    kind?: string | null;
+    isTable?: boolean | null;
+    tableCapacity?: number | null;
+  } | null;
+}): number | null {
+  if (pool.maxSlots != null && pool.maxSlots > 0) return pool.maxSlots;
+  if (pool.ticketType && isMesaTicketType(pool.ticketType)) {
+    return tableCupos(pool.ticketType.tableCapacity);
+  }
+  return null;
+}
+
 export type TicketForInviteAnchor = {
   id?: string;
   name?: string | null;
@@ -55,11 +86,16 @@ export type TicketForInviteAnchor = {
   price: unknown;
   isActive?: boolean;
   isHidden?: boolean;
+  tableCapacity?: number | null;
   pricePhases?: TicketPricePhaseRow[] | null;
 };
 
 export type InvitePoolTicketOption<T extends TicketForInviteAnchor> = {
   ticket: T;
+  /** Precio de la mesa (o del boleto, si no es mesa). */
+  tablePrice: number;
+  cupos: number;
+  /** Lo que cobra cada pago: mesa ÷ cupos. */
   unitPrice: number;
 };
 
@@ -86,13 +122,17 @@ export function listInvitePoolTicketTypes<T extends TicketForInviteAnchor>(
 
   const out: InvitePoolTicketOption<T>[] = [];
   for (const ticket of pool) {
-    const unitPrice = effectiveTicketPriceAt(
+    const tablePrice = effectiveTicketPriceAt(
       Number(ticket.price),
       ticket.pricePhases ?? null,
       at
     );
+    if (!Number.isFinite(tablePrice) || tablePrice <= 0) continue;
+    const mesa = isMesaTicketType(ticket);
+    const cupos = mesa ? tableCupos(ticket.tableCapacity) : 1;
+    const unitPrice = mesa ? tablePricePerCupo(tablePrice, cupos) : tablePrice;
     if (!Number.isFinite(unitPrice) || unitPrice <= 0) continue;
-    out.push({ ticket, unitPrice });
+    out.push({ ticket, tablePrice, cupos, unitPrice });
   }
   return out;
 }
@@ -123,7 +163,7 @@ export function pickInvitePoolAnchor<T extends TicketForInviteAnchor>(
   const listed = listInvitePoolTicketTypes(ticketTypes, at);
   if (listed.length === 0) return null;
   return listed.reduce((best, cur) =>
-    cur.unitPrice < best.unitPrice ? cur : best
+    cur.tablePrice < best.tablePrice ? cur : best
   );
 }
 

@@ -353,7 +353,7 @@ export function EventTicketsSection({
                     <>
                       <div className="w-28">
                         <label className="block text-[10px] uppercase tracking-wider text-white/40 mb-1">
-                          Capacity (guests)
+                          Cupos
                         </label>
                         <input
                           type="number"
@@ -367,6 +367,11 @@ export function EventTicketsSection({
                           }
                           className="somnus-input !py-2 text-sm"
                         />
+                        {tt.tableCapacity && tt.tableCapacity > 0 && tt.price > 0 ? (
+                          <p className="text-[10px] text-white/40 mt-1 leading-snug">
+                            ${(tt.price / tt.tableCapacity).toLocaleString("es-MX", { maximumFractionDigits: 2 })} / cupo
+                          </p>
+                        ) : null}
                       </div>
 
                       <div>

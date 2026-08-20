@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { getSession, hasRole } from "@/lib/auth/session";
+import { effectiveInvitePoolCupos } from "@/lib/ticket-pricing";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +37,7 @@ export async function GET(
     const pools = await prisma.tableInvitePool.findMany({
       where: { eventId },
       orderBy: { tableNumber: "asc" },
-      include: { ticketType: { select: { id: true, name: true } } },
+      include: { ticketType: { select: { id: true, name: true, kind: true, isTable: true, tableCapacity: true } } },
     });
 
     const poolRows = await Promise.all(
@@ -45,7 +46,8 @@ export async function GET(
           where: { poolId: p.id, status: "PAID" },
         });
         const totalCollected = paidCount * Number(p.pricePerSeat);
-        const tableConfirmed = paidCount >= p.minPaidToConfirm;
+        const cupos = effectiveInvitePoolCupos(p);
+        const tableConfirmed = cupos != null ? paidCount >= cupos : paidCount >= p.minPaidToConfirm;
         return {
           id: p.id,
           tableNumber: p.tableNumber,
@@ -61,9 +63,9 @@ export async function GET(
           expiresAt: p.expiresAt != null ? p.expiresAt.toISOString() : null,
           createdAt: p.createdAt.toISOString(),
           isPool: true,
-          maxSlots: p.maxSlots,
-          splitAmong: p.splitAmong,
-          minPaidToConfirm: p.minPaidToConfirm,
+          maxSlots: cupos,
+          splitAmong: cupos ?? p.splitAmong,
+          minPaidToConfirm: cupos ?? p.minPaidToConfirm,
           paidCount,
           totalCollected,
           tableConfirmed,

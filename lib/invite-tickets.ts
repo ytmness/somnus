@@ -1,5 +1,5 @@
 import type { TicketKind } from "@prisma/client";
-import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
+import { effectiveTicketPriceAt, tableCupos, tablePricePerCupo } from "@/lib/ticket-pricing";
 import { isSalesOpen } from "@/lib/ticket-sales-window";
 
 export function isInviteTicketVisible(
@@ -58,6 +58,7 @@ type TicketRow = {
   minPurchaseQty?: number | null;
   maxPurchaseQty?: number | null;
   manualSoldOut?: boolean;
+  tableCapacity?: number | null;
   salesStartDate?: Date | string | null;
   salesEndDate?: Date | string | null;
 };
@@ -71,11 +72,16 @@ export function toInviteTicketPayload(
   if (tt.passwordHash) return null;
   if (!isInviteTicketVisible(tt.kind, tt.isTable)) return null;
 
-  const price = effectiveTicketPriceAt(
+  const tablePrice = effectiveTicketPriceAt(
     Number(tt.price),
     tt.pricePhases ?? null,
     now
   );
+  if (!Number.isFinite(tablePrice) || tablePrice <= 0) return null;
+
+  const isTableKind = tt.kind === "TABLE" || tt.isTable;
+  const cupos = isTableKind ? tableCupos(tt.tableCapacity) : 1;
+  const price = isTableKind ? tablePricePerCupo(tablePrice, cupos) : tablePrice;
   if (!Number.isFinite(price) || price <= 0) return null;
 
   return {
@@ -86,8 +92,8 @@ export function toInviteTicketPayload(
     price,
     maxQuantity: tt.maxQuantity,
     soldQuantity: tt.soldQuantity,
-    minPurchaseQty: tt.minPurchaseQty ?? 1,
-    maxPurchaseQty: tt.maxPurchaseQty ?? null,
+    minPurchaseQty: isTableKind ? 1 : tt.minPurchaseQty ?? 1,
+    maxPurchaseQty: isTableKind ? cupos : tt.maxPurchaseQty ?? null,
     manualSoldOut: Boolean(tt.manualSoldOut),
     salesStartDate: tt.salesStartDate
       ? new Date(tt.salesStartDate).toISOString()
@@ -96,6 +102,25 @@ export function toInviteTicketPayload(
       ? new Date(tt.salesEndDate).toISOString()
       : null,
   };
+}
+
+export function limitInviteTicketsToCupos(
+  tickets: InviteTicketTypePayload[],
+  remainingCupos: number | null | undefined
+): InviteTicketTypePayload[] {
+  if (remainingCupos == null) return tickets;
+  const remaining = Math.max(0, Math.floor(remainingCupos));
+  return tickets.map((tt) => {
+    if (tt.kind !== "TABLE") return tt;
+    return {
+      ...tt,
+      minPurchaseQty: remaining > 0 ? 1 : 0,
+      maxPurchaseQty: remaining,
+      maxQuantity: remaining,
+      soldQuantity: 0,
+      manualSoldOut: remaining <= 0 || tt.manualSoldOut,
+    };
+  });
 }
 
 export function isInviteTicketSoldOut(tt: InviteTicketTypePayload): boolean {

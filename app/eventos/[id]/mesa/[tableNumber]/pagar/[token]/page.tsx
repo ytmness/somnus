@@ -37,6 +37,7 @@ type InviteData = {
   status?: string;
   paidCount?: number;
   maxSlots?: number | null;
+  cupos?: number | null;
   minPaidToConfirm?: number;
   tableConfirmed?: boolean;
   pricePerSeat?: number;
@@ -466,8 +467,9 @@ export default function PagarInvitePage() {
               invite.pricePerSeat != null &&
               !invite.tableConfirmed && (
                 <p className="mt-2 text-[11px] text-white/40">
-                  Con {invite.minPaidToConfirm} pagos a este precio se considera la mesa confirmada (total aprox.{" "}
-                  {mxn.format(invite.minPaidToConfirm * invite.pricePerSeat)}); pueden seguir entrando más pagos.
+                  Precio de mesa dividido entre {invite.minPaidToConfirm} cupos:{" "}
+                  {mxn.format(invite.pricePerSeat)} c/u (total{" "}
+                  {mxn.format(invite.minPaidToConfirm * invite.pricePerSeat)}).
                 </p>
               )}
             {invite.minPaidToConfirm != null && (
@@ -476,8 +478,8 @@ export default function PagarInvitePage() {
                   <span className="text-emerald-400/90 font-medium">Mesa confirmada</span>
                 ) : (
                   <>
-                    Confirmación al completar{" "}
-                    <span className="text-white/80 font-medium">{invite.minPaidToConfirm}</span> pagos:{" "}
+                    Se confirma al pagar los{" "}
+                    <span className="text-white/80 font-medium">{invite.minPaidToConfirm}</span> cupos:{" "}
                     <span className="text-white/80">
                       {paidCount}/{invite.minPaidToConfirm}
                     </span>
@@ -636,7 +638,7 @@ export default function PagarInvitePage() {
                               </p>
                               <p className="text-white/55 text-xs tabular-nums mt-0.5">
                                 {mxn.format(tt.price)}
-                                {tt.kind === "TABLE" ? " / mesa" : ""}
+                                {tt.kind === "TABLE" ? " / cupo" : ""}
                               </p>
                               {soldOut && (
                                 <p className="text-[10px] uppercase tracking-wider text-white/45 mt-1">

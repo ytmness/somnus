@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { ticketTypeInclude } from "@/lib/ticket-type-persist";
-import { toInviteTicketPayload, pickTicketsForInviteLink } from "@/lib/invite-tickets";
+import { toInviteTicketPayload, pickTicketsForInviteLink, limitInviteTicketsToCupos } from "@/lib/invite-tickets";
+import { effectiveInvitePoolCupos } from "@/lib/ticket-pricing";
 
 function mesaPagarUrl(baseUrl: string, eventId: string, tableKey: string, token: string) {
   return `${baseUrl}/eventos/${eventId}/mesa/${encodeURIComponent(tableKey)}/pagar/${token}`;
@@ -20,18 +21,25 @@ const eventInviteSelect = {
   salesEndDate: true,
 } as const;
 
-async function loadInviteTicketTypes(eventId: string, ticketTypeId?: string | null) {
+async function loadInviteTicketTypes(
+  eventId: string,
+  ticketTypeId?: string | null,
+  remainingCupos?: number | null
+) {
   const now = new Date();
   const rows = await prisma.ticketType.findMany({
     where: { eventId, isActive: true },
     include: ticketTypeInclude,
     orderBy: { price: "asc" },
   });
-  return pickTicketsForInviteLink(
-    rows
-      .map((tt) => toInviteTicketPayload(tt, now))
-      .filter((tt): tt is NonNullable<typeof tt> => Boolean(tt)),
-    ticketTypeId
+  return limitInviteTicketsToCupos(
+    pickTicketsForInviteLink(
+      rows
+        .map((tt) => toInviteTicketPayload(tt, now))
+        .filter((tt): tt is NonNullable<typeof tt> => Boolean(tt)),
+      ticketTypeId
+    ),
+    remainingCupos
   );
 }
 
@@ -70,7 +78,7 @@ export async function GET(
       where: { inviteToken: token },
       include: {
         event: { select: eventInviteSelect },
-        ticketType: { select: { id: true, name: true } },
+        ticketType: { select: { id: true, name: true, kind: true, isTable: true, tableCapacity: true } },
       },
     });
 
@@ -88,8 +96,11 @@ export async function GET(
     const paidCount = await prisma.tableSlotInvite.count({
       where: { poolId: pool.id, status: "PAID" },
     });
-    const poolFull = pool.maxSlots != null && paidCount >= pool.maxSlots;
-    const tableConfirmed = paidCount >= pool.minPaidToConfirm;
+    const cupos = effectiveInvitePoolCupos(pool);
+    const remainingCupos =
+      cupos != null ? Math.max(0, cupos - paidCount) : null;
+    const poolFull = cupos != null && paidCount >= cupos;
+    const tableConfirmed = cupos != null ? paidCount >= cupos : paidCount >= pool.minPaidToConfirm;
 
     const paidSlots = await prisma.tableSlotInvite.findMany({
       where: { poolId: pool.id, status: "PAID" },
@@ -113,7 +124,12 @@ export async function GET(
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const payUrl = mesaPagarUrl(baseUrl, pool.eventId, pool.tableNumber, token);
-    const ticketTypes = await loadInviteTicketTypes(pool.eventId, pool.ticketTypeId);
+    const ticketTypes = await loadInviteTicketTypes(
+      pool.eventId,
+      pool.ticketTypeId,
+      remainingCupos
+    );
+    const livePrice = ticketTypes[0]?.price ?? Number(pool.pricePerSeat);
 
     return NextResponse.json({
       success: true,
@@ -123,11 +139,12 @@ export async function GET(
         isPool: true,
         tableNumber: pool.tableNumber,
         seatNumber: null,
-        pricePerSeat: Number(pool.pricePerSeat),
+        pricePerSeat: livePrice,
         ticketTypeName: pool.ticketType?.name ?? null,
-        maxSlots: pool.maxSlots,
-        splitAmong: pool.splitAmong,
-        minPaidToConfirm: pool.minPaidToConfirm,
+        maxSlots: cupos,
+        cupos,
+        splitAmong: cupos ?? pool.splitAmong,
+        minPaidToConfirm: cupos ?? pool.minPaidToConfirm,
         paidCount,
         totalCollected,
         paymentTimeline,

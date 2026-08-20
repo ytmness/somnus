@@ -16,6 +16,8 @@ interface TableTypeOption {
   id: string;
   name: string;
   unitPrice: number;
+  tablePrice: number;
+  cupos: number;
 }
 
 interface EventOption {
@@ -111,6 +113,8 @@ export function InvitesManager() {
         id: String(row.ticket.id || ""),
         name: String(row.ticket.name || "Mesa"),
         unitPrice: row.unitPrice,
+        tablePrice: row.tablePrice,
+        cupos: row.cupos,
       })).filter((tt) => tt.id),
     };
   }, []);
@@ -269,11 +273,6 @@ export function InvitesManager() {
         return;
       }
     } else {
-      const minC = Math.floor(Number(generateMinConfirm));
-      if (!Number.isFinite(minC) || minC < 1 || minC > 10000) {
-        toast.error('"Pagos para confirmar" debe ser entre 1 y 10000.');
-        return;
-      }
       const freshRes = await fetch(`/api/events/${eventId}`, {
         credentials: "include",
       });
@@ -324,7 +323,6 @@ export function InvitesManager() {
         const body: Record<string, unknown> = usePoolMode
           ? {
               mode: "pool",
-              minPaidToConfirm: Math.floor(Number(generateMinConfirm)),
               ticketTypeId: ticketTypeId || undefined,
             }
           : { slots, totalTablePrice: totalPrice, ticketTypeId: ticketTypeId || undefined };
@@ -524,7 +522,8 @@ export function InvitesManager() {
                   ) : (
                     tableTypesForGenerate.map((tt) => (
                       <option key={tt.id} value={tt.id}>
-                        {tt.name} · ${tt.unitPrice.toLocaleString("es-MX")}
+                        {tt.name} · ${tt.tablePrice.toLocaleString("es-MX")} mesa · {tt.cupos} cupos · $
+                        {tt.unitPrice.toLocaleString("es-MX")} c/u
                       </option>
                     ))
                   )}
@@ -573,36 +572,18 @@ export function InvitesManager() {
             </div>
 
             {usePoolMode ? (
-              <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4 space-y-4">
+              <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4 space-y-2">
                 <p className="text-white/55 text-xs leading-relaxed">
-                  <strong className="text-white/75">Un link = un tipo de mesa</strong> (precio{" "}
+                  El precio de la mesa se divide entre los cupos. Cada persona paga{" "}
                   <strong className="text-white/90">
                     ${pricePerPersonForEventId(generateEventId).toLocaleString("es-MX")}
                   </strong>
-                  ). Puedes generar varias mesas a la vez; cada mesa tiene su URL. El comprador elige
-                  cantidad de ese tipo, no de otras mesas del evento.
+                  {(() => {
+                    const tt = tableTypesForGenerate.find((t) => t.id === generateTicketTypeId);
+                    if (!tt) return ".";
+                    return ` (${tt.cupos} cupos · mesa $${tt.tablePrice.toLocaleString("es-MX")}). La mesa se confirma al pagar todos los cupos.`;
+                  })()}
                 </p>
-                <div>
-                  <label className="block text-white/80 text-sm font-medium mb-1">
-                    Pagos mínimos para marcar mesa confirmada *
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={10000}
-                    value={generateMinConfirm}
-                    onChange={(e) =>
-                      setGenerateMinConfirm(
-                        Math.min(10000, Math.max(1, parseInt(e.target.value, 10) || 1))
-                      )
-                    }
-                    className="w-full max-w-[160px] px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
-                  />
-                  <p className="text-white/45 text-xs mt-2">
-                    Ej.: si pones 15 y cada pago es ${pricePerPersonForEventId(generateEventId).toLocaleString("es-MX")},
-                    al llegar a 15 pagos la mesa queda confirmada; pueden acumularse más pagos después.
-                  </p>
-                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -683,9 +664,9 @@ export function InvitesManager() {
                     {link.isPool
                       ? `${link.tableNumber ? `Mesa ${link.tableNumber} · ` : ""}${
                           link.ticketTypeName ? `${link.ticketTypeName} · ` : ""
-                        }$${link.pricePerSeat?.toLocaleString("es-MX") ?? "—"} / pago${
+                        }$${link.pricePerSeat?.toLocaleString("es-MX") ?? "—"} / cupo${
                           link.minPaidToConfirm != null
-                            ? ` · confirmar con ${link.minPaidToConfirm} pagos`
+                            ? ` · ${link.minPaidToConfirm} cupos`
                             : ""
                         } ·`
                       : `Asiento ${link.seatNumber} ·`}
@@ -816,7 +797,7 @@ export function InvitesManager() {
                         ? inv.tableConfirmed
                           ? `Confirmada · ${inv.paidCount} pagos`
                           : inv.minPaidToConfirm != null
-                          ? `${inv.paidCount}/${inv.minPaidToConfirm} para confirmar`
+                          ? `${inv.paidCount}/${inv.minPaidToConfirm} cupos`
                           : `${inv.paidCount} pagos`
                         : inv.status === "PAID"
                         ? "Pagado"
