@@ -388,7 +388,16 @@ function mapPhases(tt: TicketTypeForm) {
     : { pricePhases: [] as Array<never> };
 }
 
-function ticketPayloadFields(tt: TicketTypeForm) {
+function toEventSalesIso(v: string): string {
+  return new Date(v).toISOString();
+}
+
+function ticketPayloadFields(
+  tt: TicketTypeForm,
+  event: Pick<EventFormData, "salesStartDate" | "salesEndDate">
+) {
+  const startRaw = tt.salesStartDate || event.salesStartDate;
+  const endRaw = tt.salesEndDate || event.salesEndDate;
   return {
     kind: tt.kind,
     name: tt.name,
@@ -399,12 +408,8 @@ function ticketPayloadFields(tt: TicketTypeForm) {
     price: tt.price,
     maxQuantity: tt.maxQuantity,
     isTable: false,
-    salesStartDate: tt.salesStartDate
-      ? new Date(tt.salesStartDate).toISOString()
-      : null,
-    salesEndDate: tt.salesEndDate
-      ? new Date(tt.salesEndDate).toISOString()
-      : null,
+    salesStartDate: startRaw ? new Date(startRaw).toISOString() : null,
+    salesEndDate: endRaw ? new Date(endRaw).toISOString() : null,
     validUntil: tt.validUntil ? new Date(tt.validUntil).toISOString() : null,
     minPurchaseQty: tt.minPurchaseQty || 1,
     maxPurchaseQty: tt.maxPurchaseQty,
@@ -449,11 +454,11 @@ export function buildCreateEventPayload(data: EventFormData, _mode: EventFormMod
     imagePosY: data.imagePosY,
     imageZoom: data.imageZoom,
     maxCapacity: Number(data.maxCapacity) || 0,
-    salesStartDate: data.salesStartDate,
-    salesEndDate: data.salesEndDate,
+    salesStartDate: toEventSalesIso(data.salesStartDate),
+    salesEndDate: toEventSalesIso(data.salesEndDate),
     organizationId: data.organizationId || undefined,
     isActive: data.isActive,
-    ticketTypes: data.ticketTypes.map((tt) => ticketPayloadFields(tt)),
+    ticketTypes: data.ticketTypes.map((tt) => ticketPayloadFields(tt, data)),
   };
 }
 
@@ -472,8 +477,8 @@ export function buildUpdateEventPayload(data: EventFormData, mode: EventFormMode
     imagePosY: data.imagePosY,
     imageZoom: data.imageZoom,
     maxCapacity: Number(data.maxCapacity) || 0,
-    salesStartDate: data.salesStartDate,
-    salesEndDate: data.salesEndDate,
+    salesStartDate: toEventSalesIso(data.salesStartDate),
+    salesEndDate: toEventSalesIso(data.salesEndDate),
     isActive: data.isActive,
     ...(mode === "admin" && data.organizationId
       ? { organizationId: data.organizationId }
@@ -482,7 +487,7 @@ export function buildUpdateEventPayload(data: EventFormData, mode: EventFormMode
         : {}),
     ticketTypes: data.ticketTypes.map((tt) => ({
       ...(tt.id ? { id: tt.id } : {}),
-      ...ticketPayloadFields(tt),
+      ...ticketPayloadFields(tt, data),
     })),
   };
 }

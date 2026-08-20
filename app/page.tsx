@@ -27,6 +27,7 @@ import {
   type SessionUser,
 } from "@/components/layout/SiteHeader";
 import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
+import { isSalesOpen } from "@/lib/ticket-sales-window";
 import { ProductTour } from "@/components/onboarding/ProductTour";
 import { useClientTour } from "@/components/onboarding/useClientTour";
 import { CLIENT_TOUR } from "@/components/onboarding/tours";
@@ -59,13 +60,28 @@ function convertEventToConcert(event: any): Concert {
   }
 
   const at = new Date();
+  const eventWindow = {
+    salesStartDate: event.salesStartDate,
+    salesEndDate: event.salesEndDate,
+  };
+  const tierAvailable = (tt: any) => {
+    if (tt.manualSoldOut) return 0;
+    if (!isSalesOpen(eventWindow, tt, at)) return 0;
+    return Math.max(0, tt.maxQuantity - (tt.soldQuantity || 0));
+  };
   const eff = (tt: any) =>
     effectiveTicketPriceAt(Number(tt.price), tt.pricePhases, at);
 
+  const purchasableTypes = event.ticketTypes.filter(
+    (tt: any) => tierAvailable(tt) > 0
+  );
+
   const minPrice =
-    event.ticketTypes.length > 0
-      ? Math.min(...event.ticketTypes.map((tt: any) => eff(tt)))
-      : 0;
+    purchasableTypes.length > 0
+      ? Math.min(...purchasableTypes.map((tt: any) => eff(tt)))
+      : event.ticketTypes.length > 0
+        ? Math.min(...event.ticketTypes.map((tt: any) => eff(tt)))
+        : 0;
 
   const generalTypes = event.ticketTypes.filter(
     (tt: any) => tt.category === "GENERAL"
@@ -98,14 +114,13 @@ function convertEventToConcert(event: any): Concert {
       name: tt.name,
       description: tt.description || "",
       price: eff(tt),
-      available: Math.max(0, tt.maxQuantity - (tt.soldQuantity || 0)),
+      available: tierAvailable(tt),
     });
   });
 
   if (preferenteTypes.length > 0) {
     const totalPreferenteQuantity = preferenteTypes.reduce(
-      (sum: number, tt: any) =>
-        sum + Math.max(0, tt.maxQuantity - (tt.soldQuantity || 0)),
+      (sum: number, tt: any) => sum + tierAvailable(tt),
       0
     );
     const preferentePrice = preferenteTypes[0] ? eff(preferenteTypes[0]) : 0;
@@ -128,7 +143,7 @@ function convertEventToConcert(event: any): Concert {
       name: tt.name,
       description: tt.description || "",
       price: eff(tt),
-      available: Math.max(0, tt.maxQuantity - (tt.soldQuantity || 0)),
+      available: tierAvailable(tt),
     });
   });
 
@@ -138,7 +153,7 @@ function convertEventToConcert(event: any): Concert {
       name: tt.name,
       description: tt.description || "",
       price: eff(tt),
-      available: Math.max(0, tt.maxQuantity - (tt.soldQuantity || 0)),
+      available: tierAvailable(tt),
     });
   });
 

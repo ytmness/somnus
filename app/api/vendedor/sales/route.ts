@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth/session";
 import { canSellTickets, getAccessibleEventIds } from "@/lib/auth/permissions";
 import { generateQRHash } from "@/lib/services/qr-generator";
 import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
+import { isSalesOpen } from "@/lib/ticket-sales-window";
 
 export const dynamic = "force-dynamic";
 
@@ -58,6 +59,18 @@ export async function POST(request: NextRequest) {
       const tt = event.ticketTypes.find((t) => t.id === item.ticketTypeId);
       if (!tt) {
         return NextResponse.json({ error: "Tipo de boleto inválido" }, { status: 400 });
+      }
+      if (tt.manualSoldOut) {
+        return NextResponse.json(
+          { error: `${tt.name} está agotado` },
+          { status: 400 }
+        );
+      }
+      if (!isSalesOpen(event, tt, now)) {
+        return NextResponse.json(
+          { error: `Las ventas de ${tt.name} no están activas` },
+          { status: 400 }
+        );
       }
       const unitPrice = effectiveTicketPriceAt(
         Number(tt.price),

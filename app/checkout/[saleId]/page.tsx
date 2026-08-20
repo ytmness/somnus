@@ -113,7 +113,7 @@ export default function CheckoutPage() {
   const totalPesos = Number(sale.total);
   const eventName = sale.event?.name || "Evento Somnus";
 
-  if (sale.awaitingApproval || sale.approvalStatus === "PENDING") {
+  if (sale.awaitingApproval) {
     return (
       <div className="min-h-screen somnus-bg-main flex items-center justify-center p-4">
         <div className="somnus-card max-w-md w-full p-8 text-center">

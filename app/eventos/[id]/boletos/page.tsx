@@ -10,6 +10,7 @@ import {
   effectiveTicketPriceAt,
   priceForGuestCount,
 } from "@/lib/ticket-pricing";
+import { isSalesOpen, salesOpenStatus } from "@/lib/ticket-sales-window";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { useCart } from "@/components/cart/CartContext";
 
@@ -25,6 +26,7 @@ interface TicketTypeRow {
   maxPurchaseQty?: number | null;
   maxQuantity: number;
   soldQuantity: number;
+  manualSoldOut?: boolean;
   price: number;
   pricePhases?: Parameters<typeof effectiveTicketPriceAt>[1];
   groupPriceRows?: Parameters<typeof priceForGuestCount>[1];
@@ -49,14 +51,19 @@ function isVisibleTicketType(tt: TicketTypeRow): boolean {
   return tt.kind === "STANDARD" || tt.kind === "TABLE";
 }
 
-function isSalesOpen(tt: TicketTypeRow, now: Date): boolean {
-  if (tt.salesStartDate && now < new Date(tt.salesStartDate)) return false;
-  if (tt.salesEndDate && now > new Date(tt.salesEndDate)) return false;
-  return true;
+function isSoldOut(tt: TicketTypeRow): boolean {
+  return (
+    Boolean(tt.manualSoldOut) ||
+    tt.maxQuantity - (tt.soldQuantity || 0) <= 0
+  );
 }
 
-function isSoldOut(tt: TicketTypeRow): boolean {
-  return tt.maxQuantity - (tt.soldQuantity || 0) <= 0;
+function tierSalesStatus(
+  event: { salesStartDate: string; salesEndDate: string },
+  tt: TicketTypeRow,
+  now: Date
+) {
+  return salesOpenStatus(event, tt, now);
 }
 
 export default function EventBoletosPage() {
@@ -195,7 +202,20 @@ export default function EventBoletosPage() {
     tt.maxQuantity - (tt.soldQuantity || 0);
 
   const handleQuantityChange = (tt: TicketTypeRow, delta: number) => {
-    if (isSoldOut(tt) || !isSalesOpen(tt, new Date())) return;
+    const now = new Date();
+    if (
+      isSoldOut(tt) ||
+      !event ||
+      !isSalesOpen(
+        {
+          salesStartDate: event.salesStartDate,
+          salesEndDate: event.salesEndDate,
+        },
+        tt,
+        now
+      )
+    )
+      return;
     const available = getAvailable(tt);
     const min = tt.minPurchaseQty || 1;
     const max = tt.maxPurchaseQty ?? available;
@@ -425,11 +445,32 @@ export default function EventBoletosPage() {
     0
   );
 
-  const purchasableTypes = ticketTypes.filter(
-    (tt) => !isSoldOut(tt) && isSalesOpen(tt, new Date())
-  );
+  const now = new Date();
+  const eventWindow = event
+    ? {
+        salesStartDate: event.salesStartDate as string,
+        salesEndDate: event.salesEndDate as string,
+      }
+    : null;
+
+  const purchasableTypes = eventWindow
+    ? ticketTypes.filter(
+        (tt) =>
+          !isSoldOut(tt) && isSalesOpen(eventWindow, tt, now)
+      )
+    : [];
   const allSoldOut =
-    ticketTypes.length > 0 && purchasableTypes.length === 0;
+    ticketTypes.length > 0 && ticketTypes.every(isSoldOut);
+  const allSalesClosed =
+    ticketTypes.length > 0 &&
+    !allSoldOut &&
+    purchasableTypes.length === 0;
+  const anyNotStarted =
+    eventWindow &&
+    ticketTypes.some(
+      (tt) =>
+        !isSoldOut(tt) && tierSalesStatus(eventWindow, tt, now) === "not_started"
+    );
 
   if (isLoading) {
     return (
@@ -531,12 +572,27 @@ export default function EventBoletosPage() {
                   All tickets for this event have been sold.
                 </p>
               </div>
+            ) : allSalesClosed ? (
+              <div className="liquid-glass p-8 rounded-2xl text-center">
+                <Ticket className="w-12 h-12 text-white/50 mx-auto mb-4" aria-hidden />
+                <p className="text-white font-semibold uppercase tracking-wider mb-2">
+                  {anyNotStarted ? "Sales not open yet" : "Sales closed"}
+                </p>
+                <p className="text-white/65 text-sm">
+                  {anyNotStarted
+                    ? "Ticket sales for this event have not started yet."
+                    : "The sales window for this event has ended."}
+                </p>
+              </div>
             ) : (
               <>
                 <div className="space-y-4 mb-8">
                   {ticketTypes.map((tt) => {
                     const soldOut = isSoldOut(tt);
-                    const salesOpen = isSalesOpen(tt, new Date());
+                    const salesStatus = eventWindow
+                      ? tierSalesStatus(eventWindow, tt, now)
+                      : "open";
+                    const salesOpen = salesStatus === "open";
                     const disabled = soldOut || !salesOpen;
                     const qty = quantities[tt.id] || 0;
                     const available = getAvailable(tt);
@@ -567,7 +623,9 @@ export default function EventBoletosPage() {
                               )}
                               {!soldOut && !salesOpen && (
                                 <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-200">
-                                  Sales closed
+                                  {salesStatus === "not_started"
+                                    ? "Not on sale yet"
+                                    : "Sales closed"}
                                 </span>
                               )}
                               {tt.kind === "TABLE" && (
@@ -728,7 +786,7 @@ export default function EventBoletosPage() {
         </div>
       </main>
 
-      {!allSoldOut && ticketTypes.length > 0 && (
+      {!allSoldOut && !allSalesClosed && ticketTypes.length > 0 && (
         <div className="fixed bottom-0 inset-x-0 z-40 sm:hidden border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-md px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">

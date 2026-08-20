@@ -31,6 +31,8 @@ export async function GET(_request: NextRequest) {
     const sales = await prisma.sale.findMany({
       where: {
         approvalStatus: "PENDING",
+        status: "PENDING",
+        providerStatus: "requires_capture",
         ...eventFilter,
       },
       include: {

@@ -13,6 +13,10 @@ import {
   newBalancePayToken,
   verifyTicketPasswordToken,
 } from "@/lib/ticket-access";
+import {
+  isSalesOpen,
+  salesOpenStatus,
+} from "@/lib/ticket-sales-window";
 import type { TicketKind } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -43,18 +47,6 @@ function isTicketTypeVisible(kind: TicketKind, isTable: boolean): boolean {
   if (kind === "TABLE") return true;
   if (kind === "STANDARD" && !isTable) return true;
   return false;
-}
-
-function isWithinSalesWindow(
-  tt: {
-    salesStartDate: Date | null;
-    salesEndDate: Date | null;
-  },
-  now: Date
-): boolean {
-  if (tt.salesStartDate && now < tt.salesStartDate) return false;
-  if (tt.salesEndDate && now > tt.salesEndDate) return false;
-  return true;
 }
 
 function resolveTicketTypeId(item: CheckoutLineItem): string | null {
@@ -146,6 +138,7 @@ export async function POST(request: NextRequest) {
 
         cartTicketTypeIds.add(ticketType.id);
         const validation = validateTicketTypeForPurchase(
+          event,
           ticketType,
           1,
           passwordTokens[ticketType.id],
@@ -197,6 +190,7 @@ export async function POST(request: NextRequest) {
       cartTicketTypeIds.add(ticketType.id);
 
       const validation = validateTicketTypeForPurchase(
+        event,
         ticketType,
         quantity,
         passwordTokens[ticketType.id],
@@ -438,6 +432,7 @@ function unitPriceForTicketType(
 }
 
 function validateTicketTypeForPurchase(
+  event: { salesStartDate: Date; salesEndDate: Date },
   tt: {
     id: string;
     name: string;
@@ -451,6 +446,7 @@ function validateTicketTypeForPurchase(
     maxQuantity: number;
     soldQuantity: number;
     isActive: boolean;
+    manualSoldOut: boolean;
   },
   quantity: number,
   passwordToken: string | undefined,
@@ -464,10 +460,18 @@ function validateTicketTypeForPurchase(
     return { ok: false, error: `${tt.name} no está disponible para compra` };
   }
 
-  if (!isWithinSalesWindow(tt, now)) {
+  if (tt.manualSoldOut) {
+    return { ok: false, error: `${tt.name} está agotado` };
+  }
+
+  if (!isSalesOpen(event, tt, now)) {
+    const status = salesOpenStatus(event, tt, now);
     return {
       ok: false,
-      error: `Las ventas de ${tt.name} no están activas en este momento`,
+      error:
+        status === "not_started"
+          ? `Las ventas de ${tt.name} aún no han comenzado`
+          : `Las ventas de ${tt.name} ya cerraron`,
     };
   }
 

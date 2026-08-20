@@ -11,6 +11,7 @@ import {
   imageFramingStyle,
   normalizeImageFraming,
 } from "@/lib/utils/image-framing";
+import { eventTicketPurchaseState } from "@/lib/ticket-sales-window";
 
 export default function EventDetailPage() {
   const router = useRouter();
@@ -140,11 +141,14 @@ export default function EventDetailPage() {
   const ticketTypes = (event.ticketTypes || []).filter(
     (tt: any) => !tt.isTable,
   );
-  const allSoldOut =
-    ticketTypes.length > 0 &&
-    ticketTypes.every(
-      (tt: any) => tt.maxQuantity - (tt.soldQuantity || 0) <= 0,
-    );
+  const purchaseState = eventTicketPurchaseState(
+    {
+      salesStartDate: event.salesStartDate,
+      salesEndDate: event.salesEndDate,
+      ticketTypes,
+    },
+    new Date()
+  );
 
   return (
     <div className="min-h-screen somnus-events-bg overflow-x-hidden">
@@ -207,11 +211,11 @@ export default function EventDetailPage() {
               <button
                 type="button"
                 onClick={() => router.push(`/eventos/${eventId}/boletos`)}
-                disabled={allSoldOut}
+                disabled={purchaseState.ctaDisabled}
                 className="w-full py-4 rounded-xl bg-white text-black font-semibold uppercase tracking-wider text-sm hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mb-8"
               >
-                {allSoldOut ? (
-                  "Sold out"
+                {purchaseState.ctaDisabled ? (
+                  purchaseState.ctaLabel
                 ) : (
                   <span className="inline-flex items-center gap-2">
                     <Ticket className="w-4 h-4" aria-hidden />
