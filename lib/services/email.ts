@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { sendMail } from "@/lib/services/mailer";
+import { wrapSomnusEmail, SOMNUS_SUPPORT_EMAIL } from "@/lib/services/email-brand";
 
 export interface EmailOptions {
   to: string;
@@ -25,30 +26,24 @@ export async function sendVerificationCode(
   name: string,
   code: string
 ): Promise<boolean> {
-  const subject = "Código de verificación - Somnus";
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head><meta charset="utf-8"></head>
-    <body style="font-family: Arial, sans-serif; color: #333;">
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background: #2a2c30; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
-          <h1>Somnus</h1>
-          <p>Verificación de Email</p>
+  const subject = "Tu código Somnus";
+  const html = wrapSomnusEmail({
+    preheader: `Tu código de verificación es ${code}`,
+    heading: `Hola, ${name}.`,
+    subheading: "Usa este código para continuar. Caduca en 10 minutos.",
+    bodyHtml: `
+      <div style="margin:8px 0 4px 0;padding:22px 12px;background:#1A1A1A;border:1px solid #2C2C2C;border-radius:8px;text-align:center;">
+        <div style="font-family:Arial,Helvetica,sans-serif;color:#7BA3E8;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;">
+          Código
         </div>
-        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
-          <h2>Hola ${name},</h2>
-          <p>Tu código de verificación:</p>
-          <div style="background: #5B8DEF; color: white; font-size: 32px; font-weight: bold; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; letter-spacing: 8px;">
-            ${code}
-          </div>
-          <p>Este código expira en 10 minutos.</p>
+        <div style="margin-top:8px;font-family:Arial,Helvetica,sans-serif;color:#F4F4F4;font-size:32px;font-weight:700;letter-spacing:0.28em;">
+          ${code}
         </div>
       </div>
-    </body>
-    </html>
-  `;
-  const text = `Somnus — Hola ${name}, tu código es: ${code}. Expira en 10 minutos.`;
+    `,
+    footerNote: `Si no pediste este código, ignora el correo. ${SOMNUS_SUPPORT_EMAIL}`,
+  });
+  const text = `SOMNUS — Hola ${name}, tu código es: ${code}. Expira en 10 minutos.`;
   return sendEmail({ to: email, subject, html, text });
 }
 
@@ -57,32 +52,15 @@ export async function sendPasswordResetEmail(
   name: string,
   resetUrl: string
 ): Promise<boolean> {
-  const subject = "Restablecer contraseña - Somnus";
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head><meta charset="utf-8"></head>
-    <body style="font-family: Arial, sans-serif; color: #333;">
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background: #2a2c30; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
-          <h1>Somnus</h1>
-          <p>Restablecer contraseña</p>
-        </div>
-        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
-          <h2>Hola ${name},</h2>
-          <p>Haz clic en el botón para elegir una nueva contraseña:</p>
-          <p style="text-align: center; margin: 28px 0;">
-            <a href="${resetUrl}" style="background: #5B8DEF; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold;">
-              Restablecer contraseña
-            </a>
-          </p>
-          <p style="font-size: 12px; color: #666;">O copia este enlace:<br>${resetUrl}</p>
-          <p>El enlace expira en 1 hora. Si no lo pediste, ignora este correo.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `;
-  const text = `Somnus — Hola ${name}. Restablece tu contraseña aquí: ${resetUrl}`;
+  const subject = "Restablecer contraseña · Somnus";
+  const html = wrapSomnusEmail({
+    preheader: "Elige una nueva contraseña para tu cuenta Somnus",
+    heading: `Hola, ${name}.`,
+    subheading: "Este enlace caduca en 1 hora. Si no lo pediste, ignora el correo.",
+    bodyHtml: `<div style="height:8px;line-height:8px;font-size:0;">&nbsp;</div>`,
+    cta: { href: resetUrl, label: "Restablecer contraseña" },
+    footerNote: `O copia este enlace:<br>${resetUrl}`,
+  });
+  const text = `SOMNUS — Hola ${name}. Restablece tu contraseña aquí: ${resetUrl}`;
   return sendEmail({ to: email, subject, html, text });
 }

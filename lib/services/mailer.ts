@@ -12,15 +12,23 @@ function isLocalSmtpHost(host: string): boolean {
   return h === "localhost" || h === "127.0.0.1" || h === "::1";
 }
 
+function extractEmailAddress(value: string): string | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const angled = trimmed.match(/<([^>]+)>/);
+  if (angled?.[1]?.includes("@")) return angled[1].trim();
+  if (/^[^\s<>]+@[^\s<>]+$/.test(trimmed)) return trimmed;
+  return null;
+}
+
 export function resolveFromAddress(): string {
-  const emailFrom = process.env.EMAIL_FROM?.trim();
-  if (emailFrom) return emailFrom;
+  const emailFrom = process.env.EMAIL_FROM?.trim() || "";
   const email =
+    extractEmailAddress(emailFrom) ||
     process.env.SMTP_FROM_EMAIL?.trim() ||
     process.env.SMTP_USER?.trim() ||
     "tickets@somnus.live";
-  const name = process.env.SMTP_FROM_NAME?.trim() || "Somnus";
-  return `${name} <${email}>`;
+  return `Somnus <${email}>`;
 }
 
 function logSimulated(options: MailOptions, reason: string) {
