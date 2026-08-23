@@ -164,15 +164,37 @@ export async function POST(request: NextRequest) {
       if (!isMesaMode) {
         // MONEY_POOL: entrada del evento, sin tope
         const coverTypeId = pool.coverTicketTypeId || pool.ticketTypeId;
-        const coverRow = event.ticketTypes.find((t) => t.id === coverTypeId);
-        const coverPayload = coverRow
-          ? toInviteTicketPayload(coverRow, now)
+        const requestedId = requestedItems[0]?.ticketTypeId || "";
+        const coverRow =
+          event.ticketTypes.find((t) => t.id === coverTypeId) ||
+          event.ticketTypes.find((t) => t.id === requestedId);
+        let coverPayload = coverRow
+          ? toInviteTicketPayload(coverRow, now, { includeHidden: true })
           : null;
+        if (!coverPayload) {
+          const all = event.ticketTypes
+            .map((tt) =>
+              toInviteTicketPayload(tt, now, { includeHidden: true })
+            )
+            .filter((tt) => Boolean(tt));
+          coverPayload =
+            pickTicketsForInviteLink(all, coverTypeId)[0] ||
+            pickTicketsForInviteLink(all, requestedId)[0] ||
+            all.find((tt) => tt.kind === "STANDARD") ||
+            null;
+        }
         if (!coverPayload) {
           return NextResponse.json(
             { error: "La entrada de este money pool ya no está disponible." },
             { status: 400 }
           );
+        }
+        if (requestedId && requestedId !== coverPayload.id) {
+          const requestedRow = event.ticketTypes.find((t) => t.id === requestedId);
+          const requestedPayload = requestedRow
+            ? toInviteTicketPayload(requestedRow, now, { includeHidden: true })
+            : null;
+          if (requestedPayload) coverPayload = requestedPayload;
         }
 
         const qty =

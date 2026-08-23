@@ -17,6 +17,7 @@ import { RevenueDashboard } from "@/components/admin/RevenueDashboard";
 import { StaffManager } from "@/components/admin/StaffManager";
 import { VenuesManager } from "@/components/admin/VenuesManager";
 import { SqlEditorManager } from "@/components/admin/SqlEditorManager";
+import { CustomersManager } from "@/components/admin/CustomersManager";
 import {
   AdminSidebar,
   ADMIN_SECTION_META,
@@ -278,6 +279,12 @@ export default function AdminPage() {
             )}
 
             {activeSection === "equipo" && <StaffManager mode="admin" />}
+
+            {activeSection === "clientes" && (
+              <div className="liquid-glass p-4 sm:p-6 rounded-2xl">
+                <CustomersManager />
+              </div>
+            )}
 
             {activeSection === "venues" && <VenuesManager showOrganizer />}
 

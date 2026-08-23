@@ -13,6 +13,7 @@ import {
   TrendingUp,
   Percent,
   Database,
+  Users,
   X,
   ClipboardCheck,
   type LucideIcon,
@@ -30,7 +31,8 @@ export type AdminSection =
   | "contacto"
   | "comisiones"
   | "ingresos"
-  | "sql";
+  | "sql"
+  | "clientes";
 
 type NavItem = {
   id: AdminSection;
@@ -65,6 +67,7 @@ export const ADMIN_NAV: NavGroup[] = [
     items: [
       { id: "organizadores", label: "Organizers", icon: Building2 },
       { id: "equipo", label: "Team", icon: UserCog },
+      { id: "clientes", label: "Customers", icon: Users },
     ],
   },
   {
@@ -113,6 +116,10 @@ export const ADMIN_SECTION_META: Record<
   organizadores: {
     title: "Organizers",
     description: "Marketplace organizers, Stripe status, and their events.",
+  },
+  clientes: {
+    title: "Customers",
+    description: "Users, buyers, sales, and tickets from the database.",
   },
   equipo: {
     title: "Team",
