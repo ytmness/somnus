@@ -176,7 +176,9 @@ export async function POST(request: NextRequest) {
             .map((tt) =>
               toInviteTicketPayload(tt, now, { includeHidden: true })
             )
-            .filter((tt) => Boolean(tt));
+            .filter(
+              (tt): tt is NonNullable<typeof tt> => Boolean(tt)
+            );
           coverPayload =
             pickTicketsForInviteLink(all, coverTypeId)[0] ||
             pickTicketsForInviteLink(all, requestedId)[0] ||

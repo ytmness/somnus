@@ -76,7 +76,16 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    const byEmail = new Map();
+    const byEmail = new Map<
+      string,
+      {
+        email: string;
+        name: string | null;
+        phone: string | null;
+        user: (typeof users)[number] | null;
+        sales: (typeof sales)[number][];
+      }
+    >();
 
     for (const u of users) {
       const key = u.email.toLowerCase();
@@ -121,7 +130,7 @@ export async function GET(request: NextRequest) {
           }
         : null,
       saleCount: c.sales.length,
-      ticketCount: c.sales.reduce((n, s) => n + s.tickets.length, 0),
+      ticketCount: c.sales.reduce((n: number, s) => n + s.tickets.length, 0),
       sales: c.sales.map((s) => ({
         id: s.id,
         status: s.status,
