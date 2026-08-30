@@ -46,7 +46,11 @@ export async function GET(_request: NextRequest) {
     });
 
     const ticketTypeIds = Array.from(
-      new Set(sales.flatMap((s) => s.saleItems.map((i) => i.ticketTypeId)))
+      new Set(
+        sales
+          .flatMap((s) => s.saleItems.map((i) => i.ticketTypeId))
+          .filter((id): id is string => Boolean(id))
+      )
     );
     const ticketTypes = await prisma.ticketType.findMany({
       where: { id: { in: ticketTypeIds } },
@@ -78,9 +82,14 @@ export async function GET(_request: NextRequest) {
           saleItems: s.saleItems.map((i) => ({
             id: i.id,
             ticketTypeId: i.ticketTypeId,
-            ticketTypeName: ttMap[i.ticketTypeId] || "—",
+            ticketTypeName: i.ticketTypeId
+              ? ttMap[i.ticketTypeId] || "—"
+              : i.addOnId
+                ? "Add-on"
+                : "—",
             quantity: i.quantity,
             guestCount: i.guestCount,
+            addOnId: i.addOnId,
           })),
         };
       }),

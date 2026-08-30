@@ -4,6 +4,7 @@ import { resolvePublicRegistrationRole } from "@/lib/auth/registration";
 import { sendEmailOtp } from "@/lib/auth/otp";
 import { prisma } from "@/lib/db/prisma";
 import { registerSchema } from "@/lib/validations/schemas";
+import { applyReferralCodeForUser } from "@/lib/referrals/apply";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, name, phone, password } = result.data;
+    const { email, name, phone, password, referralCode } = result.data;
     const emailTrim = email.trim().toLowerCase();
     const userRole = resolvePublicRegistrationRole();
     const phoneClean = phone?.trim() || null;
@@ -42,6 +43,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const referralRaw =
+      referralCode?.trim() ||
+      (typeof body.ref === "string" ? body.ref.trim() : "") ||
+      "";
+
     const user = await prisma.user.create({
       data: {
         email: emailTrim,
@@ -53,6 +59,14 @@ export async function POST(request: NextRequest) {
         emailVerified: false,
       },
     });
+
+    // Register creates ORGANIZER role → attribution immediately
+    if (referralRaw) {
+      const applied = await applyReferralCodeForUser(user.id, referralRaw);
+      if (!applied.ok) {
+        console.warn("[REGISTER] referral apply:", applied.error);
+      }
+    }
 
     const otp = await sendEmailOtp(emailTrim, user.name);
     if (!otp.ok) {

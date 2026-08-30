@@ -2,7 +2,12 @@ import crypto from "crypto";
 import { prisma } from "@/lib/db/prisma";
 import { generateQRHash } from "@/lib/services/qr-generator";
 import { sendTicketsReceiptEmail } from "@/lib/services/tickets-email";
+import { notifyUserFollowers } from "@/lib/services/notifications";
 import { getAppUrl } from "@/lib/payments/config";
+import { generateTicketPDF } from "@/lib/services/ticket-generator";
+import { saveUploadBuffer } from "@/lib/storage/local";
+import { formatEventCalendarDate } from "@/lib/utils";
+import type { TicketCategory } from "@/types";
 
 export interface FulfillSaleParams {
   saleId: string;
@@ -54,6 +59,9 @@ export async function fulfillSale(
 
   if (sale.status === "COMPLETED") {
     await attemptSendReceiptEmail(saleId, sale);
+    await persistTicketPdfs(saleId).catch((err) => {
+      console.error("[fulfill-sale] PDF backfill error:", err);
+    });
     return { alreadyCompleted: true, saleId, ticketsCreated: sale.tickets.length };
   }
 
@@ -72,6 +80,16 @@ export async function fulfillSale(
 
   await prisma.$transaction(async (tx) => {
     for (const item of sale.saleItems) {
+      if (item.addOnId && !item.ticketTypeId) {
+        await tx.eventAddOn.update({
+          where: { id: item.addOnId },
+          data: { soldQuantity: { increment: item.quantity } },
+        });
+        continue;
+      }
+
+      if (!item.ticketTypeId) continue;
+
       const ticketType = await tx.ticketType.findUnique({
         where: { id: item.ticketTypeId },
       });
@@ -126,6 +144,13 @@ export async function fulfillSale(
 
         ticketsCreated++;
       }
+    }
+
+    if (sale.discountCodeId) {
+      await tx.discountCode.update({
+        where: { id: sale.discountCodeId },
+        data: { usedCount: { increment: 1 } },
+      });
     }
 
     await tx.sale.update({
@@ -209,8 +234,242 @@ export async function fulfillSale(
   });
 
   await attemptSendReceiptEmail(saleId, sale);
+  await persistTicketPdfs(saleId).catch((err) => {
+    console.error("[fulfill-sale] PDF generation error:", err);
+  });
+  await recordSocialAfterSale(saleId).catch((err) => {
+    console.error("[fulfill-sale] social post-sale error:", err);
+  });
+  await recordAttributionAfterSale(saleId).catch((err) => {
+    console.error("[fulfill-sale] attribution post-sale error:", err);
+  });
 
   return { alreadyCompleted: false, saleId, ticketsCreated };
+}
+
+/**
+ * Genera PDF por boleto, guarda bajo uploads/tickets/ y actualiza ticket.pdfUrl.
+ */
+async function persistTicketPdfs(saleId: string): Promise<void> {
+  const sale = await prisma.sale.findUnique({
+    where: { id: saleId },
+    include: {
+      event: true,
+      tickets: {
+        where: { pdfUrl: null },
+        include: { ticketType: true },
+        orderBy: { createdAt: "asc" },
+      },
+    },
+  });
+
+  if (!sale?.event || !sale.tickets.length) return;
+
+  const eventDate = formatEventCalendarDate(sale.event.eventDate, "es-MX");
+
+  for (const ticket of sale.tickets) {
+    try {
+      const pdfBuffer = await generateTicketPDF({
+        ticketId: ticket.id,
+        ticketNumber: ticket.ticketNumber,
+        qrCode: ticket.qrCode,
+        event: {
+          name: sale.event.name,
+          artist: sale.event.artist,
+          venue: sale.event.venue,
+          date: eventDate,
+          time: sale.event.eventTime,
+        },
+        ticketType: {
+          name: ticket.ticketType.name,
+          category: ticket.ticketType.category as TicketCategory,
+        },
+        buyer: {
+          name: sale.buyerName,
+          email: sale.buyerEmail,
+        },
+        tableNumber: ticket.tableNumber || undefined,
+        seatNumber: ticket.seatNumber ?? undefined,
+      });
+
+      const saved = await saveUploadBuffer({
+        buffer: pdfBuffer,
+        subdirectory: "tickets",
+        originalName: `${ticket.ticketNumber}.pdf`,
+        contentType: "application/pdf",
+      });
+
+      await prisma.ticket.update({
+        where: { id: ticket.id },
+        data: { pdfUrl: saved.publicUrl },
+      });
+    } catch (err) {
+      console.error(
+        `[fulfill-sale] PDF failed for ticket ${ticket.id}:`,
+        err
+      );
+    }
+  }
+}
+
+/**
+ * Incrementa stats de promoter/blast y revenue share de referidos.
+ */
+async function recordAttributionAfterSale(saleId: string) {
+  const sale = await prisma.sale.findUnique({
+    where: { id: saleId },
+    select: {
+      id: true,
+      total: true,
+      platformFeeAmount: true,
+      promoterLinkId: true,
+      campaignBlastId: true,
+      event: {
+        select: {
+          organizerId: true,
+          organizer: { select: { userId: true } },
+        },
+      },
+    },
+  });
+  if (!sale) return;
+
+  const saleTotal = Number(sale.total || 0);
+
+  if (sale.promoterLinkId) {
+    await prisma.promoterLink.update({
+      where: { id: sale.promoterLinkId },
+      data: {
+        salesCount: { increment: 1 },
+        salesAmount: { increment: saleTotal },
+      },
+    });
+  }
+
+  if (sale.campaignBlastId) {
+    await prisma.campaignBlast.update({
+      where: { id: sale.campaignBlastId },
+      data: {
+        salesCount: { increment: 1 },
+        salesAmount: { increment: saleTotal },
+      },
+    });
+  }
+
+  const platformFee = Number(sale.platformFeeAmount || 0);
+  const referredUserId = sale.event?.organizer?.userId;
+  if (platformFee > 0 && referredUserId) {
+    const now = new Date();
+    const attribution = await prisma.referralAttribution.findFirst({
+      where: {
+        referredOrganizerId: referredUserId,
+        isActive: true,
+        startsAt: { lte: now },
+        endsAt: { gte: now },
+      },
+    });
+    if (attribution) {
+      const sharePct = Number(attribution.revenueSharePct || 15);
+      const earned = Math.round(platformFee * (sharePct / 100) * 100) / 100;
+      if (earned > 0) {
+        await prisma.referralAttribution.update({
+          where: { id: attribution.id },
+          data: { totalEarned: { increment: earned } },
+        });
+      }
+    }
+  }
+}
+
+/**
+ * Tras completar la venta: EventAttendance, auto-follow org, notificar amigos.
+ */
+async function recordSocialAfterSale(saleId: string) {
+  const sale = await prisma.sale.findUnique({
+    where: { id: saleId },
+    select: {
+      userId: true,
+      buyerEmail: true,
+      buyerName: true,
+      channel: true,
+      eventId: true,
+      event: {
+        select: {
+          id: true,
+          name: true,
+          organizationId: true,
+        },
+      },
+    },
+  });
+
+  if (!sale?.event) return;
+
+  let buyerUserId: string | null = null;
+  let buyerName = sale.buyerName;
+
+  if (sale.buyerEmail) {
+    const byEmail = await prisma.user.findFirst({
+      where: { email: { equals: sale.buyerEmail, mode: "insensitive" } },
+      select: { id: true, name: true },
+    });
+    if (byEmail) {
+      buyerUserId = byEmail.id;
+      buyerName = byEmail.name || buyerName;
+    }
+  }
+
+  if (!buyerUserId && sale.userId && sale.channel === "ONLINE") {
+    buyerUserId = sale.userId;
+    const u = await prisma.user.findUnique({
+      where: { id: sale.userId },
+      select: { name: true },
+    });
+    if (u?.name) buyerName = u.name;
+  }
+
+  if (!buyerUserId) return;
+
+  await prisma.eventAttendance.upsert({
+    where: {
+      eventId_userId: { eventId: sale.eventId, userId: buyerUserId },
+    },
+    create: {
+      eventId: sale.eventId,
+      userId: buyerUserId,
+      isPublic: true,
+    },
+    update: {},
+  });
+
+  if (sale.event.organizationId) {
+    await prisma.organizationFollow.upsert({
+      where: {
+        userId_organizationId: {
+          userId: buyerUserId,
+          organizationId: sale.event.organizationId,
+        },
+      },
+      create: {
+        userId: buyerUserId,
+        organizationId: sale.event.organizationId,
+      },
+      update: {},
+    });
+  }
+
+  await notifyUserFollowers({
+    followingId: buyerUserId,
+    type: "FRIEND_JOINED_EVENT",
+    title: `${buyerName} va a un evento`,
+    body: `${buyerName} consiguió boletos para ${sale.event.name}`,
+    linkUrl: `/eventos/${sale.eventId}`,
+    metadata: {
+      eventId: sale.eventId,
+      buyerUserId,
+    },
+    excludeUserIds: [buyerUserId],
+  });
 }
 
 async function attemptSendReceiptEmail(

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db/prisma";
 import { canViewOwnTickets } from "@/lib/auth/registration";
 import { getSession } from "@/lib/auth/session";
 import { isWalletPassEnabled } from "@/lib/services/wallet-pass";
+import { isGoogleWalletConfigured } from "@/lib/services/google-wallet";
 
 // Marcar como dinámica porque usa cookies
 export const dynamic = 'force-dynamic';
@@ -104,6 +105,7 @@ export async function GET(request: NextRequest) {
         totalTickets: tickets.length,
         totalSales: sales.length,
         walletPassEnabled: isWalletPassEnabled(),
+        googleWalletEnabled: isGoogleWalletConfigured(),
       },
     });
   } catch (error) {

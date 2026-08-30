@@ -46,6 +46,17 @@ interface CartItem {
   guestCount?: number;
 }
 
+interface AddOnRow {
+  id: string;
+  name: string;
+  description?: string | null;
+  kind: string;
+  price: number;
+  maxQuantity: number | null;
+  soldQuantity: number;
+  available: number | null;
+}
+
 function isVisibleTicketType(tt: TicketTypeRow): boolean {
   if (tt.isHidden) return false;
   if (tt.isTable) return false;
@@ -109,6 +120,16 @@ export default function EventBoletosPage() {
   const [passwordTokens, setPasswordTokens] = useState<Record<string, string>>({});
   const [passwordVerifying, setPasswordVerifying] = useState<Record<string, boolean>>({});
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
+  const [addOns, setAddOns] = useState<AddOnRow[]>([]);
+  const [addOnQuantities, setAddOnQuantities] = useState<Record<string, number>>(
+    {}
+  );
+  const [discountCodeInput, setDiscountCodeInput] = useState("");
+  const [appliedDiscount, setAppliedDiscount] = useState<{
+    code: string;
+    discountAmount: number;
+  } | null>(null);
+  const [validatingDiscount, setValidatingDiscount] = useState(false);
 
   const loadEvent = async () => {
     try {
@@ -144,6 +165,23 @@ export default function EventBoletosPage() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!eventId) return;
+    fetch(`/api/events/${eventId}/addons`)
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.success && Array.isArray(json.data)) {
+          setAddOns(json.data);
+          const q: Record<string, number> = {};
+          json.data.forEach((a: AddOnRow) => {
+            q[a.id] = 0;
+          });
+          setAddOnQuantities(q);
+        }
+      })
+      .catch(() => {});
+  }, [eventId]);
 
   useEffect(() => {
     if (eventId) void loadEvent();
@@ -363,8 +401,22 @@ export default function EventBoletosPage() {
     setGlobalItems(globalItems.filter((i) => i.eventId !== eventId));
   };
 
-  const getSubtotal = () =>
+  const getTicketsSubtotal = () =>
     cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+
+  const getAddOnsSubtotal = () =>
+    addOns.reduce(
+      (sum, a) => sum + a.price * (addOnQuantities[a.id] || 0),
+      0
+    );
+
+  const getSubtotalBeforeDiscount = () =>
+    getTicketsSubtotal() + getAddOnsSubtotal();
+
+  const getDiscountAmount = () => appliedDiscount?.discountAmount ?? 0;
+
+  const getSubtotal = () =>
+    Math.max(0, getSubtotalBeforeDiscount() - getDiscountAmount());
 
   const getTotal = () => {
     const sub = getSubtotal();
@@ -375,6 +427,41 @@ export default function EventBoletosPage() {
   const getCommission = () => {
     const { totalCommission } = calculateServiceFee(getSubtotal());
     return totalCommission;
+  };
+
+  const applyDiscountCode = async () => {
+    const code = discountCodeInput.trim();
+    if (!code) {
+      setAppliedDiscount(null);
+      return;
+    }
+    setValidatingDiscount(true);
+    try {
+      const res = await fetch("/api/discounts/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code,
+          eventId,
+          subtotal: getSubtotalBeforeDiscount(),
+        }),
+      });
+      const json = await res.json();
+      if (!json.valid) {
+        setAppliedDiscount(null);
+        toast.error(json.error || "Código inválido");
+        return;
+      }
+      setAppliedDiscount({
+        code: json.code || code.toUpperCase(),
+        discountAmount: Number(json.discountAmount) || 0,
+      });
+      toast.success("Descuento aplicado");
+    } catch {
+      toast.error("No se pudo validar el código");
+    } finally {
+      setValidatingDiscount(false);
+    }
   };
 
   const checkoutPasswordTokens = useMemo(() => {
@@ -433,12 +520,21 @@ export default function EventBoletosPage() {
         };
       });
 
+      const addOnItems = addOns
+        .filter((a) => (addOnQuantities[a.id] || 0) > 0)
+        .map((a) => ({
+          addOnId: a.id,
+          quantity: addOnQuantities[a.id],
+        }));
+
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           eventId,
           items,
+          addOnItems,
+          discountCode: appliedDiscount?.code || discountCodeInput.trim() || undefined,
           passwordTokens: checkoutPasswordTokens,
           buyerName: checkoutData.buyerName,
           buyerEmail: checkoutData.buyerEmail,
@@ -454,6 +550,15 @@ export default function EventBoletosPage() {
       if (data.data?.saleId) {
         toast.success("Redirecting to payment…");
         clearEventCart();
+        setAddOnQuantities((prev) => {
+          const next = { ...prev };
+          Object.keys(next).forEach((k) => {
+            next[k] = 0;
+          });
+          return next;
+        });
+        setAppliedDiscount(null);
+        setDiscountCodeInput("");
         setShowCart(false);
         setShowCheckoutModal(false);
         router.push(`/checkout/${data.data.saleId}`);
@@ -806,6 +911,78 @@ export default function EventBoletosPage() {
                   })}
                 </div>
 
+                {addOns.length > 0 && (
+                  <div className="mb-8 mt-10">
+                    <h2 className="somnus-title-secondary text-xl mb-4">
+                      Add-ons
+                    </h2>
+                    <div className="space-y-3">
+                      {addOns.map((a) => {
+                        const qty = addOnQuantities[a.id] || 0;
+                        const max =
+                          a.available == null
+                            ? 20
+                            : Math.max(0, a.available);
+                        const disabled = max <= 0;
+                        return (
+                          <div
+                            key={a.id}
+                            className={`liquid-glass p-4 rounded-2xl flex items-center justify-between gap-4 ${
+                              disabled ? "opacity-60" : ""
+                            }`}
+                          >
+                            <div className="min-w-0">
+                              <p className="text-white font-medium">{a.name}</p>
+                              {a.description && (
+                                <p className="text-white/55 text-sm">
+                                  {a.description}
+                                </p>
+                              )}
+                              <p className="text-white/80 text-sm tabular-nums mt-1">
+                                ${a.price.toLocaleString("en-US")} MXN
+                              </p>
+                            </div>
+                            {!disabled && (
+                              <div className="flex items-center gap-1 border border-white/20 rounded-lg shrink-0">
+                                <button
+                                  type="button"
+                                  aria-label={`Decrease ${a.name}`}
+                                  onClick={() =>
+                                    setAddOnQuantities((p) => ({
+                                      ...p,
+                                      [a.id]: Math.max(0, (p[a.id] || 0) - 1),
+                                    }))
+                                  }
+                                  className="p-2 text-white/80 hover:text-white"
+                                >
+                                  <Minus className="w-4 h-4" aria-hidden />
+                                </button>
+                                <span className="px-3 text-white tabular-nums min-w-[2rem] text-center">
+                                  {qty}
+                                </span>
+                                <button
+                                  type="button"
+                                  aria-label={`Increase ${a.name}`}
+                                  disabled={qty >= max}
+                                  onClick={() =>
+                                    setAddOnQuantities((p) => ({
+                                      ...p,
+                                      [a.id]: Math.min(max, (p[a.id] || 0) + 1),
+                                    }))
+                                  }
+                                  className="p-2 text-white/80 hover:text-white disabled:opacity-40"
+                                >
+                                  <Plus className="w-4 h-4" aria-hidden />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div className="hidden sm:flex flex-col sm:flex-row gap-4">
                   <Button
                     type="button"
@@ -917,10 +1094,57 @@ export default function EventBoletosPage() {
               )}
               {cartItems.length > 0 && (
                 <div className="mt-6 space-y-3">
+                  {addOns
+                    .filter((a) => (addOnQuantities[a.id] || 0) > 0)
+                    .map((a) => (
+                      <div
+                        key={a.id}
+                        className="flex justify-between text-white/70 text-sm"
+                      >
+                        <span>
+                          {a.name} × {addOnQuantities[a.id]}
+                        </span>
+                        <span className="tabular-nums">
+                          $
+                          {(a.price * (addOnQuantities[a.id] || 0)).toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Código de descuento"
+                      value={discountCodeInput}
+                      onChange={(e) => {
+                        setDiscountCodeInput(e.target.value);
+                        setAppliedDiscount(null);
+                      }}
+                      className="somnus-input flex-1 text-sm"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={validatingDiscount}
+                      onClick={() => void applyDiscountCode()}
+                      className="border-white/30 text-white bg-transparent shrink-0"
+                    >
+                      Aplicar
+                    </Button>
+                  </div>
                   <div className="flex justify-between text-white/70">
                     <span>Subtotal</span>
-                    <span className="tabular-nums">${getSubtotal().toLocaleString()}</span>
+                    <span className="tabular-nums">
+                      ${getSubtotalBeforeDiscount().toLocaleString()}
+                    </span>
                   </div>
+                  {appliedDiscount && (
+                    <div className="flex justify-between text-emerald-300/90 text-sm">
+                      <span>Descuento ({appliedDiscount.code})</span>
+                      <span className="tabular-nums">
+                        −${appliedDiscount.discountAmount.toLocaleString()}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-white/70">
                     <span>Service fee</span>
                     <span className="tabular-nums">
@@ -1033,8 +1257,18 @@ export default function EventBoletosPage() {
               <div className="liquid-glass p-4 rounded-xl mt-4 space-y-2">
                 <div className="flex justify-between text-white/70">
                   <span>Subtotal</span>
-                  <span className="tabular-nums">${getSubtotal().toLocaleString()}</span>
+                  <span className="tabular-nums">
+                    ${getSubtotalBeforeDiscount().toLocaleString()}
+                  </span>
                 </div>
+                {appliedDiscount && (
+                  <div className="flex justify-between text-emerald-300/90 text-sm">
+                    <span>Descuento ({appliedDiscount.code})</span>
+                    <span className="tabular-nums">
+                      −${appliedDiscount.discountAmount.toLocaleString()}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between text-white/70">
                   <span>Service fee</span>
                   <span className="tabular-nums">

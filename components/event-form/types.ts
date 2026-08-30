@@ -9,10 +9,55 @@ import {
 export type EventFormMode = "admin" | "organizer";
 export type { ImageFraming };
 export type TicketKind = "STANDARD" | "TABLE";
+export type EventFormStatus = "DRAFT" | "PUBLISHED";
+
+export const EVENT_FORM_CURRENCIES = [
+  "MXN",
+  "USD",
+  "EUR",
+  "COP",
+  "ARS",
+  "CLP",
+  "PEN",
+  "BRL",
+  "GBP",
+] as const;
+export type EventFormCurrency = (typeof EVENT_FORM_CURRENCIES)[number];
+
+export const EVENT_FORM_TIMEZONES = [
+  "America/Mexico_City",
+  "America/Bogota",
+  "America/Lima",
+  "America/Santiago",
+  "America/Buenos_Aires",
+  "America/Sao_Paulo",
+  "America/New_York",
+  "America/Los_Angeles",
+  "Europe/Madrid",
+  "UTC",
+] as const;
 
 export interface OrganizationOption {
   id: string;
   name: string;
+}
+
+export interface ArtistForm {
+  name: string;
+  instagramUrl: string;
+  spotifyUrl: string;
+  imageUrl: string;
+  sortOrder: number;
+}
+
+export function createEmptyArtist(sortOrder = 0): ArtistForm {
+  return {
+    name: "",
+    instagramUrl: "",
+    spotifyUrl: "",
+    imageUrl: "",
+    sortOrder,
+  };
 }
 
 export interface TicketTypeForm {
@@ -58,8 +103,22 @@ export interface EventFormData {
   tour: string;
   venue: string;
   address: string;
+  city: string;
   eventDate: string;
   eventTime: string;
+  endDate: string;
+  endTime: string;
+  timezone: string;
+  currency: EventFormCurrency;
+  externalUrl: string;
+  videoUrl: string;
+  songId: string;
+  songTitle: string;
+  songArtist: string;
+  songPreviewUrl: string;
+  status: EventFormStatus;
+  membersOnly: boolean;
+  artists: ArtistForm[];
   imageUrl: string;
   imagePosX: number;
   imagePosY: number;
@@ -116,8 +175,22 @@ export function createInitialFormData(
     tour: "",
     venue: "",
     address: "",
+    city: "",
     eventDate: "",
     eventTime: "",
+    endDate: "",
+    endTime: "",
+    timezone: "America/Mexico_City",
+    currency: "MXN",
+    externalUrl: "",
+    videoUrl: "",
+    songId: "",
+    songTitle: "",
+    songArtist: "",
+    songPreviewUrl: "",
+    status: "PUBLISHED",
+    membersOnly: false,
+    artists: [],
     imageUrl: "",
     imagePosX: DEFAULT_IMAGE_FRAMING.posX,
     imagePosY: DEFAULT_IMAGE_FRAMING.posY,
@@ -155,8 +228,34 @@ export function mapApiEventToFormData(event: {
   tour?: string | null;
   venue: string;
   address?: string | null;
+  city?: string | null;
   eventDate: string | Date;
   eventTime: string;
+  endDate?: string | Date | null;
+  endTime?: string | null;
+  timezone?: string | null;
+  currency?: string | null;
+  externalUrl?: string | null;
+  videoUrl?: string | null;
+  songId?: string | null;
+  songTitle?: string | null;
+  songArtist?: string | null;
+  songPreviewUrl?: string | null;
+  status?: string | null;
+  membersOnly?: boolean | null;
+  artists?: Array<{
+    sortOrder?: number;
+    artist?: {
+      name: string;
+      instagramUrl?: string | null;
+      spotifyUrl?: string | null;
+      imageUrl?: string | null;
+    };
+    name?: string;
+    instagramUrl?: string | null;
+    spotifyUrl?: string | null;
+    imageUrl?: string | null;
+  }>;
   imageUrl?: string | null;
   imagePosX?: number | null;
   imagePosY?: number | null;
@@ -207,6 +306,26 @@ export function mapApiEventToFormData(event: {
   const tickets = (event.ticketTypes || []).filter(
     (tt) => tt.kind !== "TABLE" && !tt.isTable
   );
+  const currencyRaw = (event.currency || "MXN").toUpperCase();
+  const currency = (EVENT_FORM_CURRENCIES as readonly string[]).includes(
+    currencyRaw
+  )
+    ? (currencyRaw as EventFormCurrency)
+    : "MXN";
+  const status: EventFormStatus =
+    event.status === "DRAFT" ? "DRAFT" : "PUBLISHED";
+
+  const mappedArtists: ArtistForm[] = (event.artists || []).map((row, i) => {
+    const a = row.artist || row;
+    return {
+      name: a.name || "",
+      instagramUrl: a.instagramUrl || "",
+      spotifyUrl: a.spotifyUrl || "",
+      imageUrl: a.imageUrl || "",
+      sortOrder: row.sortOrder ?? i,
+    };
+  });
+
   return {
     name: event.name || "",
     description: event.description || "",
@@ -214,8 +333,22 @@ export function mapApiEventToFormData(event: {
     tour: event.tour || "",
     venue: event.venue || "",
     address: event.address || "",
+    city: event.city || "",
     eventDate: toDateInputValue(event.eventDate),
     eventTime: event.eventTime || "",
+    endDate: event.endDate ? toDateInputValue(event.endDate) : "",
+    endTime: event.endTime || "",
+    timezone: event.timezone || "America/Mexico_City",
+    currency,
+    externalUrl: event.externalUrl || "",
+    videoUrl: event.videoUrl || "",
+    songId: event.songId || "",
+    songTitle: event.songTitle || "",
+    songArtist: event.songArtist || "",
+    songPreviewUrl: event.songPreviewUrl || "",
+    status,
+    membersOnly: Boolean(event.membersOnly),
+    artists: mappedArtists,
     imageUrl: event.imageUrl || "",
     ...(() => {
       const f = normalizeImageFraming({
@@ -447,6 +580,45 @@ function ticketPayloadFields(
   };
 }
 
+function optionalStr(v: string): string | undefined {
+  const t = v.trim();
+  return t ? t : undefined;
+}
+
+function artistsPayload(artists: ArtistForm[]) {
+  return artists
+    .filter((a) => a.name.trim())
+    .map((a, i) => ({
+      name: a.name.trim(),
+      instagramUrl: optionalStr(a.instagramUrl),
+      spotifyUrl: optionalStr(a.spotifyUrl),
+      imageUrl: optionalStr(a.imageUrl),
+      sortOrder: a.sortOrder ?? i,
+    }));
+}
+
+function eventExtrasPayload(data: EventFormData) {
+  const status = data.status;
+  const isActive = status === "DRAFT" ? false : data.isActive;
+  return {
+    city: optionalStr(data.city),
+    endDate: data.endDate || undefined,
+    endTime: optionalStr(data.endTime),
+    timezone: data.timezone || "America/Mexico_City",
+    currency: data.currency || "MXN",
+    externalUrl: optionalStr(data.externalUrl),
+    videoUrl: optionalStr(data.videoUrl),
+    songId: optionalStr(data.songId),
+    songTitle: optionalStr(data.songTitle),
+    songArtist: optionalStr(data.songArtist),
+    songPreviewUrl: optionalStr(data.songPreviewUrl),
+    status,
+    membersOnly: Boolean(data.membersOnly),
+    artists: artistsPayload(data.artists),
+    isActive,
+  };
+}
+
 export function buildCreateEventPayload(data: EventFormData, _mode: EventFormMode) {
   return {
     name: data.name,
@@ -465,7 +637,7 @@ export function buildCreateEventPayload(data: EventFormData, _mode: EventFormMod
     salesStartDate: toEventSalesIso(data.salesStartDate),
     salesEndDate: toEventSalesIso(data.salesEndDate),
     organizationId: data.organizationId || undefined,
-    isActive: data.isActive,
+    ...eventExtrasPayload(data),
     ticketTypes: data.ticketTypes.map((tt) => ticketPayloadFields(tt, data)),
   };
 }
@@ -487,7 +659,7 @@ export function buildUpdateEventPayload(data: EventFormData, mode: EventFormMode
     maxCapacity: Number(data.maxCapacity) || 0,
     salesStartDate: toEventSalesIso(data.salesStartDate),
     salesEndDate: toEventSalesIso(data.salesEndDate),
-    isActive: data.isActive,
+    ...eventExtrasPayload(data),
     ...(mode === "admin" && data.organizationId
       ? { organizationId: data.organizationId }
       : mode === "organizer"

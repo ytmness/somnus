@@ -3,6 +3,10 @@ import path from "node:path";
 import { PKPass } from "passkit-generator";
 import { prisma } from "@/lib/db/prisma";
 import { generateQRPayload } from "@/lib/services/qr-generator";
+import {
+  eventPassRelevantDate,
+  formatWalletPassEventDate,
+} from "@/lib/utils";
 
 /**
  * Generación de pases .pkpass para Apple Wallet.
@@ -94,23 +98,6 @@ export function isWalletPassEnabled(): boolean {
   return resolveConfig() !== null;
 }
 
-const DATE_FORMATTER = new Intl.DateTimeFormat("es-MX", {
-  weekday: "short",
-  day: "numeric",
-  month: "short",
-  timeZone: "America/Mexico_City",
-});
-
-/** Combina la fecha del evento con su hora "HH:mm" para `relevantDate`. */
-function toRelevantDate(eventDate: Date, eventTime: string | null): Date {
-  const relevant = new Date(eventDate);
-  const match = /^(\d{1,2}):(\d{2})/.exec(eventTime ?? "");
-  if (match) {
-    relevant.setHours(Number(match[1]), Number(match[2]), 0, 0);
-  }
-  return relevant;
-}
-
 export interface TicketPassResult {
   buffer: Buffer;
   fileName: string;
@@ -200,7 +187,7 @@ export async function buildTicketPass(
     {
       key: "date",
       label: "FECHA",
-      value: DATE_FORMATTER.format(event.eventDate),
+      value: formatWalletPassEventDate(event.eventDate),
     },
     {
       key: "time",
@@ -252,10 +239,10 @@ export async function buildTicketPass(
     message: generateQRPayload(ticket.id, ticket.qrCode),
     format: "PKBarcodeFormatQR",
     messageEncoding: "iso-8859-1",
-    altText: ticket.ticketNumber,
   });
 
-  pass.setRelevantDate(toRelevantDate(event.eventDate, event.eventTime));
+  const relevant = eventPassRelevantDate(event.eventDate, event.eventTime);
+  pass.setRelevantDate(relevant);
 
   if (ticketType.validUntil) {
     pass.setExpirationDate(ticketType.validUntil);

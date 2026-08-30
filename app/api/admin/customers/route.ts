@@ -12,6 +12,9 @@ export async function GET(request: NextRequest) {
     }
 
     const q = (request.nextUrl.searchParams.get("q") || "").trim();
+    const ticketFilter = q
+      ? { tickets: { some: { ticketNumber: { contains: q, mode: "insensitive" as const } } } }
+      : null;
 
     const [users, sales] = await Promise.all([
       prisma.user.findMany({
@@ -44,6 +47,7 @@ export async function GET(request: NextRequest) {
                 { buyerName: { contains: q, mode: "insensitive" } },
                 { buyerEmail: { contains: q, mode: "insensitive" } },
                 { buyerPhone: { contains: q, mode: "insensitive" } },
+                ticketFilter!,
               ],
             }
           : undefined,

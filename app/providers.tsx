@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Toaster } from "sonner";
 import { CartProvider } from "@/components/cart/CartContext";
 import { NativeShell } from "@/components/native/NativeShell";
+import { RegisterSW } from "@/components/pwa/RegisterSW";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -24,6 +25,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <SessionProvider basePath="/api/authjs">
       <QueryClientProvider client={queryClient}>
         <CartProvider>
+          <RegisterSW />
           <NativeShell />
           {children}
           <Toaster position="top-right" richColors />

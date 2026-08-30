@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
+import { getSession } from "@/lib/auth/session";
+import { canManageTable } from "@/lib/auth/permissions";
 import { ticketTypeInclude } from "@/lib/ticket-type-persist";
 import { toInviteTicketPayload, pickTicketsForInviteLink, openInviteTableTickets } from "@/lib/invite-tickets";
 import {
@@ -174,7 +176,9 @@ export async function GET(
       // Money pool: entrada sin tope + N pagos para confirmar
       const coverSource = pool.coverTicketType || null;
       coverTicket = coverSource
-        ? toInviteTicketPayload(coverSource as any, new Date())
+        ? toInviteTicketPayload(coverSource as any, new Date(), {
+            includeHidden: true,
+          })
         : null;
       if (!coverTicket) {
         const fallback = await loadInviteTicketTypes(
@@ -212,7 +216,9 @@ export async function GET(
       );
 
       if (pool.coverTicketType) {
-        coverTicket = toInviteTicketPayload(pool.coverTicketType as any, new Date());
+        coverTicket = toInviteTicketPayload(pool.coverTicketType as any, new Date(), {
+          includeHidden: true,
+        });
       }
 
       if (mesaFilled && coverTicket) {
@@ -289,6 +295,13 @@ export async function GET(
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const payUrl = mesaPagarUrl(baseUrl, pool.eventId, pool.tableNumber, token);
 
+    const sessionUser = await getSession();
+    const canViewPoolFinancials = await canManageTable(
+      sessionUser,
+      pool.eventId,
+      pool.tableNumber
+    );
+
     return NextResponse.json({
       success: true,
       data: {
@@ -314,8 +327,14 @@ export async function GET(
         minPaidToConfirm: isMesaMode ? cupos : minToConfirm,
         paidCount: isMesaMode ? paidShareCount : paidCount,
         paidCoverCount,
-        totalCollected,
-        paymentTimeline,
+        canViewPoolFinancials,
+        ...(canViewPoolFinancials
+          ? { totalCollected, paymentTimeline }
+          : {
+              paymentTimeline: paymentTimeline.map(
+                ({ amount: _amount, ...entry }) => entry
+              ),
+            }),
         tableConfirmed,
         expiresAt: pool.expiresAt?.toISOString() ?? null,
         eventId: pool.eventId,

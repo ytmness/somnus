@@ -16,6 +16,9 @@ import {
   Users,
   X,
   ClipboardCheck,
+  Megaphone,
+  Handshake,
+  UsersRound,
   type LucideIcon,
 } from "lucide-react";
 
@@ -27,8 +30,11 @@ export type AdminSection =
   | "venues"
   | "galeria"
   | "invites"
+  | "guestlist"
   | "aprobaciones"
   | "contacto"
+  | "blasts"
+  | "promoters"
   | "comisiones"
   | "ingresos"
   | "sql"
@@ -67,7 +73,7 @@ export const ADMIN_NAV: NavGroup[] = [
     items: [
       { id: "organizadores", label: "Organizers", icon: Building2 },
       { id: "equipo", label: "Team", icon: UserCog },
-      { id: "clientes", label: "Customers", icon: Users },
+      { id: "clientes", label: "Clientes", icon: Users },
     ],
   },
   {
@@ -76,6 +82,9 @@ export const ADMIN_NAV: NavGroup[] = [
     items: [
       { id: "galeria", label: "Gallery", icon: ImageIcon },
       { id: "invites", label: "Table invites", icon: Link2 },
+      { id: "guestlist", label: "Guest list", icon: UsersRound },
+      { id: "blasts", label: "Blasts", icon: Megaphone },
+      { id: "promoters", label: "Promoters", icon: Handshake },
       { id: "aprobaciones", label: "Approvals", icon: ClipboardCheck },
       { id: "contacto", label: "Contact", icon: Mail },
     ],
@@ -118,8 +127,8 @@ export const ADMIN_SECTION_META: Record<
     description: "Marketplace organizers, Stripe status, and their events.",
   },
   clientes: {
-    title: "Customers",
-    description: "Users, buyers, sales, and tickets from the database.",
+    title: "Clientes",
+    description: "Compradores, cuentas y boletos emitidos.",
   },
   equipo: {
     title: "Team",
@@ -135,6 +144,10 @@ export const ADMIN_SECTION_META: Record<
     description:
       "Generate per-seat payment links from event, table, total price, and guest count.",
   },
+  guestlist: {
+    title: "Guest list",
+    description: "Cortesías y accesos gratuitos con link de canje.",
+  },
   aprobaciones: {
     title: "Pending approvals",
     description:
@@ -143,6 +156,16 @@ export const ADMIN_SECTION_META: Record<
   contacto: {
     title: "Contact",
     description: "People who submitted the contact form on the homepage.",
+  },
+  blasts: {
+    title: "Blasts",
+    description:
+      "SMS, push, and email campaigns to past buyers of an event with tracking links.",
+  },
+  promoters: {
+    title: "Promoters",
+    description:
+      "Tracking links, click attribution, and sales commission for event promoters.",
   },
   ingresos: {
     title: "Revenue",

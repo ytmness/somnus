@@ -25,7 +25,7 @@ import {
 type PaymentTimelineEntry = {
   order: number;
   name: string;
-  amount: number;
+  amount?: number;
   paidAt: string | null;
   seatNumber: number;
   isCover?: boolean;
@@ -48,6 +48,7 @@ type InviteData = {
   tableConfirmed?: boolean;
   pricePerSeat?: number;
   totalCollected?: number;
+  canViewPoolFinancials?: boolean;
   remaining?: number;
   tablePrice?: number | null;
   coverTicketTypeId?: string | null;
@@ -158,7 +159,7 @@ export default function PagarInvitePage() {
 
   const loadInvite = useCallback(async () => {
     if (!token) return null;
-    const res = await fetch(`/api/invites/${token}`);
+    const res = await fetch(`/api/invites/${token}`, { credentials: "include" });
     const data = await res.json();
     if (!res.ok) {
       return { error: data.error || "Invitación no encontrada" as string };
@@ -358,6 +359,7 @@ export default function PagarInvitePage() {
   }
 
   const priceFormatted = mxn.format(invite.pricePerSeat ?? 0);
+  const showPoolFinancials = invite.canViewPoolFinancials === true;
   const totalCollected = invite.totalCollected ?? 0;
   const timeline = invite.paymentTimeline ?? [];
   const paidCount = invite.paidCount ?? 0;
@@ -567,12 +569,14 @@ export default function PagarInvitePage() {
                     </span>
                   </p>
                 )}
-                <p>
-                  Recaudado{" "}
-                  <span className="text-white/80 tabular-nums">
-                    {mxn.format(totalCollected)}
-                  </span>
-                </p>
+                {showPoolFinancials ? (
+                  <p>
+                    Recaudado{" "}
+                    <span className="text-white/80 tabular-nums">
+                      {mxn.format(totalCollected)}
+                    </span>
+                  </p>
+                ) : null}
               </div>
             ) : (
               coverTicket && (
@@ -586,12 +590,14 @@ export default function PagarInvitePage() {
                     </span>{" "}
                     c/u
                   </p>
-                  <p>
-                    Recaudado{" "}
-                    <span className="text-white/80 tabular-nums">
-                      {mxn.format(totalCollected)}
-                    </span>
-                  </p>
+                  {showPoolFinancials ? (
+                    <p>
+                      Recaudado{" "}
+                      <span className="text-white/80 tabular-nums">
+                        {mxn.format(totalCollected)}
+                      </span>
+                    </p>
+                  ) : null}
                 </div>
               )
             )}
@@ -676,9 +682,12 @@ export default function PagarInvitePage() {
                               {entry.paidAt ? ` · ${formatPaidAt(entry.paidAt)}` : ""}
                             </p>
                           </div>
-                          <p className="text-[#7BA3E8] font-bold tabular-nums text-base sm:text-right flex-shrink-0">
-                            {mxn.format(entry.amount)}
-                          </p>
+                          {showPoolFinancials &&
+                          typeof entry.amount === "number" ? (
+                            <p className="text-[#7BA3E8] font-bold tabular-nums text-base sm:text-right flex-shrink-0">
+                              {mxn.format(entry.amount)}
+                            </p>
+                          ) : null}
                         </div>
                       </div>
                     </li>

@@ -45,6 +45,8 @@ model User {
   bio                String?  @db.VarChar(500)
   instagramUsername  String?  @db.VarChar(64)
   smsOptIn           Boolean  @default(false)
+  pushToken          String?  // FCM / APNs device token
+  referredByCode     String?  // referral code used at signup
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -65,6 +67,13 @@ model User {
   notifications       Notification[]
   otpCodes            OtpCode[]
   passwordResetTokens PasswordResetToken[]
+  following           UserFollow[]      @relation("Following")
+  followers           UserFollow[]      @relation("Followers")
+  eventAttendances    EventAttendance[]
+  memberships         OrgMembership[]
+  promoterLinks       PromoterLink[]
+  referralCode        ReferralCode?
+  contactImports      ContactImport[]
 
   @@index([email])
   @@index([role])
@@ -150,20 +159,26 @@ model Organization {
   bannerUrl    String?
   websiteUrl   String?
   instagramUrl String?
+  city         String?
+  isVerified   Boolean  @default(false)
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  organizer     Organizer            @relation(fields: [organizerId], references: [id], onDelete: Cascade)
-  events        Event[]
-  memberships   StaffMembership[]
-  followers     OrganizationFollow[]
-  posts         OrganizationPost[]
-  conversations Conversation[]
+  organizer       Organizer            @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  events          Event[]
+  memberships     StaffMembership[]
+  followers       OrganizationFollow[]
+  posts           OrganizationPost[]
+  conversations   Conversation[]
+  membershipPlans MembershipPlan[]
+  orgMemberships  OrgMembership[]
 
   @@index([organizerId])
   @@index([isActive])
   @@index([slug])
+  @@index([city])
+  @@index([isVerified])
 }
 
 // =====================================================
@@ -246,6 +261,10 @@ enum NotificationType {
   NEW_POST
   ORG_ANNOUNCEMENT
   NEW_EVENT
+  FRIEND_JOINED_EVENT
+  NEW_USER_FOLLOWER
+  MEMBERSHIP_ACTIVE
+  BLAST_SENT
 }
 
 model Notification {
@@ -406,16 +425,35 @@ model CommissionRule {
 // EVENTOS
 // =====================================================
 
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+}
+
 model Event {
-  id                String   @id @default(uuid())
+  id                String      @id @default(uuid())
   name              String
-  description       String?
+  description       String?     @db.Text // rich HTML allowed
   artist            String
   tour              String?
   venue             String
   address           String?
+  city              String?
   eventDate         DateTime
   eventTime         String
+  endDate           DateTime?
+  endTime           String?
+  timezone          String      @default("America/Mexico_City")
+  currency          String      @default("MXN") // ISO 4217
+  externalUrl       String?
+  videoUrl          String?     // YouTube URL
+  songId            String?     // Apple Music / catalog id
+  songTitle         String?
+  songArtist        String?
+  songPreviewUrl    String?
+  status            EventStatus @default(PUBLISHED)
+  membersOnly       Boolean     @default(false) // require active org membership
   imageUrl          String?
   /// Focal point X for poster crop (0–100, CSS object-position %)
   imagePosX         Float    @default(50)
@@ -445,6 +483,15 @@ model Event {
   tableInvitePools  TableInvitePool[]
   commissionRule    CommissionRule?
   staffMemberships  StaffMembership[]
+  artists           EventArtist[]
+  galleryImages     EventGalleryImage[]
+  attendances       EventAttendance[]
+  discountCodes     DiscountCode[]
+  addOns            EventAddOn[]
+  paymentLinks      PaymentLink[]
+  guestListEntries  GuestListEntry[]
+  campaignBlasts    CampaignBlast[]
+  promoterLinks     PromoterLink[]
 
   @@index([eventDate])
   @@index([isActive])
@@ -452,6 +499,9 @@ model Event {
   @@index([organizerId])
   @@index([organizationId])
   @@index([venueId])
+  @@index([city])
+  @@index([status])
+  @@index([currency])
 }
 
 // =====================================================
@@ -501,6 +551,10 @@ model TicketType {
   depositEnabled         Boolean    @default(false)
   depositPercent         Int?
   variablePricingEnabled Boolean    @default(false)
+  /// Membership gating / early access
+  membersOnly            Boolean    @default(false)
+  earlyAccessMembersOnly Boolean    @default(false)
+  earlyAccessEndsAt      DateTime?
   
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
@@ -631,6 +685,14 @@ model Sale {
   balanceDueCents      Int?
   balancePaidAt        DateTime?
   balancePayToken      String?   @unique
+
+  // Descuentos / atribución
+  discountCodeId       String?
+  discountAmount       Decimal?  @db.Decimal(10, 2)
+  currency             String    @default("MXN")
+  promoterLinkId       String?
+  campaignBlastId      String?
+  paymentLinkId        String?
   
   createdAt           DateTime    @default(now())
   updatedAt           DateTime    @updatedAt
@@ -641,6 +703,10 @@ model Sale {
   saleItems         SaleItem[]
   tickets           Ticket[]
   tableSlotInvite   TableSlotInvite? @relation(fields: [tableSlotInviteId], references: [id])
+  discountCode      DiscountCode?    @relation(fields: [discountCodeId], references: [id], onDelete: SetNull)
+  promoterLink      PromoterLink?    @relation(fields: [promoterLinkId], references: [id], onDelete: SetNull)
+  campaignBlast     CampaignBlast?   @relation(fields: [campaignBlastId], references: [id], onDelete: SetNull)
+  paymentLink       PaymentLink?     @relation(fields: [paymentLinkId], references: [id], onDelete: SetNull)
 
   @@index([eventId])
   @@index([status])
@@ -651,21 +717,27 @@ model Sale {
   @@index([providerStatus])
   @@index([approvalStatus])
   @@index([balancePayToken])
+  @@index([discountCodeId])
+  @@index([promoterLinkId])
+  @@index([campaignBlastId])
 }
 
 // Líneas de la venta (antes de pagar, para recrear tickets)
 model SaleItem {
   id            String   @id @default(uuid())
   saleId        String
-  ticketTypeId  String
+  ticketTypeId  String?
+  addOnId       String?
   quantity      Int
   isTable       Boolean  @default(false)
   tableNumber   String?
   guestCount    Int?     // tamaño de grupo (precio variable en mesas nuevas)
 
-  sale          Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  sale          Sale       @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  addOn         EventAddOn? @relation(fields: [addOnId], references: [id], onDelete: SetNull)
 
   @@index([saleId])
+  @@index([addOnId])
 }
 
 // =====================================================
@@ -975,4 +1047,403 @@ model PaymentWebhookEvent {
 
   @@index([provider, type])
   @@index([saleId])
+}
+
+// =====================================================
+// ARTISTAS / LINEUP
+// =====================================================
+
+model Artist {
+  id            String   @id @default(uuid())
+  name          String
+  slug          String   @unique
+  imageUrl      String?
+  instagramUrl  String?
+  spotifyUrl    String?
+  bio           String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  events EventArtist[]
+
+  @@index([name])
+  @@index([slug])
+}
+
+model EventArtist {
+  id        String   @id @default(uuid())
+  eventId   String
+  artistId  String
+  sortOrder Int      @default(0)
+  role      String?  // headliner, support, etc.
+  createdAt DateTime @default(now())
+
+  event  Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, artistId])
+  @@index([eventId])
+  @@index([artistId])
+}
+
+// =====================================================
+// GALERÍA POR EVENTO
+// =====================================================
+
+model EventGalleryImage {
+  id        String   @id @default(uuid())
+  eventId   String
+  url       String
+  alt       String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+}
+
+// =====================================================
+// SOCIAL: SEGUIR USUARIOS + ASISTENCIA
+// =====================================================
+
+model UserFollow {
+  id          String   @id @default(uuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
+model EventAttendance {
+  id        String   @id @default(uuid())
+  eventId   String
+  userId    String
+  isPublic  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+}
+
+// =====================================================
+// CORTESÍAS / GUEST LIST
+// =====================================================
+
+enum GuestListStatus {
+  PENDING
+  CONFIRMED
+  USED
+  CANCELLED
+}
+
+model GuestListEntry {
+  id           String          @id @default(uuid())
+  eventId      String
+  name         String
+  email        String?
+  phone        String?
+  quantity     Int             @default(1)
+  note         String?
+  inviteToken  String          @unique @default(uuid())
+  status       GuestListStatus @default(PENDING)
+  createdById  String?
+  redeemedAt   DateTime?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([email])
+  @@index([inviteToken])
+}
+
+// =====================================================
+// CÓDIGOS DE DESCUENTO
+// =====================================================
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+model DiscountCode {
+  id              String       @id @default(uuid())
+  eventId         String?
+  code            String
+  discountType    DiscountType
+  value           Decimal      @db.Decimal(10, 2) // % or fixed amount
+  maxUses         Int?
+  usedCount       Int          @default(0)
+  minSubtotal     Decimal?     @db.Decimal(10, 2)
+  startsAt        DateTime?
+  endsAt          DateTime?
+  isActive        Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  event Event? @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  sales Sale[]
+
+  @@unique([eventId, code])
+  @@index([code])
+  @@index([isActive])
+}
+
+// =====================================================
+// ADD-ONS (drink tokens, merch, etc.)
+// =====================================================
+
+enum AddOnKind {
+  DRINK_TOKEN
+  MERCH
+  OTHER
+}
+
+model EventAddOn {
+  id          String    @id @default(uuid())
+  eventId     String
+  name        String
+  description String?
+  kind        AddOnKind @default(OTHER)
+  price       Decimal   @db.Decimal(10, 2)
+  maxQuantity Int?
+  soldQuantity Int      @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  event     Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  saleItems SaleItem[]
+
+  @@index([eventId])
+}
+
+// =====================================================
+// PAYMENT LINKS GENÉRICOS
+// =====================================================
+
+model PaymentLink {
+  id           String   @id @default(uuid())
+  eventId      String
+  token        String   @unique @default(uuid())
+  label        String?
+  ticketTypeId String?
+  quantity     Int      @default(1)
+  amountCents  Int?     // override amount; null = use ticket price
+  maxUses      Int?
+  usedCount    Int      @default(0)
+  expiresAt    DateTime?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  sales Sale[]
+
+  @@index([eventId])
+  @@index([token])
+}
+
+// =====================================================
+// CAMPAIGN BLASTS (SMS / PUSH)
+// =====================================================
+
+enum BlastChannel {
+  SMS
+  PUSH
+  EMAIL
+}
+
+enum BlastStatus {
+  DRAFT
+  SENDING
+  SENT
+  FAILED
+}
+
+model CampaignBlast {
+  id            String       @id @default(uuid())
+  eventId       String?
+  channel       BlastChannel
+  subject       String?
+  body          String
+  status        BlastStatus  @default(DRAFT)
+  recipientCount Int         @default(0)
+  sentCount     Int          @default(0)
+  clickCount    Int          @default(0)
+  salesCount    Int          @default(0)
+  salesAmount   Decimal      @default(0) @db.Decimal(12, 2)
+  trackingCode  String       @unique @default(uuid())
+  sentAt        DateTime?
+  createdById   String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  event Event? @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  sales Sale[]
+
+  @@index([eventId])
+  @@index([trackingCode])
+  @@index([status])
+}
+
+// =====================================================
+// PROMOTER TRACKING LINKS
+// =====================================================
+
+model PromoterLink {
+  id            String   @id @default(uuid())
+  eventId       String
+  userId        String   // promoter user
+  code          String
+  label         String?
+  clickCount    Int      @default(0)
+  salesCount    Int      @default(0)
+  salesAmount   Decimal  @default(0) @db.Decimal(12, 2)
+  commissionPct Decimal? @db.Decimal(5, 2)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sales Sale[]
+
+  @@unique([eventId, code])
+  @@index([userId])
+  @@index([code])
+}
+
+// =====================================================
+// REFERRAL PROGRAM
+// =====================================================
+
+model ReferralCode {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  code            String   @unique
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  referrals ReferralAttribution[]
+
+  @@index([code])
+}
+
+model ReferralAttribution {
+  id               String   @id @default(uuid())
+  referralCodeId   String
+  referredOrganizerId String
+  startsAt         DateTime @default(now())
+  endsAt           DateTime // startsAt + 12 months
+  revenueSharePct  Decimal  @default(15) @db.Decimal(5, 2)
+  totalEarned      Decimal  @default(0) @db.Decimal(12, 2)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+
+  referralCode ReferralCode @relation(fields: [referralCodeId], references: [id], onDelete: Cascade)
+
+  @@unique([referredOrganizerId])
+  @@index([referralCodeId])
+}
+
+// =====================================================
+// CONTACT IMPORT
+// =====================================================
+
+model ContactImport {
+  id          String   @id @default(uuid())
+  userId      String
+  fileName    String?
+  totalRows   Int      @default(0)
+  importedRows Int     @default(0)
+  failedRows  Int      @default(0)
+  status      String   @default("PENDING") // PENDING | DONE | FAILED
+  createdAt   DateTime @default(now())
+
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contacts ImportedContact[]
+
+  @@index([userId])
+}
+
+model ImportedContact {
+  id         String   @id @default(uuid())
+  importId   String
+  email      String?
+  phone      String?
+  name       String?
+  tags       String?
+  createdAt  DateTime @default(now())
+
+  import ContactImport @relation(fields: [importId], references: [id], onDelete: Cascade)
+
+  @@index([importId])
+  @@index([email])
+}
+
+// =====================================================
+// MEMBERSHIPS (SUSCRIPCIÓN DE COMUNIDAD)
+// =====================================================
+
+model MembershipPlan {
+  id                   String   @id @default(uuid())
+  organizationId       String
+  name                 String
+  description          String?
+  priceCents           Int
+  currency             String   @default("MXN")
+  interval             String   @default("month") // month | year
+  stripePriceId        String?
+  stripeProductId      String?
+  perks                String?  // JSON or free text
+  earlyAccessHours     Int?     // hours before public sale
+  isActive             Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members      OrgMembership[]
+
+  @@index([organizationId])
+}
+
+enum MembershipStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+}
+
+model OrgMembership {
+  id                   String           @id @default(uuid())
+  userId               String
+  organizationId       String
+  planId               String
+  status               MembershipStatus @default(ACTIVE)
+  stripeSubscriptionId String?          @unique
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan         MembershipPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+  @@index([status])
 }

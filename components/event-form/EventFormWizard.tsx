@@ -7,6 +7,7 @@ import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import { EventHeaderFields } from "./sections/EventHeaderFields";
 import { EventWhenWhere } from "./sections/EventWhenWhere";
 import { EventDescription } from "./sections/EventDescription";
+import { EventMediaExtras } from "./sections/EventMediaExtras";
 import { EventTicketsSection } from "./sections/EventTicketsSection";
 import { EventPublishToggle } from "./sections/EventPublishToggle";
 import {
@@ -255,6 +256,8 @@ export function EventFormWizard({
       <EventWhenWhere data={data} onChange={patch} />
 
       <EventDescription data={data} onChange={patch} />
+
+      <EventMediaExtras data={data} onChange={patch} />
 
       <EventTicketsSection data={data} onChange={patch} isEdit={isEdit} />
 

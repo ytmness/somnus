@@ -54,6 +54,34 @@ export function eventCalendarKey(iso: string | Date): string {
   return d.toISOString().slice(0, 10);
 }
 
+/** Fecha corta para Apple Wallet (día calendario UTC, no zona local). */
+export function formatWalletPassEventDate(date: Date | string): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+  return new Intl.DateTimeFormat("es-MX", {
+    timeZone: "UTC",
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  }).format(d);
+}
+
+/**
+ * Combina día de evento (UTC) + hora HH:mm del admin en hora de Ciudad de México
+ * para `relevantDate` / notificaciones del pase.
+ */
+export function eventPassRelevantDate(
+  eventDate: Date | string,
+  eventTime: string | null
+): Date {
+  const day = eventCalendarKey(eventDate);
+  const match = /^(\d{1,2}):(\d{2})/.exec(eventTime ?? "");
+  const hours = match ? Number(match[1]) : 12;
+  const minutes = match ? Number(match[2]) : 0;
+  return new Date(
+    `${day}T${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00-06:00`
+  );
+}
+
 /** YYYY-MM-DD de "hoy" en la zona local del usuario. */
 export function localTodayCalendarKey(): string {
   const n = new Date();

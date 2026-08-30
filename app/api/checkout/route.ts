@@ -17,6 +17,8 @@ import {
   isSalesOpen,
   salesOpenStatus,
 } from "@/lib/ticket-sales-window";
+import { validateDiscountCode } from "@/lib/discounts";
+import { checkTicketMembershipAccess } from "@/lib/memberships/access";
 import type { TicketKind } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +30,11 @@ type CheckoutLineItem = {
   guestCount?: number;
   /** Legacy mesa VIP por mapa */
   table?: { number: string; price: number };
+};
+
+type AddOnLineItem = {
+  addOnId?: string;
+  quantity?: number;
 };
 
 type TicketDetail = {
@@ -64,19 +71,29 @@ export async function POST(request: NextRequest) {
     const {
       eventId,
       items,
+      addOnItems = [],
+      discountCode,
       passwordTokens = {},
       buyerName,
       buyerEmail,
       buyerPhone,
       paymentMethod,
+      promoterCode,
+      ref,
+      blastRef,
     } = body as {
       eventId?: string;
       items?: CheckoutLineItem[];
+      addOnItems?: AddOnLineItem[];
+      discountCode?: string;
       passwordTokens?: Record<string, string>;
       buyerName?: string;
       buyerEmail?: string;
       buyerPhone?: string;
       paymentMethod?: string;
+      promoterCode?: string;
+      ref?: string;
+      blastRef?: string;
     };
 
     if (!eventId || !items || !Array.isArray(items) || items.length === 0) {
@@ -152,6 +169,25 @@ export async function POST(request: NextRequest) {
       }
 
       cartTicketTypeIds.add(ticketType.id);
+
+      const membershipGate = await checkTicketMembershipAccess({
+        userId: user.id,
+        organizationId: event.organizationId,
+        ticketType: {
+          membersOnly: ticketType.membersOnly,
+          earlyAccessMembersOnly: ticketType.earlyAccessMembersOnly,
+          earlyAccessEndsAt: ticketType.earlyAccessEndsAt,
+          salesStartDate: ticketType.salesStartDate,
+        },
+        ticketName: ticketType.name,
+        now,
+      });
+      if (!membershipGate.allowed) {
+        return NextResponse.json(
+          { error: membershipGate.error, code: membershipGate.code },
+          { status: 403 }
+        );
+      }
 
       const validation = validateTicketTypeForPurchase(
         event,
@@ -231,6 +267,76 @@ export async function POST(request: NextRequest) {
     fullSubtotal = Math.round(fullSubtotal * 100) / 100;
     chargeSubtotal = Math.round(chargeSubtotal * 100) / 100;
 
+    const resolvedAddOns: Array<{
+      addOnId: string;
+      quantity: number;
+      lineTotal: number;
+    }> = [];
+
+    if (Array.isArray(addOnItems) && addOnItems.length > 0) {
+      const addOnIds = addOnItems
+        .map((a) => String(a?.addOnId || ""))
+        .filter(Boolean);
+      const addOns = await prisma.eventAddOn.findMany({
+        where: { eventId, id: { in: addOnIds }, isActive: true },
+      });
+      for (const raw of addOnItems) {
+        const addOnId = String(raw?.addOnId || "");
+        const quantity = Math.max(1, Math.floor(Number(raw?.quantity) || 1));
+        const addOn = addOns.find((a) => a.id === addOnId);
+        if (!addOn) {
+          return NextResponse.json(
+            { error: `Add-on no encontrado: ${addOnId}` },
+            { status: 400 }
+          );
+        }
+        if (addOn.maxQuantity != null) {
+          const available = addOn.maxQuantity - addOn.soldQuantity;
+          if (quantity > available) {
+            return NextResponse.json(
+              {
+                error: `Solo hay ${Math.max(0, available)} disponibles de ${addOn.name}`,
+              },
+              { status: 400 }
+            );
+          }
+        }
+        const lineTotal =
+          Math.round(Number(addOn.price) * quantity * 100) / 100;
+        resolvedAddOns.push({ addOnId, quantity, lineTotal });
+        chargeSubtotal += lineTotal;
+        fullSubtotal += lineTotal;
+      }
+      chargeSubtotal = Math.round(chargeSubtotal * 100) / 100;
+      fullSubtotal = Math.round(fullSubtotal * 100) / 100;
+    }
+
+    let discountAmount = 0;
+    let discountCodeId: string | null = null;
+    if (discountCode && String(discountCode).trim()) {
+      const validated = await validateDiscountCode({
+        code: String(discountCode),
+        eventId,
+        subtotal: chargeSubtotal,
+      });
+      if (!validated.valid) {
+        return NextResponse.json(
+          { error: validated.error || "Código de descuento inválido" },
+          { status: 400 }
+        );
+      }
+      discountAmount = validated.discountAmount;
+      discountCodeId = validated.discountCodeId;
+      chargeSubtotal = Math.max(
+        0,
+        Math.round((chargeSubtotal - discountAmount) * 100) / 100
+      );
+      fullSubtotal = Math.max(
+        0,
+        Math.round((fullSubtotal - discountAmount) * 100) / 100
+      );
+    }
+
     const balanceDueCents = depositOnly
       ? Math.max(0, Math.round((fullSubtotal - chargeSubtotal) * 100))
       : null;
@@ -257,6 +363,46 @@ export async function POST(request: NextRequest) {
       depositOnly && balanceDueCents && balanceDueCents > 0
         ? newBalancePayToken()
         : null;
+
+    let promoterLinkId: string | null = null;
+    const promoterRaw =
+      (typeof promoterCode === "string" && promoterCode.trim()) ||
+      (typeof ref === "string" &&
+      !ref.trim().toLowerCase().startsWith("blast_")
+        ? ref.trim()
+        : "") ||
+      "";
+    if (promoterRaw) {
+      const link = await prisma.promoterLink.findFirst({
+        where: {
+          eventId,
+          code: promoterRaw.toUpperCase(),
+          isActive: true,
+        },
+        select: { id: true },
+      });
+      if (link) promoterLinkId = link.id;
+    }
+
+    let campaignBlastId: string | null = null;
+    const blastRaw =
+      (typeof blastRef === "string" && blastRef.trim()) ||
+      (typeof ref === "string" && ref.trim()) ||
+      "";
+    const blastMatch = blastRaw.match(/^(?:blast_)?([0-9a-f-]{8,})$/i);
+    if (blastMatch || blastRaw.toLowerCase().startsWith("blast_")) {
+      const trackingCode = blastRaw.toLowerCase().startsWith("blast_")
+        ? blastRaw.slice("blast_".length)
+        : blastMatch?.[1] || blastRaw;
+      const blast = await prisma.campaignBlast.findFirst({
+        where: {
+          trackingCode,
+          OR: [{ eventId }, { eventId: null }],
+        },
+        select: { id: true },
+      });
+      if (blast) campaignBlastId = blast.id;
+    }
 
     const sale = await prisma.sale.create({
       data: {
@@ -287,19 +433,35 @@ export async function POST(request: NextRequest) {
         depositOnly,
         balanceDueCents,
         balancePayToken,
+        discountCodeId,
+        discountAmount: discountAmount > 0 ? discountAmount : null,
+        currency: "MXN",
+        promoterLinkId,
+        campaignBlastId,
       },
     });
 
     if (useOnlinePayment) {
       await prisma.saleItem.createMany({
-        data: ticketDetails.map((d) => ({
-          saleId: sale.id,
-          ticketTypeId: d.ticketTypeId,
-          quantity: d.quantity,
-          isTable: d.isTable ?? false,
-          tableNumber: d.tableNumber ?? null,
-          guestCount: d.guestCount ?? null,
-        })),
+        data: [
+          ...ticketDetails.map((d) => ({
+            saleId: sale.id,
+            ticketTypeId: d.ticketTypeId,
+            quantity: d.quantity,
+            isTable: d.isTable ?? false,
+            tableNumber: d.tableNumber ?? null,
+            guestCount: d.guestCount ?? null,
+          })),
+          ...resolvedAddOns.map((a) => ({
+            saleId: sale.id,
+            ticketTypeId: null as string | null,
+            addOnId: a.addOnId,
+            quantity: a.quantity,
+            isTable: false,
+            tableNumber: null as string | null,
+            guestCount: null as number | null,
+          })),
+        ],
       });
 
       return NextResponse.json({
@@ -310,6 +472,7 @@ export async function POST(request: NextRequest) {
           requiresApproval: needsApproval,
           depositOnly,
           balanceDueCents,
+          discountAmount,
         },
       });
     }
@@ -320,6 +483,17 @@ export async function POST(request: NextRequest) {
         where: { id: detail.ticketTypeId },
       });
       if (!ticketType) continue;
+
+      await prisma.saleItem.create({
+        data: {
+          saleId: sale.id,
+          ticketTypeId: detail.ticketTypeId,
+          quantity: detail.quantity,
+          isTable: detail.isTable ?? false,
+          tableNumber: detail.tableNumber ?? null,
+          guestCount: detail.guestCount ?? null,
+        },
+      });
 
       const ticketsToCreate = detail.isTable
         ? ticketType.seatsPerTable || ticketType.tableCapacity || 4
@@ -355,6 +529,28 @@ export async function POST(request: NextRequest) {
           data: { soldQuantity: { increment: 1 } },
         });
       }
+    }
+
+    for (const a of resolvedAddOns) {
+      await prisma.saleItem.create({
+        data: {
+          saleId: sale.id,
+          addOnId: a.addOnId,
+          quantity: a.quantity,
+          isTable: false,
+        },
+      });
+      await prisma.eventAddOn.update({
+        where: { id: a.addOnId },
+        data: { soldQuantity: { increment: a.quantity } },
+      });
+    }
+
+    if (discountCodeId) {
+      await prisma.discountCode.update({
+        where: { id: discountCodeId },
+        data: { usedCount: { increment: 1 } },
+      });
     }
 
     return NextResponse.json({

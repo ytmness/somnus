@@ -11,6 +11,11 @@ import {
   mapTicketTypeCreateData,
   ticketTypeInclude,
 } from "@/lib/ticket-type-persist";
+import {
+  emptyToNullField,
+  eventArtistsInclude,
+  syncEventArtists,
+} from "@/lib/events/artists";
 
 export const dynamic = "force-dynamic";
 
@@ -22,12 +27,27 @@ const eventInclude = {
   },
   organizer: { select: { id: true, businessName: true } },
   organization: { select: { id: true, name: true } },
+  ...eventArtistsInclude,
 };
 
 async function buildTicketTypesCreate(
   ticketTypes: ReturnType<typeof createEventSchema.parse>["ticketTypes"]
 ) {
   return Promise.all(ticketTypes.map((tt) => mapTicketTypeCreateData(tt)));
+}
+
+function resolveStatusAndActive(input: {
+  status?: "DRAFT" | "PUBLISHED" | "CANCELLED";
+  isActive?: boolean;
+}) {
+  const status = input.status ?? "PUBLISHED";
+  if (status === "DRAFT") {
+    return { status, isActive: false };
+  }
+  return {
+    status,
+    isActive: input.isActive ?? true,
+  };
 }
 
 /**
@@ -109,12 +129,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { ticketTypes, organizationId, organizerId: bodyOrganizerId, ...eventData } =
-      result.data;
+    const {
+      ticketTypes,
+      organizationId,
+      organizerId: bodyOrganizerId,
+      artists,
+      ...eventData
+    } = result.data;
 
     const eventDate = new Date(eventData.eventDate);
     const salesStartDate = new Date(eventData.salesStartDate);
     const salesEndDate = new Date(eventData.salesEndDate);
+    const { status, isActive } = resolveStatusAndActive({
+      status: eventData.status,
+      isActive: eventData.isActive,
+    });
 
     let finalOrganizerId: string | null = null;
     let finalOrganizationId: string | null = null;
@@ -165,13 +194,37 @@ export async function POST(request: NextRequest) {
 
     const event = await prisma.event.create({
       data: {
-        ...eventData,
+        name: eventData.name,
+        description: emptyToNullField(eventData.description) ?? null,
+        artist: eventData.artist,
+        tour: emptyToNullField(eventData.tour) ?? null,
+        venue: eventData.venue,
+        address: emptyToNullField(eventData.address) ?? null,
+        city: emptyToNullField(eventData.city) ?? null,
         eventDate,
+        eventTime: eventData.eventTime,
+        endDate: eventData.endDate ? new Date(eventData.endDate) : null,
+        endTime: emptyToNullField(eventData.endTime) ?? null,
+        timezone: eventData.timezone || "America/Mexico_City",
+        currency: eventData.currency || "MXN",
+        externalUrl: emptyToNullField(eventData.externalUrl) ?? null,
+        videoUrl: emptyToNullField(eventData.videoUrl) ?? null,
+        songId: emptyToNullField(eventData.songId) ?? null,
+        songTitle: emptyToNullField(eventData.songTitle) ?? null,
+        songArtist: emptyToNullField(eventData.songArtist) ?? null,
+        songPreviewUrl: emptyToNullField(eventData.songPreviewUrl) ?? null,
+        status,
+        membersOnly: eventData.membersOnly ?? false,
+        imageUrl: emptyToNullField(eventData.imageUrl) ?? null,
+        imagePosX: eventData.imagePosX,
+        imagePosY: eventData.imagePosY,
+        imageZoom: eventData.imageZoom,
+        maxCapacity: eventData.maxCapacity,
         salesStartDate,
         salesEndDate,
         organizerId: finalOrganizerId,
         organizationId: finalOrganizationId,
-        isActive: eventData.isActive ?? true,
+        isActive,
         ticketTypes: {
           create: await buildTicketTypesCreate(ticketTypes),
         },
@@ -180,6 +233,21 @@ export async function POST(request: NextRequest) {
         ticketTypes: { include: ticketTypeInclude },
         organizer: { select: { id: true, businessName: true } },
         organization: { select: { id: true, name: true } },
+        ...eventArtistsInclude,
+      },
+    });
+
+    if (artists && artists.length > 0) {
+      await syncEventArtists(event.id, artists);
+    }
+
+    const withArtists = await prisma.event.findUniqueOrThrow({
+      where: { id: event.id },
+      include: {
+        ticketTypes: { include: ticketTypeInclude },
+        organizer: { select: { id: true, businessName: true } },
+        organization: { select: { id: true, name: true } },
+        ...eventArtistsInclude,
       },
     });
 
@@ -189,31 +257,25 @@ export async function POST(request: NextRequest) {
         action: "EVENT_CREATED",
         entityType: "Event",
         entityId: event.id,
-        changes: { event },
+        changes: { event: withArtists },
       },
     });
 
-    if (finalOrganizationId && event.organization) {
-      const org = await prisma.organization.findUnique({
-        where: { id: finalOrganizationId },
-        select: { slug: true, name: true },
+    if (finalOrganizationId && withArtists.organization && status === "PUBLISHED") {
+      await notifyOrganizationFollowers({
+        organizationId: finalOrganizationId,
+        type: "NEW_EVENT",
+        title: `Nuevo evento: ${withArtists.name}`,
+        body: `${withArtists.artist} · ${withArtists.venue}`,
+        linkUrl: `/eventos/${withArtists.id}/boletos`,
+        metadata: { organizationId: finalOrganizationId, eventId: withArtists.id },
       });
-      if (org) {
-        await notifyOrganizationFollowers({
-          organizationId: finalOrganizationId,
-          type: "NEW_EVENT",
-          title: `Nuevo evento: ${event.name}`,
-          body: `${event.artist} · ${event.venue}`,
-          linkUrl: `/eventos/${event.id}/boletos`,
-          metadata: { organizationId: finalOrganizationId, eventId: event.id },
-        });
-      }
     }
 
     return NextResponse.json({
       success: true,
       message: "Evento creado exitosamente",
-      data: event,
+      data: withArtists,
     });
   } catch (error) {
     console.error("Create event error:", error);

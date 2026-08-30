@@ -22,6 +22,7 @@ export const registerSchema = z
       }),
     password: z.string().min(8, "Mínimo 8 caracteres"),
     confirmPassword: z.string().min(8, "Mínimo 8 caracteres"),
+    referralCode: z.string().trim().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Las contraseñas no coinciden",
@@ -130,6 +131,37 @@ export const ticketTypeSchema = ticketTypeBaseSchema.superRefine((val, ctx) => {
   }
 });
 
+const optionalUrlOrEmpty = z
+  .string()
+  .refine(
+    (v) =>
+      v === "" ||
+      v.startsWith("/uploads/") ||
+      /^https?:\/\/.+/i.test(v),
+    "URL inválida"
+  )
+  .optional();
+
+export const eventArtistInputSchema = z.object({
+  name: z.string().min(1, "Artist name is required"),
+  instagramUrl: optionalUrlOrEmpty,
+  spotifyUrl: optionalUrlOrEmpty,
+  imageUrl: optionalUrlOrEmpty,
+  sortOrder: z.number().int().min(0).optional(),
+});
+
+export const EVENT_CURRENCIES = [
+  "MXN",
+  "USD",
+  "EUR",
+  "COP",
+  "ARS",
+  "CLP",
+  "PEN",
+  "BRL",
+  "GBP",
+] as const;
+
 export const createEventSchema = z.object({
   name: z.string().min(1, "Event name is required"),
   description: z.string().optional(),
@@ -137,8 +169,21 @@ export const createEventSchema = z.object({
   tour: z.string().optional(),
   venue: z.string().min(1, "Venue is required"),
   address: z.string().optional(),
+  city: z.string().optional(),
   eventDate: z.string().or(z.date()),
   eventTime: z.string().min(1, "Time is required"),
+  endDate: z.string().or(z.date()).optional().nullable(),
+  endTime: z.string().optional().nullable(),
+  timezone: z.string().optional(),
+  currency: z.enum(EVENT_CURRENCIES).optional(),
+  externalUrl: optionalUrlOrEmpty,
+  videoUrl: optionalUrlOrEmpty,
+  songId: z.string().optional().nullable(),
+  songTitle: z.string().optional().nullable(),
+  songArtist: z.string().optional().nullable(),
+  songPreviewUrl: optionalUrlOrEmpty.nullable(),
+  status: z.enum(["DRAFT", "PUBLISHED", "CANCELLED"]).optional(),
+  membersOnly: z.boolean().optional(),
   imageUrl: z
     .string()
     .refine(
@@ -158,6 +203,7 @@ export const createEventSchema = z.object({
   organizationId: z.string().uuid("Invalid organization ID").optional(),
   organizerId: z.string().uuid("Invalid organizer ID").optional(),
   isActive: z.boolean().optional(),
+  artists: z.array(eventArtistInputSchema).optional(),
   ticketTypes: z.array(ticketTypeSchema).min(1, "At least one ticket type is required"),
 });
 

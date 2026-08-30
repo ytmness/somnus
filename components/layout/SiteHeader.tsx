@@ -39,6 +39,7 @@ function buildNavItems(
 ): NavItem[] {
   const items: NavItem[] = [
     { href: eventsHref, label: "Events" },
+    { href: "/explorar", label: "Explorar" },
     { href: "/galeria", label: "Gallery" },
   ];
 

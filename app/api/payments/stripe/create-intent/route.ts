@@ -106,10 +106,17 @@ export async function POST(request: NextRequest) {
 
     const requiresManualCapture = sale.approvalStatus === "PENDING";
 
+    // automatic_payment_methods (wallets + card) sin redirects: compatible con
+    // destination charges / Connect. Google Pay y Apple Pay aparecen en el
+    // Payment Element cuando el dominio está verificado en Stripe.
+    // No combinar con payment_method_types.
     const intentParams: Parameters<typeof stripe.paymentIntents.create>[0] = {
       amount: amounts.totalCents,
       currency: "mxn",
-      payment_method_types: ["card"],
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: "never",
+      },
       receipt_email: sale.buyerEmail,
       ...(requiresManualCapture ? { capture_method: "manual" as const } : {}),
       metadata: {
@@ -138,7 +145,7 @@ export async function POST(request: NextRequest) {
     }
 
     const paymentIntent = await stripe.paymentIntents.create(intentParams, {
-      idempotencyKey: `sale:${sale.id}:create_intent:v6-mx-destination`,
+      idempotencyKey: `sale:${sale.id}:create_intent:v7-mx-apm`,
     });
 
     await prisma.sale.update({

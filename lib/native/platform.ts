@@ -47,6 +47,15 @@ export function isNativeIOS(): boolean {
   );
 }
 
+/** ¿Estamos dentro de la app Android? Google Pay nativo / Tap to Pay futuros. */
+export function isNativeAndroid(): boolean {
+  const capacitor = getCapacitor();
+  return (
+    capacitor?.isNativePlatform?.() === true &&
+    capacitor?.getPlatform?.() === "android"
+  );
+}
+
 /** iOS en cualquier contexto (Safari o app): usado para ofrecer Apple Wallet. */
 export function isAppleDevice(): boolean {
   if (typeof navigator === "undefined") return false;

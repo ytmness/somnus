@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Globe, Instagram, MessageCircle } from "lucide-react";
+import { BadgeCheck, Globe, Instagram, MapPin, MessageCircle } from "lucide-react";
 import { FollowButton } from "./FollowButton";
 
 export interface PublicOrgProfile {
@@ -14,6 +14,8 @@ export interface PublicOrgProfile {
   bannerUrl: string | null;
   websiteUrl: string | null;
   instagramUrl: string | null;
+  city: string | null;
+  isVerified: boolean;
   isFollowing: boolean;
   organizer: { businessName: string };
   _count: { followers: number; posts: number; events: number };
@@ -67,8 +69,22 @@ export function OrganizationProfileHeader({
           </div>
 
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold">{profile.name}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold inline-flex items-center gap-2 flex-wrap">
+              {profile.name}
+              {!!profile.isVerified && (
+                <BadgeCheck
+                  className="w-6 h-6 text-sky-400 flex-shrink-0"
+                  aria-label="Verified"
+                />
+              )}
+            </h1>
             <p className="text-white/50 text-sm">{profile.organizer.businessName}</p>
+            {!!profile.city && (
+              <p className="text-white/40 text-sm mt-1 inline-flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5" aria-hidden />
+                {profile.city}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-wrap gap-2 sm:pb-1">

@@ -26,6 +26,8 @@ export async function GET(
         bannerUrl: true,
         websiteUrl: true,
         instagramUrl: true,
+        city: true,
+        isVerified: true,
         createdAt: true,
         organizer: { select: { businessName: true } },
         _count: { select: { followers: true, posts: true, events: true } },

@@ -9,6 +9,7 @@ import { EventsTable } from "@/components/admin/EventsTable";
 import { EventFormWizard } from "@/components/event-form/EventFormWizard";
 import { GalleryManager } from "@/components/admin/GalleryManager";
 import { InvitesManager } from "@/components/admin/InvitesManager";
+import { GuestListManager } from "@/components/admin/GuestListManager";
 import { PendingApprovalsManager } from "@/components/admin/PendingApprovalsManager";
 import { ContactLeadsManager } from "@/components/admin/ContactLeadsManager";
 import { CommissionsManager } from "@/components/admin/CommissionsManager";
@@ -18,6 +19,8 @@ import { StaffManager } from "@/components/admin/StaffManager";
 import { VenuesManager } from "@/components/admin/VenuesManager";
 import { SqlEditorManager } from "@/components/admin/SqlEditorManager";
 import { CustomersManager } from "@/components/admin/CustomersManager";
+import { BlastsManager } from "@/components/admin/BlastsManager";
+import { PromotersManager } from "@/components/admin/PromotersManager";
 import {
   AdminSidebar,
   ADMIN_SECTION_META,
@@ -300,6 +303,12 @@ export default function AdminPage() {
               </div>
             )}
 
+            {activeSection === "guestlist" && (
+              <div className="liquid-glass p-4 sm:p-6 rounded-2xl">
+                <GuestListManager />
+              </div>
+            )}
+
             {activeSection === "aprobaciones" && (
               <div className="liquid-glass p-4 sm:p-6 rounded-2xl">
                 <PendingApprovalsManager />
@@ -309,6 +318,18 @@ export default function AdminPage() {
             {activeSection === "contacto" && (
               <div className="liquid-glass p-4 sm:p-6 rounded-2xl">
                 <ContactLeadsManager />
+              </div>
+            )}
+
+            {activeSection === "blasts" && (
+              <div className="liquid-glass p-4 sm:p-6 rounded-2xl">
+                <BlastsManager />
+              </div>
+            )}
+
+            {activeSection === "promoters" && (
+              <div className="liquid-glass p-4 sm:p-6 rounded-2xl">
+                <PromotersManager />
               </div>
             )}
 

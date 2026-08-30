@@ -1,0 +1,31 @@
+{
+  "name": "Somnus",
+  "short_name": "Somnus",
+  "description": "Boletera oficial Somnus — eventos y accesos",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#5B8DEF",
+  "background_color": "#2a2c30",
+  "lang": "es-MX",
+  "icons": [
+    {
+      "src": "/assets/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/Panorama-Logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

@@ -36,7 +36,7 @@ export const viewport: Viewport = {
   // Necesario para que env(safe-area-inset-*) devuelva valores reales
   // bajo el notch y la home indicator dentro de la app iOS.
   viewportFit: "cover",
-  themeColor: "#0A0A0A",
+  themeColor: "#5B8DEF",
 };
 
 export const metadata: Metadata = {
@@ -44,10 +44,21 @@ export const metadata: Metadata = {
   description: "Ticket sales platform for Somnus events",
   keywords: ["tickets", "events", "concerts", "Somnus"],
   authors: [{ name: "Somnus" }],
+  manifest: "/manifest.json",
+  themeColor: "#5B8DEF",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Somnus",
+  },
   openGraph: {
     title: "Somnus Ticket Platform",
     description: "Ticket sales platform for Somnus events",
     type: "website",
+  },
+  icons: {
+    icon: "/assets/logo.png",
+    apple: "/assets/logo.png",
   },
 };
 

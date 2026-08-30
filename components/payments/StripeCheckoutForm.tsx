@@ -10,8 +10,6 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import { toast } from "sonner";
-import { isNativeIOS } from "@/lib/native/platform";
-import { NativeApplePayCheckout } from "@/components/payments/NativeApplePayCheckout";
 
 interface StripeCheckoutFormProps {
   saleId: string;
@@ -105,8 +103,10 @@ function CheckoutInner({
 
       <div>
         <label className="block text-white/90 text-sm mb-2">Método de pago</label>
+        {/* Payment Element: card + wallets (Apple Pay / Google Pay) si el dominio está verificado en Stripe. */}
         <PaymentElement
           options={{
+            layout: "tabs",
             defaultValues: {
               billingDetails: {
                 name: buyerName,
@@ -134,19 +134,11 @@ export function StripeCheckoutForm(props: StripeCheckoutFormProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [publishableKey, setPublishableKey] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [nativeIOS, setNativeIOS] = useState(false);
-  const [forceCardForm, setForceCardForm] = useState(false);
 
   const stripePromise = useMemo(
     () => (publishableKey ? loadStripe(publishableKey) : null),
     [publishableKey]
   );
-
-  // El bridge nativo solo existe en cliente: detectar tras montar evita
-  // desajustes de hidratación con el HTML renderizado en servidor.
-  useEffect(() => {
-    setNativeIOS(isNativeIOS());
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -211,8 +203,8 @@ export function StripeCheckoutForm(props: StripeCheckoutFormProps) {
     );
   }
 
-  // On native iOS, skip the custom Apple Pay button and go straight to
-  // Stripe's Payment Element which already offers Apple Pay + card.
+  // Payment Element (web + WebView): card + wallets. Google Pay nativo Capacitor:
+  // ver NativeGooglePayCheckout stub. Apple Pay nativo: NativeApplePayCheckout.
 
   const options = {
     clientSecret,

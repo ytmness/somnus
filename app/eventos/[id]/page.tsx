@@ -3,7 +3,15 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
-import { ArrowLeft, Building2, Calendar, Ticket } from "lucide-react";
+import {
+  ArrowLeft,
+  Building2,
+  Calendar,
+  ExternalLink,
+  MapPin,
+  Music,
+  Ticket,
+} from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { EventMap } from "@/components/eventos/EventMap";
@@ -12,6 +20,33 @@ import {
   normalizeImageFraming,
 } from "@/lib/utils/image-framing";
 import { eventTicketPurchaseState } from "@/lib/ticket-sales-window";
+
+/** Light client-side sanitize: strip scripts/on* and keep common markup. */
+function sanitizeEventHtml(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+    .replace(/on\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+    .replace(/javascript:/gi, "");
+}
+
+function youtubeEmbedUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes("youtu.be")) {
+      const id = u.pathname.replace(/^\//, "");
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+    if (u.hostname.includes("youtube.com")) {
+      const id = u.searchParams.get("v");
+      if (id) return `https://www.youtube.com/embed/${id}`;
+      const embed = u.pathname.match(/\/embed\/([^/]+)/);
+      if (embed?.[1]) return `https://www.youtube.com/embed/${embed[1]}`;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
 
 export default function EventDetailPage() {
   const router = useRouter();
@@ -142,6 +177,15 @@ export default function EventDetailPage() {
       }).format(new Date(event.eventDate))
     : "";
 
+  const endDateLabel = event.endDate
+    ? new Intl.DateTimeFormat("en-US", {
+        timeZone: "UTC",
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+      }).format(new Date(event.endDate))
+    : "";
+
   const eventImage =
     event.imageUrl && !event.imageUrl.includes("unsplash")
       ? event.imageUrl
@@ -159,8 +203,7 @@ export default function EventDetailPage() {
     event.organization?.name || event.organizer?.businessName || null;
 
   const ticketTypes = (event.ticketTypes || []).filter(
-    (tt: any) =>
-      !tt.isTable && tt.kind !== "TABLE" && !tt.isHidden,
+    (tt: any) => !tt.isTable && tt.kind !== "TABLE" && !tt.isHidden
   );
   const purchaseState = eventTicketPurchaseState(
     {
@@ -170,6 +213,22 @@ export default function EventDetailPage() {
     },
     new Date()
   );
+
+  const lineup = (event.artists || [])
+    .map((row: any) => row.artist || row)
+    .filter((a: any) => a?.name);
+
+  const ytEmbed = event.videoUrl ? youtubeEmbedUrl(event.videoUrl) : null;
+  const looksLikeHtml =
+    typeof event.description === "string" && /<\/?[a-z][\s\S]*>/i.test(event.description);
+
+  const whenLabel = (() => {
+    let s = `${eventDate} · ${event.eventTime}`;
+    if (endDateLabel || event.endTime) {
+      s += ` → ${endDateLabel || eventDate}${event.endTime ? ` · ${event.endTime}` : ""}`;
+    }
+    return s;
+  })();
 
   return (
     <div className="min-h-screen somnus-events-bg overflow-x-hidden">
@@ -186,7 +245,6 @@ export default function EventDetailPage() {
             Back to Events
           </button>
 
-          {/* Layout tipo Bubbl: poster izquierda + detalle y CTA derecha */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
             <div className="lg:col-span-5">
               <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[#1a1a1a]">
@@ -215,18 +273,22 @@ export default function EventDetailPage() {
                 {event.artist}
               </h1>
               {event.tour && (
-                <p className="text-white/60 text-sm mb-6">{event.tour}</p>
+                <p className="text-white/60 text-sm mb-2">{event.tour}</p>
               )}
-              {!event.tour && <div className="mb-6" />}
+              {event.city && (
+                <p className="inline-flex items-center gap-1.5 text-white/55 text-sm mb-4">
+                  <MapPin className="w-3.5 h-3.5" aria-hidden />
+                  {event.city}
+                </p>
+              )}
+              {!event.tour && !event.city && <div className="mb-6" />}
 
               <div className="flex items-center gap-3 text-white/90 mb-8">
                 <Calendar
                   className="w-5 h-5 text-white/70 shrink-0"
                   aria-hidden
                 />
-                <span>
-                  {eventDate} · {event.eventTime}
-                </span>
+                <span>{whenLabel}</span>
               </div>
 
               <button
@@ -254,13 +316,131 @@ export default function EventDetailPage() {
                 )}
               </button>
 
+              {event.externalUrl && (
+                <a
+                  href={event.externalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white mb-6"
+                >
+                  <ExternalLink className="w-4 h-4" aria-hidden />
+                  More info
+                </a>
+              )}
+
               {event.description && (
                 <div className="mb-8">
                   <h2 className="text-white font-semibold uppercase tracking-wider text-sm mb-3">
                     About
                   </h2>
-                  <div className="text-white/80 text-sm leading-relaxed whitespace-pre-line">
-                    {event.description}
+                  {looksLikeHtml ? (
+                    <div
+                      className="text-white/80 text-sm leading-relaxed prose prose-invert prose-sm max-w-none [&_a]:text-[#5B8DEF] [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5"
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeEventHtml(event.description),
+                      }}
+                    />
+                  ) : (
+                    <div className="text-white/80 text-sm leading-relaxed whitespace-pre-line">
+                      {event.description}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {lineup.length > 0 && (
+                <div className="mb-8">
+                  <h2 className="text-white font-semibold uppercase tracking-wider text-sm mb-3">
+                    Lineup
+                  </h2>
+                  <ul className="space-y-3">
+                    {lineup.map((a: any, i: number) => (
+                      <li key={a.id || i} className="flex items-center gap-3">
+                        {a.imageUrl ? (
+                          <div className="relative w-10 h-10 rounded-full overflow-hidden bg-white/10 shrink-0">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={a.imageUrl}
+                              alt=""
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-white/10 shrink-0" />
+                        )}
+                        <div className="min-w-0">
+                          <p className="text-white text-sm font-medium truncate">
+                            {a.name}
+                          </p>
+                          <div className="flex gap-3 text-xs text-white/45">
+                            {a.instagramUrl && (
+                              <a
+                                href={a.instagramUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-white"
+                              >
+                                Instagram
+                              </a>
+                            )}
+                            {a.spotifyUrl && (
+                              <a
+                                href={a.spotifyUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-white"
+                              >
+                                Spotify
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {(event.songTitle || event.songArtist) && (
+                <div className="mb-8">
+                  <h2 className="text-white font-semibold uppercase tracking-wider text-sm mb-3">
+                    Soundtrack
+                  </h2>
+                  <div className="flex items-start gap-3 text-white/80 text-sm">
+                    <Music className="w-4 h-4 mt-0.5 text-white/50 shrink-0" aria-hidden />
+                    <div>
+                      <p>
+                        {event.songTitle}
+                        {event.songArtist ? ` — ${event.songArtist}` : ""}
+                      </p>
+                      {event.songPreviewUrl && (
+                        <a
+                          href={event.songPreviewUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#5B8DEF] text-xs mt-1 inline-block"
+                        >
+                          Preview
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {ytEmbed && (
+                <div className="mb-8">
+                  <h2 className="text-white font-semibold uppercase tracking-wider text-sm mb-3">
+                    Video
+                  </h2>
+                  <div className="relative aspect-video rounded-xl overflow-hidden bg-black/40">
+                    <iframe
+                      src={ytEmbed}
+                      title="Event video"
+                      className="absolute inset-0 w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
                   </div>
                 </div>
               )}

@@ -21,7 +21,8 @@
     "ios:add": "cap add ios",
     "ios:sync": "cap sync ios",
     "ios:overlay": "bash scripts/ios-postadd.sh",
-    "ios:assets": "capacitor-assets generate --ios"
+    "ios:assets": "capacitor-assets generate --ios",
+    "cap:android": "npx cap add android"
   },
   "dependencies": {
     "@capacitor-community/stripe": "^8.2.1",

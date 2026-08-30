@@ -9,6 +9,11 @@ import {
   mapTicketTypeCreateData,
   ticketTypeInclude,
 } from "@/lib/ticket-type-persist";
+import {
+  emptyToNullField,
+  eventArtistsInclude,
+  syncEventArtists,
+} from "@/lib/events/artists";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +31,26 @@ const eventInclude = {
   },
   organizer: { select: { id: true, businessName: true } },
   organization: { select: { id: true, name: true } },
+  ...eventArtistsInclude,
 };
+
+function resolveStatusAndActive(input: {
+  status?: "DRAFT" | "PUBLISHED" | "CANCELLED";
+  isActive?: boolean;
+  currentStatus?: string;
+}) {
+  const status = input.status ?? input.currentStatus ?? "PUBLISHED";
+  if (status === "DRAFT") {
+    return { status: status as "DRAFT" | "PUBLISHED" | "CANCELLED", isActive: false as boolean | undefined };
+  }
+  if (input.status !== undefined || input.isActive !== undefined) {
+    return {
+      status: status as "DRAFT" | "PUBLISHED" | "CANCELLED",
+      isActive: input.isActive,
+    };
+  }
+  return null;
+}
 
 /**
  * GET /api/events/[id]
@@ -91,9 +115,15 @@ export async function PATCH(
       Object.keys(body).length === 1 &&
       typeof body.isActive === "boolean"
     ) {
+      const current = await prisma.event.findUnique({
+        where: { id: params.id },
+        select: { status: true },
+      });
+      const nextActive =
+        current?.status === "DRAFT" ? false : body.isActive;
       const event = await prisma.event.update({
         where: { id: params.id },
-        data: { isActive: body.isActive },
+        data: { isActive: nextActive },
         include: eventInclude,
       });
       return NextResponse.json({ success: true, data: event });
@@ -123,14 +153,100 @@ export async function PATCH(
       );
     }
 
-    const { ticketTypes, isFeatured, organizerId, organizationId, ...eventData } =
-      result.data;
+    const {
+      ticketTypes,
+      isFeatured,
+      organizerId,
+      organizationId,
+      artists,
+      ...eventData
+    } = result.data;
 
-    const updateData: Record<string, unknown> = { ...eventData };
+    const existingMeta = await prisma.event.findUnique({
+      where: { id: params.id },
+      select: { status: true, isActive: true },
+    });
+
+    const updateData: Record<string, unknown> = {};
+
+    const scalarKeys = [
+      "name",
+      "description",
+      "artist",
+      "tour",
+      "venue",
+      "address",
+      "city",
+      "eventTime",
+      "endTime",
+      "timezone",
+      "currency",
+      "externalUrl",
+      "videoUrl",
+      "songId",
+      "songTitle",
+      "songArtist",
+      "songPreviewUrl",
+      "membersOnly",
+      "imageUrl",
+      "imagePosX",
+      "imagePosY",
+      "imageZoom",
+      "maxCapacity",
+      "showQR",
+    ] as const;
+
+    for (const key of scalarKeys) {
+      if (eventData[key] !== undefined) {
+        const v = eventData[key];
+        if (
+          typeof v === "string" &&
+          [
+            "description",
+            "tour",
+            "address",
+            "city",
+            "endTime",
+            "externalUrl",
+            "videoUrl",
+            "songId",
+            "songTitle",
+            "songArtist",
+            "songPreviewUrl",
+            "imageUrl",
+          ].includes(key)
+        ) {
+          updateData[key] = emptyToNullField(v) ?? null;
+        } else {
+          updateData[key] = v;
+        }
+      }
+    }
 
     if (eventData.eventDate) updateData.eventDate = new Date(eventData.eventDate);
-    if (eventData.salesStartDate) updateData.salesStartDate = new Date(eventData.salesStartDate);
-    if (eventData.salesEndDate) updateData.salesEndDate = new Date(eventData.salesEndDate);
+    if (eventData.salesStartDate)
+      updateData.salesStartDate = new Date(eventData.salesStartDate);
+    if (eventData.salesEndDate)
+      updateData.salesEndDate = new Date(eventData.salesEndDate);
+    if (eventData.endDate !== undefined) {
+      updateData.endDate = eventData.endDate
+        ? new Date(eventData.endDate)
+        : null;
+    }
+
+    const statusActive = resolveStatusAndActive({
+      status: eventData.status,
+      isActive: eventData.isActive,
+      currentStatus: existingMeta?.status,
+    });
+    if (statusActive) {
+      if (eventData.status !== undefined) updateData.status = statusActive.status;
+      if (statusActive.status === "DRAFT") {
+        updateData.isActive = false;
+      } else if (eventData.isActive !== undefined) {
+        updateData.isActive = statusActive.isActive;
+      }
+    }
 
     // Solo ADMIN puede cambiar isFeatured, organizerId, organizationId
     if (user!.role === "ADMIN") {
@@ -149,7 +265,17 @@ export async function PATCH(
           include: eventInclude,
         });
 
+        if (artists !== undefined) {
+          await syncEventArtists(params.id, artists, tx);
+        }
+
         if (!ticketTypes || ticketTypes.length === 0) {
+          if (artists !== undefined) {
+            return tx.event.findUniqueOrThrow({
+              where: { id: params.id },
+              include: eventInclude,
+            });
+          }
           return current;
         }
 

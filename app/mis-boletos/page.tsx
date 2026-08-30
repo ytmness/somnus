@@ -8,6 +8,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { formatEventCalendarDate } from "@/lib/utils";
 import { SiteHeader, type SessionUser } from "@/components/layout/SiteHeader";
 import { AddToWalletButton } from "@/components/tickets/AddToWalletButton";
+import { AddToGoogleWalletButton } from "@/components/tickets/AddToGoogleWalletButton";
 
 interface TicketData {
   id: string;
@@ -47,6 +48,14 @@ export default function MisBoletosPage() {
   const router = useRouter();
   const [tickets, setTickets] = useState<TicketData[]>([]);
   const [walletPassEnabled, setWalletPassEnabled] = useState(false);
+  const [googleWalletEnabled, setGoogleWalletEnabled] = useState(false);
+  const [memberships, setMemberships] = useState<
+    Array<{
+      id: string;
+      organization: { name: string; slug: string };
+      plan: { name: string };
+    }>
+  >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [authRequired, setAuthRequired] = useState(false);
   const [user, setUser] = useState<SessionUser | null>(null);
@@ -77,8 +86,17 @@ export default function MisBoletosPage() {
         if (data.success && data.data) {
           setTickets(data.data.tickets || []);
           setWalletPassEnabled(Boolean(data.data.walletPassEnabled));
+          setGoogleWalletEnabled(Boolean(data.data.googleWalletEnabled));
         } else {
           toast.error(data.error || "Failed to load tickets");
+        }
+
+        const memRes = await fetch("/api/memberships/me", {
+          credentials: "include",
+        });
+        if (memRes.ok) {
+          const memJson = await memRes.json();
+          setMemberships(memJson.data || []);
         }
       } catch (error) {
         console.error("Error loading tickets:", error);
@@ -171,6 +189,17 @@ export default function MisBoletosPage() {
                 {user && (
                   <p className="somnus-text-body">
                     {user.name} • {user.email}
+                  </p>
+                )}
+                {memberships.length > 0 && (
+                  <p className="text-white/50 text-sm mt-2">
+                    Membresías:{" "}
+                    {memberships
+                      .map(
+                        (m) =>
+                          `${m.organization.name} (${m.plan.name})`
+                      )
+                      .join(" · ")}
                   </p>
                 )}
               </div>
@@ -278,10 +307,16 @@ export default function MisBoletosPage() {
                         </div>
                         <div className="flex flex-wrap items-center gap-3">
                           {ticket.status !== "CANCELLED" && (
-                            <AddToWalletButton
-                              ticketId={ticket.id}
-                              enabled={walletPassEnabled}
-                            />
+                            <>
+                              <AddToWalletButton
+                                ticketId={ticket.id}
+                                enabled={walletPassEnabled}
+                              />
+                              <AddToGoogleWalletButton
+                                ticketId={ticket.id}
+                                enabled={googleWalletEnabled}
+                              />
+                            </>
                           )}
                           {ticket.pdfUrl && (
                             <button

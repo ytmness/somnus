@@ -216,6 +216,16 @@ export default function VendedorPage() {
             >
               {submitting ? "Registrando..." : "Registrar venta POS"}
             </button>
+
+            <button
+              type="button"
+              disabled
+              title="Tap to Pay próximamente"
+              aria-disabled="true"
+              className="w-full py-3 rounded-xl border border-white/20 text-white/40 font-semibold cursor-not-allowed"
+            >
+              Tap to Pay próximamente
+            </button>
           </form>
         )}
       </main>

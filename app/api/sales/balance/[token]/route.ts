@@ -118,7 +118,10 @@ export async function POST(
     const intentParams: Parameters<typeof stripe.paymentIntents.create>[0] = {
       amount: sale.balanceDueCents,
       currency: "mxn",
-      payment_method_types: ["card"],
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: "never",
+      },
       receipt_email: sale.buyerEmail,
       metadata: {
         saleId: sale.id,
@@ -134,7 +137,7 @@ export async function POST(
     }
 
     const paymentIntent = await stripe.paymentIntents.create(intentParams, {
-      idempotencyKey: `sale:${sale.id}:balance_intent:v1`,
+      idempotencyKey: `sale:${sale.id}:balance_intent:v2-apm`,
     });
 
     return NextResponse.json({

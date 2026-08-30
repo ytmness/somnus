@@ -253,7 +253,7 @@ export async function POST(request: NextRequest) {
 
         const coverRow = event.ticketTypes.find((t) => t.id === pool.coverTicketTypeId);
         const coverPayload = coverRow
-          ? toInviteTicketPayload(coverRow, now)
+          ? toInviteTicketPayload(coverRow, now, { includeHidden: true })
           : null;
         if (!coverPayload) {
           return NextResponse.json(
