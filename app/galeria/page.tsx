@@ -139,7 +139,7 @@ function GaleriaContent() {
     <div className="min-h-screen somnus-bg-main overflow-x-hidden">
       <SiteHeader eventsHref="/" />
 
-      <main className="pt-24 sm:pt-32 pb-24 px-4 sm:px-6 lg:px-8">
+      <main className="somnus-page-under-header pb-24 px-4 sm:px-6 lg:px-8">
         <h1 className="somnus-title-secondary text-center text-4xl md:text-5xl mb-3 uppercase tracking-wider">
           Gallery
         </h1>

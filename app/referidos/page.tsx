@@ -95,7 +95,7 @@ export default function ReferidosPage() {
   return (
     <div className="min-h-screen somnus-bg-main">
       <SiteHeader eventsHref="/" onUserChange={handleUserChange} />
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 lg:pt-32 pb-16">
+      <main className="somnus-page-under-header max-w-3xl mx-auto px-4 sm:px-6 pb-16">
         <div className="flex items-center gap-3 mb-2">
           <Gift className="w-7 h-7 text-white/80" aria-hidden />
           <h1 className="text-2xl sm:text-3xl font-semibold text-white">

@@ -47,7 +47,7 @@ export default async function ArtistProfilePage({ params }: PageProps) {
         <SiteHeader eventsHref="/" />
       </div>
 
-      <main className="max-w-3xl mx-auto px-4 pt-24 pb-16 space-y-8">
+      <main className="somnus-page-under-header max-w-3xl mx-auto px-4 pb-16 space-y-8">
         <div className="flex flex-col sm:flex-row gap-6 items-start">
           <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl overflow-hidden bg-white/10 relative flex-shrink-0">
             {artist.imageUrl ? (

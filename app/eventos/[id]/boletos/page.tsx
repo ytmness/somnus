@@ -620,7 +620,7 @@ export default function EventBoletosPage() {
             SOMNUS
           </span>
         </header>
-        <main className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+        <main className="somnus-page-under-header pb-16 px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
             <div className="lg:col-span-5">
               <div className="aspect-[3/4] rounded-2xl bg-white/5 animate-pulse" />
@@ -667,12 +667,12 @@ export default function EventBoletosPage() {
     <div className="min-h-screen somnus-events-bg overflow-x-hidden">
       <SiteHeader eventsHref="/" />
 
-      <main className="pt-20 sm:pt-24 lg:pt-28 pb-28 lg:pb-16 px-4 sm:px-6 lg:px-8">
+      <main className="somnus-page-under-header pb-28 lg:pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           <button
             type="button"
             onClick={() => router.push(`/eventos/${eventId}`)}
-            className="somnus-nav-link inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-6"
+            className="somnus-nav-link relative z-0 inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-6"
           >
             <ArrowLeft className="w-4 h-4" aria-hidden />
             Back to event

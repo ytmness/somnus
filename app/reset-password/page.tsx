@@ -59,7 +59,7 @@ function ResetPasswordForm() {
   return (
     <div className="min-h-screen somnus-bg-main overflow-x-hidden">
       <SiteHeader eventsHref="/" />
-      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-32">
+      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 somnus-page-under-header">
         <div className="w-full max-w-md">
           <div className="somnus-card p-6 sm:p-8 lg:p-10">
             <div className="text-center mb-8">

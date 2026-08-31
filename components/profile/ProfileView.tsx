@@ -94,7 +94,7 @@ export function ProfileView({ profile, isOwn }: ProfileViewProps) {
 
         <SiteHeader eventsHref="/" />
 
-        <main className="relative z-10 mx-auto w-full max-w-5xl px-4 sm:px-6 pt-28 sm:pt-32 pb-20">
+        <main className="relative z-10 mx-auto w-full max-w-5xl px-4 sm:px-6 somnus-page-under-header pb-20">
           <section className="flex flex-col sm:flex-row sm:items-start gap-6 sm:gap-8">
             <div className="relative w-28 h-28 sm:w-36 sm:h-36 shrink-0 rounded-full overflow-hidden border border-white/20 bg-white/5 shadow-[0_0_0_1px_rgba(255,255,255,0.06)]">
               {profile.avatarUrl ? (
@@ -392,7 +392,7 @@ export function ProfilePageClient({ userId }: { userId?: string }) {
     return (
       <div className="min-h-screen bg-[#050505] text-white">
         <SiteHeader eventsHref="/" />
-        <div className="pt-32 text-center text-white/60">Profile not found.</div>
+        <div className="somnus-page-under-header text-center text-white/60">Profile not found.</div>
       </div>
     );
   }

@@ -177,18 +177,18 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
 
   return (
     <>
-      <header className="somnus-safe-header absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-5 flex items-center justify-between gap-3">
+      <header className="somnus-safe-header fixed top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-3 bg-gradient-to-b from-[#0A0A0A]/95 via-[#0A0A0A]/70 to-transparent">
         <button
           type="button"
           onClick={() => router.push("/")}
-          className="somnus-nav-link text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white shrink-0"
+          className="somnus-nav-link relative z-10 text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white shrink-0 leading-none py-2"
           aria-label="SOMNUS home"
           translate="no"
         >
           SOMNUS
         </button>
 
-        <nav className="flex items-center gap-1.5 sm:gap-3 lg:gap-5 min-w-0" aria-label="Main">
+        <nav className="relative z-10 flex items-center gap-1.5 sm:gap-3 lg:gap-5 min-w-0 shrink" aria-label="Main">
           <div className="hidden lg:flex items-center gap-5 min-w-0">
             {navItems.map((item) => renderNavLink(item))}
           </div>
@@ -324,7 +324,7 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
             aria-label="Close menu"
             onClick={() => setMenuOpen(false)}
           />
-          <div className="somnus-mobile-nav-sheet absolute top-[4.75rem] left-4 right-4 max-h-[min(78vh,calc(100dvh-5.5rem))] overflow-y-auto rounded-2xl border border-white/12 bg-[#0A0A0A]/92 backdrop-blur-xl shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+          <div className="somnus-mobile-nav-sheet absolute left-4 right-4 overflow-y-auto rounded-2xl border border-white/12 bg-[#0A0A0A]/92 backdrop-blur-xl shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
             <nav className="flex flex-col p-2" aria-label="Mobile">
               {navItems.map((item) => (
                 <div key={`${item.href}-${item.label}`}>

@@ -43,11 +43,11 @@ export function SomnusHeader({ user: userProp, userRole: userRoleProp, showNav =
   }, [userProp, userRoleProp]);
 
   return (
-    <header className="somnus-safe-header absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-5 flex items-center justify-between">
+    <header className="somnus-safe-header fixed top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-3 bg-gradient-to-b from-[#0A0A0A]/95 via-[#0A0A0A]/70 to-transparent">
       <button
         type="button"
         onClick={() => router.push("/")}
-        className="somnus-nav-link text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white"
+        className="somnus-nav-link relative z-10 text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white shrink-0 leading-none py-2"
         aria-label="SOMNUS home"
         translate="no"
       >

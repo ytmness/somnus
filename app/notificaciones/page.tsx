@@ -85,7 +85,7 @@ export default function NotificacionesPage() {
         <SiteHeader eventsHref="/" />
       </div>
 
-      <main className="max-w-2xl mx-auto px-4 pt-24 pb-16">
+      <main className="somnus-page-under-header max-w-2xl mx-auto px-4 pb-16">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold">Notificaciones</h1>
           {notifications.some((n) => !n.readAt) && (

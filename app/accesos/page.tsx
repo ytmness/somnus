@@ -101,7 +101,7 @@ export default function AccesosPage() {
     <div className="min-h-screen somnus-bg-main text-white">
       <SiteHeader eventsHref="/" />
 
-      <main className="mx-auto max-w-2xl px-4 sm:px-6 pt-24 sm:pt-28 pb-12 somnus-safe-bottom">
+      <main className="mx-auto max-w-2xl px-4 sm:px-6 somnus-page-under-header pb-12 somnus-safe-bottom">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full border border-white/15 bg-white/[0.04] mb-4">
             <ScanLine className="w-6 h-6 text-[#7BA3E8]" aria-hidden />

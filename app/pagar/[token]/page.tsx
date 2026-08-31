@@ -110,7 +110,7 @@ export default function PaymentLinkPage() {
   return (
     <div className="min-h-screen somnus-events-bg">
       <SiteHeader eventsHref="/" />
-      <main className="pt-24 pb-16 px-4 max-w-lg mx-auto">
+      <main className="somnus-page-under-header pb-16 px-4 max-w-lg mx-auto">
         {loading ? (
           <p className="text-white/60">Cargando…</p>
         ) : !data ? (

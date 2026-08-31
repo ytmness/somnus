@@ -76,7 +76,7 @@ export default function MensajesPageClient() {
         />
       </div>
 
-      <main className="max-w-5xl mx-auto px-4 pt-24 pb-8">
+      <main className="somnus-page-under-header max-w-5xl mx-auto px-4 pb-8">
         <h1 className="text-2xl font-bold mb-6">Mensajes</h1>
 
         <div className="somnus-card overflow-hidden grid md:grid-cols-[280px_1fr] min-h-[500px]">

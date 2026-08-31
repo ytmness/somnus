@@ -55,7 +55,7 @@ export default function FeedPage() {
         <SiteHeader eventsHref="/" />
       </div>
 
-      <main className="max-w-2xl mx-auto px-4 pt-24 pb-16">
+      <main className="somnus-page-under-header max-w-2xl mx-auto px-4 pb-16">
         <h1 className="text-2xl font-bold mb-2">Tu feed</h1>
         <p className="text-white/60 text-sm mb-8">
           Publicaciones y eventos de organizaciones que sigues

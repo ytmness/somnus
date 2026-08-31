@@ -190,7 +190,7 @@ export default function AdminPage() {
         </nav>
       </header>
 
-      <div className="pt-20 sm:pt-24 lg:pt-28 pb-4 border-b border-white/10">
+      <div className="somnus-page-under-header pb-4 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0 flex items-start gap-2">

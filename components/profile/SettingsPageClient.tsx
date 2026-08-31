@@ -119,7 +119,7 @@ export function SettingsPageClient() {
   return (
     <div className="min-h-screen bg-[#050505] text-white">
       <SiteHeader eventsHref="/" />
-      <main className="mx-auto w-full max-w-xl px-4 sm:px-6 pt-28 pb-24">
+      <main className="mx-auto w-full max-w-xl px-4 sm:px-6 somnus-page-under-header pb-24">
         <h1 className="text-center text-sm font-semibold uppercase tracking-[0.25em] mb-10">
           Settings
         </h1>

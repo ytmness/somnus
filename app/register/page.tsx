@@ -139,7 +139,7 @@ function RegisterContent() {
     <div className="min-h-screen somnus-bg-main overflow-x-hidden">
       <SiteHeader eventsHref="/" />
 
-      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-32 pb-12">
+      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 somnus-page-under-header pb-12">
         <div className="w-full max-w-5xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             <div className="hidden lg:flex flex-col justify-center space-y-8">

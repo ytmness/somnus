@@ -73,11 +73,11 @@ export default function EventGalleryPage() {
         <SiteHeader eventsHref="/" />
       </div>
 
-      <main className="max-w-5xl mx-auto px-4 pt-24 pb-16">
+      <main className="somnus-page-under-header max-w-5xl mx-auto px-4 pb-16">
         <button
           type="button"
           onClick={() => router.push(`/eventos/${eventId}`)}
-          className="somnus-nav-link inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-6"
+          className="somnus-nav-link relative z-0 inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-6"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden />
           Back to event

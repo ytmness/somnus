@@ -43,7 +43,7 @@ export default function OrganizacionesPage() {
         <SiteHeader eventsHref="/" />
       </div>
 
-      <main className="max-w-4xl mx-auto px-4 pt-24 pb-16">
+      <main className="somnus-page-under-header max-w-4xl mx-auto px-4 pb-16">
         <h1 className="text-3xl font-bold mb-2">Organizaciones</h1>
         <p className="text-white/60 mb-8">Descubre y sigue a tus organizadores favoritos</p>
 

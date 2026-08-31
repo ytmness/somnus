@@ -108,7 +108,7 @@ function MembresiasContent() {
   return (
     <div className="min-h-screen somnus-bg-main">
       <SiteHeader eventsHref="/" onUserChange={handleUserChange} />
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 lg:pt-32 pb-16">
+      <main className="somnus-page-under-header max-w-3xl mx-auto px-4 sm:px-6 pb-16">
         <h1 className="text-2xl sm:text-3xl font-semibold text-white mb-2">
           Membresías{orgName ? ` · ${orgName}` : ""}
         </h1>

@@ -89,7 +89,7 @@ export default function OrganizationProfileClient({ slug }: OrganizationProfileC
         <SiteHeader eventsHref="/" onUserChange={(u) => setUser(u)} />
       </div>
 
-      <main className="max-w-3xl mx-auto px-4 pt-24 pb-16 space-y-6">
+      <main className="somnus-page-under-header max-w-3xl mx-auto px-4 pb-16 space-y-6">
         <OrganizationProfileHeader
           profile={profile}
           isLoggedIn={!!user}

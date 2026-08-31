@@ -91,7 +91,7 @@ export default function ExplorarPage() {
         <SiteHeader eventsHref="/" />
       </div>
 
-      <main className="max-w-4xl mx-auto px-4 pt-24 pb-16">
+      <main className="somnus-page-under-header max-w-4xl mx-auto px-4 pb-16">
         <h1 className="text-2xl sm:text-3xl font-bold mb-2">Explorar</h1>
         <p className="text-white/60 text-sm mb-6">
           Search events, artists, and communities

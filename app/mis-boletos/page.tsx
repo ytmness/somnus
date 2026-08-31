@@ -126,7 +126,7 @@ export default function MisBoletosPage() {
     return (
       <div className="min-h-screen somnus-bg-main">
         <SiteHeader eventsHref="/" onUserChange={handleUserChange} />
-        <main className="w-full py-8 pt-24 lg:pt-32">
+        <main className="somnus-page-under-header w-full pb-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center py-20">
               <div className="w-16 h-16 border-4 border-white/50 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -142,7 +142,7 @@ export default function MisBoletosPage() {
     return (
       <div className="min-h-screen somnus-bg-main">
         <SiteHeader eventsHref="/" onUserChange={handleUserChange} />
-        <main className="w-full py-8 pt-24 lg:pt-32">
+        <main className="somnus-page-under-header w-full pb-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center py-20">
               <h1 className="somnus-display text-2xl sm:text-3xl text-white mb-3 uppercase tracking-wider">
@@ -169,13 +169,13 @@ export default function MisBoletosPage() {
     <div className="min-h-screen somnus-bg-main overflow-x-hidden">
       <SiteHeader eventsHref="/" onUserChange={handleUserChange} />
 
-      <main className="w-full py-8 pt-20 sm:pt-24 lg:pt-32">
+      <main className="somnus-page-under-header w-full pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <button
               type="button"
               onClick={() => router.push("/")}
-              className="somnus-nav-link inline-flex items-center gap-2 mb-6"
+              className="somnus-nav-link relative z-0 inline-flex items-center gap-2 mb-6"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Events
