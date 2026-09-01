@@ -29,7 +29,7 @@ export async function generateTicketPDF(ticketData: TicketPDFData): Promise<Buff
   const pageHeight = 105;
 
   // Fondo con gradiente simulado
-  pdf.setFillColor(42, 44, 48); // regia-dark
+  pdf.setFillColor(42, 44, 48); // brand-dark
   pdf.rect(0, 0, pageWidth, pageHeight, "F");
 
   // Borde azul media noche
@@ -44,7 +44,7 @@ export async function generateTicketPDF(ticketData: TicketPDFData): Promise<Buff
   pdf.text("Somnus", 10, 12);
   
   pdf.setFontSize(8);
-  pdf.setTextColor(249, 251, 246); // regia-cream
+  pdf.setTextColor(249, 251, 246); // brand-cream
   pdf.text("BOLETERA OFICIAL", 10, 17);
 
   // Línea divisoria

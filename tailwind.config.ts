@@ -10,8 +10,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // === NUEVA PALETA BOLETERA REGIA ===
-        regia: {
+        // Paleta accent Somnus (Tailwind: text-brand-cream, border-brand-gold, etc.)
+        brand: {
           // Colores principales - Azul media noche
           black: "#0A0A0A",           // Negro Profundo - Fondo principal
           'gold-old': "#5B8DEF",      // Azul media noche - Botones, detalles

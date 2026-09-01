@@ -241,11 +241,11 @@ export function GalleryManager() {
           value={newSectionTitle}
           onChange={(e) => setNewSectionTitle(e.target.value)}
           placeholder="New section name"
-          className="px-4 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white placeholder-white/50 w-64 focus:outline-none focus:border-regia-gold"
+          className="px-4 py-2 rounded-lg bg-white/10 border border-brand-gold/30 text-white placeholder-white/50 w-64 focus:outline-none focus:border-brand-gold"
         />
         <Button
           onClick={createSection}
-          className="bg-regia-gold hover:bg-regia-gold/90 text-white"
+          className="bg-brand-gold hover:bg-brand-gold/90 text-white"
         >
           <Plus className="w-4 h-4 mr-2" />
           Create section
@@ -262,7 +262,7 @@ export function GalleryManager() {
         {sections.map((section) => (
           <div
             key={section.id}
-            className="bg-white/5 border border-regia-gold/20 rounded-lg p-6"
+            className="bg-white/5 border border-brand-gold/20 rounded-lg p-6"
           >
             <input
               id={uploadInputId(section.id)}
@@ -316,7 +316,7 @@ export function GalleryManager() {
               }}
               className={`mb-4 block rounded-xl border-2 border-dashed px-4 py-8 text-center cursor-pointer transition-colors ${
                 dragOver === section.id
-                  ? "border-regia-gold bg-regia-gold/10"
+                  ? "border-brand-gold bg-brand-gold/10"
                   : "border-white/25 hover:border-white/40 hover:bg-white/5"
               } ${uploadBusy === section.id ? "opacity-60 pointer-events-none" : ""}`}
             >
@@ -339,7 +339,7 @@ export function GalleryManager() {
                   triggerFilePicker(section.id);
                 }}
                 disabled={uploadBusy === section.id}
-                className="border-regia-gold/50 text-regia-gold hover:bg-regia-gold hover:text-regia-dark"
+                className="border-brand-gold/50 text-brand-gold hover:bg-brand-gold hover:text-brand-dark"
               >
                 <ImageIcon className="w-4 h-4 mr-2" />
                 {uploadBusy === section.id ? "Uploading…" : "Choose files"}
@@ -369,12 +369,12 @@ export function GalleryManager() {
                     }))
                   }
                   placeholder="https://… or /assets/…"
-                  className="flex-1 min-w-[200px] px-4 py-2 rounded-lg bg-white/10 border border-regia-gold/30 text-white placeholder-white/50 focus:outline-none focus:border-regia-gold"
+                  className="flex-1 min-w-[200px] px-4 py-2 rounded-lg bg-white/10 border border-brand-gold/30 text-white placeholder-white/50 focus:outline-none focus:border-brand-gold"
                 />
                 <Button
                   size="sm"
                   onClick={() => addImageFromUrl(section.id)}
-                  className="bg-regia-gold hover:bg-regia-gold/90"
+                  className="bg-brand-gold hover:bg-brand-gold/90"
                 >
                   Add URL
                 </Button>

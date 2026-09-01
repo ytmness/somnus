@@ -87,15 +87,15 @@ body::-webkit-scrollbar {
     --somnus-offwhite: #F5F5F5;
     --somnus-cream: #E5E5E5;
     
-    /* Colores legacy (compatibilidad - tonos azules) */
-    --regia-black: #0A0A0A;
-    --regia-gold-old: #5B8DEF;
-    --regia-cream: #E0E0E0;
-    --regia-metallic-gray: #2D2D2D;
-    --regia-gold-bright: #7BA3E8;
-    --regia-gold: #5B8DEF;
-    --regia-dark: #2a2c30;
-    --regia-gray: #49484e;
+    /* Paleta accent (legacy regia → brand) */
+    --brand-black: #0A0A0A;
+    --brand-gold-old: #5B8DEF;
+    --brand-cream: #E0E0E0;
+    --brand-metallic-gray: #2D2D2D;
+    --brand-gold-bright: #7BA3E8;
+    --brand-gold: #5B8DEF;
+    --brand-dark: #2a2c30;
+    --brand-gray: #49484e;
     
     /* Colores shadcn/ui */
     --background: 0 0% 100%;
@@ -174,7 +174,7 @@ body::-webkit-scrollbar {
 
 @layer components {
   /* ===== FONDOS ===== */
-  .regia-bg-main {
+  .brand-bg-main {
     @apply bg-[#0A0A0A];
     background: 
       radial-gradient(ellipse at top center, rgba(91, 141, 239, 0.2) 0%, transparent 60%),
@@ -206,7 +206,7 @@ body::-webkit-scrollbar {
     opacity: 0.5;
   }
   
-  .regia-bg-textured {
+  .brand-bg-textured {
     background-color: #0A0A0A;
     background-image: 
       radial-gradient(at 20% 30%, rgba(91, 141, 239, 0.08) 0px, transparent 50%),
@@ -260,11 +260,11 @@ body::-webkit-scrollbar {
     opacity: 0.22;
   }
   
-  .regia-gradient {
+  .brand-gradient {
     background: linear-gradient(135deg, #2a2c30 0%, #49484e 100%);
   }
 
-  .regia-gold-gradient {
+  .brand-gold-gradient {
     background: linear-gradient(135deg, #5B8DEF 0%, #7BA3E8 100%);
   }
   
@@ -334,7 +334,7 @@ body::-webkit-scrollbar {
   }
   
   /* Legacy - mantener compatibilidad */
-  .regia-btn-primary {
+  .brand-btn-primary {
     @apply font-bold uppercase tracking-wider px-8 py-3.5 rounded-full;
     @apply transition-all duration-300 ease-in-out;
     background: rgba(255, 255, 255, 0.1);
@@ -344,31 +344,31 @@ body::-webkit-scrollbar {
     box-shadow: 0 8px 32px rgba(91, 141, 239, 0.3);
   }
   
-  .regia-btn-primary:hover {
+  .brand-btn-primary:hover {
     @apply -translate-y-0.5;
     background: rgba(91, 141, 239, 0.2);
     border-color: rgba(123, 163, 232, 0.6);
     box-shadow: 0 12px 40px rgba(91, 141, 239, 0.5);
   }
   
-  .regia-btn-secondary {
+  .brand-btn-secondary {
     @apply font-semibold uppercase tracking-wider px-8 py-3.5 rounded-full;
     @apply transition-all duration-300 ease-in-out;
     @apply bg-transparent text-white border-2 border-[#5B8DEF]/30;
   }
   
-  .regia-btn-secondary:hover {
+  .brand-btn-secondary:hover {
     @apply text-white border-[#5B8DEF]/50;
     background: rgba(91, 141, 239, 0.1);
     box-shadow: 0 4px 15px rgba(91, 141, 239, 0.3);
   }
   
   /* Botones legacy (compatibilidad) */
-  .regia-button-primary {
+  .brand-button-primary {
     @apply bg-[#5B8DEF] hover:bg-[#5B8DEF]/90 text-white font-semibold transition-all;
   }
 
-  .regia-button-secondary {
+  .brand-button-secondary {
     @apply bg-[#2a2c30] hover:bg-[#49484e] text-[#f9fbf6] border border-[#5B8DEF]/30 transition-all;
   }
   
@@ -399,37 +399,37 @@ body::-webkit-scrollbar {
   }
   
   /* Legacy - mantener para compatibilidad pero sin bordes */
-  .regia-ticket-card {
+  .brand-ticket-card {
     @apply bg-transparent border-none rounded-none p-6;
     @apply transition-all duration-300 ease-in-out;
     backdrop-filter: none;
   }
   
-  .regia-ticket-card:hover {
+  .brand-ticket-card:hover {
     @apply -translate-y-1;
     box-shadow: none;
   }
   
-  .regia-card {
+  .brand-card {
     @apply bg-white/5 backdrop-blur-sm border border-[#5B8DEF]/20 rounded-xl;
   }
 
-  .regia-card-glow {
+  .brand-card-glow {
     @apply relative bg-[#2D2D2D] border border-[#5B8DEF] rounded-2xl overflow-hidden;
   }
 
-  .regia-card-glow::before {
+  .brand-card-glow::before {
     @apply absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none;
     content: '';
     background: linear-gradient(135deg, rgba(91, 141, 239, 0.1) 0%, transparent 50%);
   }
 
-  .regia-card-glow:hover::before {
+  .brand-card-glow:hover::before {
     @apply opacity-100;
   }
   
   /* ===== TIPOGRAFÍA ===== */
-  .regia-title-main {
+  .brand-title-main {
     @apply font-black uppercase leading-none tracking-tight text-[#7BA3E8];
     font-family: var(--font-anton, var(--font-display), 'Arial Black', sans-serif);
     text-shadow: 0 0 40px rgba(91, 141, 239, 0.5);
@@ -647,59 +647,59 @@ body::-webkit-scrollbar {
   }
   
   /* Legacy - mantener compatibilidad */
-  .regia-title-secondary {
+  .brand-title-secondary {
     @apply font-semibold text-white;
     font-family: var(--font-archivo, var(--font-sans), sans-serif);
   }
   
-  .regia-text-body {
+  .brand-text-body {
     @apply text-white/80;
     font-family: var(--font-archivo, var(--font-sans), sans-serif);
     line-height: 1.6;
   }
   
   /* ===== NAVBAR ===== */
-  .regia-navbar {
+  .brand-navbar {
     @apply sticky top-0 z-50;
     background: rgba(10, 10, 10, 0.85);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(197, 160, 89, 0.2);
   }
   
-  .regia-nav-link {
+  .brand-nav-link {
     @apply text-[#E0E0E0] font-medium uppercase text-sm tracking-wider px-4 py-2;
     @apply transition-colors duration-300 relative;
     font-family: var(--font-archivo, var(--font-sans), sans-serif);
   }
   
-  .regia-nav-link::after {
+  .brand-nav-link::after {
     @apply absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#F4D03F];
     @apply transition-all duration-300;
     content: '';
   }
   
-  .regia-nav-link:hover {
+  .brand-nav-link:hover {
     @apply text-[#F4D03F];
   }
   
-  .regia-nav-link:hover::after {
+  .brand-nav-link:hover::after {
     @apply w-4/5;
   }
   
   /* ===== FOOTER ===== */
-  .regia-footer {
+  .brand-footer {
     @apply bg-[#2D2D2D] border-t py-8;
     border-top-color: rgba(197, 160, 89, 0.2);
   }
   
-  .regia-footer-text {
+  .brand-footer-text {
     @apply text-center text-sm;
     color: rgba(224, 224, 224, 0.6);
     font-family: var(--font-archivo, var(--font-sans), sans-serif);
   }
   
   /* ===== HERO SECTION ===== */
-  .regia-hero {
+  .brand-hero {
     @apply relative min-h-screen flex items-center justify-center overflow-hidden;
     background: 
       radial-gradient(ellipse at top, rgba(91, 141, 239, 0.25) 0%, transparent 50%),
@@ -709,7 +709,7 @@ body::-webkit-scrollbar {
     position: relative;
   }
   
-  .regia-hero::before {
+  .brand-hero::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -720,7 +720,7 @@ body::-webkit-scrollbar {
     z-index: 1;
   }
   
-  .regia-hero-overlay {
+  .brand-hero-overlay {
     @apply absolute inset-0 z-[1];
     background: linear-gradient(
       180deg,
@@ -730,11 +730,11 @@ body::-webkit-scrollbar {
     );
   }
   
-  .regia-hero-content {
+  .brand-hero-content {
     @apply relative z-[2] text-center px-8;
   }
   
-  .regia-hero-artist {
+  .brand-hero-artist {
     @apply font-black uppercase leading-none mb-4;
     font-family: var(--font-anton, var(--font-display), 'Arial Black', sans-serif);
     font-size: clamp(3rem, 10vw, 8rem);
@@ -746,7 +746,7 @@ body::-webkit-scrollbar {
     text-shadow: 0 0 40px rgba(91, 141, 239, 0.5);
   }
   
-  .regia-hero-subtitle {
+  .brand-hero-subtitle {
     @apply uppercase tracking-widest mb-2;
     font-family: var(--font-archivo, var(--font-sans), sans-serif);
     font-size: clamp(1rem, 2vw, 1.5rem);
@@ -864,7 +864,7 @@ html[data-native] [data-pwa-install] {
   }
   
   /* Backdrop blur personalizado */
-  .backdrop-blur-regia {
+  .backdrop-blur-brand {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
@@ -1087,7 +1087,7 @@ video.video-cupido-mobile {
 
   .somnus-btn:hover:not(:disabled),
   .somnus-card:hover,
-  .regia-ticket-card:hover {
+  .brand-ticket-card:hover {
     transform: none !important;
   }
 }

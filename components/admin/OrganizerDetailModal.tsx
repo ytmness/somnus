@@ -177,8 +177,8 @@ export function OrganizerDetailModal({
       aria-modal="true"
       aria-labelledby="organizer-detail-title"
     >
-      <div className="bg-[#2a2c30] rounded-xl border border-regia-gold/20 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-[#2a2c30] border-b border-regia-gold/20 p-6 flex items-center justify-between z-10">
+      <div className="bg-[#2a2c30] rounded-xl border border-brand-gold/20 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-[#2a2c30] border-b border-brand-gold/20 p-6 flex items-center justify-between z-10">
           <div>
             <h2 id="organizer-detail-title" className="text-2xl font-bold text-white">
               {loading ? "Cargando..." : detail?.businessName || "Organizador"}

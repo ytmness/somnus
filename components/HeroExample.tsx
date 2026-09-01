@@ -27,7 +27,7 @@ export function HeroExample({
   const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <section className="regia-hero">
+    <section className="brand-hero">
       {/* Imagen de fondo del artista */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -43,29 +43,29 @@ export function HeroExample({
       </div>
 
       {/* Overlay oscuro */}
-      <div className="regia-hero-overlay" />
+      <div className="brand-hero-overlay" />
 
       {/* Contenido principal */}
-      <div className="regia-hero-content max-w-5xl mx-auto">
+      <div className="brand-hero-content max-w-5xl mx-auto">
         {/* Nombre del artista - Título principal */}
-        <h1 className="regia-hero-artist mb-6">
+        <h1 className="brand-hero-artist mb-6">
           {artist}
         </h1>
 
         {/* Subtítulo - Fecha */}
-        <p className="regia-hero-subtitle mb-3">
+        <p className="brand-hero-subtitle mb-3">
           {date}
         </p>
 
         {/* Venue / Ubicación */}
-        <p className="text-regia-cream text-lg md:text-xl mb-8 font-light tracking-wide">
+        <p className="text-brand-cream text-lg md:text-xl mb-8 font-light tracking-wide">
           Location: {venue}
         </p>
 
         {/* Botón de compra */}
         <button
           onClick={onBuyTickets}
-          className="regia-btn-primary text-lg"
+          className="brand-btn-primary text-lg"
         >
           Buy Tickets
         </button>
@@ -111,7 +111,7 @@ export function AboutArtistSection({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         {/* Imagen del artista */}
         <div className="order-2 lg:order-1">
-          <div className="relative aspect-square rounded-2xl overflow-hidden border-2 border-regia-gold-old/30 shadow-2xl">
+          <div className="relative aspect-square rounded-2xl overflow-hidden border-2 border-brand-gold-old/30 shadow-2xl">
             <Image
               src={artistImage}
               alt="Artist"
@@ -136,18 +136,18 @@ export function AboutArtistSection({
 
         {/* Información */}
         <div className="order-1 lg:order-2">
-          <h2 className="text-4xl md:text-6xl mb-8 regia-title-main">
+          <h2 className="text-4xl md:text-6xl mb-8 brand-title-main">
             {title}
           </h2>
           
-          <div className="space-y-4 regia-text-body text-base md:text-lg leading-relaxed">
+          <div className="space-y-4 brand-text-body text-base md:text-lg leading-relaxed">
             {description.split('\n\n').map((paragraph, index) => (
               <p key={index}>{paragraph}</p>
             ))}
           </div>
 
           {/* Decoración dorada */}
-          <div className="mt-8 w-24 h-1 bg-gradient-to-r from-regia-gold-old to-regia-gold-bright rounded-full" />
+          <div className="mt-8 w-24 h-1 bg-gradient-to-r from-brand-gold-old to-brand-gold-bright rounded-full" />
         </div>
       </div>
     </section>
@@ -171,18 +171,18 @@ export function TicketTypeCard({
   highlighted = false,
 }: TicketTypeCardProps) {
   return (
-    <div className={`regia-ticket-card ${highlighted ? 'ring-2 ring-regia-gold-bright' : ''}`}>
-      <h3 className="regia-title-secondary text-2xl md:text-3xl mb-4 uppercase tracking-wide">
+    <div className={`brand-ticket-card ${highlighted ? 'ring-2 ring-brand-gold-bright' : ''}`}>
+      <h3 className="brand-title-secondary text-2xl md:text-3xl mb-4 uppercase tracking-wide">
         {title}
       </h3>
       
-      <p className="regia-text-body text-sm md:text-base mb-6 leading-relaxed">
+      <p className="brand-text-body text-sm md:text-base mb-6 leading-relaxed">
         {description}
       </p>
       
       <button
         onClick={onSelect}
-        className="regia-btn-primary w-full"
+        className="brand-btn-primary w-full"
       >
         SELECT
       </button>
@@ -209,7 +209,7 @@ export function TicketTiersSection({
 }: TicketTiersProps) {
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <h2 className="text-3xl md:text-5xl mb-12 text-center regia-title-main">
+      <h2 className="text-3xl md:text-5xl mb-12 text-center brand-title-main">
         TICKET TIERS
       </h2>
 
@@ -241,7 +241,7 @@ export function EventPageExample() {
   };
 
   return (
-    <div className="regia-bg-textured min-h-screen">
+    <div className="brand-bg-textured min-h-screen">
       {/* Hero Section */}
       <HeroExample
         artist="VICTOR MENDIUM"

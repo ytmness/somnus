@@ -80,7 +80,7 @@ export function ContactLeadsManager() {
               <td className="py-3 px-4">
                 <a
                   href={`mailto:${lead.email}`}
-                  className="text-regia-gold hover:text-regia-gold/80 flex items-center gap-2 text-sm"
+                  className="text-brand-gold hover:text-brand-gold/80 flex items-center gap-2 text-sm"
                 >
                   <Mail className="w-4 h-4" />
                   {lead.email}

@@ -29,7 +29,7 @@ export function NavbarMockup({
   ];
 
   return (
-    <nav className="regia-navbar">
+    <nav className="brand-navbar">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
@@ -50,7 +50,7 @@ export function NavbarMockup({
               <Link
                 key={link.href}
                 href={link.href}
-                className="regia-nav-link"
+                className="brand-nav-link"
               >
                 {link.label}
               </Link>
@@ -63,12 +63,12 @@ export function NavbarMockup({
             {onCartClick && (
               <button
                 onClick={onCartClick}
-                className="relative text-regia-cream hover:text-regia-gold-bright transition-colors p-2"
+                className="relative text-brand-cream hover:text-brand-gold-bright transition-colors p-2"
                 aria-label="Shopping Cart"
               >
                 <ShoppingCart className="w-6 h-6" />
                 {cartItemsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-regia-gold-bright text-regia-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-brand-gold-bright text-brand-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                     {cartItemsCount}
                   </span>
                 )}
@@ -77,7 +77,7 @@ export function NavbarMockup({
 
             {/* Buy Tickets Button */}
             <Link href="#tickets">
-              <button className="regia-btn-primary text-sm px-6 py-2.5">
+              <button className="brand-btn-primary text-sm px-6 py-2.5">
                 BUY TICKETS
               </button>
             </Link>
@@ -86,7 +86,7 @@ export function NavbarMockup({
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden text-regia-cream hover:text-regia-gold-bright transition-colors p-2"
+            className="md:hidden text-brand-cream hover:text-brand-gold-bright transition-colors p-2"
             aria-label="Toggle mobile menu"
           >
             {mobileMenuOpen ? (
@@ -100,13 +100,13 @@ export function NavbarMockup({
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-regia-gold-old/20 bg-regia-black/95 backdrop-blur-lg">
+        <div className="md:hidden border-t border-brand-gold-old/20 bg-brand-black/95 backdrop-blur-lg">
           <div className="px-4 py-4 space-y-3">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="block text-regia-cream hover:text-regia-gold-bright font-medium uppercase text-sm tracking-wider py-2 transition-colors"
+                className="block text-brand-cream hover:text-brand-gold-bright font-medium uppercase text-sm tracking-wider py-2 transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {link.label}
@@ -114,18 +114,18 @@ export function NavbarMockup({
             ))}
             
             {/* Mobile Cart & Buy Tickets */}
-            <div className="pt-4 border-t border-regia-gold-old/20 space-y-3">
+            <div className="pt-4 border-t border-brand-gold-old/20 space-y-3">
               {onCartClick && (
                 <button
                   onClick={() => {
                     onCartClick();
                     setMobileMenuOpen(false);
                   }}
-                  className="flex items-center justify-between w-full text-regia-cream hover:text-regia-gold-bright transition-colors py-2"
+                  className="flex items-center justify-between w-full text-brand-cream hover:text-brand-gold-bright transition-colors py-2"
                 >
                   <span className="font-medium uppercase text-sm tracking-wider">CART</span>
                   {cartItemsCount > 0 && (
-                    <span className="bg-regia-gold-bright text-regia-black text-xs font-bold rounded-full px-2 py-1">
+                    <span className="bg-brand-gold-bright text-brand-black text-xs font-bold rounded-full px-2 py-1">
                       {cartItemsCount}
                     </span>
                   )}
@@ -134,7 +134,7 @@ export function NavbarMockup({
               
               <Link href="#tickets">
                 <button
-                  className="regia-btn-primary w-full text-sm"
+                  className="brand-btn-primary w-full text-sm"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   BUY TICKETS
@@ -182,7 +182,7 @@ export function FooterMockup({
   };
 
   return (
-    <footer className="regia-footer">
+    <footer className="brand-footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-12">
@@ -195,14 +195,14 @@ export function FooterMockup({
               height={60}
               className="mb-6 opacity-90"
             />
-            <p className="regia-text-body text-sm leading-relaxed max-w-md">
+            <p className="brand-text-body text-sm leading-relaxed max-w-md">
               {footerSections.about.content}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="regia-title-secondary text-lg mb-4">
+            <h4 className="brand-title-secondary text-lg mb-4">
               Enlaces Rápidos
             </h4>
             <ul className="space-y-2">
@@ -210,7 +210,7 @@ export function FooterMockup({
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="regia-text-body text-sm hover:text-regia-gold-bright transition-colors inline-block"
+                    className="brand-text-body text-sm hover:text-brand-gold-bright transition-colors inline-block"
                   >
                     {link.label}
                   </Link>
@@ -221,14 +221,14 @@ export function FooterMockup({
 
           {/* Contact Info */}
           <div>
-            <h4 className="regia-title-secondary text-lg mb-4">
+            <h4 className="brand-title-secondary text-lg mb-4">
               {footerSections.contact.title}
             </h4>
-            <ul className="space-y-3 regia-text-body text-sm">
+            <ul className="space-y-3 brand-text-body text-sm">
               <li>
                 <a
                   href={`mailto:${footerSections.contact.email}`}
-                  className="hover:text-regia-gold-bright transition-colors"
+                  className="hover:text-brand-gold-bright transition-colors"
                 >
                   {footerSections.contact.email}
                 </a>
@@ -242,10 +242,10 @@ export function FooterMockup({
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-regia-gold-old/20 pt-8 pb-6">
+        <div className="border-t border-brand-gold-old/20 pt-8 pb-6">
           <div className="flex flex-col items-center gap-4">
             {/* Copyright */}
-            <p className="regia-footer-text text-center">
+            <p className="brand-footer-text text-center">
               © {currentYear} Somnus. Todos los derechos reservados.
             </p>
           </div>
@@ -270,7 +270,7 @@ export function LayoutMockup({
   onCartClick,
 }: LayoutMockupProps) {
   return (
-    <div className="min-h-screen flex flex-col regia-bg-textured">
+    <div className="min-h-screen flex flex-col brand-bg-textured">
       <NavbarMockup
         cartItemsCount={cartItemsCount}
         onCartClick={onCartClick}
