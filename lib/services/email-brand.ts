@@ -1,3 +1,4 @@
+import { somnusAssetUrl, SOMNUS_LOGO_PATH } from "@/lib/brand";
 import { getAppUrl } from "@/lib/payments/config";
 
 export const SOMNUS_FROM_NAME = "Somnus";
@@ -11,7 +12,7 @@ const MUTED = "#C8C8C8";
 const ACCENT = "#5B8DEF";
 
 export function somnusLogoUrl(appUrl = getAppUrl()): string {
-  return `${appUrl.replace(/\/$/, "")}/assets/SOMNUS%20LOGO%20BLANCO.png`;
+  return somnusAssetUrl(SOMNUS_LOGO_PATH, appUrl);
 }
 
 export function wrapSomnusEmail(params: {

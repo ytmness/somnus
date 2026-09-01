@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 /**
- * Legacy: mapa de mesas con filas (Grupo Regia / Patriotas).
+ * Legacy: mapa de mesas con filas (Patriotas).
  * Somnus vende mesas solo por link desde Admin.
  */
 export default function EventMesasRedirectPage() {

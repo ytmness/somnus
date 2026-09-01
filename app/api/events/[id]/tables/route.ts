@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * GET /api/events/[id]/tables
- * Somnus: mesas = links con nombre (TableInvitePool), no plano con filas tipo Grupo Regia.
+ * Somnus: mesas = links con nombre (TableInvitePool), no plano con filas legacy.
  */
 export async function GET(
   _request: NextRequest,

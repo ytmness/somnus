@@ -1,4 +1,4 @@
-# 🎫 Boletera Regia - Sistema Profesional de Boletería
+# Somnus — Plataforma de boletos
 
 Sistema completo de venta y gestión de boletos para eventos en vivo, desarrollado para **Somnus**.
 

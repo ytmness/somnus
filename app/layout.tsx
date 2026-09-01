@@ -4,6 +4,8 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "sonner";
 import { NativeShell } from "@/components/native/NativeShell";
+import { SOMNUS_LOGO_PATH, SOMNUS_OG_IMAGE_PATH } from "@/lib/brand";
+import { getAppUrl } from "@/lib/payments/config";
 
 // Fuente principal para texto (según mockup)
 const archivo = Archivo({
@@ -39,10 +41,18 @@ export const viewport: Viewport = {
   themeColor: "#5B8DEF",
 };
 
+const siteUrl = getAppUrl().startsWith("http")
+  ? getAppUrl()
+  : "https://somnus.live";
+
 export const metadata: Metadata = {
-  title: "Somnus Ticket Platform",
-  description: "Ticket sales platform for Somnus events",
-  keywords: ["tickets", "events", "concerts", "Somnus"],
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Somnus",
+    template: "%s | Somnus",
+  },
+  description: "Boletos y eventos Somnus — compra entradas en línea.",
+  keywords: ["boletos", "eventos", "Somnus", "tickets"],
   authors: [{ name: "Somnus" }],
   manifest: "/manifest.json",
   themeColor: "#5B8DEF",
@@ -52,13 +62,30 @@ export const metadata: Metadata = {
     title: "Somnus",
   },
   openGraph: {
-    title: "Somnus Ticket Platform",
-    description: "Ticket sales platform for Somnus events",
+    title: "Somnus",
+    description: "Boletos y eventos Somnus — compra entradas en línea.",
     type: "website",
+    siteName: "Somnus",
+    locale: "es_MX",
+    url: "/",
+    images: [
+      {
+        url: SOMNUS_OG_IMAGE_PATH,
+        width: 1200,
+        height: 630,
+        alt: "Somnus — eventos y boletos",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Somnus",
+    description: "Boletos y eventos Somnus — compra entradas en línea.",
+    images: [SOMNUS_OG_IMAGE_PATH],
   },
   icons: {
-    icon: "/assets/logo.png",
-    apple: "/assets/logo.png",
+    icon: SOMNUS_LOGO_PATH,
+    apple: SOMNUS_LOGO_PATH,
   },
 };
 

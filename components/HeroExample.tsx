@@ -13,7 +13,7 @@ interface HeroExampleProps {
 }
 
 /**
- * Hero Section estilo mockup de Boletera Regia
+ * Hero Section estilo mockup Somnus
  * Basado en el diseño de Victor Mendium
  */
 export function HeroExample({
@@ -248,7 +248,7 @@ export function EventPageExample() {
         date="SATURDAY MAY 20TH, 2026"
         venue="THE TEMPLE STAGE, MEXICO CITY"
         imageUrl="/path-to-artist-image.jpg"
-        logoUrl="/assets/logo.png"
+        logoUrl="/assets/SOMNUS LOGO BLANCO.png"
         onBuyTickets={handleBuyTickets}
       />
 
@@ -256,7 +256,7 @@ export function EventPageExample() {
       <AboutArtistSection
         description="Universo visual oscuro, pesado, pesado pesado y cinemático, cafein, confratatsts and comitate la, cad ciromstad texturas sucia, canceriices lar niagua ad and autios tea qura nted atmosfera casi ritual."
         artistImage="/path-to-artist-photo.jpg"
-        logoUrl="/assets/logo.png"
+        logoUrl="/assets/SOMNUS LOGO BLANCO.png"
       />
 
       {/* Ticket Tiers */}

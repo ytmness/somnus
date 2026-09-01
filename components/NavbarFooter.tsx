@@ -15,7 +15,7 @@ interface NavbarProps {
  * Navbar estilo mockup - Fondo oscuro con blur
  */
 export function NavbarMockup({
-  logoUrl = "/assets/logo.png",
+  logoUrl = "/assets/SOMNUS LOGO BLANCO.png",
   cartItemsCount = 0,
   onCartClick,
 }: NavbarProps) {
@@ -156,7 +156,7 @@ interface FooterProps {
 }
 
 export function FooterMockup({
-  logoUrl = "/assets/logo.png",
+  logoUrl = "/assets/SOMNUS LOGO BLANCO.png",
 }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
