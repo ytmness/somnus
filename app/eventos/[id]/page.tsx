@@ -20,6 +20,7 @@ import {
   normalizeImageFraming,
 } from "@/lib/utils/image-framing";
 import { eventTicketPurchaseState } from "@/lib/ticket-sales-window";
+import { SOMNUS_PLACEHOLDER_IMAGE_PATH } from "@/lib/brand";
 
 /** Light client-side sanitize: strip scripts/on* and keep common markup. */
 function sanitizeEventHtml(html: string): string {
@@ -189,7 +190,7 @@ export default function EventDetailPage() {
   const eventImage =
     event.imageUrl && !event.imageUrl.includes("unsplash")
       ? event.imageUrl
-      : "/assets/hero-cuernavaca.jpg";
+      : SOMNUS_PLACEHOLDER_IMAGE_PATH;
 
   const posterFraming = imageFramingStyle(
     normalizeImageFraming({

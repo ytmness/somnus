@@ -1,6 +1,9 @@
 /** Rutas de marca Somnus (archivos en public/assets/). */
 export const SOMNUS_LOGO_PATH = "/assets/SOMNUS LOGO BLANCO.png";
-export const SOMNUS_OG_IMAGE_PATH = "/assets/hero-cuernavaca.jpg";
+/** Imagen OG 1200×630 — generar con `node scripts/generate-og-image.mjs`. */
+export const SOMNUS_OG_IMAGE_PATH = "/assets/og-somnus.jpg";
+/** Placeholder cuando un evento no tiene imagen propia. */
+export const SOMNUS_PLACEHOLDER_IMAGE_PATH = SOMNUS_OG_IMAGE_PATH;
 
 export function somnusAssetUrl(
   assetPath: string,

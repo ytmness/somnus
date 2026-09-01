@@ -31,6 +31,7 @@ import { isSalesOpen } from "@/lib/ticket-sales-window";
 import { ProductTour } from "@/components/onboarding/ProductTour";
 import { useClientTour } from "@/components/onboarding/useClientTour";
 import { CLIENT_TOUR } from "@/components/onboarding/tours";
+import { SOMNUS_PLACEHOLDER_IMAGE_PATH } from "@/lib/brand";
 
 const HERO_VIDEO = "/assets/Adobe Express 2026-02-17 16.05.01.mp4";
 
@@ -40,7 +41,7 @@ function convertEventToConcert(event: any): Concert {
   const heroImage =
     event.imageUrl && !event.imageUrl.includes("unsplash")
       ? event.imageUrl
-      : "/assets/hero-cuernavaca.jpg";
+      : SOMNUS_PLACEHOLDER_IMAGE_PATH;
 
   if (!event.ticketTypes || event.ticketTypes.length === 0) {
     return {

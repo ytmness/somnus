@@ -1,5 +1,5 @@
 /* Somnus PWA — service worker mínimo (shell cache + network-first nav). */
-const CACHE_NAME = "somnus-shell-v1";
+const CACHE_NAME = "somnus-shell-v2";
 const SHELL_URLS = ["/", "/manifest.json", "/assets/SOMNUS%20LOGO%20BLANCO.png"];
 
 self.addEventListener("install", (event) => {
