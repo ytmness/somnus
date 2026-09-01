@@ -295,6 +295,7 @@ export function SiteHeader({ onUserChange, eventsHref = "#eventos" }: SiteHeader
                 setProfileOpen(false);
                 setMenuOpen((v) => !v);
               }}
+              data-tour="client-menu"
               className="somnus-nav-link lg:hidden p-2 text-white/85 hover:text-white"
               aria-expanded={menuOpen}
               aria-controls="somnus-mobile-nav"

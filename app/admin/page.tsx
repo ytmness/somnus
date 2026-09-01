@@ -197,6 +197,7 @@ export default function AdminPage() {
               <button
                 type="button"
                 onClick={() => setMobileNavOpen(true)}
+                data-tour="admin-menu"
                 className="lg:hidden somnus-nav-link p-2 -ml-2 mt-0.5 text-white/70 hover:text-white"
                 aria-label="Open admin menu"
               >

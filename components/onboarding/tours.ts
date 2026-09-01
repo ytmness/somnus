@@ -1,9 +1,13 @@
 export type TourStep = {
   id: string;
-  /** Matches data-tour="<target>" on the page. Omit for centered welcome. */
+  /** Matches data-tour="<target>" on the page. Omit for centered/bottom welcome. */
   target?: string;
+  /** Used instead of target when viewport ≤ 1023px (drawer / hamburger layouts). */
+  targetMobile?: string;
   title: string;
   body: string;
+  /** Optional shorter copy when the phone uses a bottom sheet + alternate target. */
+  bodyMobile?: string;
 };
 
 export const ADMIN_TOUR: TourStep[] = [
@@ -15,8 +19,11 @@ export const ADMIN_TOUR: TourStep[] = [
   {
     id: "sidebar",
     target: "admin-sidebar",
+    targetMobile: "admin-menu",
     title: "Grouped navigation",
     body: "Tools are organized by job: Events, People, Marketing, Finance, and Advanced. On mobile, open the menu button to reach every section.",
+    bodyMobile:
+      "Tap this menu button to open Events, People, Marketing, Finance, and Advanced on your phone.",
   },
   {
     id: "stats",
@@ -114,7 +121,10 @@ export const CLIENT_TOUR: TourStep[] = [
   {
     id: "profile",
     target: "client-profile",
+    targetMobile: "client-menu",
     title: "Your profile",
     body: "Open your name for My tickets (QR codes after purchase) and Sign out.",
+    bodyMobile:
+      "Tap the menu (☰) for Profile, My tickets (QR after purchase), Settings, and Sign out.",
   },
 ];
