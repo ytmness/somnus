@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Register creates ORGANIZER role → attribution immediately
+    // Register creates CLIENTE role → attribution immediately
     if (referralRaw) {
       const applied = await applyReferralCodeForUser(user.id, referralRaw);
       if (!applied.ok) {

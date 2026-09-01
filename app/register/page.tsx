@@ -41,7 +41,7 @@ function RegisterContent() {
         const data = await res.json();
         if (cancelled || !data?.user) return;
         const path = resolveAuthRedirectPath(
-          data.user.role || "ORGANIZER",
+          data.user.role || "CLIENTE",
           redirectParam,
           data.user.staffRoles,
           authSurface
@@ -122,7 +122,7 @@ function RegisterContent() {
 
       toast.success("Account created! Welcome to Somnus");
       const redirectPath = resolveAuthRedirectPath(
-        data.user?.role || "ORGANIZER",
+        data.user?.role || "CLIENTE",
         redirectParam,
         undefined,
         authSurface

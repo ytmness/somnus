@@ -54,7 +54,7 @@ function VerificarEmailContent() {
       toast.success("Email verified!");
 
       const redirectPath = resolveAuthRedirectPath(
-        data.user?.role || "ORGANIZER",
+        data.user?.role || "CLIENTE",
         redirectParam,
         data.user?.staffRoles,
         fromApp || isNativePlatform() ? "app" : "web"

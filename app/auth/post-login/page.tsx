@@ -34,7 +34,7 @@ function PostLoginContent() {
         }
 
         const redirectPath = resolveAuthRedirectPath(
-          user.role || "ORGANIZER",
+          user.role || "CLIENTE",
           requestedRedirect,
           user.staffRoles,
           fromApp || isNativePlatform() ? "app" : "web"

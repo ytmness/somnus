@@ -77,7 +77,7 @@ assert(
 );
 
 console.log("\n=== resolvePublicRegistrationRole ===");
-assert(resolvePublicRegistrationRole() === "ORGANIZER", "registro público → ORGANIZER");
+assert(resolvePublicRegistrationRole() === "CLIENTE", "registro público → CLIENTE");
 
 console.log("\n=== resolvePostAuthRedirect ===");
 assert(resolvePostAuthRedirect("ORGANIZER") === "/", "ORGANIZER web → landing");

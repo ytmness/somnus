@@ -1,8 +1,7 @@
 /**
  * Lógica de registro público.
- * Todos los registros públicos son ORGANIZER en backend (marketplace).
- * En web se tratan como compradores (landing); publicar eventos es opt-in.
- * El panel /organizador solo se usa como destino default en la app.
+ * Por ahora todos los registros públicos son CLIENTE (comprador).
+ * El rol ORGANIZER queda reservado para cuentas elevadas manualmente.
  */
 
 export type AuthSurface = "web" | "app";
@@ -14,8 +13,8 @@ export function parseAuthSurface(value: unknown): AuthSurface {
   return "web";
 }
 
-export function resolvePublicRegistrationRole(): "ORGANIZER" {
-  return "ORGANIZER";
+export function resolvePublicRegistrationRole(): "CLIENTE" {
+  return "CLIENTE";
 }
 
 export function resolvePostAuthRedirect(

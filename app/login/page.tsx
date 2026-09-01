@@ -69,7 +69,7 @@ function LoginContent() {
         const data = await res.json();
         if (cancelled || !data?.user) return;
         const path = resolveAuthRedirectPath(
-          data.user.role || "ORGANIZER",
+          data.user.role || "CLIENTE",
           redirectParam,
           data.user.staffRoles,
           fromApp || isNativePlatform() ? "app" : "web"
@@ -126,14 +126,14 @@ function LoginContent() {
       const redirectPath =
         redirectParam != null
           ? resolveAuthRedirectPath(
-              data.user?.role || "ORGANIZER",
+              data.user?.role || "CLIENTE",
               redirectParam,
               undefined,
               authSurface
             )
           : (data.redirectPath ??
             resolveAuthRedirectPath(
-              data.user?.role || "ORGANIZER",
+              data.user?.role || "CLIENTE",
               null,
               undefined,
               authSurface
