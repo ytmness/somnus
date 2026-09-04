@@ -259,7 +259,7 @@ export async function POST(
     const now = new Date();
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     // Links de mesa/invitación no expiran.
-    const expiresAt: Date | null = null;
+    const expiresAtIso: string | null = null;
 
     if (isPoolMode) {
       const existingPool = await prisma.tableInvitePool.findFirst({
@@ -393,7 +393,7 @@ export async function POST(
             splitAmong: cupos,
             minPaidToConfirm: confirmAt,
             pricePerSeat: unitPrice,
-            expiresAt,
+            expiresAt: null,
           },
         });
 
@@ -426,7 +426,7 @@ export async function POST(
             ],
             tableNumber,
             eventName: event.name,
-            expiresAt: expiresAt?.toISOString() ?? null,
+            expiresAt: expiresAtIso,
           },
         });
       }
@@ -481,7 +481,7 @@ export async function POST(
           splitAmong: minPaidToConfirm,
           minPaidToConfirm,
           pricePerSeat: cover.coverPrice,
-          expiresAt,
+          expiresAt: null,
         },
       });
 
@@ -513,7 +513,7 @@ export async function POST(
           ],
           tableNumber,
           eventName: event.name,
-          expiresAt: expiresAt?.toISOString() ?? null,
+          expiresAt: expiresAtIso,
         },
       });
     }
@@ -601,7 +601,7 @@ export async function POST(
           invitedEmail: inv?.email?.trim() || null,
           invitedPhone: inv?.phone?.trim() || null,
           pricePerSeat,
-          expiresAt,
+          expiresAt: null,
         },
       });
 
@@ -622,7 +622,7 @@ export async function POST(
         invites: createdInvites,
         tableNumber,
         eventName: event.name,
-        expiresAt: expiresAt?.toISOString() ?? null,
+        expiresAt: expiresAtIso,
       },
     });
   } catch (error) {
