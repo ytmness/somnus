@@ -70,10 +70,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (link.expiresAt && new Date() > link.expiresAt) {
-      return NextResponse.json({ error: "Este link ha expirado" }, { status: 400 });
-    }
-
     if (link.maxUses != null && link.usedCount >= link.maxUses) {
       return NextResponse.json(
         { error: "Este link ya alcanzó el máximo de usos" },
@@ -215,10 +211,6 @@ export async function GET(request: NextRequest) {
 
     if (!link || !link.isActive) {
       return NextResponse.json({ error: "Link no encontrado" }, { status: 404 });
-    }
-
-    if (link.expiresAt && new Date() > link.expiresAt) {
-      return NextResponse.json({ error: "Link expirado" }, { status: 400 });
     }
 
     if (link.maxUses != null && link.usedCount >= link.maxUses) {

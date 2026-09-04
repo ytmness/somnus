@@ -84,7 +84,8 @@ export async function POST(
       body?.amountCents != null ? Math.round(Number(body.amountCents)) : null;
     const maxUses =
       body?.maxUses != null ? Math.floor(Number(body.maxUses)) : null;
-    const expiresAt = body?.expiresAt ? new Date(body.expiresAt) : null;
+    // Payment links no expiran (se ignora expiresAt del body).
+    const expiresAt = null;
 
     if (ticketTypeId) {
       const tt = await prisma.ticketType.findFirst({

@@ -119,13 +119,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Invitación no encontrada" }, { status: 404 });
       }
 
-      if (pool.expiresAt && new Date() > pool.expiresAt) {
-        return NextResponse.json(
-          { error: "Este link ha expirado" },
-          { status: 400 }
-        );
-      }
-
       const paidShareCount = await prisma.tableSlotInvite.count({
         where: { poolId: pool.id, status: "PAID", isCover: false },
       });
@@ -455,27 +448,22 @@ export async function POST(request: NextRequest) {
 
       invite = createdSlots[0];
     } else {
+      if (invite.status === "EXPIRED") {
+        invite = await prisma.tableSlotInvite.update({
+          where: { id: invite.id },
+          data: { status: "PENDING", expiresAt: null },
+          include: { event: true, ticketType: true },
+        });
+      }
+
       if (invite.status !== "PENDING") {
         return NextResponse.json(
           {
             error:
               invite.status === "PAID"
                 ? "Esta invitación ya fue pagada"
-                : invite.status === "EXPIRED"
-                ? "Esta invitación ha expirado"
                 : "Esta invitación no está disponible",
           },
-          { status: 400 }
-        );
-      }
-
-      if (invite.expiresAt && new Date() > invite.expiresAt) {
-        await prisma.tableSlotInvite.update({
-          where: { id: invite.id },
-          data: { status: "EXPIRED" },
-        });
-        return NextResponse.json(
-          { error: "Esta invitación ha expirado" },
           { status: 400 }
         );
       }

@@ -11,7 +11,6 @@ import {
   effectiveTicketPriceAt,
 } from "@/lib/ticket-pricing";
 
-const INVITE_EXPIRY_DAYS = 7;
 const MAX_TRADITIONAL_SLOTS = 500;
 const MAX_MIN_PAID_CONFIRM = 10_000;
 const MAX_CUPOS = 500;
@@ -259,8 +258,8 @@ export async function POST(
 
     const now = new Date();
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + INVITE_EXPIRY_DAYS);
+    // Links de mesa/invitación no expiran.
+    const expiresAt: Date | null = null;
 
     if (isPoolMode) {
       const existingPool = await prisma.tableInvitePool.findFirst({
@@ -427,7 +426,7 @@ export async function POST(
             ],
             tableNumber,
             eventName: event.name,
-            expiresAt: expiresAt.toISOString(),
+            expiresAt: expiresAt?.toISOString() ?? null,
           },
         });
       }
@@ -514,7 +513,7 @@ export async function POST(
           ],
           tableNumber,
           eventName: event.name,
-          expiresAt: expiresAt.toISOString(),
+          expiresAt: expiresAt?.toISOString() ?? null,
         },
       });
     }
@@ -623,7 +622,7 @@ export async function POST(
         invites: createdInvites,
         tableNumber,
         eventName: event.name,
-        expiresAt: expiresAt.toISOString(),
+        expiresAt: expiresAt?.toISOString() ?? null,
       },
     });
   } catch (error) {

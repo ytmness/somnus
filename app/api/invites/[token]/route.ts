@@ -119,13 +119,6 @@ export async function GET(
       return NextResponse.json({ error: "Invitación no encontrada" }, { status: 404 });
     }
 
-    if (pool.expiresAt && new Date() > pool.expiresAt) {
-      return NextResponse.json(
-        { error: "Este link ha expirado" },
-        { status: 400 }
-      );
-    }
-
     const isMesaMode = pool.mode === "FULL_TABLE";
     const paidShareCount = await prisma.tableSlotInvite.count({
       where: { poolId: pool.id, status: "PAID", isCover: false },
@@ -358,23 +351,17 @@ async function handleSlotInvite(invite: any) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const payUrl = mesaPagarUrl(baseUrl, invite.eventId, invite.tableNumber, invite.inviteToken);
 
-  if (invite.expiresAt && new Date() > invite.expiresAt && invite.status === "PENDING") {
-      await prisma.tableSlotInvite.update({
-        where: { id: invite.id },
-        data: { status: "EXPIRED" },
-      });
-      return NextResponse.json(
-        { error: "Esta invitación ha expirado" },
-        { status: 400 }
-      );
-    }
-
-    if (invite.status === "EXPIRED") {
-      return NextResponse.json(
-        { error: "Esta invitación ha expirado" },
-        { status: 400 }
-      );
-    }
+  // Links no expiran: reactivar invitaciones marcadas EXPIRED (legado).
+  if (invite.status === "EXPIRED") {
+    invite = await prisma.tableSlotInvite.update({
+      where: { id: invite.id },
+      data: { status: "PENDING", expiresAt: null },
+      include: {
+        event: true,
+        ticketType: true,
+      },
+    });
+  }
 
     // Si ya está pagada: devolver datos para mostrar "Mesa reservada"
     if (invite.status === "PAID") {

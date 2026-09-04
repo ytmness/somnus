@@ -436,14 +436,6 @@ export default function PagarInvitePage() {
 
   if (invite.isPool) {
     const poolFull = !!invite.tableReserved;
-    const expiresLine =
-      invite.expiresAt &&
-      new Intl.DateTimeFormat("es-MX", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }).format(new Date(invite.expiresAt));
-
     return (
       <div className="min-h-screen somnus-bg-main text-white pb-32 relative z-0">
         <header className="sticky top-0 z-40 flex items-center justify-between gap-3 px-4 h-14 border-b border-white/10 bg-[#0A0A0A]/90 backdrop-blur-md">
@@ -1057,11 +1049,6 @@ export default function PagarInvitePage() {
         {!poolFull && invite.status !== "PAID" && (
           <div className="fixed bottom-0 left-0 right-0 z-50 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/98 to-transparent">
             <div className="max-w-lg mx-auto space-y-3">
-              {expiresLine && (
-                <p className="text-center text-[11px] text-white/45">
-                  Se aceptan pagos hasta el {expiresLine}
-                </p>
-              )}
               <button
                 type="submit"
                 form="pool-pay-form"
