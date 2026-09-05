@@ -573,7 +573,7 @@ export async function reverseSale(saleId: string): Promise<void> {
     for (const t of validTickets) {
       byType.set(t.ticketTypeId, (byType.get(t.ticketTypeId) || 0) + 1);
     }
-    for (const [ticketTypeId, count] of byType) {
+    for (const [ticketTypeId, count] of Array.from(byType.entries())) {
       const tt = await tx.ticketType.findUnique({
         where: { id: ticketTypeId },
         select: { soldQuantity: true },
