@@ -97,13 +97,12 @@ async function cancelStalePendingSales() {
 }
 
 async function reverseNonStripeTestSales() {
+  // Solo ventas manuales de prueba (POS). Guestlist reales NO se tocan.
   const targets = await prisma.sale.findMany({
     where: {
       status: "COMPLETED",
-      OR: [
-        { paymentMethod: "manual", paymentProvider: "manual" },
-        { paymentMethod: "guestlist", total: { lte: 0 } },
-      ],
+      paymentMethod: "manual",
+      paymentProvider: "manual",
     },
     select: {
       id: true,
@@ -115,7 +114,7 @@ async function reverseNonStripeTestSales() {
     },
   });
 
-  console.log(`[TEST/NO-STRIPE] ventas a revertir: ${targets.length}`);
+  console.log(`[TEST/MANUAL] ventas a revertir: ${targets.length}`);
   for (const s of targets) {
     console.log(
       `  - ${s.id.slice(0, 8)} ${s.paymentMethod}/${s.paymentProvider} $${Number(s.total)} ${s.buyerEmail} tickets=${s._count.tickets}`
