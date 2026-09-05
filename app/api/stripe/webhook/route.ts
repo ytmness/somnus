@@ -122,14 +122,12 @@ export async function POST(request: NextRequest) {
       }
 
       case "payment_intent.amount_capturable_updated": {
+        // Solo autorización (manual capture). NUNCA emitir boletos aquí:
+        // los boletos salen tras capture real → payment_intent.succeeded
+        // o tras approve del organizador.
         const pi = event.data.object as Stripe.PaymentIntent;
         const saleId = pi.metadata?.saleId;
         if (!saleId) break;
-
-        const sale = await prisma.sale.findUnique({
-          where: { id: saleId },
-          select: { approvalStatus: true },
-        });
 
         await prisma.sale.update({
           where: { id: saleId },
@@ -139,34 +137,6 @@ export async function POST(request: NextRequest) {
             lastWebhookEventId: event.id,
           },
         });
-
-        if (
-          sale?.approvalStatus === "PENDING" &&
-          pi.status === "requires_capture"
-        ) {
-          await prisma.paymentWebhookEvent.update({
-            where: { providerEventId: event.id },
-            data: { processedAt: new Date() },
-          });
-          break;
-        }
-
-        if (sale?.approvalStatus !== "PENDING" && pi.status === "requires_capture") {
-          const chargeId =
-            typeof pi.latest_charge === "string"
-              ? pi.latest_charge
-              : pi.latest_charge?.id;
-
-          await fulfillSale({
-            saleId,
-            provider: "stripe",
-            providerPaymentId: pi.id,
-            providerStatus: "requires_capture",
-            webhookEventId: event.id,
-            stripeChargeId: chargeId || undefined,
-            stripeConnectedAccountId: pi.metadata?.connectedAccountId || undefined,
-          }).catch(() => {});
-        }
 
         await prisma.paymentWebhookEvent.update({
           where: { providerEventId: event.id },

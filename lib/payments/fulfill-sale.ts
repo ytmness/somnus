@@ -69,6 +69,13 @@ export async function fulfillSale(
     throw new Error(`Venta ${saleId} no está pendiente (status: ${sale.status})`);
   }
 
+  // Defensa: nunca emitir boletos por autorización sin captura.
+  if (providerStatus === "requires_capture") {
+    throw new Error(
+      `Venta ${saleId}: pago solo autorizado (requires_capture); se requiere captura/succeeded`
+    );
+  }
+
   if (!sale.saleItems?.length) {
     throw new Error(`Venta ${saleId} sin saleItems`);
   }
@@ -540,6 +547,7 @@ async function attemptSendReceiptEmail(
 
 /**
  * Marca una venta como reembolsada e invalida sus tickets.
+ * También ajusta soldQuantity del tipo de boleto.
  */
 export async function reverseSale(saleId: string): Promise<void> {
   const sale = await prisma.sale.findUnique({ where: { id: saleId } });
@@ -547,6 +555,11 @@ export async function reverseSale(saleId: string): Promise<void> {
   if (sale.status === "REFUNDED") return;
 
   await prisma.$transaction(async (tx) => {
+    const validTickets = await tx.ticket.findMany({
+      where: { saleId, status: "VALID" },
+      select: { id: true, ticketTypeId: true },
+    });
+
     await tx.sale.update({
       where: { id: saleId },
       data: { status: "REFUNDED", providerStatus: "refunded" },
@@ -555,5 +568,53 @@ export async function reverseSale(saleId: string): Promise<void> {
       where: { saleId, status: "VALID" },
       data: { status: "CANCELLED" },
     });
+
+    const byType = new Map<string, number>();
+    for (const t of validTickets) {
+      byType.set(t.ticketTypeId, (byType.get(t.ticketTypeId) || 0) + 1);
+    }
+    for (const [ticketTypeId, count] of byType) {
+      const tt = await tx.ticketType.findUnique({
+        where: { id: ticketTypeId },
+        select: { soldQuantity: true },
+      });
+      if (!tt) continue;
+      await tx.ticketType.update({
+        where: { id: ticketTypeId },
+        data: { soldQuantity: Math.max(0, tt.soldQuantity - count) },
+      });
+    }
   });
+}
+
+/**
+ * Recalcula soldQuantity = boletos no cancelados de ventas COMPLETED.
+ * Fuente de verdad para inventario.
+ */
+export async function recalculateSoldQuantities(eventId?: string): Promise<{
+  updated: number;
+}> {
+  const types = await prisma.ticketType.findMany({
+    where: eventId ? { eventId } : undefined,
+    select: { id: true, soldQuantity: true },
+  });
+
+  let updated = 0;
+  for (const tt of types) {
+    const count = await prisma.ticket.count({
+      where: {
+        ticketTypeId: tt.id,
+        status: { not: "CANCELLED" },
+        sale: { status: "COMPLETED" },
+      },
+    });
+    if (count !== tt.soldQuantity) {
+      await prisma.ticketType.update({
+        where: { id: tt.id },
+        data: { soldQuantity: count },
+      });
+      updated++;
+    }
+  }
+  return { updated };
 }
