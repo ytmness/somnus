@@ -7,6 +7,7 @@ import { getAppUrl } from "@/lib/payments/config";
 import { generateTicketPDF } from "@/lib/services/ticket-generator";
 import { saveUploadBuffer } from "@/lib/storage/local";
 import { formatEventCalendarDate } from "@/lib/utils";
+import { resolvePoolSlotIdsToMarkPaid } from "@/lib/invite-pool-slots";
 import type { TicketCategory } from "@/types";
 
 export interface FulfillSaleParams {
@@ -182,16 +183,22 @@ export async function fulfillSale(
         (sum, si) => sum + (si.quantity || 0),
         0
       );
-      const start = invite.seatNumber ?? 0;
-      const end = start + Math.max(0, totalQty - 1);
 
       try {
         if (invite.poolId) {
-          await tx.tableSlotInvite.updateMany({
-            where: {
+          const slotIds = await resolvePoolSlotIdsToMarkPaid(
+            {
               poolId: invite.poolId,
-              seatNumber: { gte: start, lte: end },
+              primaryInviteId: invite.id,
+              invitedEmail: invite.invitedEmail,
+              invitedName: invite.invitedName,
+              primaryCreatedAt: invite.createdAt,
+              quantity: Math.max(1, totalQty),
             },
+            tx
+          );
+          await tx.tableSlotInvite.updateMany({
+            where: { id: { in: slotIds } },
             data: { status: "PAID", paidAt: new Date() },
           });
         } else {
@@ -215,11 +222,19 @@ export async function fulfillSale(
           msg.includes("does not exist")
         ) {
           if (invite.poolId) {
-            await tx.tableSlotInvite.updateMany({
-              where: {
+            const slotIds = await resolvePoolSlotIdsToMarkPaid(
+              {
                 poolId: invite.poolId,
-                seatNumber: { gte: start, lte: end },
+                primaryInviteId: invite.id,
+                invitedEmail: invite.invitedEmail,
+                invitedName: invite.invitedName,
+                primaryCreatedAt: invite.createdAt,
+                quantity: Math.max(1, totalQty),
               },
+              tx
+            );
+            await tx.tableSlotInvite.updateMany({
+              where: { id: { in: slotIds } },
               data: { status: "PAID" },
             });
           } else {

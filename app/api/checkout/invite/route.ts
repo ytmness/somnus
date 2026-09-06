@@ -12,6 +12,10 @@ import {
   toInviteTicketPayload,
 } from "@/lib/invite-tickets";
 import {
+  cancelOrphanPendingPoolSlots,
+  nextPoolSeatNumber,
+} from "@/lib/invite-pool-slots";
+import {
   invitePoolPaymentCap,
   invitePoolSharesLeft,
   invitePoolMesaFilled,
@@ -121,9 +125,6 @@ export async function POST(request: NextRequest) {
 
       const paidShareCount = await prisma.tableSlotInvite.count({
         where: { poolId: pool.id, status: "PAID", isCover: false },
-      });
-      const paidCount = await prisma.tableSlotInvite.count({
-        where: { poolId: pool.id, status: "PAID" },
       });
       const isMesaMode = pool.mode === "FULL_TABLE";
       const sharesLeft = invitePoolSharesLeft(pool, paidShareCount);
@@ -417,7 +418,9 @@ export async function POST(request: NextRequest) {
       }
 
       const createdSlots: InviteLoaded[] = [];
-      const startSeatNumber = paidCount + 1;
+      // Evita asientos fantasma de checkouts abandonados / reintentos.
+      await cancelOrphanPendingPoolSlots(pool.id);
+      const startSeatNumber = await nextPoolSeatNumber(pool.id);
 
       for (let offset = 0; offset < peopleForSeats.length; offset++) {
         const slotToken = await uniqueInviteToken();
