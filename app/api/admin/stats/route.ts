@@ -33,7 +33,12 @@ export async function GET() {
       newContactLeads,
     ] = await Promise.all([
       prisma.event.count(),
-      prisma.ticket.count(),
+      prisma.ticket.count({
+        where: {
+          status: "VALID",
+          sale: { status: "COMPLETED" },
+        },
+      }),
       prisma.user.count({ where: { isActive: true } }),
       prisma.sale.aggregate({
         where: {
