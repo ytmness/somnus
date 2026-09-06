@@ -117,7 +117,7 @@ export async function resolvePoolSlotIdsToMarkPaid(
   if (!ids.includes(opts.primaryInviteId)) {
     ids.unshift(opts.primaryInviteId);
   }
-  return [...new Set(ids)].slice(0, qty);
+  return Array.from(new Set(ids)).slice(0, qty);
 }
 
 /** Siguiente seatNumber libre (solo cuenta PAID; PENDING huérfanos deben cancelarse antes). */
