@@ -1051,6 +1051,133 @@ video.video-cupido-mobile {
   appearance: none !important;
 }
 
+/* ===== IMPRESORA DE RECIBO (pago exitoso) ===== */
+@keyframes receipt-feed-stepped {
+  0% {
+    transform: translateY(calc(-100% + 2px));
+  }
+  7.5%,
+  10.5% {
+    transform: translateY(-91%);
+  }
+  18%,
+  21% {
+    transform: translateY(-81%);
+  }
+  28.5%,
+  31.5% {
+    transform: translateY(-70%);
+  }
+  39%,
+  42% {
+    transform: translateY(-58%);
+  }
+  49.5%,
+  52.5% {
+    transform: translateY(-45%);
+  }
+  60%,
+  63% {
+    transform: translateY(-32%);
+  }
+  70.5%,
+  73.5% {
+    transform: translateY(-20%);
+  }
+  81%,
+  84% {
+    transform: translateY(-10%);
+  }
+  91.5%,
+  94.5% {
+    transform: translateY(-3%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes receipt-feed-smooth {
+  from {
+    transform: translateY(calc(-100% + 2px));
+  }
+  to {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes receipt-status-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes receipt-icon-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.receipt-output-sheet {
+  transform: translateY(calc(-100% + 2px));
+  opacity: 0;
+}
+
+.receipt-output {
+  height: 1.25rem;
+  overflow: hidden;
+}
+
+.receipt-printer[data-stage="printing"] .receipt-output {
+  height: min(32rem, 70dvh);
+}
+
+.receipt-printer[data-stage="printing"] .receipt-output-sheet,
+.receipt-printer[data-stage="complete"] .receipt-output-sheet {
+  opacity: 1;
+}
+
+.receipt-printer[data-stage="printing"][data-feed="stepped"][data-move="true"]
+  .receipt-output-sheet {
+  animation: receipt-feed-stepped 1.75s linear forwards;
+}
+
+.receipt-printer[data-stage="printing"][data-feed="smooth"][data-move="true"]
+  .receipt-output-sheet {
+  animation: receipt-feed-smooth 1.75s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+.receipt-printer[data-stage="complete"] .receipt-output-sheet,
+.receipt-printer[data-move="false"][data-stage="printing"] .receipt-output-sheet,
+.receipt-printer[data-move="false"][data-stage="complete"] .receipt-output-sheet {
+  transform: translateY(0%);
+  opacity: 1;
+  animation: none;
+}
+
+.receipt-printer[data-stage="complete"] .receipt-output {
+  height: auto;
+  overflow: visible;
+}
+
+.receipt-status-copy {
+  animation: receipt-status-in 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.receipt-status-icon {
+  animation: receipt-icon-in 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
 /* ===== REDUCED MOTION ===== */
 @media (prefers-reduced-motion: reduce) {
   .brand-scroll-animate {
@@ -1089,6 +1216,24 @@ video.video-cupido-mobile {
   .somnus-card:hover,
   .brand-ticket-card:hover {
     transform: none !important;
+  }
+
+  .receipt-output-sheet,
+  .receipt-printer[data-stage="printing"] .receipt-output-sheet,
+  .receipt-printer[data-stage="complete"] .receipt-output-sheet {
+    animation: none !important;
+    transform: translateY(0%) !important;
+    opacity: 1 !important;
+  }
+
+  .receipt-printer .receipt-output {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .receipt-status-copy,
+  .receipt-status-icon {
+    animation: none !important;
   }
 }
 

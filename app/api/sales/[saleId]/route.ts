@@ -17,7 +17,11 @@ export async function GET(
       where: { id: params.saleId },
       include: {
         event: true,
-        saleItems: true,
+        saleItems: {
+          include: {
+            addOn: { select: { id: true, name: true } },
+          },
+        },
       },
     });
 
@@ -40,7 +44,37 @@ export async function GET(
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
-    return NextResponse.json({ success: true, data: sale });
+    const ticketTypeIds = Array.from(
+      new Set(
+        sale.saleItems
+          .map((item) => item.ticketTypeId)
+          .filter((id): id is string => Boolean(id))
+      )
+    );
+    const ticketTypes =
+      ticketTypeIds.length > 0
+        ? await prisma.ticketType.findMany({
+            where: { id: { in: ticketTypeIds } },
+            select: { id: true, name: true },
+          })
+        : [];
+    const ticketTypeNames = Object.fromEntries(
+      ticketTypes.map((type) => [type.id, type.name])
+    );
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        ...sale,
+        saleItems: sale.saleItems.map((item) => ({
+          ...item,
+          ticketTypeName: item.ticketTypeId
+            ? ticketTypeNames[item.ticketTypeId] || null
+            : null,
+          addOnName: item.addOn?.name || null,
+        })),
+      },
+    });
   } catch (error) {
     console.error("Get sale error:", error);
     return NextResponse.json(

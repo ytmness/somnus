@@ -33,11 +33,9 @@ export default function CheckoutPage() {
 
         if (data.data?.status === "COMPLETED") {
           const buyerEmail = data.data?.buyerEmail || "";
-          router.push(
-            buyerEmail
-              ? `/pago-exitoso?email=${encodeURIComponent(buyerEmail)}`
-              : "/pago-exitoso"
-          );
+          const params = new URLSearchParams({ saleId });
+          if (buyerEmail) params.set("email", buyerEmail);
+          router.push(`/pago-exitoso?${params.toString()}`);
           return;
         }
 
@@ -70,11 +68,9 @@ export default function CheckoutPage() {
         const data = await res.json();
         if (res.ok && data?.data?.status === "COMPLETED") {
           const buyerEmail = data.data?.buyerEmail || "";
-          router.push(
-            buyerEmail
-              ? `/pago-exitoso?email=${encodeURIComponent(buyerEmail)}`
-              : "/pago-exitoso"
-          );
+          const params = new URLSearchParams({ saleId });
+          if (buyerEmail) params.set("email", buyerEmail);
+          router.push(`/pago-exitoso?${params.toString()}`);
         }
       } catch {
         // ignore polling errors
