@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, type RefObject } from "react";
+import { useEffect, useId, useRef, type Ref } from "react";
 import { cn } from "@/lib/utils";
 
 export type AvatarMood = "idle" | "talk" | "think" | "happy";
@@ -450,8 +450,8 @@ function Arm({
   mexico,
   straw,
 }: {
-  armRef: RefObject<SVGGElement | null>;
-  maracaRef: RefObject<SVGGElement | null>;
+  armRef: Ref<SVGGElement>;
+  maracaRef: Ref<SVGGElement>;
   bodyFill: string;
   cx: number;
   cy: number;
@@ -504,8 +504,8 @@ function Eye({
 }: {
   x: number;
   blurId: string;
-  glowRef: RefObject<SVGEllipseElement | null>;
-  fillRef: RefObject<SVGRectElement | null>;
+  glowRef: Ref<SVGEllipseElement>;
+  fillRef: Ref<SVGRectElement>;
 }) {
   const cx = x + 9.5;
   return (
