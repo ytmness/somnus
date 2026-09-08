@@ -1178,6 +1178,11 @@ video.video-cupido-mobile {
   animation: receipt-icon-in 160ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+.somnus-vaiven {
+  display: block;
+  overflow: visible;
+}
+
 /* ===== REDUCED MOTION ===== */
 @media (prefers-reduced-motion: reduce) {
   .brand-scroll-animate {
@@ -1233,6 +1238,11 @@ video.video-cupido-mobile {
 
   .receipt-status-copy,
   .receipt-status-icon {
+    animation: none !important;
+  }
+
+  .somnus-vaiven--idle,
+  .somnus-vaiven__eyes {
     animation: none !important;
   }
 }
