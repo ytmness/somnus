@@ -29,7 +29,7 @@ export const ADMIN_TOUR: TourStep[] = [
     id: "stats",
     target: "admin-stats",
     title: "Overview landing",
-    body: "You land here first. These cards summarize events, tickets sold, active users, and this month’s platform commission.",
+    body: "You land here first. These cards summarize events, tickets sold (including used), active users, and this month’s orders and commission.",
   },
   {
     id: "new-event",

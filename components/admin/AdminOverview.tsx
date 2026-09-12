@@ -19,6 +19,7 @@ import type { AdminSection } from "./AdminSidebar";
 export interface AdminStats {
   totalEvents: number;
   ticketsSold: number;
+  ticketsSoldMonth: number;
   activeUsers: number;
   platformCommissionMonth: number;
   salesCompletedMonth: number;
@@ -43,23 +44,32 @@ function formatMoney(n: number) {
 function StatCard({
   label,
   value,
+  hint,
   icon: Icon,
 }: {
   label: string;
   value: string;
+  hint?: string;
   icon: LucideIcon;
 }) {
   return (
-    <div className="liquid-glass p-5 rounded-2xl h-full flex flex-col">
-      <div className="flex items-start justify-between gap-3 min-h-11">
-        <p className="text-white/70 text-sm leading-snug pt-0.5">{label}</p>
-        <div className="w-11 h-11 liquid-glass rounded-xl flex items-center justify-center shrink-0">
-          <Icon className="w-5 h-5 text-white" aria-hidden />
+    <div className="liquid-glass p-3.5 sm:p-5 rounded-2xl h-full flex flex-col min-w-0">
+      <div className="flex items-start justify-between gap-2 min-h-0">
+        <p className="text-white/70 text-xs sm:text-sm leading-snug pt-0.5 min-w-0 break-words">
+          {label}
+        </p>
+        <div className="w-8 h-8 sm:w-11 sm:h-11 liquid-glass rounded-xl flex items-center justify-center shrink-0">
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" aria-hidden />
         </div>
       </div>
-      <p className="mt-3 text-3xl font-bold leading-none tabular-nums text-white min-h-[2.25rem] flex items-end">
+      <p className="mt-2 sm:mt-3 text-xl sm:text-3xl font-bold leading-none tabular-nums text-white min-h-[1.5rem] sm:min-h-[2.25rem] flex items-end">
         {value}
       </p>
+      {hint ? (
+        <p className="mt-1.5 text-[11px] sm:text-xs text-white/45 tabular-nums">
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -77,7 +87,7 @@ export function AdminOverview({
     <div className="space-y-8">
       {/* Stats */}
       <div
-        className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 items-stretch"
+        className="grid grid-cols-2 xl:grid-cols-5 gap-3 sm:gap-4 items-stretch"
         data-tour="admin-stats"
       >
         <StatCard
@@ -91,6 +101,11 @@ export function AdminOverview({
           label="Tickets sold"
           value={
             stats !== null ? stats.ticketsSold.toLocaleString("es-MX") : "—"
+          }
+          hint={
+            stats !== null
+              ? `${(stats.ticketsSoldMonth ?? 0).toLocaleString("es-MX")} this month`
+              : undefined
           }
           icon={Ticket}
         />
@@ -116,6 +131,11 @@ export function AdminOverview({
             stats !== null
               ? stats.salesCompletedMonth.toLocaleString("es-MX")
               : "—"
+          }
+          hint={
+            stats !== null
+              ? `${(stats.ticketsSoldMonth ?? 0).toLocaleString("es-MX")} tickets`
+              : undefined
           }
           icon={Ticket}
         />

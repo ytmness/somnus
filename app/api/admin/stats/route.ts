@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
 import { getSession, hasRole } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/prisma";
+import { startOfCurrentMonth } from "@/lib/datetime";
 
 export const dynamic = "force-dynamic";
 
-function startOfCurrentMonth(): Date {
-  const d = new Date();
-  return new Date(d.getFullYear(), d.getMonth(), 1, 0, 0, 0, 0);
-}
+const completedThisMonth = (monthStart: Date) => ({
+  status: "COMPLETED" as const,
+  OR: [
+    { paidAt: { gte: monthStart } },
+    { paidAt: null, createdAt: { gte: monthStart } },
+  ],
+});
 
 /**
  * GET /api/admin/stats
@@ -23,10 +27,12 @@ export async function GET() {
     const monthStart = startOfCurrentMonth();
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const monthWhere = completedThisMonth(monthStart);
 
     const [
       totalEvents,
       ticketsSold,
+      ticketsSoldMonth,
       activeUsers,
       monthSales,
       organizersPendingStripe,
@@ -35,16 +41,19 @@ export async function GET() {
       prisma.event.count(),
       prisma.ticket.count({
         where: {
-          status: "VALID",
+          status: { not: "CANCELLED" },
           sale: { status: "COMPLETED" },
+        },
+      }),
+      prisma.ticket.count({
+        where: {
+          status: { not: "CANCELLED" },
+          sale: monthWhere,
         },
       }),
       prisma.user.count({ where: { isActive: true } }),
       prisma.sale.aggregate({
-        where: {
-          status: "COMPLETED",
-          paidAt: { gte: monthStart },
-        },
+        where: monthWhere,
         _count: true,
         _sum: { platformFeeAmount: true },
       }),
@@ -59,6 +68,7 @@ export async function GET() {
     return NextResponse.json({
       totalEvents,
       ticketsSold,
+      ticketsSoldMonth,
       activeUsers,
       salesCompletedMonth: monthSales._count,
       platformCommissionMonth: Number(monthSales._sum.platformFeeAmount ?? 0),

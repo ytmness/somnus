@@ -182,12 +182,12 @@ export function RevenueDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end gap-3">
-        <div>
+        <div className="w-full sm:w-auto min-w-0">
           <label className="text-white/60 text-xs block mb-1">Periodo</label>
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value as PeriodPreset)}
-            className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm"
+            className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm w-full sm:w-auto"
           >
             <option value="7">Últimos 7 días</option>
             <option value="30">Últimos 30 días</option>
@@ -218,12 +218,12 @@ export function RevenueDashboard() {
             </div>
           </>
         )}
-        <div>
+        <div className="w-full sm:w-auto min-w-0">
           <label className="text-white/60 text-xs block mb-1">Evento</label>
           <select
             value={eventId}
             onChange={(e) => setEventId(e.target.value)}
-            className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm min-w-[180px]"
+            className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm w-full min-w-0 sm:w-auto sm:min-w-[180px]"
           >
             <option value="">Todos</option>
             {events.map((e) => (
@@ -233,12 +233,12 @@ export function RevenueDashboard() {
             ))}
           </select>
         </div>
-        <div>
+        <div className="w-full sm:w-auto min-w-0">
           <label className="text-white/60 text-xs block mb-1">Organizador</label>
           <select
             value={organizerId}
             onChange={(e) => setOrganizerId(e.target.value)}
-            className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm min-w-[180px]"
+            className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm w-full min-w-0 sm:w-auto sm:min-w-[180px]"
           >
             <option value="">Todos</option>
             {organizers.map((o) => (

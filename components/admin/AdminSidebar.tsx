@@ -294,7 +294,7 @@ export function AdminSidebar({
             role="dialog"
             aria-modal="true"
             aria-label="Admin navigation"
-            className="relative w-[min(18rem,85vw)] h-full bg-[#0A0A0A] border-r border-white/10 overflow-y-auto shadow-2xl p-4 pt-5"
+            className="relative w-[min(18rem,85vw)] h-full bg-[#0A0A0A] border-r border-white/10 overflow-y-auto overscroll-contain shadow-2xl p-4 pt-[max(1.25rem,env(safe-area-inset-top))]"
           >
             <div className="flex items-center justify-between mb-5">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-white/50">

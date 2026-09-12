@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus, HelpCircle, Menu } from "lucide-react";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 import { EventsTable } from "@/components/admin/EventsTable";
 import { EventFormWizard } from "@/components/event-form/EventFormWizard";
 import { GalleryManager } from "@/components/admin/GalleryManager";
@@ -33,7 +33,6 @@ import {
 import { ProductTour } from "@/components/onboarding/ProductTour";
 import { useProductTour } from "@/components/onboarding/useProductTour";
 import { ADMIN_TOUR } from "@/components/onboarding/tours";
-import { toast } from "sonner";
 
 interface SessionUser {
   id: string;
@@ -114,16 +113,6 @@ export default function AdminPage() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", { method: "POST" });
-      toast.success("Sesión cerrada");
-      router.push("/login");
-    } catch {
-      toast.error("Error al cerrar sesión");
-    }
-  };
-
   const handleEventCreated = () => {
     setShowCreateModal(false);
     setRefreshKey((prev) => prev + 1);
@@ -142,58 +131,12 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen somnus-bg-main overflow-x-hidden">
-      <header className="absolute top-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-12 py-4 sm:py-5 flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => router.push("/")}
-          className="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-        >
-          SOMNUS
-        </button>
-        <nav className="flex items-center gap-2 sm:gap-4 lg:gap-6">
-          <button
-            onClick={() => router.push("/")}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-          >
-            Eventos
-          </button>
-          <button
-            onClick={() => router.push("/galeria")}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
-          >
-            Gallery
-          </button>
-          <Link
-            href="/admin"
-            className="text-white/90 text-xs sm:text-sm font-medium px-2 py-1 uppercase tracking-wider"
-          >
-            Panel
-          </Link>
-          <button
-            onClick={() => router.push("/accesos")}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
-          >
-            Accesos
-          </button>
-          <button
-            onClick={() => router.push("/mis-boletos")}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors hidden sm:inline"
-          >
-            Mis Boletos
-          </button>
-          <button
-            onClick={handleLogout}
-            className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider hover:text-white transition-colors"
-          >
-            Salir
-          </button>
-        </nav>
-      </header>
+      <SiteHeader eventsHref="/" />
 
-      <div className="somnus-page-under-header pb-4 border-b border-white/10">
+      <div className="somnus-page-under-header pb-3 sm:pb-4 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0 flex items-start gap-2">
+          <div className="flex items-center justify-between gap-3 min-w-0">
+            <div className="min-w-0 flex items-start gap-1 sm:gap-2">
               <button
                 type="button"
                 onClick={() => setMobileNavOpen(true)}
@@ -204,8 +147,8 @@ export default function AdminPage() {
                 <Menu className="w-5 h-5" aria-hidden />
               </button>
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold text-white truncate">
+                <div className="flex items-center gap-2 min-w-0">
+                  <h1 className="text-xl sm:text-2xl font-bold text-white truncate text-balance">
                     {sectionMeta.title}
                   </h1>
                   <button
@@ -218,7 +161,7 @@ export default function AdminPage() {
                     <HelpCircle className="w-5 h-5" aria-hidden />
                   </button>
                 </div>
-                <p className="text-white/60 text-sm mt-0.5 line-clamp-2">
+                <p className="text-white/60 text-xs sm:text-sm mt-0.5 line-clamp-2">
                   {sectionMeta.description}
                   {user?.name ? ` · ${user.name}` : ""}
                 </p>
@@ -240,7 +183,7 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 somnus-safe-bottom">
         <div className="flex gap-6 lg:gap-8 items-start">
           <AdminSidebar
             activeSection={activeSection}
