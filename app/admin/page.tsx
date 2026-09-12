@@ -96,7 +96,11 @@ export default function AdminPage() {
       const res = await fetch("/api/admin/stats");
       if (res.ok) {
         const data = await res.json();
-        setStats(data);
+        setStats({
+          ...data,
+          ticketsUsed: data.ticketsUsed ?? 0,
+          soldByEvent: data.soldByEvent ?? [],
+        });
       }
     } catch (error) {
       console.error("Error fetching stats:", error);

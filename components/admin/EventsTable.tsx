@@ -248,10 +248,13 @@ export function EventsTable({
                     </div>
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-white/40">
-                        Tickets
+                        Sold
                       </p>
                       <p className="text-white/80 tabular-nums">
-                        {soldTickets} / {totalTickets}
+                        {soldTickets.toLocaleString("es-MX")}
+                      </p>
+                      <p className="text-[11px] text-white/40">
+                        of {totalTickets.toLocaleString("es-MX")} · includes used
                       </p>
                     </div>
                     <div className="flex items-end gap-2">
@@ -316,7 +319,7 @@ export function EventsTable({
                     Date
                   </th>
                   <th className="text-left py-4 px-4 text-white/90 font-semibold">
-                    Tickets
+                    Sold
                   </th>
                   <th className="text-left py-4 px-4 text-white/90 font-semibold">
                     Status
@@ -363,7 +366,10 @@ export function EventsTable({
                       </td>
                       <td className="py-4 px-4">
                         <p className="text-white/80 tabular-nums">
-                          {soldTickets} / {totalTickets}
+                          {soldTickets.toLocaleString("es-MX")} sold
+                        </p>
+                        <p className="text-white/40 text-xs">
+                          of {totalTickets.toLocaleString("es-MX")} · includes used
                         </p>
                       </td>
                       <td className="py-4 px-4">
