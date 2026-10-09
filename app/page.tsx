@@ -18,8 +18,6 @@ import { GALLERY_EVENTS } from "@/lib/gallery-events";
 import { RevealSection } from "@/components/RevealSection";
 import {
   formatEventCalendarDate,
-  eventCalendarKey,
-  localTodayCalendarKey,
   isEventPastByCalendar,
 } from "@/lib/utils";
 import {
@@ -227,24 +225,28 @@ export default function HomePage() {
         const data = await response.json();
 
         if (data.success && data.data) {
-          const withTickets = data.data.filter(
-            (e: any) => e.ticketTypes && e.ticketTypes.length > 0
+          const published = data.data.filter(
+            (e: any) =>
+              e.status === "PUBLISHED" &&
+              e.ticketTypes &&
+              e.ticketTypes.length > 0
           );
-          const todayKey = localTodayCalendarKey();
 
-          // "Upcoming" = eventos marcados activos en admin (no solo por fecha futura)
-          const adminActiveEvents = withTickets.filter((e: any) => e.isActive);
-          const activeConverted = adminActiveEvents
+          // Próximo = publicado, activo y con fecha de hoy o futura.
+          // Lo que ya pasó sale de "Next event" aunque siga marcado activo.
+          const upcomingEvents = published.filter(
+            (e: any) => e.isActive && !isEventPastByCalendar(e.eventDate)
+          );
+          const activeConverted = upcomingEvents
             .sort((a: any, b: any) => {
               if (a.isFeatured !== b.isFeatured) return a.isFeatured ? -1 : 1;
               return new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime();
             })
             .map(convertEventToConcert);
 
-          // Pasados = inactivos cuya fecha ya pasó
-          const pastEvents = withTickets.filter(
-            (e: any) =>
-              !e.isActive && eventCalendarKey(e.eventDate) < todayKey
+          // Pasados = publicados cuya fecha ya pasó. Borradores y ocultos no entran.
+          const pastEvents = published.filter((e: any) =>
+            isEventPastByCalendar(e.eventDate)
           );
           const pastConverted = pastEvents
             .sort(

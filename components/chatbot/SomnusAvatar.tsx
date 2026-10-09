@@ -68,8 +68,6 @@ export function SomnusAvatar({
 }) {
   const uid = useId().replace(/:/g, "");
   const bodyFill = `${uid}-body`;
-  const pumpkin = `${uid}-pumpkin`;
-  const stem = `${uid}-stem`;
   const blur = `${uid}-blur`;
   const poolBlur = `${uid}-pool`;
 
@@ -291,15 +289,6 @@ export function SomnusAvatar({
           <stop offset="48%" stopColor="#F4F0FF" />
           <stop offset="100%" stopColor="#D9D0EA" />
         </radialGradient>
-        <radialGradient cx="36%" cy="32%" id={pumpkin} r="70%">
-          <stop offset="0%" stopColor="#FDBA74" />
-          <stop offset="55%" stopColor="#F97316" />
-          <stop offset="100%" stopColor="#C2410C" />
-        </radialGradient>
-        <linearGradient id={stem} x1="0%" x2="0%" y1="0%" y2="100%">
-          <stop offset="0%" stopColor="#86EFAC" />
-          <stop offset="100%" stopColor="#166534" />
-        </linearGradient>
         <filter id={blur} x="-80%" y="-80%" width="260%" height="260%">
           <feGaussianBlur stdDeviation="3.5" />
         </filter>
@@ -319,14 +308,7 @@ export function SomnusAvatar({
         ry="14"
       />
 
-      <g opacity="0" ref={droppedRef}>
-        <g transform="translate(78 214) rotate(-28)">
-          <Pumpkin fill={`url(#${pumpkin})`} stem={`url(#${stem})`} />
-        </g>
-        <g transform="translate(184 214) rotate(32)">
-          <Pumpkin fill={`url(#${pumpkin})`} stem={`url(#${stem})`} />
-        </g>
-      </g>
+      <g opacity="0" ref={droppedRef} />
 
       <g className="somnus-vaiven__puppet" ref={puppetRef}>
         <path
@@ -392,9 +374,7 @@ export function SomnusAvatar({
           </text>
         </g>
 
-        <g className="somnus-vaiven__hat" ref={hatRef}>
-          <Pumpkin cx={130} cy={48} fill={`url(#${pumpkin})`} scale={1.15} stem={`url(#${stem})`} />
-        </g>
+        <g className="somnus-vaiven__hat" ref={hatRef} />
 
         <Arm
           armRef={armLRef}
@@ -402,8 +382,6 @@ export function SomnusAvatar({
           cx={58}
           cy={168}
           maracaRef={maracaLRef}
-          pumpkin={pumpkin}
-          stem={stem}
         />
         <Arm
           armRef={armRRef}
@@ -412,42 +390,9 @@ export function SomnusAvatar({
           cy={168}
           flip
           maracaRef={maracaRRef}
-          pumpkin={pumpkin}
-          stem={stem}
         />
       </g>
     </svg>
-  );
-}
-
-function Pumpkin({
-  fill,
-  stem,
-  cx = 0,
-  cy = 0,
-  scale = 1,
-}: {
-  fill: string;
-  stem: string;
-  cx?: number;
-  cy?: number;
-  scale?: number;
-}) {
-  return (
-    <g transform={`translate(${cx} ${cy}) scale(${scale})`}>
-      <ellipse cx="0" cy="2" fill={fill} rx="14" ry="12" />
-      <path
-        d="M0 -8 C2 -16 8 -18 7 -24"
-        fill="none"
-        stroke={stem}
-        strokeLinecap="round"
-        strokeWidth="2.4"
-      />
-      <ellipse cx="8" cy="-16" fill="#166534" rx="5" ry="2.2" transform="rotate(-28 8 -16)" />
-      <path d="M-6 0 q3 4 0 7" fill="none" stroke="#7C2D12" strokeLinecap="round" strokeWidth="1.3" />
-      <path d="M3 0 q3 4 0 7" fill="none" stroke="#7C2D12" strokeLinecap="round" strokeWidth="1.3" />
-      <path d="M-5 8 q5 4 10 0" fill="none" stroke="#7C2D12" strokeLinecap="round" strokeWidth="1.3" />
-    </g>
   );
 }
 
@@ -458,8 +403,6 @@ function Arm({
   cx,
   cy,
   flip = false,
-  pumpkin,
-  stem,
 }: {
   armRef: Ref<SVGGElement>;
   maracaRef: Ref<SVGGElement>;
@@ -467,8 +410,6 @@ function Arm({
   cx: number;
   cy: number;
   flip?: boolean;
-  pumpkin: string;
-  stem: string;
 }) {
   return (
     <g ref={armRef}>
@@ -483,9 +424,7 @@ function Arm({
           strokeOpacity="0.7"
           strokeWidth="2"
         />
-        <g ref={maracaRef} transform="translate(18 -6)">
-          <Pumpkin fill={`url(#${pumpkin})`} scale={0.62} stem={`url(#${stem})`} />
-        </g>
+        <g ref={maracaRef} />
       </g>
     </g>
   );
