@@ -1,5 +1,6 @@
 "use client";
 
+import { Crown } from "lucide-react";
 import type { EventFormData, EventFormMode, OrganizationOption } from "../types";
 
 interface EventHeaderFieldsProps {
@@ -16,86 +17,63 @@ export function EventHeaderFields({
   onChange,
 }: EventHeaderFieldsProps) {
   return (
-    <div className="space-y-4">
-      {organizations.length > 0 && (
-        <div>
-          {mode === "organizer" && organizations.length === 1 ? (
-            <p className="text-xs text-white/45">
-              Posting as{" "}
-              <span className="text-white/80 font-medium">
-                {organizations[0].name}
-              </span>
+    <div className="space-y-2.5">
+      <div className="rounded-2xl border border-white/10 bg-white/[0.07] px-4 py-3">
+        <label htmlFor="event-name" className="sr-only">
+          Nombre del evento
+        </label>
+        <input
+          id="event-name"
+          type="text"
+          value={data.name}
+          onChange={(e) => onChange({ name: e.target.value })}
+          placeholder="Nombre del evento"
+          autoComplete="off"
+          className="w-full bg-transparent text-3xl font-semibold text-white outline-none placeholder:text-white/80"
+        />
+        {organizations.length > 0 &&
+          (mode === "organizer" && organizations.length === 1 ? (
+            <p className="mt-1 text-xs text-white/45">
+              Publicas como{" "}
+              <span className="font-medium text-white/80">{organizations[0].name}</span>
             </p>
           ) : (
-            <label className="inline-flex items-center gap-2 text-xs text-white/45">
-              {mode === "admin" ? "Organization" : "Posting as"}
+            <label className="mt-2 flex items-center gap-2 text-xs text-white/45">
+              {mode === "admin" ? "Organización" : "Publicas como"}
               <select
                 value={data.organizationId}
                 onChange={(e) => onChange({ organizationId: e.target.value })}
-                className="bg-transparent border border-white/15 rounded-full px-3 py-1 text-white/80 text-xs"
+                className="rounded-full border border-white/15 bg-transparent px-3 py-1 text-xs text-white/80"
+                style={{ colorScheme: "dark" }}
               >
                 {mode === "admin" && (
-                  <option value="" className="bg-[#0A0A0A]">
-                    Platform (no organization)
+                  <option value="" className="bg-[#111111]">
+                    Plataforma (sin organización)
                   </option>
                 )}
                 {organizations.map((org) => (
-                  <option key={org.id} value={org.id} className="bg-[#0A0A0A]">
+                  <option key={org.id} value={org.id} className="bg-[#111111]">
                     {org.name}
                   </option>
                 ))}
               </select>
             </label>
-          )}
-        </div>
-      )}
-
-      <input
-        id="event-name"
-        type="text"
-        value={data.name}
-        onChange={(e) => onChange({ name: e.target.value })}
-        placeholder="Nombre del evento"
-        autoComplete="off"
-        className="w-full bg-transparent border-0 border-b border-white/15 focus:border-[#5B8DEF] focus:outline-none focus:ring-0 text-3xl sm:text-4xl font-bold text-white placeholder:text-white/25 pb-2 transition-colors"
-      />
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label
-            htmlFor="event-artist"
-            className="block text-[11px] uppercase tracking-wider text-white/45 mb-1.5"
-          >
-            Organizador *
-          </label>
-          <input
-            id="event-artist"
-            type="text"
-            value={data.artist}
-            onChange={(e) => onChange({ artist: e.target.value })}
-            className="somnus-input !py-2.5 text-sm"
-            placeholder="Nombre del organizador"
-            autoComplete="off"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="event-tour"
-            className="block text-[11px] uppercase tracking-wider text-white/45 mb-1.5"
-          >
-            Tour (optional)
-          </label>
-          <input
-            id="event-tour"
-            type="text"
-            value={data.tour}
-            onChange={(e) => onChange({ tour: e.target.value })}
-            className="somnus-input !py-2.5 text-sm"
-            placeholder="e.g. Awake Tour 2026"
-            autoComplete="off"
-          />
-        </div>
+          ))}
       </div>
+
+      <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3.5">
+        <Crown className="h-4 w-4 shrink-0 text-white/55" aria-hidden />
+        <span className="sr-only">Organizador</span>
+        <input
+          id="event-artist"
+          type="text"
+          value={data.artist}
+          onChange={(e) => onChange({ artist: e.target.value })}
+          placeholder="Organizado por"
+          autoComplete="off"
+          className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/45"
+        />
+      </label>
     </div>
   );
 }

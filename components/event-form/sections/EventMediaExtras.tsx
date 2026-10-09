@@ -1,6 +1,8 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Link2, Music, Plus, Trash2, Users, Video } from "lucide-react";
+import { ExpandablePill } from "../ExpandablePill";
 import {
   createEmptyArtist,
   type ArtistForm,
@@ -20,59 +22,68 @@ function updateArtist(
   return artists.map((a, i) => (i === index ? { ...a, ...patch } : a));
 }
 
+type OpenExtra = "link" | "video" | "song" | "lineup" | null;
+
 export function EventMediaExtras({ data, onChange }: EventMediaExtrasProps) {
   const artists = data.artists;
+  const [open, setOpen] = useState<OpenExtra>(null);
+  const toggle = (pill: OpenExtra) =>
+    setOpen((current) => (current === pill ? null : pill));
 
   return (
-    <div className="space-y-5" id="section-media">
-      <div>
-        <h3 className="text-[11px] uppercase tracking-wider text-white/45 mb-3">
-          Links & media
-        </h3>
-        <div className="space-y-3">
-          <div>
-            <label
-              htmlFor="event-external-url"
-              className="block text-[11px] uppercase tracking-wider text-white/45 mb-1.5"
-            >
-              External URL
-            </label>
-            <input
-              id="event-external-url"
-              type="url"
-              value={data.externalUrl}
-              onChange={(e) => onChange({ externalUrl: e.target.value })}
-              className="somnus-input !py-2.5 text-sm"
-              placeholder="https://…"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="event-video-url"
-              className="block text-[11px] uppercase tracking-wider text-white/45 mb-1.5"
-            >
-              YouTube video URL
-            </label>
-            <input
-              id="event-video-url"
-              type="url"
-              value={data.videoUrl}
-              onChange={(e) => onChange({ videoUrl: e.target.value })}
-              className="somnus-input !py-2.5 text-sm"
-              placeholder="https://www.youtube.com/watch?v=…"
-            />
-          </div>
-        </div>
-      </div>
+    <div className="space-y-2.5" id="section-media">
+      <div className="flex flex-wrap items-center gap-2">
+        <ExpandablePill
+          appearance="chip"
+          icon={Link2}
+          label="Enlace"
+          valueText={data.externalUrl}
+          placeholder=""
+          hasValue={Boolean(data.externalUrl.trim())}
+          isOpen={open === "link"}
+          onToggle={() => toggle("link")}
+        >
+          <input
+            id="event-external-url"
+            type="url"
+            value={data.externalUrl}
+            onChange={(e) => onChange({ externalUrl: e.target.value })}
+            className="somnus-input !py-2.5 text-sm"
+            placeholder="https://…"
+          />
+        </ExpandablePill>
 
-      <div>
-        <h3 className="text-[11px] uppercase tracking-wider text-white/45 mb-1.5">
-          Song / soundtrack
-        </h3>
-        <p className="text-[11px] text-white/35 mb-3">
-          Apple Music API opcional — por ahora introduce los datos a mano.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <ExpandablePill
+          appearance="chip"
+          icon={Video}
+          label="Video"
+          valueText={data.videoUrl}
+          placeholder=""
+          hasValue={Boolean(data.videoUrl.trim())}
+          isOpen={open === "video"}
+          onToggle={() => toggle("video")}
+        >
+          <input
+            id="event-video-url"
+            type="url"
+            value={data.videoUrl}
+            onChange={(e) => onChange({ videoUrl: e.target.value })}
+            className="somnus-input !py-2.5 text-sm"
+            placeholder="https://www.youtube.com/watch?v=…"
+          />
+        </ExpandablePill>
+
+        <ExpandablePill
+          appearance="chip"
+          icon={Music}
+          label="Canción"
+          valueText={data.songTitle}
+          placeholder=""
+          hasValue={Boolean(data.songTitle.trim() || data.songArtist.trim())}
+          isOpen={open === "song"}
+          onToggle={() => toggle("song")}
+        >
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <label
               htmlFor="song-title"
@@ -138,12 +149,21 @@ export function EventMediaExtras({ data, onChange }: EventMediaExtrasProps) {
             />
           </div>
         </div>
-      </div>
+        </ExpandablePill>
 
-      <div>
+        <ExpandablePill
+          appearance="chip"
+          icon={Users}
+          label="Lineup"
+          valueText={artists.length ? `${artists.length}` : ""}
+          placeholder=""
+          hasValue={artists.length > 0}
+          isOpen={open === "lineup"}
+          onToggle={() => toggle("lineup")}
+        >
         <div className="flex items-center justify-between gap-3 mb-3">
           <h3 className="text-[11px] uppercase tracking-wider text-white/45">
-            Lineup artists
+            Artistas
           </h3>
           <button
             type="button"
@@ -152,16 +172,16 @@ export function EventMediaExtras({ data, onChange }: EventMediaExtrasProps) {
                 artists: [...artists, createEmptyArtist(artists.length)],
               })
             }
-            className="inline-flex items-center gap-1.5 text-xs text-white/70 hover:text-white border border-white/12 rounded-lg px-2.5 py-1.5 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-2.5 py-1.5 text-xs text-white/70 transition-colors hover:text-white"
           >
             <Plus className="w-3.5 h-3.5" aria-hidden />
-            Add artist
+            Agregar artista
           </button>
         </div>
 
         {artists.length === 0 && (
           <p className="text-[11px] text-white/35">
-            Optional — add DJs or performers for the public lineup.
+            Opcional. Agrega DJs o artistas del lineup.
           </p>
         )}
 
@@ -246,6 +266,7 @@ export function EventMediaExtras({ data, onChange }: EventMediaExtrasProps) {
             </div>
           ))}
         </div>
+        </ExpandablePill>
       </div>
     </div>
   );

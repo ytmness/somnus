@@ -12,7 +12,7 @@ interface ExpandablePillProps {
   onToggle: () => void;
   children: React.ReactNode;
   hasValue: boolean;
-  size?: "default" | "sm";
+  appearance?: "bar" | "chip";
 }
 
 /**
@@ -28,56 +28,62 @@ export function ExpandablePill({
   onToggle,
   children,
   hasValue,
-  size = "default",
+  appearance = "bar",
 }: ExpandablePillProps) {
+  const chip = appearance === "chip";
+
   return (
-    <div
-      className={cn(
-        "rounded-xl border transition-colors",
-        isOpen
-          ? "border-[#5B8DEF]/50 bg-white/[0.04]"
-          : "border-white/12 bg-white/[0.02] hover:border-white/25"
-      )}
-    >
+    <div className={chip ? "contents" : "w-full"}>
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={isOpen}
         className={cn(
-          "w-full flex items-center gap-3 text-left",
-          size === "sm" ? "px-3 py-2.5" : "px-4 py-3.5"
+          "text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-white/40",
+          chip
+            ? cn(
+                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm",
+                hasValue || isOpen
+                  ? "border-white/30 bg-white/10 text-white"
+                  : "border-white/15 bg-transparent text-white/80 hover:bg-white/10"
+              )
+            : cn(
+                "flex w-full items-center gap-3 rounded-2xl border px-4 py-3.5",
+                isOpen
+                  ? "border-white/20 bg-white/[0.08]"
+                  : "border-white/10 bg-white/[0.06] hover:bg-white/[0.09]"
+              )
         )}
       >
-        <Icon
+        <Icon className="h-4 w-4 shrink-0 text-white/55" aria-hidden />
+        <span
           className={cn(
-            "shrink-0 text-white/50",
-            size === "sm" ? "w-4 h-4" : "w-5 h-5"
+            "min-w-0 flex-1 truncate",
+            chip ? "" : "text-sm",
+            hasValue ? "text-white" : "text-white/45"
           )}
-          aria-hidden
-        />
-        <span className="min-w-0 flex-1">
-          <span className="block text-[10px] uppercase tracking-wider text-white/45">
-            {label}
-          </span>
-          <span
-            className={cn(
-              "block truncate text-sm",
-              hasValue ? "text-white" : "text-white/40"
-            )}
-          >
-            {hasValue ? valueText : placeholder}
-          </span>
+        >
+          {chip ? label : hasValue ? valueText : placeholder}
         </span>
-        <ChevronDown
-          className={cn(
-            "w-4 h-4 text-white/40 shrink-0 transition-transform",
-            isOpen && "rotate-180"
-          )}
-          aria-hidden
-        />
+        {!chip && (
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 shrink-0 text-white/35 transition-transform",
+              isOpen && "rotate-180"
+            )}
+            aria-hidden
+          />
+        )}
       </button>
       {isOpen && (
-        <div className="px-4 pb-4 pt-1 border-t border-white/10">{children}</div>
+        <div
+          className={cn(
+            "rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3",
+            chip ? "basis-full" : "mt-2"
+          )}
+        >
+          {children}
+        </div>
       )}
     </div>
   );

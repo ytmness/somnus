@@ -215,14 +215,22 @@ export function EventFormWizard({
 
   return (
     <EventCreatorShell
-      title={isEdit ? "Edit event" : "Create event"}
+      title={isEdit ? "Editar evento" : "Crear evento"}
       onClose={handleClose}
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
-      submitLabel={isEdit ? "Save changes" : "Create event"}
-      submittingLabel={isEdit ? "Saving…" : "Publishing…"}
+      submitLabel={isEdit ? "Guardar cambios" : "Crear evento"}
+      submittingLabel={isEdit ? "Guardando…" : "Publicando…"}
       error={error}
       isLoading={isFetching}
+      aside={
+        <>
+          <EventPublishToggle data={data} onChange={patch} />
+          <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-3.5">
+            <EventTicketsSection data={data} onChange={patch} isEdit={isEdit} />
+          </div>
+        </>
+      }
       flyer={
         <ImageUploadField
           variant="flyer"
@@ -255,13 +263,9 @@ export function EventFormWizard({
 
       <EventWhenWhere data={data} onChange={patch} />
 
-      <EventDescription data={data} onChange={patch} />
-
       <EventMediaExtras data={data} onChange={patch} />
 
-      <EventTicketsSection data={data} onChange={patch} isEdit={isEdit} />
-
-      <EventPublishToggle data={data} onChange={patch} />
+      <EventDescription data={data} onChange={patch} />
     </EventCreatorShell>
   );
 }

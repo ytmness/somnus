@@ -6,12 +6,12 @@ import { cn } from "@/lib/utils";
 export type AvatarMood = "idle" | "talk" | "think" | "happy";
 
 const PARTY = [
-  "#5B8DEF",
-  "#22D3EE",
-  "#F472B6",
-  "#C084FC",
+  "#F97316",
+  "#A855F7",
   "#FACC15",
   "#FB7185",
+  "#C084FC",
+  "#FDBA74",
 ];
 
 const MOTION: Record<
@@ -68,8 +68,8 @@ export function SomnusAvatar({
 }) {
   const uid = useId().replace(/:/g, "");
   const bodyFill = `${uid}-body`;
-  const straw = `${uid}-straw`;
-  const mexico = `${uid}-mx`;
+  const pumpkin = `${uid}-pumpkin`;
+  const stem = `${uid}-stem`;
   const blur = `${uid}-blur`;
   const poolBlur = `${uid}-pool`;
 
@@ -80,8 +80,8 @@ export function SomnusAvatar({
   const happyEyesRef = useRef<SVGGElement>(null);
   const glowLRef = useRef<SVGEllipseElement>(null);
   const glowRRef = useRef<SVGEllipseElement>(null);
-  const fillLRef = useRef<SVGRectElement>(null);
-  const fillRRef = useRef<SVGRectElement>(null);
+  const fillLRef = useRef<SVGEllipseElement>(null);
+  const fillRRef = useRef<SVGEllipseElement>(null);
   const poolRef = useRef<SVGEllipseElement>(null);
   const armLRef = useRef<SVGGElement>(null);
   const armRRef = useRef<SVGGElement>(null);
@@ -286,22 +286,19 @@ export function SomnusAvatar({
       width={size}
     >
       <defs>
-        <radialGradient cx="34%" cy="28%" id={bodyFill} r="74%">
-          <stop offset="0%" stopColor="#2A2A2A" />
-          <stop offset="55%" stopColor="#121212" />
-          <stop offset="100%" stopColor="#070707" />
+        <radialGradient cx="38%" cy="24%" id={bodyFill} r="78%">
+          <stop offset="0%" stopColor="#FFFFFF" />
+          <stop offset="48%" stopColor="#F4F0FF" />
+          <stop offset="100%" stopColor="#D9D0EA" />
         </radialGradient>
-        <linearGradient id={straw} x1="0%" x2="0%" y1="0%" y2="100%">
-          <stop offset="0%" stopColor="#E2B75A" />
-          <stop offset="100%" stopColor="#B07A28" />
-        </linearGradient>
-        <linearGradient id={mexico} x1="0%" x2="100%" y1="0%" y2="0%">
-          <stop offset="0%" stopColor="#006847" />
-          <stop offset="33%" stopColor="#006847" />
-          <stop offset="33%" stopColor="#F4F7FF" />
-          <stop offset="67%" stopColor="#F4F7FF" />
-          <stop offset="67%" stopColor="#CE1126" />
-          <stop offset="100%" stopColor="#CE1126" />
+        <radialGradient cx="36%" cy="32%" id={pumpkin} r="70%">
+          <stop offset="0%" stopColor="#FDBA74" />
+          <stop offset="55%" stopColor="#F97316" />
+          <stop offset="100%" stopColor="#C2410C" />
+        </radialGradient>
+        <linearGradient id={stem} x1="0%" x2="0%" y1="0%" y2="100%">
+          <stop offset="0%" stopColor="#86EFAC" />
+          <stop offset="100%" stopColor="#166534" />
         </linearGradient>
         <filter id={blur} x="-80%" y="-80%" width="260%" height="260%">
           <feGaussianBlur stdDeviation="3.5" />
@@ -323,35 +320,24 @@ export function SomnusAvatar({
       />
 
       <g opacity="0" ref={droppedRef}>
-        <g transform="translate(78 214) rotate(-58)">
-          <rect fill={`url(#${straw})`} height="16" rx="3" width="5" x="-2.5" y="0" />
-          <ellipse cx="0" cy="-12" fill={`url(#${mexico})`} rx="9" ry="12" />
+        <g transform="translate(78 214) rotate(-28)">
+          <Pumpkin fill={`url(#${pumpkin})`} stem={`url(#${stem})`} />
         </g>
-        <g transform="translate(184 214) rotate(62)">
-          <rect fill={`url(#${straw})`} height="16" rx="3" width="5" x="-2.5" y="0" />
-          <ellipse cx="0" cy="-12" fill={`url(#${mexico})`} rx="9" ry="12" />
+        <g transform="translate(184 214) rotate(32)">
+          <Pumpkin fill={`url(#${pumpkin})`} stem={`url(#${stem})`} />
         </g>
       </g>
 
       <g className="somnus-vaiven__puppet" ref={puppetRef}>
-        <circle
-          cx="130"
-          cy="158"
-          fill="none"
-          r="55.5"
-          stroke="#F4F7FF"
-          strokeOpacity="0.45"
-          strokeWidth="3"
+        <path
+          d="M72 146 C70 92 96 62 130 62 C164 62 190 92 188 146 L190 196 C180 184 170 202 158 198 C146 194 140 178 130 180 C120 182 112 202 100 198 C88 194 80 182 70 190 C66 174 70 160 72 146 Z"
+          fill={`url(#${bodyFill})`}
+          stroke="#FFFFFF"
+          strokeOpacity="0.65"
+          strokeWidth="2"
         />
-        <circle cx="130" cy="158" fill={`url(#${bodyFill})`} r="54" />
-        <ellipse
-          cx="112"
-          cy="138"
-          fill="#F4F7FF"
-          opacity="0.1"
-          rx="16"
-          ry="11"
-        />
+        <ellipse cx="108" cy="96" fill="#FFFFFF" opacity="0.55" rx="18" ry="12" />
+        <ellipse cx="130" cy="178" fill="#1C1424" opacity="0.82" rx="7" ry="9" />
 
         <g className="somnus-vaiven__eyes" ref={eyesRef}>
           <g ref={openEyesRef}>
@@ -372,14 +358,14 @@ export function SomnusAvatar({
             <path
               d="M106 150q8 14 18 0"
               fill="none"
-              stroke="#F4F7FF"
+              stroke="#1C1424"
               strokeLinecap="round"
               strokeWidth="5.5"
             />
             <path
               d="M141 150q8 14 18 0"
               fill="none"
-              stroke="#F4F7FF"
+              stroke="#1C1424"
               strokeLinecap="round"
               strokeWidth="5.5"
             />
@@ -407,36 +393,61 @@ export function SomnusAvatar({
         </g>
 
         <g className="somnus-vaiven__hat" ref={hatRef}>
-          <ellipse cx="130" cy="114" fill="#8A5A18" rx="88" ry="16" />
-          <ellipse cx="130" cy="108" fill={`url(#${straw})`} rx="88" ry="15" />
-          <path
-            d="M98 108 Q104 52 130 46 Q156 52 162 108 Z"
-            fill={`url(#${straw})`}
-          />
-          <rect fill={`url(#${mexico})`} height="10" rx="3" width="58" x="101" y="94" />
+          <Pumpkin cx={130} cy={48} fill={`url(#${pumpkin})`} scale={1.15} stem={`url(#${stem})`} />
         </g>
 
         <Arm
           armRef={armLRef}
           bodyFill={bodyFill}
-          cx={54}
-          cy={178}
+          cx={58}
+          cy={168}
           maracaRef={maracaLRef}
-          mexico={mexico}
-          straw={straw}
+          pumpkin={pumpkin}
+          stem={stem}
         />
         <Arm
           armRef={armRRef}
           bodyFill={bodyFill}
-          cx={206}
-          cy={178}
+          cx={202}
+          cy={168}
           flip
           maracaRef={maracaRRef}
-          mexico={mexico}
-          straw={straw}
+          pumpkin={pumpkin}
+          stem={stem}
         />
       </g>
     </svg>
+  );
+}
+
+function Pumpkin({
+  fill,
+  stem,
+  cx = 0,
+  cy = 0,
+  scale = 1,
+}: {
+  fill: string;
+  stem: string;
+  cx?: number;
+  cy?: number;
+  scale?: number;
+}) {
+  return (
+    <g transform={`translate(${cx} ${cy}) scale(${scale})`}>
+      <ellipse cx="0" cy="2" fill={fill} rx="14" ry="12" />
+      <path
+        d="M0 -8 C2 -16 8 -18 7 -24"
+        fill="none"
+        stroke={stem}
+        strokeLinecap="round"
+        strokeWidth="2.4"
+      />
+      <ellipse cx="8" cy="-16" fill="#166534" rx="5" ry="2.2" transform="rotate(-28 8 -16)" />
+      <path d="M-6 0 q3 4 0 7" fill="none" stroke="#7C2D12" strokeLinecap="round" strokeWidth="1.3" />
+      <path d="M3 0 q3 4 0 7" fill="none" stroke="#7C2D12" strokeLinecap="round" strokeWidth="1.3" />
+      <path d="M-5 8 q5 4 10 0" fill="none" stroke="#7C2D12" strokeLinecap="round" strokeWidth="1.3" />
+    </g>
   );
 }
 
@@ -447,8 +458,8 @@ function Arm({
   cx,
   cy,
   flip = false,
-  mexico,
-  straw,
+  pumpkin,
+  stem,
 }: {
   armRef: Ref<SVGGElement>;
   maracaRef: Ref<SVGGElement>;
@@ -456,40 +467,24 @@ function Arm({
   cx: number;
   cy: number;
   flip?: boolean;
-  mexico: string;
-  straw: string;
+  pumpkin: string;
+  stem: string;
 }) {
   return (
     <g ref={armRef}>
       <g transform={`translate(${cx} ${cy}) scale(${flip ? -1 : 1} 1)`}>
-        <circle
-          cx="7"
-          cy="5"
+        <ellipse
+          cx="8"
+          cy="8"
           fill={`url(#${bodyFill})`}
-          r="6"
-          stroke="#F4F7FF"
-          strokeOpacity="0.4"
+          rx="16"
+          ry="11"
+          stroke="#FFFFFF"
+          strokeOpacity="0.7"
           strokeWidth="2"
         />
-        <circle
-          fill={`url(#${bodyFill})`}
-          r="13"
-          stroke="#F4F7FF"
-          strokeOpacity="0.5"
-          strokeWidth="2.6"
-        />
-        <ellipse
-          cx="-4"
-          cy="-4"
-          fill="#F4F7FF"
-          opacity="0.18"
-          rx="5"
-          ry="4"
-        />
-        <g ref={maracaRef}>
-          <rect fill={`url(#${straw})`} height="20" rx="3" width="6" x="-3" y="-26" />
-          <ellipse cx="0" cy="-38" fill={`url(#${mexico})`} rx="12" ry="16" />
-          <ellipse cx="-3" cy="-43" fill="#F4F7FF" opacity="0.32" rx="5" ry="4" />
+        <g ref={maracaRef} transform="translate(18 -6)">
+          <Pumpkin fill={`url(#${pumpkin})`} scale={0.62} stem={`url(#${stem})`} />
         </g>
       </g>
     </g>
@@ -505,31 +500,37 @@ function Eye({
   x: number;
   blurId: string;
   glowRef: Ref<SVGEllipseElement>;
-  fillRef: Ref<SVGRectElement>;
+  fillRef: Ref<SVGEllipseElement>;
 }) {
   const cx = x + 9.5;
   return (
     <g>
       <ellipse
         cx={cx}
-        cy={154}
-        fill="#5B8DEF"
+        cy={152}
+        fill="#F97316"
         filter={`url(#${blurId})`}
-        opacity="0.35"
+        opacity="0.45"
         ref={glowRef}
         rx="16"
-        ry="24"
+        ry="14"
       />
-      <rect
-        fill="#5B8DEF"
-        height="40"
-        ref={fillRef}
+      <ellipse
+        cx={cx}
+        cy={152}
+        fill="#1C1424"
         rx="11"
-        width="19"
-        x={x}
-        y={134}
+        ry="13"
       />
-      <ellipse cx={cx} cy={142} fill="#FFFFFF" opacity="0.72" rx="5" ry="4" />
+      <ellipse
+        cx={cx}
+        cy={152}
+        fill="#F97316"
+        ref={fillRef}
+        rx="6.5"
+        ry="8"
+      />
+      <ellipse cx={cx - 2} cy={147} fill="#FFFFFF" opacity="0.8" rx="2.4" ry="2" />
     </g>
   );
 }

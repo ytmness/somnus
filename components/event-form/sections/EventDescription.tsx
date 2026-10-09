@@ -82,14 +82,11 @@ export function EventDescription({ data, onChange }: EventDescriptionProps) {
   };
 
   return (
-    <div id="section-description">
-      <label
-        htmlFor="event-desc"
-        className="block text-[11px] uppercase tracking-wider text-white/45 mb-1.5"
-      >
-        About / descripción (opcional)
+    <div id="section-description" className="space-y-2">
+      <label htmlFor="event-desc" className="sr-only">
+        Descripción
       </label>
-      <div className="flex flex-wrap gap-1 mb-2">
+      <div className="flex flex-wrap gap-1">
         {TOOLBAR.map((btn) => (
           <button
             key={btn.tag}
@@ -112,14 +109,11 @@ export function EventDescription({ data, onChange }: EventDescriptionProps) {
           e.target.style.height = `${e.target.scrollHeight}px`;
         }}
         rows={6}
-        className="somnus-input resize-y min-h-[8rem] leading-relaxed font-mono text-[13px]"
-        placeholder={
-          "Escribe HTML ligero o usa la barra: negrita, listas, enlaces…"
-        }
+        className="w-full resize-y rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm leading-relaxed text-white outline-none placeholder:text-white/40 focus-visible:ring-2 focus-visible:ring-white/30 min-h-[7.5rem]"
+        placeholder="Agrega una descripción del evento"
       />
-      <p className="mt-1.5 text-[11px] text-white/40">
-        Se guarda como HTML. Selecciona texto y usa la barra para envolverlo en
-        etiquetas.
+      <p className="text-[11px] text-white/35">
+        Selecciona texto y usa la barra para darle formato.
       </p>
     </div>
   );

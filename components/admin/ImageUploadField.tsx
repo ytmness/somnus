@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Upload, X, Move, ZoomIn } from "lucide-react";
+import { Pencil, Upload, X, ZoomIn } from "lucide-react";
 import { toast } from "sonner";
 import {
   DEFAULT_IMAGE_FRAMING,
@@ -216,7 +216,7 @@ export function ImageUploadField({
         onClick={() => {
           if (!value && !isUploading) inputRef.current?.click();
         }}
-        className={`relative w-full h-full min-h-0 rounded-2xl border-2 border-dashed transition-colors overflow-hidden ${
+        className={`group relative w-full h-full min-h-0 rounded-2xl border transition-colors overflow-hidden ${
           value ? "cursor-grab active:cursor-grabbing border-white/15" : "cursor-pointer"
         } ${
           isDragging
@@ -253,14 +253,7 @@ export function ImageUploadField({
                 onError={() => {}}
               />
             </div>
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/25" />
-
-            <div className="absolute top-3 left-3 right-14 flex flex-wrap items-center gap-2 pointer-events-none">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-black/65 px-2.5 py-1 text-[10px] uppercase tracking-wider text-white/85">
-                <Move className="w-3 h-3" aria-hidden />
-                Drag to frame
-              </span>
-            </div>
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 
             <button
               type="button"
@@ -268,15 +261,27 @@ export function ImageUploadField({
                 e.stopPropagation();
                 handleClear();
               }}
-              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-black/60 text-white/80 hover:text-white hover:bg-black/80 transition-colors"
-              aria-label="Remove flyer"
-              title="Remove flyer"
+              className="absolute top-3 right-3 z-10 rounded-full bg-black/60 p-2 text-white/80 opacity-0 transition-opacity hover:bg-black/80 hover:text-white group-hover:opacity-100"
+              aria-label="Quitar flyer"
+              title="Quitar flyer"
             >
               <X className="w-4 h-4" aria-hidden />
             </button>
 
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                inputRef.current?.click();
+              }}
+              className="absolute bottom-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-medium text-black shadow-sm"
+            >
+              <Pencil className="h-3.5 w-3.5" aria-hidden />
+              Editar
+            </button>
+
             <div
-              className="absolute bottom-3 left-3 right-3 z-10 flex items-center gap-2 rounded-xl bg-black/70 px-3 py-2 border border-white/10"
+              className="absolute bottom-3 left-3 right-24 z-10 flex items-center gap-2 rounded-xl border border-white/10 bg-black/70 px-3 py-2 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
               onClick={(e) => e.stopPropagation()}
               onPointerDown={(e) => e.stopPropagation()}
             >
@@ -299,13 +304,6 @@ export function ImageUploadField({
                 }
                 className="w-full accent-white h-1.5 cursor-pointer"
               />
-              <button
-                type="button"
-                onClick={() => inputRef.current?.click()}
-                className="shrink-0 text-[10px] uppercase tracking-wider text-white/80 hover:text-white px-2 py-1 rounded-md border border-white/20"
-              >
-                Replace
-              </button>
             </div>
           </>
         ) : (
@@ -321,7 +319,7 @@ export function ImageUploadField({
             ) : (
               <>
                 <Upload className="w-9 h-9 text-white/40" aria-hidden />
-                <p className="text-white/70 text-sm">Add flyer</p>
+                <p className="text-white/70 text-sm">Agrega el flyer</p>
                 <p className="text-white/40 text-xs">
                   JPG, PNG, GIF or WebP · Max {MAX_SIZE_MB} MB
                 </p>

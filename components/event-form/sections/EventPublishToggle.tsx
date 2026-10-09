@@ -1,103 +1,63 @@
 "use client";
 
-import type { EventFormData, EventFormStatus } from "../types";
+import { Lock } from "lucide-react";
+import type { EventFormData } from "../types";
 
 interface EventPublishToggleProps {
   data: EventFormData;
   onChange: (patch: Partial<EventFormData>) => void;
 }
 
+type Visibility = "draft" | "public" | "members" | "hidden";
+
+function visibilityOf(data: EventFormData): Visibility {
+  if (data.status === "DRAFT") return "draft";
+  if (data.membersOnly) return "members";
+  if (!data.isActive) return "hidden";
+  return "public";
+}
+
 export function EventPublishToggle({ data, onChange }: EventPublishToggleProps) {
-  const setStatus = (status: EventFormStatus) => {
-    if (status === "DRAFT") {
-      onChange({ status, isActive: false });
+  const setVisibility = (value: Visibility) => {
+    if (value === "draft") {
+      onChange({ status: "DRAFT", isActive: false });
       return;
     }
-    onChange({ status });
+    if (value === "members") {
+      onChange({ status: "PUBLISHED", isActive: true, membersOnly: true });
+      return;
+    }
+    if (value === "hidden") {
+      onChange({ status: "PUBLISHED", isActive: false, membersOnly: false });
+      return;
+    }
+    onChange({ status: "PUBLISHED", isActive: true, membersOnly: false });
   };
 
   return (
-    <div className="space-y-3" id="section-publish">
-      <div className="rounded-xl border border-white/12 bg-white/[0.02] px-4 py-3.5">
-        <p className="text-sm font-medium text-white mb-1">Publish status</p>
-        <p className="text-xs text-white/45 mb-3">
-          Drafts stay hidden. Published events can appear in Explore when active.
-        </p>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => setStatus("DRAFT")}
-            className={`rounded-lg px-3 py-2.5 text-sm font-medium transition-colors border ${
-              data.status === "DRAFT"
-                ? "border-[#5B8DEF] bg-[#5B8DEF]/15 text-white"
-                : "border-white/12 bg-transparent text-white/60 hover:text-white"
-            }`}
-          >
-            Save as Draft
-          </button>
-          <button
-            type="button"
-            onClick={() => setStatus("PUBLISHED")}
-            className={`rounded-lg px-3 py-2.5 text-sm font-medium transition-colors border ${
-              data.status === "PUBLISHED"
-                ? "border-[#5B8DEF] bg-[#5B8DEF]/15 text-white"
-                : "border-white/12 bg-transparent text-white/60 hover:text-white"
-            }`}
-          >
-            Publish
-          </button>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between gap-4 rounded-xl border border-white/12 bg-white/[0.02] px-4 py-3.5">
-        <div>
-          <p className="text-sm font-medium text-white">Shown in Explore</p>
-          <p className="text-xs text-white/45 mt-0.5">
-            {data.status === "DRAFT"
-              ? "Disabled while the event is a draft."
-              : "Visible on the public events page when active."}
-          </p>
-        </div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={data.isActive && data.status !== "DRAFT"}
-          disabled={data.status === "DRAFT"}
-          onClick={() => {
-            if (data.status === "DRAFT") return;
-            onChange({ isActive: !data.isActive });
-          }}
-          className={`relative shrink-0 w-11 h-6 rounded-full transition-colors disabled:opacity-40 ${
-            data.isActive && data.status !== "DRAFT"
-              ? "bg-[#5B8DEF]"
-              : "bg-white/15"
-          }`}
-        >
-          <span
-            className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
-              data.isActive && data.status !== "DRAFT"
-                ? "translate-x-5"
-                : "translate-x-0"
-            }`}
-            aria-hidden
-          />
-        </button>
-      </div>
-
-      <label className="flex items-center justify-between gap-4 rounded-xl border border-white/12 bg-white/[0.02] px-4 py-3.5 cursor-pointer">
-        <div>
-          <p className="text-sm font-medium text-white">Members only</p>
-          <p className="text-xs text-white/45 mt-0.5">
-            Require an active org membership to see or buy.
-          </p>
-        </div>
-        <input
-          type="checkbox"
-          checked={data.membersOnly}
-          onChange={(e) => onChange({ membersOnly: e.target.checked })}
-          className="h-4 w-4 rounded border-white/30 bg-transparent"
-        />
+    <div
+      id="section-publish"
+      className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3"
+    >
+      <p className="flex min-w-0 items-center gap-2 text-sm text-white">
+        <Lock className="h-4 w-4 shrink-0 text-white/55" aria-hidden />
+        <span className="truncate">¿Quién puede verlo?</span>
+      </p>
+      <label className="sr-only" htmlFor="event-visibility">
+        Quién puede ver el evento
       </label>
+      <select
+        id="event-visibility"
+        value={visibilityOf(data)}
+        onChange={(e) => setVisibility(e.target.value as Visibility)}
+        className="shrink-0 rounded-lg border border-white/15 bg-black/40 px-2.5 py-1.5 text-sm text-white outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+        style={{ colorScheme: "dark" }}
+      >
+        <option value="public">Público</option>
+        <option value="members">Solo miembros</option>
+        <option value="hidden">Oculto</option>
+        <option value="draft">Borrador</option>
+      </select>
     </div>
   );
 }

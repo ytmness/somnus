@@ -128,7 +128,7 @@ export const ADMIN_SECTION_META: Record<
   },
   clientes: {
     title: "Clientes",
-    description: "Compradores, cuentas y boletos emitidos.",
+    description: "Directorio de compradores. Filtra por evento y descarga esa vista en Excel.",
   },
   equipo: {
     title: "Team",

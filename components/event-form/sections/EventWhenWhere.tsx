@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, MapPin, Users, CalendarClock, Coins } from "lucide-react";
+import { Calendar, MapPin, Users, CalendarClock, Coins, Route } from "lucide-react";
 import { ExpandablePill } from "../ExpandablePill";
 import {
   EVENT_FORM_CURRENCIES,
@@ -10,7 +10,7 @@ import {
   type EventFormData,
 } from "../types";
 
-type OpenPill = "when" | "location" | "capacity" | "sales" | "currency" | null;
+type OpenPill = "when" | "location" | "sales" | "currency" | "tour" | null;
 
 interface EventWhenWhereProps {
   data: EventFormData;
@@ -21,7 +21,7 @@ function formatDateTime(date: string, time: string): string {
   if (!date) return "";
   try {
     const d = new Date(`${date}T${time || "00:00"}`);
-    const datePart = d.toLocaleDateString("en-US", {
+    const datePart = d.toLocaleDateString("es-MX", {
       weekday: "short",
       day: "numeric",
       month: "short",
@@ -53,9 +53,9 @@ export function EventWhenWhere({ data, onChange }: EventWhenWhereProps) {
     <div className="space-y-2.5" id="section-when">
       <ExpandablePill
         icon={Calendar}
-        label="Date & time"
+        label="Fecha"
         valueText={whenValue}
-        placeholder="Set date & time"
+        placeholder="Elige fecha y hora"
         hasValue={Boolean(data.eventDate)}
         isOpen={open === "when"}
         onToggle={() => toggle("when")}
@@ -67,7 +67,7 @@ export function EventWhenWhere({ data, onChange }: EventWhenWhereProps) {
                 htmlFor="event-date"
                 className="block text-[11px] uppercase tracking-wider text-white/45 mb-1.5"
               >
-                Start date *
+                Fecha de inicio *
               </label>
               <input
                 id="event-date"
@@ -82,7 +82,7 @@ export function EventWhenWhere({ data, onChange }: EventWhenWhereProps) {
                 htmlFor="event-time"
                 className="block text-[11px] uppercase tracking-wider text-white/45 mb-1.5"
               >
-                Start time *
+                Hora de inicio *
               </label>
               <input
                 id="event-time"
@@ -99,7 +99,7 @@ export function EventWhenWhere({ data, onChange }: EventWhenWhereProps) {
                 htmlFor="event-end-date"
                 className="block text-[11px] uppercase tracking-wider text-white/45 mb-1.5"
               >
-                End date
+                Fecha de fin
               </label>
               <input
                 id="event-end-date"
@@ -114,7 +114,7 @@ export function EventWhenWhere({ data, onChange }: EventWhenWhereProps) {
                 htmlFor="event-end-time"
                 className="block text-[11px] uppercase tracking-wider text-white/45 mb-1.5"
               >
-                End time
+                Hora de fin
               </label>
               <input
                 id="event-end-time"
@@ -130,7 +130,7 @@ export function EventWhenWhere({ data, onChange }: EventWhenWhereProps) {
               htmlFor="event-timezone"
               className="block text-[11px] uppercase tracking-wider text-white/45 mb-1.5"
             >
-              Timezone
+              Zona horaria
             </label>
             <select
               id="event-timezone"
@@ -156,9 +156,9 @@ export function EventWhenWhere({ data, onChange }: EventWhenWhereProps) {
 
       <ExpandablePill
         icon={MapPin}
-        label="Location"
+        label="Lugar"
         valueText={locationValue}
-        placeholder="Set venue & address"
+        placeholder="Lugar"
         hasValue={Boolean(data.venue)}
         isOpen={open === "location"}
         onToggle={() => toggle("location")}
@@ -177,7 +177,7 @@ export function EventWhenWhere({ data, onChange }: EventWhenWhereProps) {
               value={data.venue}
               onChange={(e) => onChange({ venue: e.target.value })}
               className="somnus-input !py-2.5 text-sm"
-              placeholder="Club or venue name"
+              placeholder="Nombre del venue"
             />
           </div>
           <div>
@@ -185,7 +185,7 @@ export function EventWhenWhere({ data, onChange }: EventWhenWhereProps) {
               htmlFor="event-city"
               className="block text-[11px] uppercase tracking-wider text-white/45 mb-1.5"
             >
-              City
+              Ciudad
             </label>
             <input
               id="event-city"
@@ -193,7 +193,7 @@ export function EventWhenWhere({ data, onChange }: EventWhenWhereProps) {
               value={data.city}
               onChange={(e) => onChange({ city: e.target.value })}
               className="somnus-input !py-2.5 text-sm"
-              placeholder="Mexico City"
+              placeholder="Monterrey"
             />
           </div>
           <div className="sm:col-span-2">
@@ -201,7 +201,7 @@ export function EventWhenWhere({ data, onChange }: EventWhenWhereProps) {
               htmlFor="event-address"
               className="block text-[11px] uppercase tracking-wider text-white/45 mb-1.5"
             >
-              Address (optional)
+              Dirección (opcional)
             </label>
             <input
               id="event-address"
@@ -209,156 +209,121 @@ export function EventWhenWhere({ data, onChange }: EventWhenWhereProps) {
               value={data.address}
               onChange={(e) => onChange({ address: e.target.value })}
               className="somnus-input !py-2.5 text-sm"
-              placeholder="Street, neighborhood"
+              placeholder="Calle, colonia"
             />
           </div>
         </div>
       </ExpandablePill>
 
-      {open === "capacity" || open === "sales" || open === "currency" ? (
-        open === "capacity" ? (
-          <ExpandablePill
-            icon={Users}
-            label="Capacity"
-            valueText={
-              data.maxCapacity ? `${data.maxCapacity.toLocaleString()}` : ""
-            }
-            placeholder="Set capacity"
-            hasValue={Boolean(data.maxCapacity)}
-            isOpen
-            onToggle={() => toggle("capacity")}
-          >
-            <div className="pt-2 max-w-xs">
+      <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3.5">
+        <Users className="h-4 w-4 shrink-0 text-white/55" aria-hidden />
+        <span className="sr-only">Cupo</span>
+        <input
+          id="event-capacity"
+          type="number"
+          min={1}
+          value={data.maxCapacity || ""}
+          onChange={(e) =>
+            onChange({ maxCapacity: parseInt(e.target.value, 10) || 0 })
+          }
+          className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/45"
+          placeholder="Cupo"
+        />
+      </label>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <ExpandablePill
+          appearance="chip"
+          icon={CalendarClock}
+          label="Ventas"
+          valueText=""
+          placeholder=""
+          hasValue={Boolean(data.salesStartDate && data.salesEndDate)}
+          isOpen={open === "sales"}
+          onToggle={() => toggle("sales")}
+        >
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label
+                htmlFor="sales-start"
+                className="mb-1.5 block text-[11px] uppercase tracking-wider text-white/45"
+              >
+                Inicio de ventas *
+              </label>
               <input
-                id="event-capacity"
-                type="number"
-                min={1}
-                value={data.maxCapacity || ""}
-                onChange={(e) =>
-                  onChange({ maxCapacity: parseInt(e.target.value, 10) || 0 })
-                }
+                id="sales-start"
+                type="datetime-local"
+                value={data.salesStartDate}
+                onChange={(e) => onChange({ salesStartDate: e.target.value })}
                 className="somnus-input !py-2.5 text-sm"
-                placeholder="500"
               />
             </div>
-          </ExpandablePill>
-        ) : open === "sales" ? (
-          <ExpandablePill
-            icon={CalendarClock}
-            label="Sales window"
-            valueText={data.salesStartDate && data.salesEndDate ? "Set" : ""}
-            placeholder="Set window"
-            hasValue={Boolean(data.salesStartDate && data.salesEndDate)}
-            isOpen
-            onToggle={() => toggle("sales")}
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-              <div>
-                <label
-                  htmlFor="sales-start"
-                  className="block text-[11px] uppercase tracking-wider text-white/45 mb-1.5"
-                >
-                  Sales start *
-                </label>
-                <input
-                  id="sales-start"
-                  type="datetime-local"
-                  value={data.salesStartDate}
-                  onChange={(e) => onChange({ salesStartDate: e.target.value })}
-                  className="somnus-input !py-2.5 text-sm"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="sales-end"
-                  className="block text-[11px] uppercase tracking-wider text-white/45 mb-1.5"
-                >
-                  Sales end *
-                </label>
-                <input
-                  id="sales-end"
-                  type="datetime-local"
-                  value={data.salesEndDate}
-                  onChange={(e) => onChange({ salesEndDate: e.target.value })}
-                  className="somnus-input !py-2.5 text-sm"
-                />
-              </div>
-            </div>
-          </ExpandablePill>
-        ) : (
-          <ExpandablePill
-            icon={Coins}
-            label="Currency"
-            valueText={data.currency}
-            placeholder="MXN"
-            hasValue={Boolean(data.currency)}
-            isOpen
-            onToggle={() => toggle("currency")}
-          >
-            <div className="pt-2 max-w-xs">
-              <select
-                id="event-currency"
-                value={data.currency}
-                onChange={(e) =>
-                  onChange({
-                    currency: e.target.value as EventFormCurrency,
-                  })
-                }
-                className="somnus-input !py-2.5 text-sm"
+            <div>
+              <label
+                htmlFor="sales-end"
+                className="mb-1.5 block text-[11px] uppercase tracking-wider text-white/45"
               >
-                {EVENT_FORM_CURRENCIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+                Fin de ventas *
+              </label>
+              <input
+                id="sales-end"
+                type="datetime-local"
+                value={data.salesEndDate}
+                onChange={(e) => onChange({ salesEndDate: e.target.value })}
+                className="somnus-input !py-2.5 text-sm"
+              />
             </div>
-          </ExpandablePill>
-        )
-      ) : (
-        <div className="grid grid-cols-3 gap-2.5">
-          <ExpandablePill
-            icon={Users}
-            label="Capacity"
-            valueText={
-              data.maxCapacity ? `${data.maxCapacity.toLocaleString()}` : ""
+          </div>
+        </ExpandablePill>
+
+        <ExpandablePill
+          appearance="chip"
+          icon={Coins}
+          label="Moneda"
+          valueText={data.currency}
+          placeholder=""
+          hasValue={Boolean(data.currency)}
+          isOpen={open === "currency"}
+          onToggle={() => toggle("currency")}
+        >
+          <select
+            id="event-currency"
+            value={data.currency}
+            onChange={(e) =>
+              onChange({ currency: e.target.value as EventFormCurrency })
             }
-            placeholder="Set capacity"
-            hasValue={Boolean(data.maxCapacity)}
-            isOpen={false}
-            onToggle={() => toggle("capacity")}
-            size="sm"
+            className="somnus-input !py-2.5 text-sm"
+            style={{ colorScheme: "dark" }}
           >
-            {null}
-          </ExpandablePill>
+            {EVENT_FORM_CURRENCIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </ExpandablePill>
 
-          <ExpandablePill
-            icon={CalendarClock}
-            label="Sales window"
-            valueText={data.salesStartDate && data.salesEndDate ? "Set" : ""}
-            placeholder="Set window"
-            hasValue={Boolean(data.salesStartDate && data.salesEndDate)}
-            isOpen={false}
-            onToggle={() => toggle("sales")}
-            size="sm"
-          >
-            {null}
-          </ExpandablePill>
-
-          <ExpandablePill
-            icon={Coins}
-            label="Currency"
-            valueText={data.currency}
-            placeholder="MXN"
-            hasValue={Boolean(data.currency)}
-            isOpen={false}
-            onToggle={() => toggle("currency")}
-            size="sm"
-          >
-            {null}
-          </ExpandablePill>
-        </div>
-      )}
+        <ExpandablePill
+          appearance="chip"
+          icon={Route}
+          label="Tour"
+          valueText={data.tour}
+          placeholder=""
+          hasValue={Boolean(data.tour.trim())}
+          isOpen={open === "tour"}
+          onToggle={() => toggle("tour")}
+        >
+          <input
+            id="event-tour"
+            type="text"
+            value={data.tour}
+            onChange={(e) => onChange({ tour: e.target.value })}
+            className="somnus-input !py-2.5 text-sm"
+            placeholder="Nombre del tour"
+            autoComplete="off"
+          />
+        </ExpandablePill>
+      </div>
     </div>
   );
 }

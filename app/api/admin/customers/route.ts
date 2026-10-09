@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
           createdAt: true,
         },
         orderBy: { createdAt: "desc" },
-        take: 500,
+        take: 2000,
       }),
       prisma.sale.findMany({
         where: q
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
           },
         },
         orderBy: { createdAt: "desc" },
-        take: 1000,
+        take: 5000,
       }),
     ]);
 
@@ -139,6 +139,7 @@ export async function GET(request: NextRequest) {
         id: s.id,
         status: s.status,
         total: Number(s.total),
+        eventId: s.event.id,
         eventName: s.event.name,
         paymentMethod: s.paymentMethod,
         paidAt: s.paidAt,
@@ -166,6 +167,7 @@ export async function GET(request: NextRequest) {
         sales: sales.length,
         tickets: sales.reduce((n, s) => n + s.tickets.length, 0),
       },
+      truncated: users.length >= 2000 || sales.length >= 5000,
     });
   } catch (error) {
     console.error("GET admin/customers error:", error);

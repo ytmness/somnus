@@ -118,9 +118,7 @@ export function EventTicketsSection({
   return (
     <div className="space-y-3" id="section-tickets">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-[11px] uppercase tracking-wider text-white/45">
-          Ticket tiers
-        </p>
+        <p className="text-sm font-medium text-white">Entradas</p>
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
