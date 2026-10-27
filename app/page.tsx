@@ -28,6 +28,7 @@ import { effectiveTicketPriceAt } from "@/lib/ticket-pricing";
 import { isSalesOpen } from "@/lib/ticket-sales-window";
 import { ProductTour } from "@/components/onboarding/ProductTour";
 import { useClientTour } from "@/components/onboarding/useClientTour";
+import { sanitizeRedirectPath } from "@/lib/auth/redirect-path";
 import { CLIENT_TOUR } from "@/components/onboarding/tours";
 import { SOMNUS_PLACEHOLDER_IMAGE_PATH } from "@/lib/brand";
 
@@ -185,6 +186,21 @@ export default function HomePage() {
   const [pastConcerts, setPastConcerts] = useState<Concert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showLoader, setShowLoader] = useState(false);
+
+  // Respaldo: si el login OAuth perdió el callbackUrl y caímos en la home,
+  // regresar a la página pendiente (p. ej. pagar mesa).
+  useEffect(() => {
+    let pending: string | null = null;
+    try {
+      pending = sessionStorage.getItem("somnus-post-login-redirect");
+      if (pending) sessionStorage.removeItem("somnus-post-login-redirect");
+    } catch {
+      return;
+    }
+    if (!pending) return;
+    const safe = sanitizeRedirectPath(pending);
+    if (safe && safe !== "/") window.location.replace(safe);
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

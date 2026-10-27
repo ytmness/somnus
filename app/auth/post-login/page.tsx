@@ -9,7 +9,7 @@ import { useNativeAuthSurface } from "@/lib/native/use-auth-surface";
 function PostLoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const requestedRedirect = searchParams.get("redirect");
+  const queryRedirect = searchParams.get("redirect");
   const fromApp = useNativeAuthSurface(searchParams);
   const [message, setMessage] = useState("Completando inicio de sesión...");
 
@@ -17,6 +17,14 @@ function PostLoginContent() {
     let cancelled = false;
 
     async function finishLogin() {
+      let requestedRedirect = queryRedirect;
+      if (!requestedRedirect) {
+        try {
+          requestedRedirect = sessionStorage.getItem("somnus-post-login-redirect");
+        } catch {
+          // ignore
+        }
+      }
       try {
         const response = await fetch("/api/auth/session", {
           credentials: "include",
@@ -41,6 +49,11 @@ function PostLoginContent() {
         );
 
         if (!cancelled) {
+          try {
+            sessionStorage.removeItem("somnus-post-login-redirect");
+          } catch {
+            // ignore
+          }
           window.location.href = redirectPath;
         }
       } catch {
@@ -55,7 +68,7 @@ function PostLoginContent() {
     return () => {
       cancelled = true;
     };
-  }, [requestedRedirect, fromApp, router]);
+  }, [queryRedirect, fromApp, router]);
 
   return (
     <div className="min-h-screen somnus-bg-main flex items-center justify-center p-4">

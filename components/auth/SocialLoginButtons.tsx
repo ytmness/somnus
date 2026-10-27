@@ -92,6 +92,13 @@ export function SocialLoginButtons({
     setLoadingProvider(provider);
     try {
       const safeRedirect = sanitizeRedirectPath(redirectTo ?? null);
+      if (safeRedirect) {
+        try {
+          sessionStorage.setItem("somnus-post-login-redirect", safeRedirect);
+        } catch {
+          // ignore
+        }
+      }
       const params = new URLSearchParams();
       if (safeRedirect) params.set("redirect", safeRedirect);
       if (fromApp || isNativePlatform()) params.set("app", "1");

@@ -155,6 +155,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth(async () => {
     session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 30 },
     secret: process.env.AUTH_SECRET || process.env.JWT_SECRET,
     trustHost: true,
+    // Apple regresa con un POST cross-site (response_mode=form_post): con SameSite=Lax
+    // el navegador no manda esta cookie y se perdía el redirect (caía en la home).
+    cookies: {
+      callbackUrl: {
+        name: "__Secure-authjs.callback-url",
+        options: { httpOnly: true, sameSite: "none", path: "/", secure: true },
+      },
+    },
     pages: {
       signIn: "/login",
       error: "/login",
