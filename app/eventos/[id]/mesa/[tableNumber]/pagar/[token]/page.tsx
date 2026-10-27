@@ -128,7 +128,7 @@ export default function PagarInvitePage() {
   const [payMode, setPayMode] = useState<"share" | "full">("share");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const inviteReturnPath = `/eventos/${params.eventId}/mesa/${params.tableNumber}/pagar/${token}`;
+  const inviteReturnPath = `/eventos/${params.id}/mesa/${params.tableNumber}/pagar/${token}`;
 
   useEffect(() => {
     fetch("/api/auth/session", { credentials: "include" })
