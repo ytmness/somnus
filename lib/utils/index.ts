@@ -143,6 +143,8 @@ const STRIPE_PCT = 0.036;
 const STRIPE_FIXED_MXN = 3;
 const IVA_RATE = 0.16;
 const PLATFORM_BUFFER_MXN = 1;
+/** Cargo de plataforma Somnus que paga el comprador: 4% del subtotal. */
+export const BUYER_PLATFORM_FEE_PCT = 0.04;
 
 /**
  * Calcula el cargo de servicio que absorbe Stripe + colchón de plataforma.
@@ -157,7 +159,10 @@ export function calculateServiceFee(subtotal: number): {
   const stripeFactor = STRIPE_PCT * (1 + IVA_RATE);
   const denom = 1 - stripeFactor;
   const numerator =
-    stripeFactor * s + STRIPE_FIXED_MXN * (1 + IVA_RATE) + PLATFORM_BUFFER_MXN;
+    stripeFactor * s +
+    STRIPE_FIXED_MXN * (1 + IVA_RATE) +
+    PLATFORM_BUFFER_MXN +
+    BUYER_PLATFORM_FEE_PCT * s;
   const totalCommission = Math.round((numerator / denom) * 100) / 100;
 
   const totalForStripe = s + totalCommission;
