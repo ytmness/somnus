@@ -26,7 +26,7 @@ interface ScanResponse {
   };
 }
 
-export function QRScanner({ eventId }: { eventId?: string }) {
+export function QRScanner({ eventId, eventName }: { eventId?: string; eventName?: string }) {
   const [isScanning, setIsScanning] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -35,7 +35,12 @@ export function QRScanner({ eventId }: { eventId?: string }) {
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const lastScanTimeRef = useRef<number>(0);
   const isProcessingRef = useRef(false);
+  const eventIdRef = useRef<string | undefined>(eventId);
   const qrCodeRegionId = "qr-reader";
+
+  useEffect(() => {
+    eventIdRef.current = eventId;
+  }, [eventId]);
 
   useEffect(() => {
     startScanner();
@@ -136,7 +141,7 @@ export function QRScanner({ eventId }: { eventId?: string }) {
       const response = await fetch("/api/tickets/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ qrData: decodedText, eventId }),
+        body: JSON.stringify({ qrData: decodedText, eventId: eventIdRef.current }),
       });
 
       const data: ScanResponse = await response.json();
@@ -205,6 +210,11 @@ export function QRScanner({ eventId }: { eventId?: string }) {
               Escáner QR
             </h2>
             <p className="text-xs text-white/50 truncate">{statusLabel}</p>
+            {eventName && (
+              <p className="text-xs text-[#7BA3E8] truncate mt-0.5">
+                {eventName}
+              </p>
+            )}
           </div>
           {isScanning ? (
             <Camera className="h-5 w-5 text-emerald-400 shrink-0 animate-pulse" aria-hidden />
