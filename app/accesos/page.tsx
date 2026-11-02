@@ -138,7 +138,10 @@ export default function AccesosPage() {
 
           <ScanStats />
 
-          <QRScanner eventId={selectedEventId || undefined} />
+          <QRScanner 
+            eventId={selectedEventId || undefined} 
+            eventName={events.find(e => e.id === selectedEventId)?.name}
+          />
 
           <div className="liquid-glass p-5 sm:p-6">
             <h3 className="text-[11px] uppercase tracking-wider text-white/45 mb-3">
