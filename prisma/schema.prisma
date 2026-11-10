@@ -707,6 +707,7 @@ model Sale {
   promoterLink      PromoterLink?    @relation(fields: [promoterLinkId], references: [id], onDelete: SetNull)
   campaignBlast     CampaignBlast?   @relation(fields: [campaignBlastId], references: [id], onDelete: SetNull)
   paymentLink       PaymentLink?     @relation(fields: [paymentLinkId], references: [id], onDelete: SetNull)
+  guestListEntry    GuestListEntry?
 
   @@index([eventId])
   @@index([status])
@@ -1159,10 +1160,13 @@ model GuestListEntry {
   status       GuestListStatus @default(PENDING)
   createdById  String?
   redeemedAt   DateTime?
+  /// Sale COMPLETED creada al canjear la cortesía (boletos gratis)
+  saleId       String?         @unique
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  sale  Sale? @relation(fields: [saleId], references: [id], onDelete: SetNull)
 
   @@index([eventId])
   @@index([email])

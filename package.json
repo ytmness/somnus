@@ -14,6 +14,7 @@
     "db:delete-somnus-panorama": "tsx scripts/delete-somnus-panorama-events.ts",
     "compress-gallery": "tsx scripts/compress-gallery.ts",
     "test:auth": "tsx scripts/test-auth-logic.ts",
+    "test:guestlist": "tsx scripts/test-guestlist-logic.ts",
     "verify": "tsx scripts/verify-coordinator.ts",
     "db:migrate-storage": "tsx scripts/migrate-storage-to-local.ts",
     "verify:env": "tsx scripts/verificar-env.ts",

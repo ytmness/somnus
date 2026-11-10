@@ -331,7 +331,10 @@ export default function MisBoletosPage() {
                         </div>
                       </div>
 
-                      {(ticket.event.showQR !== false) && ticket.qrCode && ticket.qrCode !== "TEMP" && (
+                      {ticket.status !== "CANCELLED" &&
+                        ticket.event.showQR !== false &&
+                        ticket.qrCode &&
+                        ticket.qrCode !== "TEMP" && (
                         <div className="mt-6 pt-6 border-t border-white/10">
                           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                             <div className="flex-1">

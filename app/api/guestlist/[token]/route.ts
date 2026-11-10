@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { prisma } from "@/lib/db/prisma";
+import { getSession } from "@/lib/auth/session";
 import { generateQRHash } from "@/lib/services/qr-generator";
+import { emailsMatch, guestListErrorMessage } from "@/lib/guestlist";
 
 export const dynamic = "force-dynamic";
 
@@ -15,9 +17,23 @@ async function resolveToken(
   return resolved.token;
 }
 
+async function ticketsForSale(saleId: string) {
+  const tickets = await prisma.ticket.findMany({
+    where: { saleId },
+    select: {
+      id: true,
+      ticketNumber: true,
+      qrCode: true,
+      status: true,
+    },
+    orderBy: { createdAt: "asc" },
+  });
+  return tickets;
+}
+
 /**
  * GET /api/guestlist/[token]
- * Datos públicos de una cortesía
+ * Datos de una cortesía. Si hay sesión, indica si ya la canjeó el usuario.
  */
 export async function GET(
   _request: NextRequest,
@@ -44,26 +60,76 @@ export async function GET(
             imageUrl: true,
           },
         },
+        sale: {
+          select: {
+            id: true,
+            buyerEmail: true,
+            status: true,
+          },
+        },
       },
     });
 
     if (!entry) {
-      return NextResponse.json({ error: "Invitación no encontrada" }, { status: 404 });
+      return NextResponse.json(
+        { error: guestListErrorMessage(null, { notFound: true }) },
+        { status: 404 }
+      );
     }
+
+    const user = await getSession();
+    const isCancelled = entry.status === "CANCELLED";
+    const claimed = !isCancelled && (entry.status === "USED" || !!entry.redeemedAt);
+    const claimedByCurrentUser =
+      !!user &&
+      claimed &&
+      !!entry.sale &&
+      emailsMatch(entry.sale.buyerEmail, user.email);
+
+    let tickets: Array<{
+      id: string;
+      ticketNumber: string;
+      qrCode: string;
+      status: string;
+    }> = [];
+
+    if (claimedByCurrentUser && entry.saleId) {
+      tickets = await ticketsForSale(entry.saleId);
+    }
+
+    const canAccept =
+      !!user &&
+      !isCancelled &&
+      (entry.status === "PENDING" || entry.status === "CONFIRMED") &&
+      !entry.redeemedAt;
+
+    let error: string | null = null;
+    if (isCancelled) {
+      error = guestListErrorMessage("CANCELLED");
+    } else if (claimed && user && !claimedByCurrentUser) {
+      error = guestListErrorMessage("USED", { claimedByOther: true });
+    } else if (claimed && user && claimedByCurrentUser) {
+      error = null;
+    }
+
+    // Cancelada: no hace falta login. Resto: sí, para aceptar o ver si ya es suya.
+    const requiresAuth = !user && !isCancelled;
 
     return NextResponse.json({
       success: true,
       data: {
         id: entry.id,
         name: entry.name,
-        email: entry.email,
-        phone: entry.phone,
         quantity: entry.quantity,
         note: entry.note,
         status: entry.status,
         redeemedAt: entry.redeemedAt,
         event: entry.event,
-        canRedeem: entry.status === "PENDING" || entry.status === "CONFIRMED",
+        requiresAuth,
+        canAccept,
+        claimedByCurrentUser,
+        tickets,
+        error,
       },
     });
   } catch (error) {
@@ -77,11 +143,10 @@ export async function GET(
 
 /**
  * POST /api/guestlist/[token]
- * Redeem: crea Sale COMPLETED gratis + Tickets con QR, o solo CONFIRMED
- * Body: { mode?: "tickets" | "confirm", buyerName?, buyerEmail?, buyerPhone? }
+ * Aceptar cortesía: requiere sesión. Emite Sale COMPLETED $0 + Tickets (sin cargo Stripe/4%).
  */
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ token: string }> | { token: string } }
 ) {
   try {
@@ -90,52 +155,59 @@ export async function POST(
       return NextResponse.json({ error: "Token requerido" }, { status: 400 });
     }
 
+    const user = await getSession();
+    if (!user) {
+      return NextResponse.json(
+        { error: "Inicia sesión o regístrate para aceptar tu cortesía" },
+        { status: 401 }
+      );
+    }
+
     const entry = await prisma.guestListEntry.findUnique({
       where: { inviteToken: token },
       include: {
         event: { select: { id: true, name: true } },
+        sale: { select: { id: true, buyerEmail: true } },
       },
     });
 
     if (!entry) {
-      return NextResponse.json({ error: "Invitación no encontrada" }, { status: 404 });
+      return NextResponse.json(
+        { error: guestListErrorMessage(null, { notFound: true }) },
+        { status: 404 }
+      );
     }
 
     if (entry.status === "CANCELLED") {
       return NextResponse.json(
-        { error: "Esta cortesía fue cancelada" },
+        { error: guestListErrorMessage("CANCELLED") },
         { status: 400 }
       );
     }
 
+    // Ya canjeada: si es del usuario, devolver boletos; si no, error claro
     if (entry.status === "USED" || entry.redeemedAt) {
+      if (entry.sale && emailsMatch(entry.sale.buyerEmail, user.email)) {
+        const tickets = entry.saleId ? await ticketsForSale(entry.saleId) : [];
+        return NextResponse.json({
+          success: true,
+          message: "Ya tienes tu boleto",
+          data: {
+            saleId: entry.saleId,
+            entry: {
+              id: entry.id,
+              status: entry.status,
+              redeemedAt: entry.redeemedAt,
+            },
+            tickets,
+            alreadyClaimed: true,
+          },
+        });
+      }
       return NextResponse.json(
-        { error: "Esta cortesía ya fue canjeada" },
+        { error: guestListErrorMessage("USED", { claimedByOther: true }) },
         { status: 400 }
       );
-    }
-
-    const body = await request.json().catch(() => ({}));
-    const mode = body?.mode === "confirm" ? "confirm" : "tickets";
-    const buyerName =
-      String(body?.buyerName || "").trim() || entry.name;
-    const buyerEmail =
-      String(body?.buyerEmail || "").trim().toLowerCase() ||
-      entry.email ||
-      `guestlist+${entry.id.slice(0, 8)}@somnus.local`;
-    const buyerPhone =
-      String(body?.buyerPhone || "").trim() || entry.phone || null;
-
-    if (mode === "confirm") {
-      const updated = await prisma.guestListEntry.update({
-        where: { id: entry.id },
-        data: { status: "CONFIRMED" },
-      });
-      return NextResponse.json({
-        success: true,
-        message: "Cortesía confirmada",
-        data: { entry: updated, tickets: [] },
-      });
     }
 
     const ticketType = await prisma.ticketType.findFirst({
@@ -152,7 +224,7 @@ export async function POST(
       return NextResponse.json(
         {
           error:
-            "No hay tipo de boleto STANDARD para emitir cortesías. Confirma sin tickets o crea uno.",
+            "No hay boleto disponible para esta cortesía. Contacta al organizador.",
         },
         { status: 400 }
       );
@@ -161,11 +233,27 @@ export async function POST(
     const qty = Math.max(1, entry.quantity);
     const eventPrefix = (entry.event.name || "EVT").substring(0, 3).toUpperCase();
     const typePrefix = (ticketType.name || "GL").substring(0, 3).toUpperCase();
+    const buyerName = user.name?.trim() || entry.name;
+    const buyerEmail = user.email.trim().toLowerCase();
+    const buyerPhone = entry.phone || null;
 
     const result = await prisma.$transaction(async (tx) => {
+      // Releer con lock lógico: evitar doble canje concurrente
+      const fresh = await tx.guestListEntry.findUnique({
+        where: { id: entry.id },
+        select: { status: true, redeemedAt: true, saleId: true },
+      });
+      if (!fresh || fresh.status === "CANCELLED") {
+        throw new Error("CANCELLED");
+      }
+      if (fresh.status === "USED" || fresh.redeemedAt) {
+        throw new Error("ALREADY_USED");
+      }
+
       const sale = await tx.sale.create({
         data: {
           eventId: entry.eventId,
+          userId: user.id,
           channel: "ONLINE",
           status: "COMPLETED",
           subtotal: 0,
@@ -177,6 +265,8 @@ export async function POST(
           paymentMethod: "guestlist",
           paidAt: new Date(),
           currency: "MXN",
+          platformFeeAmount: 0,
+          organizerNetAmount: 0,
         },
       });
 
@@ -221,6 +311,9 @@ export async function POST(
         data: {
           status: "USED",
           redeemedAt: new Date(),
+          saleId: sale.id,
+          email: buyerEmail,
+          name: buyerName,
         },
       });
 
@@ -229,7 +322,7 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      message: "Cortesía canjeada",
+      message: "¡Listo! Ya tienes tu boleto",
       data: {
         saleId: result.sale.id,
         entry: result.entry,
@@ -237,13 +330,28 @@ export async function POST(
           id: t.id,
           ticketNumber: t.ticketNumber,
           qrCode: t.qrCode,
+          status: t.status,
         })),
+        alreadyClaimed: false,
       },
     });
   } catch (error) {
+    const msg = error instanceof Error ? error.message : "";
+    if (msg === "CANCELLED") {
+      return NextResponse.json(
+        { error: guestListErrorMessage("CANCELLED") },
+        { status: 400 }
+      );
+    }
+    if (msg === "ALREADY_USED") {
+      return NextResponse.json(
+        { error: guestListErrorMessage("USED") },
+        { status: 400 }
+      );
+    }
     console.error("[guestlist token POST]", error);
     return NextResponse.json(
-      { error: "Error al canjear cortesía" },
+      { error: "Error al aceptar cortesía" },
       { status: 500 }
     );
   }
