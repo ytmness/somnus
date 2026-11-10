@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Copy, Check, Plus, Users } from "lucide-react";
+import { Copy, Check, Plus, Users, Ban } from "lucide-react";
 import { toast } from "sonner";
 
 interface EventOption {
@@ -18,11 +18,19 @@ interface GuestRow {
   quantity: number;
   note: string | null;
   status: string;
+  statusLabel?: string;
   inviteToken: string;
   redeemUrl: string;
   redeemedAt: string | null;
   createdAt: string;
 }
+
+const STATUS_LABELS: Record<string, string> = {
+  PENDING: "Pendiente",
+  CONFIRMED: "Confirmada",
+  USED: "Canjeada",
+  CANCELLED: "Cancelada",
+};
 
 export function GuestListManager() {
   const [events, setEvents] = useState<EventOption[]>([]);
@@ -30,6 +38,7 @@ export function GuestListManager() {
   const [entries, setEntries] = useState<GuestRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -132,6 +141,34 @@ export function GuestListManager() {
     }
   };
 
+  const handleCancel = async (row: GuestRow) => {
+    if (!selectedEventId || row.status === "CANCELLED") return;
+    const ok = window.confirm(
+      row.status === "USED"
+        ? `¿Cancelar la cortesía de ${row.name}? Sus boletos dejarán de ser válidos en acceso.`
+        : `¿Cancelar la cortesía de ${row.name}? El link dejará de funcionar.`
+    );
+    if (!ok) return;
+
+    setCancellingId(row.id);
+    try {
+      const res = await fetch(`/api/events/${selectedEventId}/guestlist`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entryId: row.id, action: "cancel" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error al cancelar");
+      toast.success(data.message || "Cortesía cancelada");
+      void loadEntries(selectedEventId);
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Error al cancelar");
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
   if (loading) {
     return <p className="text-white/60 text-sm">Cargando…</p>;
   }
@@ -205,32 +242,61 @@ export function GuestListManager() {
             Sin cortesías en este evento
           </p>
         ) : (
-          entries.map((row) => (
-            <div
-              key={row.id}
-              className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border border-white/10"
-            >
-              <div className="min-w-0">
-                <p className="text-white font-medium truncate">{row.name}</p>
-                <p className="text-white/50 text-xs">
-                  ×{row.quantity} · {row.status}
-                  {row.email ? ` · ${row.email}` : ""}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => void copyUrl(row)}
-                className="inline-flex items-center gap-1.5 text-xs text-white/70 hover:text-white border border-white/15 rounded-lg px-2.5 py-1.5"
+          entries.map((row) => {
+            const label =
+              row.statusLabel || STATUS_LABELS[row.status] || row.status;
+            const isCancelled = row.status === "CANCELLED";
+            return (
+              <div
+                key={row.id}
+                className={`flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border ${
+                  isCancelled
+                    ? "border-white/5 opacity-60"
+                    : "border-white/10"
+                }`}
               >
-                {copiedId === row.id ? (
-                  <Check className="w-3.5 h-3.5" aria-hidden />
-                ) : (
-                  <Copy className="w-3.5 h-3.5" aria-hidden />
-                )}
-                Link
-              </button>
-            </div>
-          ))
+                <div className="min-w-0">
+                  <p className="text-white font-medium truncate">{row.name}</p>
+                  <p className="text-white/50 text-xs">
+                    ×{row.quantity} · {label}
+                    {row.email ? ` · ${row.email}` : ""}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {!isCancelled && (
+                    <button
+                      type="button"
+                      onClick={() => void copyUrl(row)}
+                      className="inline-flex items-center gap-1.5 text-xs text-white/70 hover:text-white border border-white/15 rounded-lg px-2.5 py-1.5"
+                    >
+                      {copiedId === row.id ? (
+                        <Check className="w-3.5 h-3.5" aria-hidden />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" aria-hidden />
+                      )}
+                      Link
+                    </button>
+                  )}
+                  {!isCancelled && (
+                    <button
+                      type="button"
+                      onClick={() => void handleCancel(row)}
+                      disabled={cancellingId === row.id}
+                      className="inline-flex items-center gap-1.5 text-xs text-red-300/90 hover:text-red-200 border border-red-400/30 rounded-lg px-2.5 py-1.5 disabled:opacity-50"
+                    >
+                      <Ban className="w-3.5 h-3.5" aria-hidden />
+                      {cancellingId === row.id ? "…" : "Cancelar"}
+                    </button>
+                  )}
+                  {isCancelled && (
+                    <span className="text-xs text-white/40 uppercase tracking-wide">
+                      Cancelada
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })
         )}
       </div>
     </div>

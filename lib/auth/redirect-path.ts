@@ -29,6 +29,7 @@ const ALLOWED_REDIRECT_PREFIXES = [
   "/pago",
   "/pago-exitoso",
   "/invitacion",
+  "/guestlist",
   "/mesa",
   "/register",
   "/login",

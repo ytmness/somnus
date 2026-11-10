@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { getSession } from "@/lib/auth/session";
 import { userOwnsEvent } from "@/lib/auth/event-access";
+import { cancelGuestListEntry, GUESTLIST_STATUS_LABELS } from "@/lib/guestlist";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,8 @@ export async function GET(
       success: true,
       data: entries.map((e) => ({
         ...e,
+        statusLabel:
+          GUESTLIST_STATUS_LABELS[e.status] ?? e.status,
         redeemUrl: `${baseUrl}/guestlist/${e.inviteToken}`,
       })),
     });
@@ -116,6 +119,8 @@ export async function POST(
         success: true,
         data: {
           ...entry,
+          statusLabel:
+            GUESTLIST_STATUS_LABELS[entry.status] ?? entry.status,
           redeemUrl: `${baseUrl}/guestlist/${entry.inviteToken}`,
         },
       },
@@ -125,6 +130,81 @@ export async function POST(
     console.error("[guestlist POST]", error);
     return NextResponse.json(
       { error: "Error al crear entrada" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * PATCH /api/events/[id]/guestlist
+ * Cancelar una cortesía (y sus boletos si ya se emitieron).
+ * Body: { entryId: string, action: "cancel" }
+ */
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> | { id: string } }
+) {
+  try {
+    const eventId = await resolveId(params);
+    const user = await getSession();
+    if (!user) {
+      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    }
+
+    const owns = await userOwnsEvent(user, eventId);
+    if (!owns) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    }
+
+    const body = await request.json().catch(() => ({}));
+    const entryId = String(body?.entryId || "").trim();
+    const action = String(body?.action || "").trim();
+
+    if (!entryId) {
+      return NextResponse.json({ error: "entryId requerido" }, { status: 400 });
+    }
+    if (action !== "cancel") {
+      return NextResponse.json(
+        { error: "Acción no soportada" },
+        { status: 400 }
+      );
+    }
+
+    const existing = await prisma.guestListEntry.findFirst({
+      where: { id: entryId, eventId },
+      select: { id: true, status: true },
+    });
+    if (!existing) {
+      return NextResponse.json(
+        { error: "Entrada no encontrada" },
+        { status: 404 }
+      );
+    }
+
+    const updated = await cancelGuestListEntry(entryId);
+    if (!updated) {
+      return NextResponse.json(
+        { error: "Entrada no encontrada" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message:
+        existing.status === "CANCELLED"
+          ? "La cortesía ya estaba cancelada"
+          : "Cortesía cancelada",
+      data: {
+        ...updated,
+        statusLabel:
+          GUESTLIST_STATUS_LABELS[updated.status] ?? updated.status,
+      },
+    });
+  } catch (error) {
+    console.error("[guestlist PATCH]", error);
+    return NextResponse.json(
+      { error: "Error al cancelar cortesía" },
       { status: 500 }
     );
   }
